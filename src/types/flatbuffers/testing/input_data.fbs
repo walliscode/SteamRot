@@ -5,7 +5,7 @@ namespace steamrot;
 ////////////////////////////////////////////////////////////
 /// @brief Types of input events that can be simulated
 ////////////////////////////////////////////////////////////
-enum InputType : byte {
+enum InputTypeFbs : byte {
   MouseMove,
   MouseClick,
   MouseRelease,
@@ -16,7 +16,7 @@ enum InputType : byte {
 ////////////////////////////////////////////////////////////
 /// @brief Mouse input data for simulation
 ////////////////////////////////////////////////////////////
-table MouseInputData {
+table MouseInputDataFbs {
   position: Vector2fData;
   button: uint8;  // SFML mouse button enum
 }
@@ -24,7 +24,7 @@ table MouseInputData {
 ////////////////////////////////////////////////////////////
 /// @brief Keyboard input data for simulation
 ////////////////////////////////////////////////////////////
-table KeyboardInputData {
+table KeyboardInputDataFbs {
   key_code: uint32;  // SFML key code
   alt: bool = false;
   control: bool = false;
@@ -34,9 +34,9 @@ table KeyboardInputData {
 ////////////////////////////////////////////////////////////
 /// @brief Union of possible input data types
 ////////////////////////////////////////////////////////////
-union InputEventData {
-  MouseInputData,
-  KeyboardInputData
+union InputEventDataFbs {
+  MouseInputDataFbs,
+  KeyboardInputDataFbs
 }
 
 ////////////////////////////////////////////////////////////
@@ -45,17 +45,13 @@ union InputEventData {
 /// Each input event represents a discrete input action that can be
 /// injected into the test fixture at a specific tick/timestamp.
 ////////////////////////////////////////////////////////////
-table InputEvent {
+table InputEventFbs {
   /// @brief Type of input event
-  input_type: InputType;
-  
+  input_type: InputTypeFbs;
+
   /// @brief Input-specific data
-  input_data: InputEventData;
-  
-  /// @brief Relative tick number for sequencing (0-based)
-  /// Events with the same tick are processed together
-  tick: uint32 = 0;
-  
+  input_data: InputEventDataFbs;
+
   /// @brief Optional description for debugging
   description: string;
 }
@@ -65,11 +61,11 @@ table InputEvent {
 ///
 /// Represents a complete sequence of inputs at a given tick
 ////////////////////////////////////////////////////////////
-table InputSequence {
+table InputSequenceFbs {
   /// @brief Ordered list of input events
-  inputs: [InputEvent];
-  
-  /// @brief tick at which to insert the inputs
+  inputs: [InputEventFbs];
+
+  /// @brief Tick at which to insert the inputs
   tick: uint32;
 }
 

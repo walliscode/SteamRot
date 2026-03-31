@@ -3,6 +3,7 @@ add_executable(test_harness
   harness_runner.test.cpp
   SimulationRunner.test.cpp
   add_uuids.test.cpp
+  input_simulation.test.cpp
 )
 
 target_link_libraries(test_harness

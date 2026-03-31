@@ -60,6 +60,21 @@ table TickSnapshotPairFbs {
 }
 
 ////////////////////////////////////////////////////////////
+/// @brief Represents a single tick-to-input-events mapping
+///
+/// FlatBuffers doesn't support maps directly, so we represent
+/// the C++ std::unordered_map<size_t, std::vector<sf::Event>> as a
+/// vector of these pairs.
+////////////////////////////////////////////////////////////
+table TickInputsPairFbs {
+  /// @brief Tick number (key in the map)
+  tick: uint64 (key);
+
+  /// @brief All input events to be injected at this tick
+  inputs: [InputEventFbs];
+}
+
+////////////////////////////////////////////////////////////
 /// @brief Root table for test data configuration
 ///
 /// This is the main container for test data. It's designed
@@ -87,6 +102,12 @@ table TestDataFbs
   /// Maps tick numbers to expected engine states for validation.
   /// In C++, this becomes std::map<size_t, EngineSnapshot>.
   expected_engine_snapshots: [TickSnapshotPairFbs];
+
+  /// @brief Input events to inject per tick
+  ///
+  /// Maps tick numbers to the input events to simulate at that tick.
+  /// In C++, this becomes std::unordered_map<size_t, std::vector<sf::Event>>.
+  input_events: [TickInputsPairFbs];
 
   /// @brief If set, the TestEngine loads this scene from default data instead
   /// of using starting_engine_snapshot. UNKNOWN (0) means use

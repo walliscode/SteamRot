@@ -17,43 +17,43 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct MouseInputData;
-struct MouseInputDataBuilder;
+struct MouseInputDataFbs;
+struct MouseInputDataFbsBuilder;
 
-struct KeyboardInputData;
-struct KeyboardInputDataBuilder;
+struct KeyboardInputDataFbs;
+struct KeyboardInputDataFbsBuilder;
 
-struct InputEvent;
-struct InputEventBuilder;
+struct InputEventFbs;
+struct InputEventFbsBuilder;
 
-struct InputSequence;
-struct InputSequenceBuilder;
+struct InputSequenceFbs;
+struct InputSequenceFbsBuilder;
 
 ////////////////////////////////////////////////////////////
 /// @brief Types of input events that can be simulated
 ////////////////////////////////////////////////////////////
-enum InputType : int8_t {
-  InputType_MouseMove = 0,
-  InputType_MouseClick = 1,
-  InputType_MouseRelease = 2,
-  InputType_KeyPress = 3,
-  InputType_KeyRelease = 4,
-  InputType_MIN = InputType_MouseMove,
-  InputType_MAX = InputType_KeyRelease
+enum InputTypeFbs : int8_t {
+  InputTypeFbs_MouseMove = 0,
+  InputTypeFbs_MouseClick = 1,
+  InputTypeFbs_MouseRelease = 2,
+  InputTypeFbs_KeyPress = 3,
+  InputTypeFbs_KeyRelease = 4,
+  InputTypeFbs_MIN = InputTypeFbs_MouseMove,
+  InputTypeFbs_MAX = InputTypeFbs_KeyRelease
 };
 
-inline const InputType (&EnumValuesInputType())[5] {
-  static const InputType values[] = {
-    InputType_MouseMove,
-    InputType_MouseClick,
-    InputType_MouseRelease,
-    InputType_KeyPress,
-    InputType_KeyRelease
+inline const InputTypeFbs (&EnumValuesInputTypeFbs())[5] {
+  static const InputTypeFbs values[] = {
+    InputTypeFbs_MouseMove,
+    InputTypeFbs_MouseClick,
+    InputTypeFbs_MouseRelease,
+    InputTypeFbs_KeyPress,
+    InputTypeFbs_KeyRelease
   };
   return values;
 }
 
-inline const char * const *EnumNamesInputType() {
+inline const char * const *EnumNamesInputTypeFbs() {
   static const char * const names[6] = {
     "MouseMove",
     "MouseClick",
@@ -65,68 +65,68 @@ inline const char * const *EnumNamesInputType() {
   return names;
 }
 
-inline const char *EnumNameInputType(InputType e) {
-  if (::flatbuffers::IsOutRange(e, InputType_MouseMove, InputType_KeyRelease)) return "";
+inline const char *EnumNameInputTypeFbs(InputTypeFbs e) {
+  if (::flatbuffers::IsOutRange(e, InputTypeFbs_MouseMove, InputTypeFbs_KeyRelease)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesInputType()[index];
+  return EnumNamesInputTypeFbs()[index];
 }
 
 ////////////////////////////////////////////////////////////
 /// @brief Union of possible input data types
 ////////////////////////////////////////////////////////////
-enum InputEventData : uint8_t {
-  InputEventData_NONE = 0,
-  InputEventData_MouseInputData = 1,
-  InputEventData_KeyboardInputData = 2,
-  InputEventData_MIN = InputEventData_NONE,
-  InputEventData_MAX = InputEventData_KeyboardInputData
+enum InputEventDataFbs : uint8_t {
+  InputEventDataFbs_NONE = 0,
+  InputEventDataFbs_MouseInputDataFbs = 1,
+  InputEventDataFbs_KeyboardInputDataFbs = 2,
+  InputEventDataFbs_MIN = InputEventDataFbs_NONE,
+  InputEventDataFbs_MAX = InputEventDataFbs_KeyboardInputDataFbs
 };
 
-inline const InputEventData (&EnumValuesInputEventData())[3] {
-  static const InputEventData values[] = {
-    InputEventData_NONE,
-    InputEventData_MouseInputData,
-    InputEventData_KeyboardInputData
+inline const InputEventDataFbs (&EnumValuesInputEventDataFbs())[3] {
+  static const InputEventDataFbs values[] = {
+    InputEventDataFbs_NONE,
+    InputEventDataFbs_MouseInputDataFbs,
+    InputEventDataFbs_KeyboardInputDataFbs
   };
   return values;
 }
 
-inline const char * const *EnumNamesInputEventData() {
+inline const char * const *EnumNamesInputEventDataFbs() {
   static const char * const names[4] = {
     "NONE",
-    "MouseInputData",
-    "KeyboardInputData",
+    "MouseInputDataFbs",
+    "KeyboardInputDataFbs",
     nullptr
   };
   return names;
 }
 
-inline const char *EnumNameInputEventData(InputEventData e) {
-  if (::flatbuffers::IsOutRange(e, InputEventData_NONE, InputEventData_KeyboardInputData)) return "";
+inline const char *EnumNameInputEventDataFbs(InputEventDataFbs e) {
+  if (::flatbuffers::IsOutRange(e, InputEventDataFbs_NONE, InputEventDataFbs_KeyboardInputDataFbs)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesInputEventData()[index];
+  return EnumNamesInputEventDataFbs()[index];
 }
 
-template<typename T> struct InputEventDataTraits {
-  static const InputEventData enum_value = InputEventData_NONE;
+template<typename T> struct InputEventDataFbsTraits {
+  static const InputEventDataFbs enum_value = InputEventDataFbs_NONE;
 };
 
-template<> struct InputEventDataTraits<steamrot::MouseInputData> {
-  static const InputEventData enum_value = InputEventData_MouseInputData;
+template<> struct InputEventDataFbsTraits<steamrot::MouseInputDataFbs> {
+  static const InputEventDataFbs enum_value = InputEventDataFbs_MouseInputDataFbs;
 };
 
-template<> struct InputEventDataTraits<steamrot::KeyboardInputData> {
-  static const InputEventData enum_value = InputEventData_KeyboardInputData;
+template<> struct InputEventDataFbsTraits<steamrot::KeyboardInputDataFbs> {
+  static const InputEventDataFbs enum_value = InputEventDataFbs_KeyboardInputDataFbs;
 };
 
-bool VerifyInputEventData(::flatbuffers::Verifier &verifier, const void *obj, InputEventData type);
-bool VerifyInputEventDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+bool VerifyInputEventDataFbs(::flatbuffers::Verifier &verifier, const void *obj, InputEventDataFbs type);
+bool VerifyInputEventDataFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
 ////////////////////////////////////////////////////////////
 /// @brief Mouse input data for simulation
 ////////////////////////////////////////////////////////////
-struct MouseInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef MouseInputDataBuilder Builder;
+struct MouseInputDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef MouseInputDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_POSITION = 4,
     VT_BUTTON = 6
@@ -146,32 +146,32 @@ struct MouseInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct MouseInputDataBuilder {
-  typedef MouseInputData Table;
+struct MouseInputDataFbsBuilder {
+  typedef MouseInputDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_position(::flatbuffers::Offset<steamrot::Vector2fData> position) {
-    fbb_.AddOffset(MouseInputData::VT_POSITION, position);
+    fbb_.AddOffset(MouseInputDataFbs::VT_POSITION, position);
   }
   void add_button(uint8_t button) {
-    fbb_.AddElement<uint8_t>(MouseInputData::VT_BUTTON, button, 0);
+    fbb_.AddElement<uint8_t>(MouseInputDataFbs::VT_BUTTON, button, 0);
   }
-  explicit MouseInputDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit MouseInputDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<MouseInputData> Finish() {
+  ::flatbuffers::Offset<MouseInputDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<MouseInputData>(end);
+    auto o = ::flatbuffers::Offset<MouseInputDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<MouseInputData> CreateMouseInputData(
+inline ::flatbuffers::Offset<MouseInputDataFbs> CreateMouseInputDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
     uint8_t button = 0) {
-  MouseInputDataBuilder builder_(_fbb);
+  MouseInputDataFbsBuilder builder_(_fbb);
   builder_.add_position(position);
   builder_.add_button(button);
   return builder_.Finish();
@@ -180,8 +180,8 @@ inline ::flatbuffers::Offset<MouseInputData> CreateMouseInputData(
 ////////////////////////////////////////////////////////////
 /// @brief Keyboard input data for simulation
 ////////////////////////////////////////////////////////////
-struct KeyboardInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef KeyboardInputDataBuilder Builder;
+struct KeyboardInputDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef KeyboardInputDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_KEY_CODE = 4,
     VT_ALT = 6,
@@ -210,40 +210,40 @@ struct KeyboardInputData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   }
 };
 
-struct KeyboardInputDataBuilder {
-  typedef KeyboardInputData Table;
+struct KeyboardInputDataFbsBuilder {
+  typedef KeyboardInputDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_key_code(uint32_t key_code) {
-    fbb_.AddElement<uint32_t>(KeyboardInputData::VT_KEY_CODE, key_code, 0);
+    fbb_.AddElement<uint32_t>(KeyboardInputDataFbs::VT_KEY_CODE, key_code, 0);
   }
   void add_alt(bool alt) {
-    fbb_.AddElement<uint8_t>(KeyboardInputData::VT_ALT, static_cast<uint8_t>(alt), 0);
+    fbb_.AddElement<uint8_t>(KeyboardInputDataFbs::VT_ALT, static_cast<uint8_t>(alt), 0);
   }
   void add_control(bool control) {
-    fbb_.AddElement<uint8_t>(KeyboardInputData::VT_CONTROL, static_cast<uint8_t>(control), 0);
+    fbb_.AddElement<uint8_t>(KeyboardInputDataFbs::VT_CONTROL, static_cast<uint8_t>(control), 0);
   }
   void add_shift(bool shift) {
-    fbb_.AddElement<uint8_t>(KeyboardInputData::VT_SHIFT, static_cast<uint8_t>(shift), 0);
+    fbb_.AddElement<uint8_t>(KeyboardInputDataFbs::VT_SHIFT, static_cast<uint8_t>(shift), 0);
   }
-  explicit KeyboardInputDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit KeyboardInputDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<KeyboardInputData> Finish() {
+  ::flatbuffers::Offset<KeyboardInputDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<KeyboardInputData>(end);
+    auto o = ::flatbuffers::Offset<KeyboardInputDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<KeyboardInputData> CreateKeyboardInputData(
+inline ::flatbuffers::Offset<KeyboardInputDataFbs> CreateKeyboardInputDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t key_code = 0,
     bool alt = false,
     bool control = false,
     bool shift = false) {
-  KeyboardInputDataBuilder builder_(_fbb);
+  KeyboardInputDataFbsBuilder builder_(_fbb);
   builder_.add_key_code(key_code);
   builder_.add_shift(shift);
   builder_.add_control(control);
@@ -257,37 +257,31 @@ inline ::flatbuffers::Offset<KeyboardInputData> CreateKeyboardInputData(
 /// Each input event represents a discrete input action that can be
 /// injected into the test fixture at a specific tick/timestamp.
 ////////////////////////////////////////////////////////////
-struct InputEvent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef InputEventBuilder Builder;
+struct InputEventFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef InputEventFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INPUT_TYPE = 4,
     VT_INPUT_DATA_TYPE = 6,
     VT_INPUT_DATA = 8,
-    VT_TICK = 10,
-    VT_DESCRIPTION = 12
+    VT_DESCRIPTION = 10
   };
   /// @brief Type of input event
-  steamrot::InputType input_type() const {
-    return static_cast<steamrot::InputType>(GetField<int8_t>(VT_INPUT_TYPE, 0));
+  steamrot::InputTypeFbs input_type() const {
+    return static_cast<steamrot::InputTypeFbs>(GetField<int8_t>(VT_INPUT_TYPE, 0));
   }
-  steamrot::InputEventData input_data_type() const {
-    return static_cast<steamrot::InputEventData>(GetField<uint8_t>(VT_INPUT_DATA_TYPE, 0));
+  steamrot::InputEventDataFbs input_data_type() const {
+    return static_cast<steamrot::InputEventDataFbs>(GetField<uint8_t>(VT_INPUT_DATA_TYPE, 0));
   }
   /// @brief Input-specific data
   const void *input_data() const {
     return GetPointer<const void *>(VT_INPUT_DATA);
   }
   template<typename T> const T *input_data_as() const;
-  const steamrot::MouseInputData *input_data_as_MouseInputData() const {
-    return input_data_type() == steamrot::InputEventData_MouseInputData ? static_cast<const steamrot::MouseInputData *>(input_data()) : nullptr;
+  const steamrot::MouseInputDataFbs *input_data_as_MouseInputDataFbs() const {
+    return input_data_type() == steamrot::InputEventDataFbs_MouseInputDataFbs ? static_cast<const steamrot::MouseInputDataFbs *>(input_data()) : nullptr;
   }
-  const steamrot::KeyboardInputData *input_data_as_KeyboardInputData() const {
-    return input_data_type() == steamrot::InputEventData_KeyboardInputData ? static_cast<const steamrot::KeyboardInputData *>(input_data()) : nullptr;
-  }
-  /// @brief Relative tick number for sequencing (0-based)
-  /// Events with the same tick are processed together
-  uint32_t tick() const {
-    return GetField<uint32_t>(VT_TICK, 0);
+  const steamrot::KeyboardInputDataFbs *input_data_as_KeyboardInputDataFbs() const {
+    return input_data_type() == steamrot::InputEventDataFbs_KeyboardInputDataFbs ? static_cast<const steamrot::KeyboardInputDataFbs *>(input_data()) : nullptr;
   }
   /// @brief Optional description for debugging
   const ::flatbuffers::String *description() const {
@@ -298,82 +292,74 @@ struct InputEvent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<int8_t>(verifier, VT_INPUT_TYPE, 1) &&
            VerifyField<uint8_t>(verifier, VT_INPUT_DATA_TYPE, 1) &&
            VerifyOffset(verifier, VT_INPUT_DATA) &&
-           VerifyInputEventData(verifier, input_data(), input_data_type()) &&
-           VerifyField<uint32_t>(verifier, VT_TICK, 4) &&
+           VerifyInputEventDataFbs(verifier, input_data(), input_data_type()) &&
            VerifyOffset(verifier, VT_DESCRIPTION) &&
            verifier.VerifyString(description()) &&
            verifier.EndTable();
   }
 };
 
-template<> inline const steamrot::MouseInputData *InputEvent::input_data_as<steamrot::MouseInputData>() const {
-  return input_data_as_MouseInputData();
+template<> inline const steamrot::MouseInputDataFbs *InputEventFbs::input_data_as<steamrot::MouseInputDataFbs>() const {
+  return input_data_as_MouseInputDataFbs();
 }
 
-template<> inline const steamrot::KeyboardInputData *InputEvent::input_data_as<steamrot::KeyboardInputData>() const {
-  return input_data_as_KeyboardInputData();
+template<> inline const steamrot::KeyboardInputDataFbs *InputEventFbs::input_data_as<steamrot::KeyboardInputDataFbs>() const {
+  return input_data_as_KeyboardInputDataFbs();
 }
 
-struct InputEventBuilder {
-  typedef InputEvent Table;
+struct InputEventFbsBuilder {
+  typedef InputEventFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_input_type(steamrot::InputType input_type) {
-    fbb_.AddElement<int8_t>(InputEvent::VT_INPUT_TYPE, static_cast<int8_t>(input_type), 0);
+  void add_input_type(steamrot::InputTypeFbs input_type) {
+    fbb_.AddElement<int8_t>(InputEventFbs::VT_INPUT_TYPE, static_cast<int8_t>(input_type), 0);
   }
-  void add_input_data_type(steamrot::InputEventData input_data_type) {
-    fbb_.AddElement<uint8_t>(InputEvent::VT_INPUT_DATA_TYPE, static_cast<uint8_t>(input_data_type), 0);
+  void add_input_data_type(steamrot::InputEventDataFbs input_data_type) {
+    fbb_.AddElement<uint8_t>(InputEventFbs::VT_INPUT_DATA_TYPE, static_cast<uint8_t>(input_data_type), 0);
   }
   void add_input_data(::flatbuffers::Offset<void> input_data) {
-    fbb_.AddOffset(InputEvent::VT_INPUT_DATA, input_data);
-  }
-  void add_tick(uint32_t tick) {
-    fbb_.AddElement<uint32_t>(InputEvent::VT_TICK, tick, 0);
+    fbb_.AddOffset(InputEventFbs::VT_INPUT_DATA, input_data);
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
-    fbb_.AddOffset(InputEvent::VT_DESCRIPTION, description);
+    fbb_.AddOffset(InputEventFbs::VT_DESCRIPTION, description);
   }
-  explicit InputEventBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit InputEventFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<InputEvent> Finish() {
+  ::flatbuffers::Offset<InputEventFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<InputEvent>(end);
+    auto o = ::flatbuffers::Offset<InputEventFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<InputEvent> CreateInputEvent(
+inline ::flatbuffers::Offset<InputEventFbs> CreateInputEventFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::InputType input_type = steamrot::InputType_MouseMove,
-    steamrot::InputEventData input_data_type = steamrot::InputEventData_NONE,
+    steamrot::InputTypeFbs input_type = steamrot::InputTypeFbs_MouseMove,
+    steamrot::InputEventDataFbs input_data_type = steamrot::InputEventDataFbs_NONE,
     ::flatbuffers::Offset<void> input_data = 0,
-    uint32_t tick = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
-  InputEventBuilder builder_(_fbb);
+  InputEventFbsBuilder builder_(_fbb);
   builder_.add_description(description);
-  builder_.add_tick(tick);
   builder_.add_input_data(input_data);
   builder_.add_input_data_type(input_data_type);
   builder_.add_input_type(input_type);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<InputEvent> CreateInputEventDirect(
+inline ::flatbuffers::Offset<InputEventFbs> CreateInputEventFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::InputType input_type = steamrot::InputType_MouseMove,
-    steamrot::InputEventData input_data_type = steamrot::InputEventData_NONE,
+    steamrot::InputTypeFbs input_type = steamrot::InputTypeFbs_MouseMove,
+    steamrot::InputEventDataFbs input_data_type = steamrot::InputEventDataFbs_NONE,
     ::flatbuffers::Offset<void> input_data = 0,
-    uint32_t tick = 0,
     const char *description = nullptr) {
   auto description__ = description ? _fbb.CreateString(description) : 0;
-  return steamrot::CreateInputEvent(
+  return steamrot::CreateInputEventFbs(
       _fbb,
       input_type,
       input_data_type,
       input_data,
-      tick,
       description__);
 }
 
@@ -382,17 +368,17 @@ inline ::flatbuffers::Offset<InputEvent> CreateInputEventDirect(
 ///
 /// Represents a complete sequence of inputs at a given tick
 ////////////////////////////////////////////////////////////
-struct InputSequence FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef InputSequenceBuilder Builder;
+struct InputSequenceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef InputSequenceFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INPUTS = 4,
     VT_TICK = 6
   };
   /// @brief Ordered list of input events
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *inputs() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>> *>(VT_INPUTS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>> *inputs() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>> *>(VT_INPUTS);
   }
-  /// @brief tick at which to insert the inputs
+  /// @brief Tick at which to insert the inputs
   uint32_t tick() const {
     return GetField<uint32_t>(VT_TICK, 0);
   }
@@ -406,71 +392,71 @@ struct InputSequence FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct InputSequenceBuilder {
-  typedef InputSequence Table;
+struct InputSequenceFbsBuilder {
+  typedef InputSequenceFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_inputs(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> inputs) {
-    fbb_.AddOffset(InputSequence::VT_INPUTS, inputs);
+  void add_inputs(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>>> inputs) {
+    fbb_.AddOffset(InputSequenceFbs::VT_INPUTS, inputs);
   }
   void add_tick(uint32_t tick) {
-    fbb_.AddElement<uint32_t>(InputSequence::VT_TICK, tick, 0);
+    fbb_.AddElement<uint32_t>(InputSequenceFbs::VT_TICK, tick, 0);
   }
-  explicit InputSequenceBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit InputSequenceFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<InputSequence> Finish() {
+  ::flatbuffers::Offset<InputSequenceFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<InputSequence>(end);
+    auto o = ::flatbuffers::Offset<InputSequenceFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<InputSequence> CreateInputSequence(
+inline ::flatbuffers::Offset<InputSequenceFbs> CreateInputSequenceFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEvent>>> inputs = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>>> inputs = 0,
     uint32_t tick = 0) {
-  InputSequenceBuilder builder_(_fbb);
+  InputSequenceFbsBuilder builder_(_fbb);
   builder_.add_tick(tick);
   builder_.add_inputs(inputs);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<InputSequence> CreateInputSequenceDirect(
+inline ::flatbuffers::Offset<InputSequenceFbs> CreateInputSequenceFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::InputEvent>> *inputs = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::InputEventFbs>> *inputs = nullptr,
     uint32_t tick = 0) {
-  auto inputs__ = inputs ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::InputEvent>>(*inputs) : 0;
-  return steamrot::CreateInputSequence(
+  auto inputs__ = inputs ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::InputEventFbs>>(*inputs) : 0;
+  return steamrot::CreateInputSequenceFbs(
       _fbb,
       inputs__,
       tick);
 }
 
-inline bool VerifyInputEventData(::flatbuffers::Verifier &verifier, const void *obj, InputEventData type) {
+inline bool VerifyInputEventDataFbs(::flatbuffers::Verifier &verifier, const void *obj, InputEventDataFbs type) {
   switch (type) {
-    case InputEventData_NONE: {
+    case InputEventDataFbs_NONE: {
       return true;
     }
-    case InputEventData_MouseInputData: {
-      auto ptr = reinterpret_cast<const steamrot::MouseInputData *>(obj);
+    case InputEventDataFbs_MouseInputDataFbs: {
+      auto ptr = reinterpret_cast<const steamrot::MouseInputDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case InputEventData_KeyboardInputData: {
-      auto ptr = reinterpret_cast<const steamrot::KeyboardInputData *>(obj);
+    case InputEventDataFbs_KeyboardInputDataFbs: {
+      auto ptr = reinterpret_cast<const steamrot::KeyboardInputDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
   }
 }
 
-inline bool VerifyInputEventDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+inline bool VerifyInputEventDataFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
   if (!values || !types) return !values && !types;
   if (values->size() != types->size()) return false;
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifyInputEventData(
-        verifier,  values->Get(i), types->GetEnum<InputEventData>(i))) {
+    if (!VerifyInputEventDataFbs(
+        verifier,  values->Get(i), types->GetEnum<InputEventDataFbs>(i))) {
       return false;
     }
   }
