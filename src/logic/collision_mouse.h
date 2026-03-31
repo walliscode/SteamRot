@@ -13,9 +13,32 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
+#include "UIElement.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::collision::mouse {
+
+/////////////////////////////////////////////////
+/// @brief Checks if the mouse position is within the given bounds.
+///
+/// @param mouse_position The current global mouse position.
+/// @param bounds The global bounds to check against.
+/// @return True if the mouse is within the bounds, false otherwise.
+/////////////////////////////////////////////////
+bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
+                       const sf::FloatRect &bounds);
+
+/////////////////////////////////////////////////
+/// @brief Checks if the mouse is over a UIElement or any of its nested
+/// children, and sets each element's is_mouse_over accordingly.
+///
+/// If a child is hovered the parent's is_mouse_over is set to false.
+///
+/// @param mouse_position The current global mouse position.
+/// @param element UIElement to check against (recurses into children).
+/////////////////////////////////////////////////
+void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over the growth point and sets
