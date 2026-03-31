@@ -522,10 +522,11 @@ TEST_CASE("ToSFMLEvent MouseMove produces MouseMoved event with correct "
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
 
   REQUIRE(result.has_value());
-  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(out));
-  const auto &moved = std::get<sf::Event::MouseMoved>(out);
-  REQUIRE(moved.position.x == 100);
-  REQUIRE(moved.position.y == 200);
+  REQUIRE(out.is<sf::Event::MouseMoved>());
+  const auto *moved = out.getIf<sf::Event::MouseMoved>();
+  REQUIRE(moved != nullptr);
+  REQUIRE(moved->position.x == 100);
+  REQUIRE(moved->position.y == 200);
 }
 
 TEST_CASE("ToSFMLEvent MouseMove fails when mouse data is null",
@@ -559,11 +560,12 @@ TEST_CASE("ToSFMLEvent MouseClick produces MouseButtonPressed event with "
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
 
   REQUIRE(result.has_value());
-  REQUIRE(std::holds_alternative<sf::Event::MouseButtonPressed>(out));
-  const auto &pressed = std::get<sf::Event::MouseButtonPressed>(out);
-  REQUIRE(pressed.button == sf::Mouse::Button::Right);
-  REQUIRE(pressed.position.x == 50);
-  REQUIRE(pressed.position.y == 75);
+  REQUIRE(out.is<sf::Event::MouseButtonPressed>());
+  const auto *pressed = out.getIf<sf::Event::MouseButtonPressed>();
+  REQUIRE(pressed != nullptr);
+  REQUIRE(pressed->button == sf::Mouse::Button::Right);
+  REQUIRE(pressed->position.x == 50);
+  REQUIRE(pressed->position.y == 75);
 }
 
 TEST_CASE("ToSFMLEvent MouseClick fails when mouse data is null",
@@ -594,11 +596,12 @@ TEST_CASE("ToSFMLEvent MouseRelease produces MouseButtonReleased event with "
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
 
   REQUIRE(result.has_value());
-  REQUIRE(std::holds_alternative<sf::Event::MouseButtonReleased>(out));
-  const auto &released = std::get<sf::Event::MouseButtonReleased>(out);
-  REQUIRE(released.button == sf::Mouse::Button::Left);
-  REQUIRE(released.position.x == 30);
-  REQUIRE(released.position.y == 40);
+  REQUIRE(out.is<sf::Event::MouseButtonReleased>());
+  const auto *released = out.getIf<sf::Event::MouseButtonReleased>();
+  REQUIRE(released != nullptr);
+  REQUIRE(released->button == sf::Mouse::Button::Left);
+  REQUIRE(released->position.x == 30);
+  REQUIRE(released->position.y == 40);
 }
 
 TEST_CASE("ToSFMLEvent MouseRelease fails when mouse data is null",
@@ -631,12 +634,13 @@ TEST_CASE("ToSFMLEvent KeyPress produces KeyPressed event with correct "
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
 
   REQUIRE(result.has_value());
-  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(out));
-  const auto &pressed = std::get<sf::Event::KeyPressed>(out);
-  REQUIRE(pressed.code == sf::Keyboard::Key::A);
-  REQUIRE(pressed.alt == true);
-  REQUIRE(pressed.control == false);
-  REQUIRE(pressed.shift == true);
+  REQUIRE(out.is<sf::Event::KeyPressed>());
+  const auto *pressed = out.getIf<sf::Event::KeyPressed>();
+  REQUIRE(pressed != nullptr);
+  REQUIRE(pressed->code == sf::Keyboard::Key::A);
+  REQUIRE(pressed->alt == true);
+  REQUIRE(pressed->control == false);
+  REQUIRE(pressed->shift == true);
 }
 
 TEST_CASE("ToSFMLEvent KeyPress fails when keyboard data is null",
@@ -669,12 +673,13 @@ TEST_CASE("ToSFMLEvent KeyRelease produces KeyReleased event with correct "
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
 
   REQUIRE(result.has_value());
-  REQUIRE(std::holds_alternative<sf::Event::KeyReleased>(out));
-  const auto &released = std::get<sf::Event::KeyReleased>(out);
-  REQUIRE(released.code == sf::Keyboard::Key::Space);
-  REQUIRE(released.alt == false);
-  REQUIRE(released.control == true);
-  REQUIRE(released.shift == false);
+  REQUIRE(out.is<sf::Event::KeyReleased>());
+  const auto *released = out.getIf<sf::Event::KeyReleased>();
+  REQUIRE(released != nullptr);
+  REQUIRE(released->code == sf::Keyboard::Key::Space);
+  REQUIRE(released->alt == false);
+  REQUIRE(released->control == true);
+  REQUIRE(released->shift == false);
 }
 
 TEST_CASE("ToSFMLEvent KeyRelease fails when keyboard data is null",
@@ -747,10 +752,11 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with a MouseMove "
   REQUIRE(result_map.size() == 1);
   REQUIRE(result_map.count(3) == 1);
   REQUIRE(result_map[3].size() == 1);
-  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[3][0]));
-  const auto &moved = std::get<sf::Event::MouseMoved>(result_map[3][0]);
-  REQUIRE(moved.position.x == 10);
-  REQUIRE(moved.position.y == 20);
+  REQUIRE(result_map[3][0].is<sf::Event::MouseMoved>());
+  const auto *moved = result_map[3][0].getIf<sf::Event::MouseMoved>();
+  REQUIRE(moved != nullptr);
+  REQUIRE(moved->position.x == 10);
+  REQUIRE(moved->position.y == 20);
 }
 
 TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
@@ -796,8 +802,8 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
   REQUIRE(result.has_value());
   REQUIRE(result_map.count(0) == 1);
   REQUIRE(result_map[0].size() == 2);
-  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[0][0]));
-  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(result_map[0][1]));
+  REQUIRE(result_map[0][0].is<sf::Event::MouseMoved>());
+  REQUIRE(result_map[0][1].is<sf::Event::KeyPressed>());
 }
 
 TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
@@ -847,8 +853,8 @@ TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
   REQUIRE(result_map.size() == 2);
   REQUIRE(result_map.count(1) == 1);
   REQUIRE(result_map.count(5) == 1);
-  REQUIRE(std::holds_alternative<sf::Event::MouseMoved>(result_map[1][0]));
-  REQUIRE(std::holds_alternative<sf::Event::KeyReleased>(result_map[5][0]));
+  REQUIRE(result_map[1][0].is<sf::Event::MouseMoved>());
+  REQUIRE(result_map[5][0].is<sf::Event::KeyReleased>());
 }
 
 TEST_CASE("ConfigureInputEventsByTick handles empty inputs vector for a tick",
@@ -954,9 +960,9 @@ TEST_CASE("ConfigureTestData populates input_events_by_tick correctly",
   REQUIRE(test_data.input_events_by_tick.size() == 1);
   REQUIRE(test_data.input_events_by_tick.count(2) == 1);
   REQUIRE(test_data.input_events_by_tick[2].size() == 1);
-  REQUIRE(std::holds_alternative<sf::Event::KeyPressed>(
-      test_data.input_events_by_tick[2][0]));
-  const auto &kp =
-      std::get<sf::Event::KeyPressed>(test_data.input_events_by_tick[2][0]);
-  REQUIRE(kp.code == sf::Keyboard::Key::W);
+  REQUIRE(test_data.input_events_by_tick[2][0].is<sf::Event::KeyPressed>());
+  const auto *kp =
+      test_data.input_events_by_tick[2][0].getIf<sf::Event::KeyPressed>();
+  REQUIRE(kp != nullptr);
+  REQUIRE(kp->code == sf::Keyboard::Key::W);
 }
