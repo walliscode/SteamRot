@@ -13,9 +13,10 @@
 /////////////////////////////////////////////////
 #include "EventHandler.h"
 #include "FailInfo.h"
-#include "input_data_generated.h"
+#include "InputEvent.h"
+#include <SFML/System/Vector2.hpp>
 #include <expected>
-#include <variant>
+#include <unordered_map>
 #include <vector>
 
 namespace steamrot::tests {
@@ -23,7 +24,7 @@ namespace steamrot::tests {
 // Execute all input events scheduled for a specific tick.
 // Updates mouse_position and adds EventPackets to the event handler.
 std::expected<std::monostate, FailInfo>
-execute_input_events_for_tick(const std::vector<InputEvent>,
+execute_input_events_for_tick(const std::vector<InputEvent> &input_events,
                               EventHandler &event_handler,
                               sf::Vector2i &mouse_position);
 

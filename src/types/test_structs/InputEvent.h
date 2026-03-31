@@ -14,7 +14,7 @@
 #include <string>
 #include <variant>
 
-namespace steamrot {
+namespace steamrot::tests {
 
 enum class InputType {
   None = 0,
@@ -47,4 +47,4 @@ struct InputEvent {
   std::string description{};
 };
 
-} // namespace steamrot
+} // namespace steamrot::tests
