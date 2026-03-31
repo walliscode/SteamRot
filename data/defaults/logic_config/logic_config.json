@@ -19,7 +19,7 @@
       {
         "event_type": "LOGIC",
         "filter_payload_type": "LogicPayloadFbs",
-        "filter_payload": { "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD" }
+        "filter_payload": { "toggle_name": "CLEAR_MACHINA_FORM_SCAFFOLD" }
       }
     ]
   }

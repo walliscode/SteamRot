@@ -28,6 +28,7 @@ TEST_CASE("ClearActiveMachinaForm clears the active MachinaForm in the "
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
+  REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
   auto result = steamrot::logic::actions::grimoire_machina::
       ClearActiveMachinaFormScaffold(grimoire_machina);
   REQUIRE(result.has_value());

@@ -63,6 +63,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
       if (logic_payload.toggle_name ==
           LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
+
         auto clear_result =
             actions::grimoire_machina::ClearActiveMachinaFormScaffold(
                 grimoire_machina);

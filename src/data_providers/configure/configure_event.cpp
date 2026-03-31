@@ -96,6 +96,10 @@ ConfigureLogicPayload(LogicPayload &logic_payload,
     logic_payload.toggle_name =
         LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD;
     break;
+  case LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD:
+    logic_payload.toggle_name =
+        LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,

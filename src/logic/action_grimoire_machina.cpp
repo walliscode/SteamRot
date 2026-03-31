@@ -29,7 +29,7 @@ std::expected<std::monostate, FailInfo>
 ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
   // clear the active form if it exists
   if (grimoire_machina.m_scaffold_form)
-    grimoire_machina.m_scaffold_form.reset();
+    grimoire_machina.m_scaffold_form = nullptr;
 
   return std::monostate{};
 }

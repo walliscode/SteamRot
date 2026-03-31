@@ -67,7 +67,9 @@
                 },
                 {
                   "element_type": "ButtonData",
+
                   "element": {
+                    "label": "New Construct",
                     "base_data": {
                       "position": {
                         "x": 0,
@@ -111,8 +113,7 @@
                           }
                         }
                       ]
-                    },
-                    "label": "New Construct"
+                    }
                   }
                 }
               ],
@@ -163,21 +164,21 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "type": "UI",
-                          "payload_type": "UIPayloadFbs",
+                          "type": "LOGIC",
+                          "payload_type": "LogicPayloadFbs",
                           "payload": {
-                            "c_ui_state_name": "new_construct_menu_off",
-                            "action": "TOGGLE"
+                            "toggle_name": "CLEAR_MACHINA_FORM_SCAFFOLD"
                           }
                         },
                         {
                           "context": {
                             "lifetime": 1
                           },
-                          "type": "LOGIC",
-                          "payload_type": "LogicPayloadFbs",
+                          "type": "UI",
+                          "payload_type": "UIPayloadFbs",
                           "payload": {
-                            "toggle_name": "INITIATE_MACHINA_FORM_SCAFFOLD"
+                            "c_ui_state_name": "new_construct_menu_off",
+                            "action": "TOGGLE"
                           }
                         }
                       ],
