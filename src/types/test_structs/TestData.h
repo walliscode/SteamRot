@@ -16,7 +16,7 @@
 #include "SceneType.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
-#include "InputEvent.h"
+#include <SFML/Window/Event.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -56,9 +56,10 @@ struct TestData {
 
   /////////////////////////////////////////////////
   /// @brief All simulated input events to be injected into the simulation,
-  /// organized by tick
+  /// organized by tick. Each sf::Event is already converted from FlatBuffers
+  /// input data at configuration time.
   /////////////////////////////////////////////////
-  std::unordered_map<size_t, std::vector<tests::InputEvent>> input_events_by_tick{};
+  std::unordered_map<size_t, std::vector<sf::Event>> input_events_by_tick{};
 
   /////////////////////////////////////////////////
   /// @brief starting engine snapshot before simulation begins

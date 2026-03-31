@@ -9,6 +9,10 @@
 #include "configure_test_data.h"
 #include "configure_engine_snapshot.h"
 #include "scene_type_conversion.h"
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
+#include <format>
 
 namespace steamrot::data::configure {
 
@@ -152,6 +156,140 @@ std::expected<std::monostate, FailInfo> ConfigureExpectedEngineSnapshots(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
+ToSFMLEvent(const InputEventFbs *fbs_input_event, sf::Event &out_event) {
+  if (!fbs_input_event) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "InputEventFbs pointer is null."});
+  }
+
+  switch (fbs_input_event->input_type()) {
+
+  case InputTypeFbs_MouseMove: {
+    const auto *mouse_data =
+        fbs_input_event->input_data_as_MouseInputDataFbs();
+    if (!mouse_data || !mouse_data->position()) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "MouseInputDataFbs or position is null for MouseMove."});
+    }
+    sf::Event::MouseMoved moved;
+    moved.position = {static_cast<int>(mouse_data->position()->x()),
+                      static_cast<int>(mouse_data->position()->y())};
+    out_event = sf::Event{moved};
+    break;
+  }
+
+  case InputTypeFbs_MouseClick: {
+    const auto *mouse_data =
+        fbs_input_event->input_data_as_MouseInputDataFbs();
+    if (!mouse_data || !mouse_data->position()) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "MouseInputDataFbs or position is null for MouseClick."});
+    }
+    sf::Event::MouseButtonPressed pressed;
+    pressed.button = static_cast<sf::Mouse::Button>(mouse_data->button());
+    pressed.position = {static_cast<int>(mouse_data->position()->x()),
+                        static_cast<int>(mouse_data->position()->y())};
+    out_event = sf::Event{pressed};
+    break;
+  }
+
+  case InputTypeFbs_MouseRelease: {
+    const auto *mouse_data =
+        fbs_input_event->input_data_as_MouseInputDataFbs();
+    if (!mouse_data || !mouse_data->position()) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "MouseInputDataFbs or position is null for MouseRelease."});
+    }
+    sf::Event::MouseButtonReleased released;
+    released.button = static_cast<sf::Mouse::Button>(mouse_data->button());
+    released.position = {static_cast<int>(mouse_data->position()->x()),
+                         static_cast<int>(mouse_data->position()->y())};
+    out_event = sf::Event{released};
+    break;
+  }
+
+  case InputTypeFbs_KeyPress: {
+    const auto *key_data =
+        fbs_input_event->input_data_as_KeyboardInputDataFbs();
+    if (!key_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "KeyboardInputDataFbs is null for KeyPress."});
+    }
+    sf::Event::KeyPressed pressed;
+    pressed.code = static_cast<sf::Keyboard::Key>(key_data->key_code());
+    pressed.alt = key_data->alt();
+    pressed.control = key_data->control();
+    pressed.shift = key_data->shift();
+    out_event = sf::Event{pressed};
+    break;
+  }
+
+  case InputTypeFbs_KeyRelease: {
+    const auto *key_data =
+        fbs_input_event->input_data_as_KeyboardInputDataFbs();
+    if (!key_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "KeyboardInputDataFbs is null for KeyRelease."});
+    }
+    sf::Event::KeyReleased released;
+    released.code = static_cast<sf::Keyboard::Key>(key_data->key_code());
+    released.alt = key_data->alt();
+    released.control = key_data->control();
+    released.shift = key_data->shift();
+    out_event = sf::Event{released};
+    break;
+  }
+
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 std::format("Unhandled InputTypeFbs value: {}",
+                             static_cast<int>(fbs_input_event->input_type()))});
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConfigureInputEventsByTick(
+    std::unordered_map<size_t, std::vector<sf::Event>> &input_events_by_tick,
+    const flatbuffers::Vector<flatbuffers::Offset<TickInputsPairFbs>>
+        *fbs_tick_inputs_pairs) {
+
+  if (!fbs_tick_inputs_pairs)
+    return std::monostate{};
+
+  for (const auto *fbs_pair : *fbs_tick_inputs_pairs) {
+    if (!fbs_pair)
+      continue;
+
+    const size_t tick = static_cast<size_t>(fbs_pair->tick());
+    std::vector<sf::Event> events;
+
+    if (fbs_pair->inputs()) {
+      for (const auto *fbs_event : *fbs_pair->inputs()) {
+        sf::Event sfml_event{sf::Event::MouseMoved{}};
+        auto result = ToSFMLEvent(fbs_event, sfml_event);
+        if (!result)
+          return std::unexpected(result.error());
+        events.push_back(sfml_event);
+      }
+    }
+
+    input_events_by_tick[tick] = std::move(events);
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
 ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
                   EventHandler &event_handler) {
 
@@ -212,6 +350,14 @@ ConfigureTestData(TestData &test_data, const TestDataFbs *fbs_test_data,
     if (!conversion_result.has_value())
       return std::unexpected(conversion_result.error());
     test_data.initial_scene_type = conversion_result.value();
+  }
+
+  // Configure input_events_by_tick (optional)
+  if (fbs_test_data->input_events()) {
+    auto input_events_result = ConfigureInputEventsByTick(
+        test_data.input_events_by_tick, fbs_test_data->input_events());
+    if (!input_events_result)
+      return std::unexpected(input_events_result.error());
   }
 
   return std::monostate{};

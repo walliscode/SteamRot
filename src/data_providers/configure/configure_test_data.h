@@ -17,10 +17,14 @@
 #include "SimulationData.h"
 #include "TestData.h"
 #include "TestMetaData.h"
+#include "input_data_generated.h"
 #include "simulation_data_generated.h"
 #include "test_data_generated.h"
+#include <SFML/Window/Event.hpp>
 #include <expected>
 #include <map>
+#include <unordered_map>
+#include <vector>
 
 namespace steamrot::data::configure {
 
@@ -70,6 +74,34 @@ std::expected<std::monostate, FailInfo> ConfigureExpectedEngineSnapshots(
     const flatbuffers::Vector<flatbuffers::Offset<TickSnapshotPairFbs>>
         *fbs_tick_snapshot_pairs,
     EventHandler &event_handler);
+
+/////////////////////////////////////////////////
+/// @brief Converts a single FlatBuffers InputEventFbs to sf::Event objects.
+///
+/// One FlatBuffers input event may produce one sf::Event. The out-parameter
+/// is populated only when the conversion succeeds.
+///
+/// @param fbs_input_event The FlatBuffers InputEventFbs to convert.
+/// @param out_event Output sf::Event (set on success).
+/// @return std::monostate on success, FailInfo on error.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ToSFMLEvent(const InputEventFbs *fbs_input_event, sf::Event &out_event);
+
+/////////////////////////////////////////////////
+/// @brief Configures input events by tick from FlatBuffers data.
+///
+/// Converts each InputEventFbs into an sf::Event and stores it in the
+/// output map keyed by tick number.
+///
+/// @param input_events_by_tick Map to populate with tick->sf::Events pairs.
+/// @param fbs_tick_inputs_pairs FlatBuffers vector of tick-inputs pairs.
+/// @return std::monostate on success, FailInfo on error.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo> ConfigureInputEventsByTick(
+    std::unordered_map<size_t, std::vector<sf::Event>> &input_events_by_tick,
+    const flatbuffers::Vector<flatbuffers::Offset<TickInputsPairFbs>>
+        *fbs_tick_inputs_pairs);
 
 /////////////////////////////////////////////////
 /// @brief Configures a TestData instance from FlatBuffers data.
