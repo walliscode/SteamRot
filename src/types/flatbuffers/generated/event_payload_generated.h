@@ -97,27 +97,30 @@ inline const char *EnumNameUIActionFbs(UIActionFbs e) {
 ////////////////////////////////////////////////////////////
 enum LogicToggleFbs : int8_t {
   LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD = 0,
+  LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD = 1,
   LogicToggleFbs_MIN = LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD,
-  LogicToggleFbs_MAX = LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD
+  LogicToggleFbs_MAX = LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD
 };
 
-inline const LogicToggleFbs (&EnumValuesLogicToggleFbs())[1] {
+inline const LogicToggleFbs (&EnumValuesLogicToggleFbs())[2] {
   static const LogicToggleFbs values[] = {
-    LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD
+    LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD,
+    LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD
   };
   return values;
 }
 
 inline const char * const *EnumNamesLogicToggleFbs() {
-  static const char * const names[2] = {
+  static const char * const names[3] = {
     "INITIATE_MACHINA_FORM_SCAFFOLD",
+    "CLEAR_MACHINA_FORM_SCAFFOLD",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLogicToggleFbs(LogicToggleFbs e) {
-  if (::flatbuffers::IsOutRange(e, LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD, LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD)) return "";
+  if (::flatbuffers::IsOutRange(e, LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD, LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLogicToggleFbs()[index];
 }

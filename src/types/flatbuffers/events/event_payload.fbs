@@ -28,7 +28,8 @@ enum UIActionFbs: byte {
 /// Logic toggle types
 ////////////////////////////////////////////////////////////
 enum LogicToggleFbs: byte {
-  INITIATE_MACHINA_FORM_SCAFFOLD = 0
+  INITIATE_MACHINA_FORM_SCAFFOLD,
+  CLEAR_MACHINA_FORM_SCAFFOLD
 }
 
 ////////////////////////////////////////////////////////////
