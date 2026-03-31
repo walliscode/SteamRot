@@ -340,7 +340,7 @@ TEST_CASE("ConfigureTestData maps initial_scene_type TITLE correctly",
   auto meta_offset = steamrot::CreateTestMetadataFbs(
       builder, builder.CreateString("DefaultLoadTest"));
   auto test_data_offset = steamrot::CreateTestDataFbs(
-      builder, meta_offset, 0, 1, 0, 0, steamrot::SceneTypeFbs_TITLE);
+      builder, meta_offset, 0, 1, 0, 0, 0, steamrot::SceneTypeFbs_TITLE);
   builder.Finish(test_data_offset);
   const steamrot::TestDataFbs *fbs =
       steamrot::GetTestDataFbs(builder.GetBufferPointer());
@@ -363,7 +363,7 @@ TEST_CASE("ConfigureTestData maps initial_scene_type CRAFTING correctly",
   auto meta_offset = steamrot::CreateTestMetadataFbs(
       builder, builder.CreateString("CraftingDefaultTest"));
   auto test_data_offset = steamrot::CreateTestDataFbs(
-      builder, meta_offset, 0, 1, 0, 0, steamrot::SceneTypeFbs_CRAFTING);
+      builder, meta_offset, 0, 1, 0, 0, 0, steamrot::SceneTypeFbs_CRAFTING);
   builder.Finish(test_data_offset);
   const steamrot::TestDataFbs *fbs =
       steamrot::GetTestDataFbs(builder.GetBufferPointer());
@@ -476,7 +476,8 @@ BuildMouseReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
 const steamrot::InputEventFbs *
 BuildKeyPressEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
                       bool alt, bool control, bool shift) {
-  auto kbd = steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
+  auto kbd =
+      steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_KeyPress,
       steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
@@ -489,7 +490,8 @@ BuildKeyPressEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
 const steamrot::InputEventFbs *
 BuildKeyReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
                         bool alt, bool control, bool shift) {
-  auto kbd = steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
+  auto kbd =
+      steamrot::CreateKeyboardInputDataFbs(builder, key, alt, control, shift);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_KeyRelease,
       steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
@@ -504,7 +506,8 @@ BuildKeyReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, uint32_t key,
 // ToSFMLEvent tests
 /////////////////////////////////////////////////
 
-TEST_CASE("ToSFMLEvent fails with null pointer", "[unit][configure_test_data]") {
+TEST_CASE("ToSFMLEvent fails with null pointer",
+          "[unit][configure_test_data]") {
   sf::Event out{sf::Event::MouseMoved{}};
   auto result = steamrot::data::configure::ToSFMLEvent(nullptr, out);
   REQUIRE_FALSE(result.has_value());
@@ -534,9 +537,9 @@ TEST_CASE("ToSFMLEvent MouseMove fails when mouse data is null",
   flatbuffers::FlatBufferBuilder builder;
   // Build event with NONE union type but set input_type to MouseMove so it
   // passes the switch but has no mouse data.
-  auto evt = steamrot::CreateInputEventFbs(builder,
-                                           steamrot::InputTypeFbs_MouseMove,
-                                           steamrot::InputEventDataFbs_NONE, 0);
+  auto evt =
+      steamrot::CreateInputEventFbs(builder, steamrot::InputTypeFbs_MouseMove,
+                                    steamrot::InputEventDataFbs_NONE, 0);
   builder.Finish(evt);
   const auto *fbs =
       flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
@@ -571,9 +574,9 @@ TEST_CASE("ToSFMLEvent MouseClick produces MouseButtonPressed event with "
 TEST_CASE("ToSFMLEvent MouseClick fails when mouse data is null",
           "[unit][configure_test_data]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto evt = steamrot::CreateInputEventFbs(builder,
-                                           steamrot::InputTypeFbs_MouseClick,
-                                           steamrot::InputEventDataFbs_NONE, 0);
+  auto evt =
+      steamrot::CreateInputEventFbs(builder, steamrot::InputTypeFbs_MouseClick,
+                                    steamrot::InputEventDataFbs_NONE, 0);
   builder.Finish(evt);
   const auto *fbs =
       flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
@@ -607,9 +610,9 @@ TEST_CASE("ToSFMLEvent MouseRelease produces MouseButtonReleased event with "
 TEST_CASE("ToSFMLEvent MouseRelease fails when mouse data is null",
           "[unit][configure_test_data]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto evt = steamrot::CreateInputEventFbs(
-      builder, steamrot::InputTypeFbs_MouseRelease,
-      steamrot::InputEventDataFbs_NONE, 0);
+  auto evt = steamrot::CreateInputEventFbs(builder,
+                                           steamrot::InputTypeFbs_MouseRelease,
+                                           steamrot::InputEventDataFbs_NONE, 0);
   builder.Finish(evt);
   const auto *fbs =
       flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
@@ -627,8 +630,7 @@ TEST_CASE("ToSFMLEvent KeyPress produces KeyPressed event with correct "
           "[unit][configure_test_data]") {
   flatbuffers::FlatBufferBuilder builder;
   const uint32_t key_code = static_cast<uint32_t>(sf::Keyboard::Key::A);
-  const auto *fbs =
-      BuildKeyPressEventFbs(builder, key_code, true, false, true);
+  const auto *fbs = BuildKeyPressEventFbs(builder, key_code, true, false, true);
 
   sf::Event out{sf::Event::MouseMoved{}};
   auto result = steamrot::data::configure::ToSFMLEvent(fbs, out);
@@ -646,9 +648,9 @@ TEST_CASE("ToSFMLEvent KeyPress produces KeyPressed event with correct "
 TEST_CASE("ToSFMLEvent KeyPress fails when keyboard data is null",
           "[unit][configure_test_data]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto evt = steamrot::CreateInputEventFbs(builder,
-                                           steamrot::InputTypeFbs_KeyPress,
-                                           steamrot::InputEventDataFbs_NONE, 0);
+  auto evt =
+      steamrot::CreateInputEventFbs(builder, steamrot::InputTypeFbs_KeyPress,
+                                    steamrot::InputEventDataFbs_NONE, 0);
   builder.Finish(evt);
   const auto *fbs =
       flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
@@ -685,9 +687,9 @@ TEST_CASE("ToSFMLEvent KeyRelease produces KeyReleased event with correct "
 TEST_CASE("ToSFMLEvent KeyRelease fails when keyboard data is null",
           "[unit][configure_test_data]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto evt = steamrot::CreateInputEventFbs(
-      builder, steamrot::InputTypeFbs_KeyRelease,
-      steamrot::InputEventDataFbs_NONE, 0);
+  auto evt =
+      steamrot::CreateInputEventFbs(builder, steamrot::InputTypeFbs_KeyRelease,
+                                    steamrot::InputEventDataFbs_NONE, 0);
   builder.Finish(evt);
   const auto *fbs =
       flatbuffers::GetRoot<steamrot::InputEventFbs>(builder.GetBufferPointer());
@@ -708,8 +710,8 @@ TEST_CASE("ConfigureInputEventsByTick succeeds with null pair vector",
           "[unit][configure_test_data]") {
   std::unordered_map<size_t, std::vector<sf::Event>> result_map;
 
-  auto result =
-      steamrot::data::configure::ConfigureInputEventsByTick(result_map, nullptr);
+  auto result = steamrot::data::configure::ConfigureInputEventsByTick(
+      result_map, nullptr);
 
   REQUIRE(result.has_value());
   REQUIRE(result_map.empty());
@@ -737,11 +739,10 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with a MouseMove "
   auto pairs_vec =
       builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
 
-  auto meta = steamrot::CreateTestMetadataFbs(builder,
-                                              builder.CreateString("t"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto meta =
+      steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
@@ -775,8 +776,8 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
 
   // Event 2: KeyPress
   auto kbd = steamrot::CreateKeyboardInputDataFbs(
-      builder, static_cast<uint32_t>(sf::Keyboard::Key::Enter),
-      false, false, false);
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::Enter), false, false,
+      false);
   auto evt2 = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_KeyPress,
       steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
@@ -790,9 +791,8 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
 
   auto meta =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
@@ -824,8 +824,8 @@ TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
 
   // Tick 5: KeyRelease
   auto kbd = steamrot::CreateKeyboardInputDataFbs(
-      builder, static_cast<uint32_t>(sf::Keyboard::Key::Escape),
-      false, false, false);
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::Escape), false, false,
+      false);
   auto e2 = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_KeyRelease,
       steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
@@ -834,15 +834,14 @@ TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
   auto pair2 = steamrot::CreateTickInputsPairFbs(builder, 5, ev2);
 
   std::vector<flatbuffers::Offset<steamrot::TickInputsPairFbs>> pairs{pair1,
-                                                                        pair2};
+                                                                      pair2};
   auto pairs_vec =
       builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
 
   auto meta =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
@@ -873,9 +872,8 @@ TEST_CASE("ConfigureInputEventsByTick handles empty inputs vector for a tick",
 
   auto meta =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
@@ -894,9 +892,9 @@ TEST_CASE("ConfigureInputEventsByTick propagates ToSFMLEvent error",
   flatbuffers::FlatBufferBuilder builder;
 
   // Build a MouseMove event with no mouse data so ToSFMLEvent will fail
-  auto bad_evt = steamrot::CreateInputEventFbs(
-      builder, steamrot::InputTypeFbs_MouseMove,
-      steamrot::InputEventDataFbs_NONE, 0);
+  auto bad_evt =
+      steamrot::CreateInputEventFbs(builder, steamrot::InputTypeFbs_MouseMove,
+                                    steamrot::InputEventDataFbs_NONE, 0);
   auto ev = builder.CreateVector(
       std::vector<flatbuffers::Offset<steamrot::InputEventFbs>>{bad_evt});
   auto pair = steamrot::CreateTickInputsPairFbs(builder, 0, ev);
@@ -906,9 +904,8 @@ TEST_CASE("ConfigureInputEventsByTick propagates ToSFMLEvent error",
 
   auto meta =
       steamrot::CreateTestMetadataFbs(builder, builder.CreateString("t"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 1, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 
@@ -932,8 +929,8 @@ TEST_CASE("ConfigureTestData populates input_events_by_tick correctly",
 
   // Build a KeyPress event for tick 2
   auto kbd = steamrot::CreateKeyboardInputDataFbs(
-      builder, static_cast<uint32_t>(sf::Keyboard::Key::W),
-      false, false, false);
+      builder, static_cast<uint32_t>(sf::Keyboard::Key::W), false, false,
+      false);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_KeyPress,
       steamrot::InputEventDataFbs_KeyboardInputDataFbs, kbd.Union());
@@ -944,11 +941,10 @@ TEST_CASE("ConfigureTestData populates input_events_by_tick correctly",
   auto pairs_vec =
       builder.CreateVectorOfSortedTables<steamrot::TickInputsPairFbs>(&pairs);
 
-  auto meta = steamrot::CreateTestMetadataFbs(builder,
-                                              builder.CreateString("InputTest"));
-  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 4, 0, 0,
-                                        steamrot::SceneTypeFbs_UNKNOWN,
-                                        pairs_vec);
+  auto meta = steamrot::CreateTestMetadataFbs(
+      builder, builder.CreateString("InputTest"));
+  auto td = steamrot::CreateTestDataFbs(builder, meta, 0, 4, 0, 0, pairs_vec,
+                                        steamrot::SceneTypeFbs_UNKNOWN);
   builder.Finish(td);
   const auto *fbs = steamrot::GetTestDataFbs(builder.GetBufferPointer());
 

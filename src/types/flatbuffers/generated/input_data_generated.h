@@ -378,7 +378,7 @@ struct InputSequenceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>> *inputs() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::InputEventFbs>> *>(VT_INPUTS);
   }
-  /// @brief tick at which to insert the inputs
+  /// @brief Tick at which to insert the inputs
   uint32_t tick() const {
     return GetField<uint32_t>(VT_TICK, 0);
   }
