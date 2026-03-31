@@ -12,7 +12,6 @@ add_library(logic
   GrimoireMachinaRenderLogic.cpp
   GrimoireMachinaCollisionLogic.cpp
 
-  collision_ui.cpp
   action_ui.cpp
   ui_helpers.cpp
   render_ui.cpp
@@ -24,7 +23,7 @@ add_library(logic
 
   positioning_grimoire_machina.cpp
 
-  collision_grimoire_machina.cpp
+  collision_mouse.cpp
 )
 
 target_include_directories(logic

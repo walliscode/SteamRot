@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaCollisionLogic.h"
-#include "collision_grimoire_machina.h"
+#include "collision_mouse.h"
 
 namespace steamrot::logic {
 
@@ -28,11 +28,20 @@ void GrimoireMachinaCollisionLogic::ProcessLogic() {
   MachinaFormScaffold *active_scaffold_form =
       grimoire_machina.m_scaffold_form.get();
 
-  // run logic based MachinaFormScaffold
+  // run collision logic for all parts of the active MachinaFormScaffold
   if (active_scaffold_form) {
 
-    collision::grimoire_machina::CheckMouseOverGrowthPoint(
-        m_scene_context.mouse_position, active_scaffold_form->growth_point);
+    collision::mouse::CheckMouseOver(m_scene_context.mouse_position,
+                                     active_scaffold_form->growth_point);
+
+    for (auto &joint : active_scaffold_form->joints) {
+      collision::mouse::CheckMouseOver(m_scene_context.mouse_position, joint);
+    }
+
+    for (auto &fragment : active_scaffold_form->fragments) {
+      collision::mouse::CheckMouseOver(m_scene_context.mouse_position,
+                                       fragment);
+    }
   }
 }
 
