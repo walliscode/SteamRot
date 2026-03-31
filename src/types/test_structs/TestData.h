@@ -16,6 +16,7 @@
 #include "SceneType.h"
 #include "SimulationData.h"
 #include "TestMetaData.h"
+#include "input_data_generated.h"
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -44,14 +45,20 @@ struct TestData {
   SimulationData simulation_data{};
 
   /////////////////////////////////////////////////
+  /// @brief Number of ticks to run the simulation for
+  /////////////////////////////////////////////////
+  uint32_t number_of_ticks{1};
+
+  /////////////////////////////////////////////////
   /// @brief All events to be injected into the simulation, organized by tick
   /////////////////////////////////////////////////
   std::unordered_map<size_t, std::vector<EventPacket>> events_by_tick{};
 
   /////////////////////////////////////////////////
-  /// @brief Number of ticks to run the simulation for
+  /// @brief All simulated input events to be injected into the simulation,
+  /// organized by tick
   /////////////////////////////////////////////////
-  uint32_t number_of_ticks{1};
+  std::unordered_map<size_t, std::vector<InputEvent>> input_events_by_tick{};
 
   /////////////////////////////////////////////////
   /// @brief starting engine snapshot before simulation begins

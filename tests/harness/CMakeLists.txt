@@ -2,6 +2,7 @@ add_library(harness
   TestEngine.cpp
   harness_runner.cpp
   SimulationRunner.cpp
+  input_simulation.cpp
   add_uuids.cpp
 )
 

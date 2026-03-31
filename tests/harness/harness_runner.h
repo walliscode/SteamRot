@@ -16,15 +16,14 @@
 #include "FailInfo.h"
 #include "SceneData.h"
 #include "TestData.h"
+#include "TestEngine.h"
 #include <cstdint>
 #include <expected>
 #include <filesystem>
 #include <string>
 #include <variant>
-namespace steamrot::tests {
 
-// Forward declarations
-class TestEngine;
+namespace steamrot::tests {
 
 /////////////////////////////////////////////////
 /// @brief Wrapper function to run all harness tests located in the adjacent
@@ -71,13 +70,13 @@ ConvertAllEntityTransportVariantsInTestData(TestData &test_data);
 /// @param expected The expected EngineSnapshot from TestData
 /// @param test_name Optional test name for error reporting
 /// @param tick Optional tick number for error reporting
-/// @return std::monostate on match (will not return on mismatch due to REQUIRE_THAT)
+/// @return std::monostate on match (will not return on mismatch due to
+/// REQUIRE_THAT)
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 CompareEngineSnapshots(const EngineSnapshot &actual,
                        const EngineSnapshot &expected,
-                       const std::string &test_name = "",
-                       uint32_t tick = 0);
+                       const std::string &test_name = "", uint32_t tick = 0);
 
 /////////////////////////////////////////////////
 /// @brief Run all snapshot comparisons for a single test

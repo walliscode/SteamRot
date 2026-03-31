@@ -17,13 +17,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPacket.h"
-#include "EventPayload.h"
-#include "FailInfo.h"
 #include "InputActionRegistry.h"
 #include "UserInputBitset.h"
-#include "sfml_event_convert.h"
 #include <SFML/Window/Event.hpp>
-#include <expected>
 #include <vector>
 
 namespace steamrot {
