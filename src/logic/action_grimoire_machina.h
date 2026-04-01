@@ -18,7 +18,7 @@
 #include <expected>
 #include <variant>
 
-namespace steamrot::logic::actions::grimoire_machina {
+namespace steamrot::logic::action::grimoire_machina {
 
 /////////////////////////////////////////////////
 /// @brief Intialise the MachinaFormScaffold in the GrimoireMachine.
@@ -67,4 +67,4 @@ void SetColor(FragmentInstance &fragment_instance);
 /// @param joint_instance JointInstance reference
 /////////////////////////////////////////////////
 void SetColor(JointInstance &joint_instance);
-} // namespace steamrot::logic::actions::grimoire_machina
+} // namespace steamrot::logic::action::grimoire_machina

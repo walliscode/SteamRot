@@ -10,7 +10,7 @@
 #include "action_grimoire_machina.h"
 #include "MachinaFormScaffold.h"
 
-namespace steamrot::logic::actions::grimoire_machina {
+namespace steamrot::logic::action::grimoire_machina {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
@@ -66,4 +66,4 @@ void SetColor(JointInstance &joint_instance) {
     SetColor(socket);
   }
 }
-} // namespace steamrot::logic::actions::grimoire_machina
+} // namespace steamrot::logic::action::grimoire_machina

@@ -16,7 +16,7 @@ TEST_CASE("InitialiseActiveMachinaForm adds a new MachinaForm to the "
           "[GrimoireMachina]") {
   steamrot::GrimoireMachina grimoire_machina;
 
-  auto result = steamrot::logic::actions::grimoire_machina::
+  auto result = steamrot::logic::action::grimoire_machina::
       InitialiseActiveMachinaFormScaffold(grimoire_machina);
   REQUIRE(result.has_value());
   REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
@@ -29,8 +29,9 @@ TEST_CASE("ClearActiveMachinaForm clears the active MachinaForm in the "
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
-  auto result = steamrot::logic::actions::grimoire_machina::
-      ClearActiveMachinaFormScaffold(grimoire_machina);
+  auto result =
+      steamrot::logic::action::grimoire_machina::ClearActiveMachinaFormScaffold(
+          grimoire_machina);
   REQUIRE(result.has_value());
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
@@ -42,7 +43,7 @@ TEST_CASE("SetColor GrowthPoint sets origin color to hover_color "
   growth_point.is_mouse_over = true;
   growth_point.hover_color = sf::Color::Red;
   growth_point.base_color = sf::Color::Blue;
-  steamrot::logic::actions::grimoire_machina::SetColor(growth_point);
+  steamrot::logic::action::grimoire_machina::SetColor(growth_point);
   REQUIRE(growth_point.origin.getFillColor() == growth_point.hover_color);
 }
 
@@ -53,7 +54,7 @@ TEST_CASE("SetColor GrowthPoint sets origin color to base_color "
   growth_point.is_mouse_over = false;
   growth_point.hover_color = sf::Color::Red;
   growth_point.base_color = sf::Color::Blue;
-  steamrot::logic::actions::grimoire_machina::SetColor(growth_point);
+  steamrot::logic::action::grimoire_machina::SetColor(growth_point);
   REQUIRE(growth_point.origin.getFillColor() == growth_point.base_color);
 }
 
@@ -64,7 +65,7 @@ TEST_CASE("SetColor Socket sets circle color to hover_color "
   socket.is_mouse_over = true;
   socket.hover_color = sf::Color::Cyan;
   socket.base_color = sf::Color::White;
-  steamrot::logic::actions::grimoire_machina::SetColor(socket);
+  steamrot::logic::action::grimoire_machina::SetColor(socket);
   REQUIRE(socket.circle.getFillColor() == socket.hover_color);
 }
 
@@ -75,7 +76,7 @@ TEST_CASE("SetColor Socket sets circle color to base_color "
   socket.is_mouse_over = false;
   socket.hover_color = sf::Color::Cyan;
   socket.base_color = sf::Color::White;
-  steamrot::logic::actions::grimoire_machina::SetColor(socket);
+  steamrot::logic::action::grimoire_machina::SetColor(socket);
   REQUIRE(socket.circle.getFillColor() == socket.base_color);
 }
 
@@ -95,7 +96,7 @@ TEST_CASE("SetColor FragmentInstance sets all socket colors based on "
 
   steamrot::FragmentInstance fragment_instance{
       fragment, {}, {socket_hovered, socket_not_hovered}};
-  steamrot::logic::actions::grimoire_machina::SetColor(fragment_instance);
+  steamrot::logic::action::grimoire_machina::SetColor(fragment_instance);
 
   REQUIRE(fragment_instance.sockets[0].circle.getFillColor() ==
           socket_hovered.hover_color);
@@ -119,7 +120,7 @@ TEST_CASE(
 
   steamrot::JointInstance joint_instance{
       joint, {}, {socket_hovered, socket_not_hovered}};
-  steamrot::logic::actions::grimoire_machina::SetColor(joint_instance);
+  steamrot::logic::action::grimoire_machina::SetColor(joint_instance);
 
   REQUIRE(joint_instance.sockets[0].circle.getFillColor() ==
           socket_hovered.hover_color);
