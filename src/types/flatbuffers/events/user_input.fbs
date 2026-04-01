@@ -1,6 +1,6 @@
 namespace steamrot;
 
-enum KeyboardInput : ubyte {
+enum KeyboardInputFbs : ubyte {
     A = 0,
     B = 1,
     C = 2,
@@ -28,7 +28,7 @@ enum KeyboardInput : ubyte {
     Y = 24,
     Z = 25
 }
-enum MouseInput: ubyte {
+enum MouseInputFbs: ubyte {
     LEFT_CLICK = 0,
     RIGHT_CLICK = 1,
     MIDDLE_CLICK = 2,
@@ -36,11 +36,11 @@ enum MouseInput: ubyte {
     SCROLL_DOWN = 4,
   }
 
-table UserInputBitsetData {
-  keyboard_pressed: [KeyboardInput];
-  keyboard_released: [KeyboardInput];
-  mouse_pressed: [MouseInput];
-  mouse_released: [MouseInput];
+table UserInputBitsetDataFbs {
+  keyboard_pressed: [KeyboardInputFbs];
+  keyboard_released: [KeyboardInputFbs];
+  mouse_pressed: [MouseInputFbs];
+  mouse_released: [MouseInputFbs];
   }
 
 

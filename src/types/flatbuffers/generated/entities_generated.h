@@ -37,8 +37,8 @@ struct EntityDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::UserInterfaceFbs *c_user_interface() const {
     return GetPointer<const steamrot::UserInterfaceFbs *>(VT_C_USER_INTERFACE);
   }
-  const steamrot::UIStateCollectionData *c_ui_state() const {
-    return GetPointer<const steamrot::UIStateCollectionData *>(VT_C_UI_STATE);
+  const steamrot::UIStateCollectionDataFbs *c_ui_state() const {
+    return GetPointer<const steamrot::UIStateCollectionDataFbs *>(VT_C_UI_STATE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -61,7 +61,7 @@ struct EntityDataFbsBuilder {
   void add_c_user_interface(::flatbuffers::Offset<steamrot::UserInterfaceFbs> c_user_interface) {
     fbb_.AddOffset(EntityDataFbs::VT_C_USER_INTERFACE, c_user_interface);
   }
-  void add_c_ui_state(::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state) {
+  void add_c_ui_state(::flatbuffers::Offset<steamrot::UIStateCollectionDataFbs> c_ui_state) {
     fbb_.AddOffset(EntityDataFbs::VT_C_UI_STATE, c_ui_state);
   }
   explicit EntityDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -79,7 +79,7 @@ inline ::flatbuffers::Offset<EntityDataFbs> CreateEntityDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t index = 0,
     ::flatbuffers::Offset<steamrot::UserInterfaceFbs> c_user_interface = 0,
-    ::flatbuffers::Offset<steamrot::UIStateCollectionData> c_ui_state = 0) {
+    ::flatbuffers::Offset<steamrot::UIStateCollectionDataFbs> c_ui_state = 0) {
   EntityDataFbsBuilder builder_(_fbb);
   builder_.add_c_ui_state(c_ui_state);
   builder_.add_c_user_interface(c_user_interface);

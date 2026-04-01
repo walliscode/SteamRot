@@ -15,24 +15,24 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct DisplayPreferences;
-struct DisplayPreferencesBuilder;
+struct DisplayPreferencesFbs;
+struct DisplayPreferencesFbsBuilder;
 
-struct AudioPreferences;
-struct AudioPreferencesBuilder;
+struct AudioPreferencesFbs;
+struct AudioPreferencesFbsBuilder;
 
-struct AccessibilityPreferences;
-struct AccessibilityPreferencesBuilder;
+struct AccessibilityPreferencesFbs;
+struct AccessibilityPreferencesFbsBuilder;
 
-struct UserPreferencesData;
-struct UserPreferencesDataBuilder;
+struct UserPreferencesDataFbs;
+struct UserPreferencesDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
 /// Display-related user preferences
 /// Note: Window size/framerate are in EngineCoreDataFbs, not here
 ////////////////////////////////////////////////////////////
-struct DisplayPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DisplayPreferencesBuilder Builder;
+struct DisplayPreferencesFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DisplayPreferencesFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_FULLSCREEN = 4,
     VT_VSYNC = 6
@@ -53,32 +53,32 @@ struct DisplayPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   }
 };
 
-struct DisplayPreferencesBuilder {
-  typedef DisplayPreferences Table;
+struct DisplayPreferencesFbsBuilder {
+  typedef DisplayPreferencesFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_fullscreen(bool fullscreen) {
-    fbb_.AddElement<uint8_t>(DisplayPreferences::VT_FULLSCREEN, static_cast<uint8_t>(fullscreen), 0);
+    fbb_.AddElement<uint8_t>(DisplayPreferencesFbs::VT_FULLSCREEN, static_cast<uint8_t>(fullscreen), 0);
   }
   void add_vsync(bool vsync) {
-    fbb_.AddElement<uint8_t>(DisplayPreferences::VT_VSYNC, static_cast<uint8_t>(vsync), 1);
+    fbb_.AddElement<uint8_t>(DisplayPreferencesFbs::VT_VSYNC, static_cast<uint8_t>(vsync), 1);
   }
-  explicit DisplayPreferencesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DisplayPreferencesFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DisplayPreferences> Finish() {
+  ::flatbuffers::Offset<DisplayPreferencesFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DisplayPreferences>(end);
+    auto o = ::flatbuffers::Offset<DisplayPreferencesFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DisplayPreferences> CreateDisplayPreferences(
+inline ::flatbuffers::Offset<DisplayPreferencesFbs> CreateDisplayPreferencesFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     bool fullscreen = false,
     bool vsync = true) {
-  DisplayPreferencesBuilder builder_(_fbb);
+  DisplayPreferencesFbsBuilder builder_(_fbb);
   builder_.add_vsync(vsync);
   builder_.add_fullscreen(fullscreen);
   return builder_.Finish();
@@ -87,8 +87,8 @@ inline ::flatbuffers::Offset<DisplayPreferences> CreateDisplayPreferences(
 ////////////////////////////////////////////////////////////
 /// Audio-related user preferences
 ////////////////////////////////////////////////////////////
-struct AudioPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef AudioPreferencesBuilder Builder;
+struct AudioPreferencesFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AudioPreferencesFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MASTER_VOLUME = 4,
     VT_MUSIC_VOLUME = 6,
@@ -121,40 +121,40 @@ struct AudioPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct AudioPreferencesBuilder {
-  typedef AudioPreferences Table;
+struct AudioPreferencesFbsBuilder {
+  typedef AudioPreferencesFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_master_volume(float master_volume) {
-    fbb_.AddElement<float>(AudioPreferences::VT_MASTER_VOLUME, master_volume, 1.0f);
+    fbb_.AddElement<float>(AudioPreferencesFbs::VT_MASTER_VOLUME, master_volume, 1.0f);
   }
   void add_music_volume(float music_volume) {
-    fbb_.AddElement<float>(AudioPreferences::VT_MUSIC_VOLUME, music_volume, 0.8f);
+    fbb_.AddElement<float>(AudioPreferencesFbs::VT_MUSIC_VOLUME, music_volume, 0.8f);
   }
   void add_sfx_volume(float sfx_volume) {
-    fbb_.AddElement<float>(AudioPreferences::VT_SFX_VOLUME, sfx_volume, 1.0f);
+    fbb_.AddElement<float>(AudioPreferencesFbs::VT_SFX_VOLUME, sfx_volume, 1.0f);
   }
   void add_muted(bool muted) {
-    fbb_.AddElement<uint8_t>(AudioPreferences::VT_MUTED, static_cast<uint8_t>(muted), 0);
+    fbb_.AddElement<uint8_t>(AudioPreferencesFbs::VT_MUTED, static_cast<uint8_t>(muted), 0);
   }
-  explicit AudioPreferencesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit AudioPreferencesFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<AudioPreferences> Finish() {
+  ::flatbuffers::Offset<AudioPreferencesFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<AudioPreferences>(end);
+    auto o = ::flatbuffers::Offset<AudioPreferencesFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<AudioPreferences> CreateAudioPreferences(
+inline ::flatbuffers::Offset<AudioPreferencesFbs> CreateAudioPreferencesFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float master_volume = 1.0f,
     float music_volume = 0.8f,
     float sfx_volume = 1.0f,
     bool muted = false) {
-  AudioPreferencesBuilder builder_(_fbb);
+  AudioPreferencesFbsBuilder builder_(_fbb);
   builder_.add_sfx_volume(sfx_volume);
   builder_.add_music_volume(music_volume);
   builder_.add_master_volume(master_volume);
@@ -165,8 +165,8 @@ inline ::flatbuffers::Offset<AudioPreferences> CreateAudioPreferences(
 ////////////////////////////////////////////////////////////
 /// Accessibility-related user preferences (extensible)
 ////////////////////////////////////////////////////////////
-struct AccessibilityPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef AccessibilityPreferencesBuilder Builder;
+struct AccessibilityPreferencesFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef AccessibilityPreferencesFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_UI_SCALE = 4,
     VT_PREFERRED_FONT = 6
@@ -188,43 +188,43 @@ struct AccessibilityPreferences FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
   }
 };
 
-struct AccessibilityPreferencesBuilder {
-  typedef AccessibilityPreferences Table;
+struct AccessibilityPreferencesFbsBuilder {
+  typedef AccessibilityPreferencesFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_ui_scale(float ui_scale) {
-    fbb_.AddElement<float>(AccessibilityPreferences::VT_UI_SCALE, ui_scale, 1.0f);
+    fbb_.AddElement<float>(AccessibilityPreferencesFbs::VT_UI_SCALE, ui_scale, 1.0f);
   }
   void add_preferred_font(::flatbuffers::Offset<::flatbuffers::String> preferred_font) {
-    fbb_.AddOffset(AccessibilityPreferences::VT_PREFERRED_FONT, preferred_font);
+    fbb_.AddOffset(AccessibilityPreferencesFbs::VT_PREFERRED_FONT, preferred_font);
   }
-  explicit AccessibilityPreferencesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit AccessibilityPreferencesFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<AccessibilityPreferences> Finish() {
+  ::flatbuffers::Offset<AccessibilityPreferencesFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<AccessibilityPreferences>(end);
+    auto o = ::flatbuffers::Offset<AccessibilityPreferencesFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<AccessibilityPreferences> CreateAccessibilityPreferences(
+inline ::flatbuffers::Offset<AccessibilityPreferencesFbs> CreateAccessibilityPreferencesFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float ui_scale = 1.0f,
     ::flatbuffers::Offset<::flatbuffers::String> preferred_font = 0) {
-  AccessibilityPreferencesBuilder builder_(_fbb);
+  AccessibilityPreferencesFbsBuilder builder_(_fbb);
   builder_.add_preferred_font(preferred_font);
   builder_.add_ui_scale(ui_scale);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<AccessibilityPreferences> CreateAccessibilityPreferencesDirect(
+inline ::flatbuffers::Offset<AccessibilityPreferencesFbs> CreateAccessibilityPreferencesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float ui_scale = 1.0f,
     const char *preferred_font = nullptr) {
   auto preferred_font__ = preferred_font ? _fbb.CreateString(preferred_font) : 0;
-  return steamrot::CreateAccessibilityPreferences(
+  return steamrot::CreateAccessibilityPreferencesFbs(
       _fbb,
       ui_scale,
       preferred_font__);
@@ -233,8 +233,8 @@ inline ::flatbuffers::Offset<AccessibilityPreferences> CreateAccessibilityPrefer
 ////////////////////////////////////////////////////////////
 /// Root table containing all user preferences
 ////////////////////////////////////////////////////////////
-struct UserPreferencesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UserPreferencesDataBuilder Builder;
+struct UserPreferencesDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserPreferencesDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_DISPLAY = 4,
     VT_AUDIO = 6,
@@ -242,16 +242,16 @@ struct UserPreferencesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
     VT_VERSION = 10
   };
   /// Display settings
-  const steamrot::DisplayPreferences *display() const {
-    return GetPointer<const steamrot::DisplayPreferences *>(VT_DISPLAY);
+  const steamrot::DisplayPreferencesFbs *display() const {
+    return GetPointer<const steamrot::DisplayPreferencesFbs *>(VT_DISPLAY);
   }
   /// Audio settings
-  const steamrot::AudioPreferences *audio() const {
-    return GetPointer<const steamrot::AudioPreferences *>(VT_AUDIO);
+  const steamrot::AudioPreferencesFbs *audio() const {
+    return GetPointer<const steamrot::AudioPreferencesFbs *>(VT_AUDIO);
   }
   /// Accessibility settings
-  const steamrot::AccessibilityPreferences *accessibility() const {
-    return GetPointer<const steamrot::AccessibilityPreferences *>(VT_ACCESSIBILITY);
+  const steamrot::AccessibilityPreferencesFbs *accessibility() const {
+    return GetPointer<const steamrot::AccessibilityPreferencesFbs *>(VT_ACCESSIBILITY);
   }
   /// Version number for migration support
   uint32_t version() const {
@@ -270,40 +270,40 @@ struct UserPreferencesData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   }
 };
 
-struct UserPreferencesDataBuilder {
-  typedef UserPreferencesData Table;
+struct UserPreferencesDataFbsBuilder {
+  typedef UserPreferencesDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_display(::flatbuffers::Offset<steamrot::DisplayPreferences> display) {
-    fbb_.AddOffset(UserPreferencesData::VT_DISPLAY, display);
+  void add_display(::flatbuffers::Offset<steamrot::DisplayPreferencesFbs> display) {
+    fbb_.AddOffset(UserPreferencesDataFbs::VT_DISPLAY, display);
   }
-  void add_audio(::flatbuffers::Offset<steamrot::AudioPreferences> audio) {
-    fbb_.AddOffset(UserPreferencesData::VT_AUDIO, audio);
+  void add_audio(::flatbuffers::Offset<steamrot::AudioPreferencesFbs> audio) {
+    fbb_.AddOffset(UserPreferencesDataFbs::VT_AUDIO, audio);
   }
-  void add_accessibility(::flatbuffers::Offset<steamrot::AccessibilityPreferences> accessibility) {
-    fbb_.AddOffset(UserPreferencesData::VT_ACCESSIBILITY, accessibility);
+  void add_accessibility(::flatbuffers::Offset<steamrot::AccessibilityPreferencesFbs> accessibility) {
+    fbb_.AddOffset(UserPreferencesDataFbs::VT_ACCESSIBILITY, accessibility);
   }
   void add_version(uint32_t version) {
-    fbb_.AddElement<uint32_t>(UserPreferencesData::VT_VERSION, version, 1);
+    fbb_.AddElement<uint32_t>(UserPreferencesDataFbs::VT_VERSION, version, 1);
   }
-  explicit UserPreferencesDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UserPreferencesDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UserPreferencesData> Finish() {
+  ::flatbuffers::Offset<UserPreferencesDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UserPreferencesData>(end);
+    auto o = ::flatbuffers::Offset<UserPreferencesDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UserPreferencesData> CreateUserPreferencesData(
+inline ::flatbuffers::Offset<UserPreferencesDataFbs> CreateUserPreferencesDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::DisplayPreferences> display = 0,
-    ::flatbuffers::Offset<steamrot::AudioPreferences> audio = 0,
-    ::flatbuffers::Offset<steamrot::AccessibilityPreferences> accessibility = 0,
+    ::flatbuffers::Offset<steamrot::DisplayPreferencesFbs> display = 0,
+    ::flatbuffers::Offset<steamrot::AudioPreferencesFbs> audio = 0,
+    ::flatbuffers::Offset<steamrot::AccessibilityPreferencesFbs> accessibility = 0,
     uint32_t version = 1) {
-  UserPreferencesDataBuilder builder_(_fbb);
+  UserPreferencesDataFbsBuilder builder_(_fbb);
   builder_.add_version(version);
   builder_.add_accessibility(accessibility);
   builder_.add_audio(audio);
@@ -311,33 +311,33 @@ inline ::flatbuffers::Offset<UserPreferencesData> CreateUserPreferencesData(
   return builder_.Finish();
 }
 
-inline const steamrot::UserPreferencesData *GetUserPreferencesData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::UserPreferencesData>(buf);
+inline const steamrot::UserPreferencesDataFbs *GetUserPreferencesDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::UserPreferencesDataFbs>(buf);
 }
 
-inline const steamrot::UserPreferencesData *GetSizePrefixedUserPreferencesData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::UserPreferencesData>(buf);
+inline const steamrot::UserPreferencesDataFbs *GetSizePrefixedUserPreferencesDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::UserPreferencesDataFbs>(buf);
 }
 
 inline bool VerifyUserPreferencesDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::UserPreferencesData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::UserPreferencesDataFbs>(nullptr);
 }
 
 inline bool VerifySizePrefixedUserPreferencesDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::UserPreferencesData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::UserPreferencesDataFbs>(nullptr);
 }
 
 inline void FinishUserPreferencesDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::UserPreferencesData> root) {
+    ::flatbuffers::Offset<steamrot::UserPreferencesDataFbs> root) {
   fbb.Finish(root);
 }
 
 inline void FinishSizePrefixedUserPreferencesDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::UserPreferencesData> root) {
+    ::flatbuffers::Offset<steamrot::UserPreferencesDataFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 

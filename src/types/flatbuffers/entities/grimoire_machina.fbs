@@ -1,6 +1,6 @@
 namespace steamrot;
 
-table GrimoireMachinaData {
+table GrimoireMachinaDataFbs {
   fragments : [string] (required);
   joints : [string] (required);
   }

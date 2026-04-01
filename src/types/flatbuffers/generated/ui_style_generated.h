@@ -17,32 +17,32 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct StyleData;
-struct StyleDataBuilder;
+struct StyleDataFbs;
+struct StyleDataFbsBuilder;
 
-struct PanelStyleData;
-struct PanelStyleDataBuilder;
+struct PanelStyleDataFbs;
+struct PanelStyleDataFbsBuilder;
 
-struct ButtonStyleData;
-struct ButtonStyleDataBuilder;
+struct ButtonStyleDataFbs;
+struct ButtonStyleDataFbsBuilder;
 
-struct DropDownContainerStyleData;
-struct DropDownContainerStyleDataBuilder;
+struct DropDownContainerStyleDataFbs;
+struct DropDownContainerStyleDataFbsBuilder;
 
-struct DropDownListStyleData;
-struct DropDownListStyleDataBuilder;
+struct DropDownListStyleDataFbs;
+struct DropDownListStyleDataFbsBuilder;
 
-struct DropDownItemStyleData;
-struct DropDownItemStyleDataBuilder;
+struct DropDownItemStyleDataFbs;
+struct DropDownItemStyleDataFbsBuilder;
 
-struct DropDownButtonStyleData;
-struct DropDownButtonStyleDataBuilder;
+struct DropDownButtonStyleDataFbs;
+struct DropDownButtonStyleDataFbsBuilder;
 
-struct UIStyleData;
-struct UIStyleDataBuilder;
+struct UIStyleDataFbs;
+struct UIStyleDataFbsBuilder;
 
-struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef StyleDataBuilder Builder;
+struct StyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef StyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BACKGROUND_COLOR = 4,
     VT_BORDER_COLOR = 6,
@@ -52,11 +52,11 @@ struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_MINIMUM_SIZE = 14,
     VT_MAXIMUM_SIZE = 16
   };
-  const steamrot::ColorData *background_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_BACKGROUND_COLOR);
+  const steamrot::ColorDataFbs *background_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_BACKGROUND_COLOR);
   }
-  const steamrot::ColorData *border_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_BORDER_COLOR);
+  const steamrot::ColorDataFbs *border_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_BORDER_COLOR);
   }
   float border_thickness() const {
     return GetField<float>(VT_BORDER_THICKNESS, 0.0f);
@@ -64,14 +64,14 @@ struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t radius_resolution() const {
     return GetField<int32_t>(VT_RADIUS_RESOLUTION, 0);
   }
-  const steamrot::Vector2fData *inner_margin() const {
-    return GetPointer<const steamrot::Vector2fData *>(VT_INNER_MARGIN);
+  const steamrot::Vector2fDataFbs *inner_margin() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_INNER_MARGIN);
   }
-  const steamrot::Vector2fData *minimum_size() const {
-    return GetPointer<const steamrot::Vector2fData *>(VT_MINIMUM_SIZE);
+  const steamrot::Vector2fDataFbs *minimum_size() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_MINIMUM_SIZE);
   }
-  const steamrot::Vector2fData *maximum_size() const {
-    return GetPointer<const steamrot::Vector2fData *>(VT_MAXIMUM_SIZE);
+  const steamrot::Vector2fDataFbs *maximum_size() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_MAXIMUM_SIZE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -91,57 +91,57 @@ struct StyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct StyleDataBuilder {
-  typedef StyleData Table;
+struct StyleDataFbsBuilder {
+  typedef StyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_background_color(::flatbuffers::Offset<steamrot::ColorData> background_color) {
-    fbb_.AddOffset(StyleData::VT_BACKGROUND_COLOR, background_color);
+  void add_background_color(::flatbuffers::Offset<steamrot::ColorDataFbs> background_color) {
+    fbb_.AddOffset(StyleDataFbs::VT_BACKGROUND_COLOR, background_color);
   }
-  void add_border_color(::flatbuffers::Offset<steamrot::ColorData> border_color) {
-    fbb_.AddOffset(StyleData::VT_BORDER_COLOR, border_color);
+  void add_border_color(::flatbuffers::Offset<steamrot::ColorDataFbs> border_color) {
+    fbb_.AddOffset(StyleDataFbs::VT_BORDER_COLOR, border_color);
   }
   void add_border_thickness(float border_thickness) {
-    fbb_.AddElement<float>(StyleData::VT_BORDER_THICKNESS, border_thickness, 0.0f);
+    fbb_.AddElement<float>(StyleDataFbs::VT_BORDER_THICKNESS, border_thickness, 0.0f);
   }
   void add_radius_resolution(int32_t radius_resolution) {
-    fbb_.AddElement<int32_t>(StyleData::VT_RADIUS_RESOLUTION, radius_resolution, 0);
+    fbb_.AddElement<int32_t>(StyleDataFbs::VT_RADIUS_RESOLUTION, radius_resolution, 0);
   }
-  void add_inner_margin(::flatbuffers::Offset<steamrot::Vector2fData> inner_margin) {
-    fbb_.AddOffset(StyleData::VT_INNER_MARGIN, inner_margin);
+  void add_inner_margin(::flatbuffers::Offset<steamrot::Vector2fDataFbs> inner_margin) {
+    fbb_.AddOffset(StyleDataFbs::VT_INNER_MARGIN, inner_margin);
   }
-  void add_minimum_size(::flatbuffers::Offset<steamrot::Vector2fData> minimum_size) {
-    fbb_.AddOffset(StyleData::VT_MINIMUM_SIZE, minimum_size);
+  void add_minimum_size(::flatbuffers::Offset<steamrot::Vector2fDataFbs> minimum_size) {
+    fbb_.AddOffset(StyleDataFbs::VT_MINIMUM_SIZE, minimum_size);
   }
-  void add_maximum_size(::flatbuffers::Offset<steamrot::Vector2fData> maximum_size) {
-    fbb_.AddOffset(StyleData::VT_MAXIMUM_SIZE, maximum_size);
+  void add_maximum_size(::flatbuffers::Offset<steamrot::Vector2fDataFbs> maximum_size) {
+    fbb_.AddOffset(StyleDataFbs::VT_MAXIMUM_SIZE, maximum_size);
   }
-  explicit StyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit StyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<StyleData> Finish() {
+  ::flatbuffers::Offset<StyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<StyleData>(end);
-    fbb_.Required(o, StyleData::VT_BACKGROUND_COLOR);
-    fbb_.Required(o, StyleData::VT_BORDER_COLOR);
-    fbb_.Required(o, StyleData::VT_INNER_MARGIN);
-    fbb_.Required(o, StyleData::VT_MINIMUM_SIZE);
-    fbb_.Required(o, StyleData::VT_MAXIMUM_SIZE);
+    auto o = ::flatbuffers::Offset<StyleDataFbs>(end);
+    fbb_.Required(o, StyleDataFbs::VT_BACKGROUND_COLOR);
+    fbb_.Required(o, StyleDataFbs::VT_BORDER_COLOR);
+    fbb_.Required(o, StyleDataFbs::VT_INNER_MARGIN);
+    fbb_.Required(o, StyleDataFbs::VT_MINIMUM_SIZE);
+    fbb_.Required(o, StyleDataFbs::VT_MAXIMUM_SIZE);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<StyleData> CreateStyleData(
+inline ::flatbuffers::Offset<StyleDataFbs> CreateStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::ColorData> background_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> border_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> background_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> border_color = 0,
     float border_thickness = 0.0f,
     int32_t radius_resolution = 0,
-    ::flatbuffers::Offset<steamrot::Vector2fData> inner_margin = 0,
-    ::flatbuffers::Offset<steamrot::Vector2fData> minimum_size = 0,
-    ::flatbuffers::Offset<steamrot::Vector2fData> maximum_size = 0) {
-  StyleDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> inner_margin = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> minimum_size = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> maximum_size = 0) {
+  StyleDataFbsBuilder builder_(_fbb);
   builder_.add_maximum_size(maximum_size);
   builder_.add_minimum_size(minimum_size);
   builder_.add_inner_margin(inner_margin);
@@ -152,13 +152,13 @@ inline ::flatbuffers::Offset<StyleData> CreateStyleData(
   return builder_.Finish();
 }
 
-struct PanelStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef PanelStyleDataBuilder Builder;
+struct PanelStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PanelStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -168,35 +168,35 @@ struct PanelStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct PanelStyleDataBuilder {
-  typedef PanelStyleData Table;
+struct PanelStyleDataFbsBuilder {
+  typedef PanelStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(PanelStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(PanelStyleDataFbs::VT_STYLE, style);
   }
-  explicit PanelStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit PanelStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<PanelStyleData> Finish() {
+  ::flatbuffers::Offset<PanelStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<PanelStyleData>(end);
-    fbb_.Required(o, PanelStyleData::VT_STYLE);
+    auto o = ::flatbuffers::Offset<PanelStyleDataFbs>(end);
+    fbb_.Required(o, PanelStyleDataFbs::VT_STYLE);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<PanelStyleData> CreatePanelStyleData(
+inline ::flatbuffers::Offset<PanelStyleDataFbs> CreatePanelStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0) {
-  PanelStyleDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0) {
+  PanelStyleDataFbsBuilder builder_(_fbb);
   builder_.add_style(style);
   return builder_.Finish();
 }
 
-struct ButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ButtonStyleDataBuilder Builder;
+struct ButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ButtonStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
@@ -204,14 +204,14 @@ struct ButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_FONT = 10,
     VT_FONT_SIZE = 12
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
-  const steamrot::ColorData *text_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_TEXT_COLOR);
+  const steamrot::ColorDataFbs *text_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
   }
-  const steamrot::ColorData *hover_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_HOVER_COLOR);
+  const steamrot::ColorDataFbs *hover_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -234,48 +234,48 @@ struct ButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct ButtonStyleDataBuilder {
-  typedef ButtonStyleData Table;
+struct ButtonStyleDataFbsBuilder {
+  typedef ButtonStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(ButtonStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(ButtonStyleDataFbs::VT_STYLE, style);
   }
-  void add_text_color(::flatbuffers::Offset<steamrot::ColorData> text_color) {
-    fbb_.AddOffset(ButtonStyleData::VT_TEXT_COLOR, text_color);
+  void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
+    fbb_.AddOffset(ButtonStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorData> hover_color) {
-    fbb_.AddOffset(ButtonStyleData::VT_HOVER_COLOR, hover_color);
+  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
+    fbb_.AddOffset(ButtonStyleDataFbs::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
-    fbb_.AddOffset(ButtonStyleData::VT_FONT, font);
+    fbb_.AddOffset(ButtonStyleDataFbs::VT_FONT, font);
   }
   void add_font_size(int32_t font_size) {
-    fbb_.AddElement<int32_t>(ButtonStyleData::VT_FONT_SIZE, font_size, 0);
+    fbb_.AddElement<int32_t>(ButtonStyleDataFbs::VT_FONT_SIZE, font_size, 0);
   }
-  explicit ButtonStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit ButtonStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<ButtonStyleData> Finish() {
+  ::flatbuffers::Offset<ButtonStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ButtonStyleData>(end);
-    fbb_.Required(o, ButtonStyleData::VT_STYLE);
-    fbb_.Required(o, ButtonStyleData::VT_TEXT_COLOR);
-    fbb_.Required(o, ButtonStyleData::VT_HOVER_COLOR);
-    fbb_.Required(o, ButtonStyleData::VT_FONT);
+    auto o = ::flatbuffers::Offset<ButtonStyleDataFbs>(end);
+    fbb_.Required(o, ButtonStyleDataFbs::VT_STYLE);
+    fbb_.Required(o, ButtonStyleDataFbs::VT_TEXT_COLOR);
+    fbb_.Required(o, ButtonStyleDataFbs::VT_HOVER_COLOR);
+    fbb_.Required(o, ButtonStyleDataFbs::VT_FONT);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleData(
+inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
-  ButtonStyleDataBuilder builder_(_fbb);
+  ButtonStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
@@ -284,15 +284,15 @@ inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleDataDirect(
+inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
-  return steamrot::CreateButtonStyleData(
+  return steamrot::CreateButtonStyleDataFbs(
       _fbb,
       style,
       text_color,
@@ -301,14 +301,14 @@ inline ::flatbuffers::Offset<ButtonStyleData> CreateButtonStyleDataDirect(
       font_size);
 }
 
-struct DropDownContainerStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DropDownContainerStyleDataBuilder Builder;
+struct DropDownContainerStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownContainerStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_DROP_SYMBOL_RATIO = 6
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
   float drop_symbol_ratio() const {
     return GetField<float>(VT_DROP_SYMBOL_RATIO, 0.0f);
@@ -322,40 +322,40 @@ struct DropDownContainerStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffer
   }
 };
 
-struct DropDownContainerStyleDataBuilder {
-  typedef DropDownContainerStyleData Table;
+struct DropDownContainerStyleDataFbsBuilder {
+  typedef DropDownContainerStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(DropDownContainerStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(DropDownContainerStyleDataFbs::VT_STYLE, style);
   }
   void add_drop_symbol_ratio(float drop_symbol_ratio) {
-    fbb_.AddElement<float>(DropDownContainerStyleData::VT_DROP_SYMBOL_RATIO, drop_symbol_ratio, 0.0f);
+    fbb_.AddElement<float>(DropDownContainerStyleDataFbs::VT_DROP_SYMBOL_RATIO, drop_symbol_ratio, 0.0f);
   }
-  explicit DropDownContainerStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DropDownContainerStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DropDownContainerStyleData> Finish() {
+  ::flatbuffers::Offset<DropDownContainerStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DropDownContainerStyleData>(end);
-    fbb_.Required(o, DropDownContainerStyleData::VT_STYLE);
+    auto o = ::flatbuffers::Offset<DropDownContainerStyleDataFbs>(end);
+    fbb_.Required(o, DropDownContainerStyleDataFbs::VT_STYLE);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DropDownContainerStyleData> CreateDropDownContainerStyleData(
+inline ::flatbuffers::Offset<DropDownContainerStyleDataFbs> CreateDropDownContainerStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     float drop_symbol_ratio = 0.0f) {
-  DropDownContainerStyleDataBuilder builder_(_fbb);
+  DropDownContainerStyleDataFbsBuilder builder_(_fbb);
   builder_.add_drop_symbol_ratio(drop_symbol_ratio);
   builder_.add_style(style);
   return builder_.Finish();
 }
 
-struct DropDownListStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DropDownListStyleDataBuilder Builder;
+struct DropDownListStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownListStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
@@ -363,14 +363,14 @@ struct DropDownListStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
     VT_FONT = 10,
     VT_FONT_SIZE = 12
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
-  const steamrot::ColorData *text_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_TEXT_COLOR);
+  const steamrot::ColorDataFbs *text_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
   }
-  const steamrot::ColorData *hover_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_HOVER_COLOR);
+  const steamrot::ColorDataFbs *hover_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -393,48 +393,48 @@ struct DropDownListStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   }
 };
 
-struct DropDownListStyleDataBuilder {
-  typedef DropDownListStyleData Table;
+struct DropDownListStyleDataFbsBuilder {
+  typedef DropDownListStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(DropDownListStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(DropDownListStyleDataFbs::VT_STYLE, style);
   }
-  void add_text_color(::flatbuffers::Offset<steamrot::ColorData> text_color) {
-    fbb_.AddOffset(DropDownListStyleData::VT_TEXT_COLOR, text_color);
+  void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
+    fbb_.AddOffset(DropDownListStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorData> hover_color) {
-    fbb_.AddOffset(DropDownListStyleData::VT_HOVER_COLOR, hover_color);
+  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
+    fbb_.AddOffset(DropDownListStyleDataFbs::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
-    fbb_.AddOffset(DropDownListStyleData::VT_FONT, font);
+    fbb_.AddOffset(DropDownListStyleDataFbs::VT_FONT, font);
   }
   void add_font_size(int32_t font_size) {
-    fbb_.AddElement<int32_t>(DropDownListStyleData::VT_FONT_SIZE, font_size, 0);
+    fbb_.AddElement<int32_t>(DropDownListStyleDataFbs::VT_FONT_SIZE, font_size, 0);
   }
-  explicit DropDownListStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DropDownListStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DropDownListStyleData> Finish() {
+  ::flatbuffers::Offset<DropDownListStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DropDownListStyleData>(end);
-    fbb_.Required(o, DropDownListStyleData::VT_STYLE);
-    fbb_.Required(o, DropDownListStyleData::VT_TEXT_COLOR);
-    fbb_.Required(o, DropDownListStyleData::VT_HOVER_COLOR);
-    fbb_.Required(o, DropDownListStyleData::VT_FONT);
+    auto o = ::flatbuffers::Offset<DropDownListStyleDataFbs>(end);
+    fbb_.Required(o, DropDownListStyleDataFbs::VT_STYLE);
+    fbb_.Required(o, DropDownListStyleDataFbs::VT_TEXT_COLOR);
+    fbb_.Required(o, DropDownListStyleDataFbs::VT_HOVER_COLOR);
+    fbb_.Required(o, DropDownListStyleDataFbs::VT_FONT);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleData(
+inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
-  DropDownListStyleDataBuilder builder_(_fbb);
+  DropDownListStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
@@ -443,15 +443,15 @@ inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleDataDirect(
+inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
-  return steamrot::CreateDropDownListStyleData(
+  return steamrot::CreateDropDownListStyleDataFbs(
       _fbb,
       style,
       text_color,
@@ -460,8 +460,8 @@ inline ::flatbuffers::Offset<DropDownListStyleData> CreateDropDownListStyleDataD
       font_size);
 }
 
-struct DropDownItemStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DropDownItemStyleDataBuilder Builder;
+struct DropDownItemStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownItemStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
@@ -469,14 +469,14 @@ struct DropDownItemStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
     VT_FONT = 10,
     VT_FONT_SIZE = 12
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
-  const steamrot::ColorData *text_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_TEXT_COLOR);
+  const steamrot::ColorDataFbs *text_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
   }
-  const steamrot::ColorData *hover_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_HOVER_COLOR);
+  const steamrot::ColorDataFbs *hover_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -499,48 +499,48 @@ struct DropDownItemStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   }
 };
 
-struct DropDownItemStyleDataBuilder {
-  typedef DropDownItemStyleData Table;
+struct DropDownItemStyleDataFbsBuilder {
+  typedef DropDownItemStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(DropDownItemStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(DropDownItemStyleDataFbs::VT_STYLE, style);
   }
-  void add_text_color(::flatbuffers::Offset<steamrot::ColorData> text_color) {
-    fbb_.AddOffset(DropDownItemStyleData::VT_TEXT_COLOR, text_color);
+  void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
+    fbb_.AddOffset(DropDownItemStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorData> hover_color) {
-    fbb_.AddOffset(DropDownItemStyleData::VT_HOVER_COLOR, hover_color);
+  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
+    fbb_.AddOffset(DropDownItemStyleDataFbs::VT_HOVER_COLOR, hover_color);
   }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
-    fbb_.AddOffset(DropDownItemStyleData::VT_FONT, font);
+    fbb_.AddOffset(DropDownItemStyleDataFbs::VT_FONT, font);
   }
   void add_font_size(int32_t font_size) {
-    fbb_.AddElement<int32_t>(DropDownItemStyleData::VT_FONT_SIZE, font_size, 0);
+    fbb_.AddElement<int32_t>(DropDownItemStyleDataFbs::VT_FONT_SIZE, font_size, 0);
   }
-  explicit DropDownItemStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DropDownItemStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DropDownItemStyleData> Finish() {
+  ::flatbuffers::Offset<DropDownItemStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DropDownItemStyleData>(end);
-    fbb_.Required(o, DropDownItemStyleData::VT_STYLE);
-    fbb_.Required(o, DropDownItemStyleData::VT_TEXT_COLOR);
-    fbb_.Required(o, DropDownItemStyleData::VT_HOVER_COLOR);
-    fbb_.Required(o, DropDownItemStyleData::VT_FONT);
+    auto o = ::flatbuffers::Offset<DropDownItemStyleDataFbs>(end);
+    fbb_.Required(o, DropDownItemStyleDataFbs::VT_STYLE);
+    fbb_.Required(o, DropDownItemStyleDataFbs::VT_TEXT_COLOR);
+    fbb_.Required(o, DropDownItemStyleDataFbs::VT_HOVER_COLOR);
+    fbb_.Required(o, DropDownItemStyleDataFbs::VT_FONT);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleData(
+inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
-  DropDownItemStyleDataBuilder builder_(_fbb);
+  DropDownItemStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
   builder_.add_hover_color(hover_color);
@@ -549,15 +549,15 @@ inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleDataDirect(
+inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0,
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
-  return steamrot::CreateDropDownItemStyleData(
+  return steamrot::CreateDropDownItemStyleDataFbs(
       _fbb,
       style,
       text_color,
@@ -566,21 +566,21 @@ inline ::flatbuffers::Offset<DropDownItemStyleData> CreateDropDownItemStyleDataD
       font_size);
 }
 
-struct DropDownButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DropDownButtonStyleDataBuilder Builder;
+struct DropDownButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DropDownButtonStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TRIANGLE_COLOR = 6,
     VT_HOVER_COLOR = 8
   };
-  const steamrot::StyleData *style() const {
-    return GetPointer<const steamrot::StyleData *>(VT_STYLE);
+  const steamrot::StyleDataFbs *style() const {
+    return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
-  const steamrot::ColorData *triangle_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_TRIANGLE_COLOR);
+  const steamrot::ColorDataFbs *triangle_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_TRIANGLE_COLOR);
   }
-  const steamrot::ColorData *hover_color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_HOVER_COLOR);
+  const steamrot::ColorDataFbs *hover_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -594,47 +594,47 @@ struct DropDownButtonStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::
   }
 };
 
-struct DropDownButtonStyleDataBuilder {
-  typedef DropDownButtonStyleData Table;
+struct DropDownButtonStyleDataFbsBuilder {
+  typedef DropDownButtonStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_style(::flatbuffers::Offset<steamrot::StyleData> style) {
-    fbb_.AddOffset(DropDownButtonStyleData::VT_STYLE, style);
+  void add_style(::flatbuffers::Offset<steamrot::StyleDataFbs> style) {
+    fbb_.AddOffset(DropDownButtonStyleDataFbs::VT_STYLE, style);
   }
-  void add_triangle_color(::flatbuffers::Offset<steamrot::ColorData> triangle_color) {
-    fbb_.AddOffset(DropDownButtonStyleData::VT_TRIANGLE_COLOR, triangle_color);
+  void add_triangle_color(::flatbuffers::Offset<steamrot::ColorDataFbs> triangle_color) {
+    fbb_.AddOffset(DropDownButtonStyleDataFbs::VT_TRIANGLE_COLOR, triangle_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorData> hover_color) {
-    fbb_.AddOffset(DropDownButtonStyleData::VT_HOVER_COLOR, hover_color);
+  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
+    fbb_.AddOffset(DropDownButtonStyleDataFbs::VT_HOVER_COLOR, hover_color);
   }
-  explicit DropDownButtonStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DropDownButtonStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DropDownButtonStyleData> Finish() {
+  ::flatbuffers::Offset<DropDownButtonStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DropDownButtonStyleData>(end);
-    fbb_.Required(o, DropDownButtonStyleData::VT_STYLE);
-    fbb_.Required(o, DropDownButtonStyleData::VT_TRIANGLE_COLOR);
-    fbb_.Required(o, DropDownButtonStyleData::VT_HOVER_COLOR);
+    auto o = ::flatbuffers::Offset<DropDownButtonStyleDataFbs>(end);
+    fbb_.Required(o, DropDownButtonStyleDataFbs::VT_STYLE);
+    fbb_.Required(o, DropDownButtonStyleDataFbs::VT_TRIANGLE_COLOR);
+    fbb_.Required(o, DropDownButtonStyleDataFbs::VT_HOVER_COLOR);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DropDownButtonStyleData> CreateDropDownButtonStyleData(
+inline ::flatbuffers::Offset<DropDownButtonStyleDataFbs> CreateDropDownButtonStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::StyleData> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> triangle_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> hover_color = 0) {
-  DropDownButtonStyleDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> triangle_color = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0) {
+  DropDownButtonStyleDataFbsBuilder builder_(_fbb);
   builder_.add_hover_color(hover_color);
   builder_.add_triangle_color(triangle_color);
   builder_.add_style(style);
   return builder_.Finish();
 }
 
-struct UIStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UIStyleDataBuilder Builder;
+struct UIStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UIStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PANEL_STYLE = 4,
     VT_BUTTON_STYLE = 6,
@@ -644,23 +644,23 @@ struct UIStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DROP_DOWN_BUTTON_STYLE = 14,
     VT_NAME = 16
   };
-  const steamrot::PanelStyleData *panel_style() const {
-    return GetPointer<const steamrot::PanelStyleData *>(VT_PANEL_STYLE);
+  const steamrot::PanelStyleDataFbs *panel_style() const {
+    return GetPointer<const steamrot::PanelStyleDataFbs *>(VT_PANEL_STYLE);
   }
-  const steamrot::ButtonStyleData *button_style() const {
-    return GetPointer<const steamrot::ButtonStyleData *>(VT_BUTTON_STYLE);
+  const steamrot::ButtonStyleDataFbs *button_style() const {
+    return GetPointer<const steamrot::ButtonStyleDataFbs *>(VT_BUTTON_STYLE);
   }
-  const steamrot::DropDownContainerStyleData *drop_down_container_style() const {
-    return GetPointer<const steamrot::DropDownContainerStyleData *>(VT_DROP_DOWN_CONTAINER_STYLE);
+  const steamrot::DropDownContainerStyleDataFbs *drop_down_container_style() const {
+    return GetPointer<const steamrot::DropDownContainerStyleDataFbs *>(VT_DROP_DOWN_CONTAINER_STYLE);
   }
-  const steamrot::DropDownListStyleData *drop_down_list_style() const {
-    return GetPointer<const steamrot::DropDownListStyleData *>(VT_DROP_DOWN_LIST_STYLE);
+  const steamrot::DropDownListStyleDataFbs *drop_down_list_style() const {
+    return GetPointer<const steamrot::DropDownListStyleDataFbs *>(VT_DROP_DOWN_LIST_STYLE);
   }
-  const steamrot::DropDownItemStyleData *drop_down_item_style() const {
-    return GetPointer<const steamrot::DropDownItemStyleData *>(VT_DROP_DOWN_ITEM_STYLE);
+  const steamrot::DropDownItemStyleDataFbs *drop_down_item_style() const {
+    return GetPointer<const steamrot::DropDownItemStyleDataFbs *>(VT_DROP_DOWN_ITEM_STYLE);
   }
-  const steamrot::DropDownButtonStyleData *drop_down_button_style() const {
-    return GetPointer<const steamrot::DropDownButtonStyleData *>(VT_DROP_DOWN_BUTTON_STYLE);
+  const steamrot::DropDownButtonStyleDataFbs *drop_down_button_style() const {
+    return GetPointer<const steamrot::DropDownButtonStyleDataFbs *>(VT_DROP_DOWN_BUTTON_STYLE);
   }
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
@@ -685,59 +685,59 @@ struct UIStyleData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct UIStyleDataBuilder {
-  typedef UIStyleData Table;
+struct UIStyleDataFbsBuilder {
+  typedef UIStyleDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_panel_style(::flatbuffers::Offset<steamrot::PanelStyleData> panel_style) {
-    fbb_.AddOffset(UIStyleData::VT_PANEL_STYLE, panel_style);
+  void add_panel_style(::flatbuffers::Offset<steamrot::PanelStyleDataFbs> panel_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_PANEL_STYLE, panel_style);
   }
-  void add_button_style(::flatbuffers::Offset<steamrot::ButtonStyleData> button_style) {
-    fbb_.AddOffset(UIStyleData::VT_BUTTON_STYLE, button_style);
+  void add_button_style(::flatbuffers::Offset<steamrot::ButtonStyleDataFbs> button_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_BUTTON_STYLE, button_style);
   }
-  void add_drop_down_container_style(::flatbuffers::Offset<steamrot::DropDownContainerStyleData> drop_down_container_style) {
-    fbb_.AddOffset(UIStyleData::VT_DROP_DOWN_CONTAINER_STYLE, drop_down_container_style);
+  void add_drop_down_container_style(::flatbuffers::Offset<steamrot::DropDownContainerStyleDataFbs> drop_down_container_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_DROP_DOWN_CONTAINER_STYLE, drop_down_container_style);
   }
-  void add_drop_down_list_style(::flatbuffers::Offset<steamrot::DropDownListStyleData> drop_down_list_style) {
-    fbb_.AddOffset(UIStyleData::VT_DROP_DOWN_LIST_STYLE, drop_down_list_style);
+  void add_drop_down_list_style(::flatbuffers::Offset<steamrot::DropDownListStyleDataFbs> drop_down_list_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_DROP_DOWN_LIST_STYLE, drop_down_list_style);
   }
-  void add_drop_down_item_style(::flatbuffers::Offset<steamrot::DropDownItemStyleData> drop_down_item_style) {
-    fbb_.AddOffset(UIStyleData::VT_DROP_DOWN_ITEM_STYLE, drop_down_item_style);
+  void add_drop_down_item_style(::flatbuffers::Offset<steamrot::DropDownItemStyleDataFbs> drop_down_item_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_DROP_DOWN_ITEM_STYLE, drop_down_item_style);
   }
-  void add_drop_down_button_style(::flatbuffers::Offset<steamrot::DropDownButtonStyleData> drop_down_button_style) {
-    fbb_.AddOffset(UIStyleData::VT_DROP_DOWN_BUTTON_STYLE, drop_down_button_style);
+  void add_drop_down_button_style(::flatbuffers::Offset<steamrot::DropDownButtonStyleDataFbs> drop_down_button_style) {
+    fbb_.AddOffset(UIStyleDataFbs::VT_DROP_DOWN_BUTTON_STYLE, drop_down_button_style);
   }
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
-    fbb_.AddOffset(UIStyleData::VT_NAME, name);
+    fbb_.AddOffset(UIStyleDataFbs::VT_NAME, name);
   }
-  explicit UIStyleDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UIStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UIStyleData> Finish() {
+  ::flatbuffers::Offset<UIStyleDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UIStyleData>(end);
-    fbb_.Required(o, UIStyleData::VT_PANEL_STYLE);
-    fbb_.Required(o, UIStyleData::VT_BUTTON_STYLE);
-    fbb_.Required(o, UIStyleData::VT_DROP_DOWN_CONTAINER_STYLE);
-    fbb_.Required(o, UIStyleData::VT_DROP_DOWN_LIST_STYLE);
-    fbb_.Required(o, UIStyleData::VT_DROP_DOWN_ITEM_STYLE);
-    fbb_.Required(o, UIStyleData::VT_DROP_DOWN_BUTTON_STYLE);
-    fbb_.Required(o, UIStyleData::VT_NAME);
+    auto o = ::flatbuffers::Offset<UIStyleDataFbs>(end);
+    fbb_.Required(o, UIStyleDataFbs::VT_PANEL_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_BUTTON_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_DROP_DOWN_CONTAINER_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_DROP_DOWN_LIST_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_DROP_DOWN_ITEM_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_DROP_DOWN_BUTTON_STYLE);
+    fbb_.Required(o, UIStyleDataFbs::VT_NAME);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UIStyleData> CreateUIStyleData(
+inline ::flatbuffers::Offset<UIStyleDataFbs> CreateUIStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::PanelStyleData> panel_style = 0,
-    ::flatbuffers::Offset<steamrot::ButtonStyleData> button_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownContainerStyleData> drop_down_container_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownListStyleData> drop_down_list_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownItemStyleData> drop_down_item_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownButtonStyleData> drop_down_button_style = 0,
+    ::flatbuffers::Offset<steamrot::PanelStyleDataFbs> panel_style = 0,
+    ::flatbuffers::Offset<steamrot::ButtonStyleDataFbs> button_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownContainerStyleDataFbs> drop_down_container_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownListStyleDataFbs> drop_down_list_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownItemStyleDataFbs> drop_down_item_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownButtonStyleDataFbs> drop_down_button_style = 0,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
-  UIStyleDataBuilder builder_(_fbb);
+  UIStyleDataFbsBuilder builder_(_fbb);
   builder_.add_name(name);
   builder_.add_drop_down_button_style(drop_down_button_style);
   builder_.add_drop_down_item_style(drop_down_item_style);
@@ -748,17 +748,17 @@ inline ::flatbuffers::Offset<UIStyleData> CreateUIStyleData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStyleData> CreateUIStyleDataDirect(
+inline ::flatbuffers::Offset<UIStyleDataFbs> CreateUIStyleDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::PanelStyleData> panel_style = 0,
-    ::flatbuffers::Offset<steamrot::ButtonStyleData> button_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownContainerStyleData> drop_down_container_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownListStyleData> drop_down_list_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownItemStyleData> drop_down_item_style = 0,
-    ::flatbuffers::Offset<steamrot::DropDownButtonStyleData> drop_down_button_style = 0,
+    ::flatbuffers::Offset<steamrot::PanelStyleDataFbs> panel_style = 0,
+    ::flatbuffers::Offset<steamrot::ButtonStyleDataFbs> button_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownContainerStyleDataFbs> drop_down_container_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownListStyleDataFbs> drop_down_list_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownItemStyleDataFbs> drop_down_item_style = 0,
+    ::flatbuffers::Offset<steamrot::DropDownButtonStyleDataFbs> drop_down_button_style = 0,
     const char *name = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  return steamrot::CreateUIStyleData(
+  return steamrot::CreateUIStyleDataFbs(
       _fbb,
       panel_style,
       button_style,
@@ -769,33 +769,33 @@ inline ::flatbuffers::Offset<UIStyleData> CreateUIStyleDataDirect(
       name__);
 }
 
-inline const steamrot::UIStyleData *GetUIStyleData(const void *buf) {
-  return ::flatbuffers::GetRoot<steamrot::UIStyleData>(buf);
+inline const steamrot::UIStyleDataFbs *GetUIStyleDataFbs(const void *buf) {
+  return ::flatbuffers::GetRoot<steamrot::UIStyleDataFbs>(buf);
 }
 
-inline const steamrot::UIStyleData *GetSizePrefixedUIStyleData(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<steamrot::UIStyleData>(buf);
+inline const steamrot::UIStyleDataFbs *GetSizePrefixedUIStyleDataFbs(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<steamrot::UIStyleDataFbs>(buf);
 }
 
 inline bool VerifyUIStyleDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<steamrot::UIStyleData>(nullptr);
+  return verifier.VerifyBuffer<steamrot::UIStyleDataFbs>(nullptr);
 }
 
 inline bool VerifySizePrefixedUIStyleDataBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<steamrot::UIStyleData>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<steamrot::UIStyleDataFbs>(nullptr);
 }
 
 inline void FinishUIStyleDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::UIStyleData> root) {
+    ::flatbuffers::Offset<steamrot::UIStyleDataFbs> root) {
   fbb.Finish(root);
 }
 
 inline void FinishSizePrefixedUIStyleDataBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<steamrot::UIStyleData> root) {
+    ::flatbuffers::Offset<steamrot::UIStyleDataFbs> root) {
   fbb.FinishSizePrefixed(root);
 }
 

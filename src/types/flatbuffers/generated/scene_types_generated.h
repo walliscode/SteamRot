@@ -15,8 +15,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct SceneChangePacketData;
-struct SceneChangePacketDataBuilder;
+struct SceneChangePacketDataFbs;
+struct SceneChangePacketDataFbsBuilder;
 
 enum SceneTypeFbs : int8_t {
   SceneTypeFbs_UNKNOWN = 0,
@@ -54,8 +54,8 @@ inline const char *EnumNameSceneTypeFbs(SceneTypeFbs e) {
   return EnumNamesSceneTypeFbs()[index];
 }
 
-struct SceneChangePacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SceneChangePacketDataBuilder Builder;
+struct SceneChangePacketDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SceneChangePacketDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_UUID = 4,
     VT_SCENE_TYPE = 6
@@ -75,43 +75,43 @@ struct SceneChangePacketData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   }
 };
 
-struct SceneChangePacketDataBuilder {
-  typedef SceneChangePacketData Table;
+struct SceneChangePacketDataFbsBuilder {
+  typedef SceneChangePacketDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_uuid(::flatbuffers::Offset<::flatbuffers::String> uuid) {
-    fbb_.AddOffset(SceneChangePacketData::VT_UUID, uuid);
+    fbb_.AddOffset(SceneChangePacketDataFbs::VT_UUID, uuid);
   }
   void add_scene_type(steamrot::SceneTypeFbs scene_type) {
-    fbb_.AddElement<int8_t>(SceneChangePacketData::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
+    fbb_.AddElement<int8_t>(SceneChangePacketDataFbs::VT_SCENE_TYPE, static_cast<int8_t>(scene_type), 0);
   }
-  explicit SceneChangePacketDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit SceneChangePacketDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<SceneChangePacketData> Finish() {
+  ::flatbuffers::Offset<SceneChangePacketDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SceneChangePacketData>(end);
+    auto o = ::flatbuffers::Offset<SceneChangePacketDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<SceneChangePacketData> CreateSceneChangePacketData(
+inline ::flatbuffers::Offset<SceneChangePacketDataFbs> CreateSceneChangePacketDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> uuid = 0,
     steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
-  SceneChangePacketDataBuilder builder_(_fbb);
+  SceneChangePacketDataFbsBuilder builder_(_fbb);
   builder_.add_uuid(uuid);
   builder_.add_scene_type(scene_type);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<SceneChangePacketData> CreateSceneChangePacketDataDirect(
+inline ::flatbuffers::Offset<SceneChangePacketDataFbs> CreateSceneChangePacketDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *uuid = nullptr,
     steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {
   auto uuid__ = uuid ? _fbb.CreateString(uuid) : 0;
-  return steamrot::CreateSceneChangePacketData(
+  return steamrot::CreateSceneChangePacketDataFbs(
       _fbb,
       uuid__,
       scene_type);

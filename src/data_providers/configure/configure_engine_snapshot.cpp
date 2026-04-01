@@ -34,7 +34,7 @@ ConfigureEngineSnapshot(EngineSnapshot &snapshot,
   // if (fb_snapshot->global_event_bus()) {
   //
   //   auto event_bus_result =
-  //       event::ConvertEventBusDataToEventBus(fb_snapshot->global_event_bus());
+  //       event::ConvertEventBusDataFbsToEventBus(fb_snapshot->global_event_bus());
   //   if (!event_bus_result.has_value()) {
   //     return std::unexpected(event_bus_result.error());
   //   }

@@ -15,12 +15,12 @@ namespace steamrot::data::configure {
 
 namespace {
 /////////////////////////////////////////////////
-std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb,
+std::expected<sf::Color, FailInfo> ToColor(const ColorDataFbs *color_fb,
                                            const std::string &context) {
 
   if (!color_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    context + " ColorData is null"});
+                                    context + " ColorDataFbs is null"});
 
   sf::Color color;
   if (!color_fb->r()) {
@@ -46,11 +46,11 @@ std::expected<sf::Color, FailInfo> ToColor(const ColorData *color_fb,
   return color;
 }
 /////////////////////////////////////////////////
-std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb,
+std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fDataFbs *vec_fb,
                                               const std::string &context) {
   if (!vec_fb)
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    context + " Vector2fData is null"});
+                                    context + " Vector2fDataFbs is null"});
 
   sf::Vector2f vec;
   if (!vec_fb->x()) {
@@ -69,7 +69,7 @@ std::expected<sf::Vector2f, FailInfo> ToVec2f(const Vector2fData *vec_fb,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureBaseStyle(const StyleData *style_fb, Style &style,
+ConfigureBaseStyle(const StyleDataFbs *style_fb, Style &style,
                    const std::string &style_name) {
 
   if (!style_fb)
@@ -137,7 +137,7 @@ ConfigureBaseStyle(const StyleData *style_fb, Style &style,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigurePanelStyle(const PanelStyleData *panel_fb, PanelStyle &panel_style) {
+ConfigurePanelStyle(const PanelStyleDataFbs *panel_fb, PanelStyle &panel_style) {
 
   if (!panel_fb)
     return std::unexpected(
@@ -159,7 +159,7 @@ ConfigurePanelStyle(const PanelStyleData *panel_fb, PanelStyle &panel_style) {
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureButtonStyle(const ButtonStyleData *button_fb,
+ConfigureButtonStyle(const ButtonStyleDataFbs *button_fb,
                      ButtonStyle &button_style,
                      std::unordered_map<std::string,
                                         std::shared_ptr<const sf::Font>>
@@ -216,7 +216,7 @@ ConfigureButtonStyle(const ButtonStyleData *button_fb,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConfigureDropDownContainerStyle(
-    const DropDownContainerStyleData *dd_container_fb,
+    const DropDownContainerStyleDataFbs *dd_container_fb,
     DropDownContainerStyle &dd_container_style) {
 
   if (!dd_container_fb)
@@ -242,7 +242,7 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerStyle(
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownListStyle(const DropDownListStyleData *dd_list_fb,
+ConfigureDropDownListStyle(const DropDownListStyleDataFbs *dd_list_fb,
                            DropDownListStyle &dd_list_style,
                            std::unordered_map<std::string,
                                               std::shared_ptr<const sf::Font>>
@@ -293,7 +293,7 @@ ConfigureDropDownListStyle(const DropDownListStyleData *dd_list_fb,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownItemStyle(const DropDownItemStyleData *dd_item_fb,
+ConfigureDropDownItemStyle(const DropDownItemStyleDataFbs *dd_item_fb,
                            DropDownItemStyle &dd_item_style,
                            std::unordered_map<std::string,
                                               std::shared_ptr<const sf::Font>>
@@ -340,7 +340,7 @@ ConfigureDropDownItemStyle(const DropDownItemStyleData *dd_item_fb,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureDropDownButtonStyle(const DropDownButtonStyleData *dd_button_fb,
+ConfigureDropDownButtonStyle(const DropDownButtonStyleDataFbs *dd_button_fb,
                              DropDownButtonStyle &dd_button_style) {
 
   if (!dd_button_fb)

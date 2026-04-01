@@ -17,8 +17,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct EventBusData;
-struct EventBusDataBuilder;
+struct EventBusDataFbs;
+struct EventBusDataFbsBuilder;
 
 ////////////////////////////////////////////////////////////
 /// @brief Snapshot of EventBus state
@@ -27,8 +27,8 @@ struct EventBusDataBuilder;
 /// at a specific point in time. Used for testing to configure initial state
 /// or validate expected state.
 ////////////////////////////////////////////////////////////
-struct EventBusData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef EventBusDataBuilder Builder;
+struct EventBusDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EventBusDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_EVENTS = 4,
     VT_DESCRIPTION = 6
@@ -53,44 +53,44 @@ struct EventBusData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct EventBusDataBuilder {
-  typedef EventBusData Table;
+struct EventBusDataFbsBuilder {
+  typedef EventBusDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_events(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events) {
-    fbb_.AddOffset(EventBusData::VT_EVENTS, events);
+    fbb_.AddOffset(EventBusDataFbs::VT_EVENTS, events);
   }
   void add_description(::flatbuffers::Offset<::flatbuffers::String> description) {
-    fbb_.AddOffset(EventBusData::VT_DESCRIPTION, description);
+    fbb_.AddOffset(EventBusDataFbs::VT_DESCRIPTION, description);
   }
-  explicit EventBusDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EventBusDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<EventBusData> Finish() {
+  ::flatbuffers::Offset<EventBusDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<EventBusData>(end);
+    auto o = ::flatbuffers::Offset<EventBusDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<EventBusData> CreateEventBusData(
+inline ::flatbuffers::Offset<EventBusDataFbs> CreateEventBusDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::EventPacketFbs>>> events = 0,
     ::flatbuffers::Offset<::flatbuffers::String> description = 0) {
-  EventBusDataBuilder builder_(_fbb);
+  EventBusDataFbsBuilder builder_(_fbb);
   builder_.add_description(description);
   builder_.add_events(events);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EventBusData> CreateEventBusDataDirect(
+inline ::flatbuffers::Offset<EventBusDataFbs> CreateEventBusDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events = nullptr,
     const char *description = nullptr) {
   auto events__ = events ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*events) : 0;
   auto description__ = description ? _fbb.CreateString(description) : 0;
-  return steamrot::CreateEventBusData(
+  return steamrot::CreateEventBusDataFbs(
       _fbb,
       events__,
       description__);

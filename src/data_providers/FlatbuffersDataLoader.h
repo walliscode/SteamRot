@@ -45,7 +45,7 @@ public:
   /////////////////////////////////////////////////
   /// @brief find and load all ui styles from flatbuffers data
   /////////////////////////////////////////////////
-  std::expected<std::vector<const UIStyleData *>, FailInfo>
+  std::expected<std::vector<const UIStyleDataFbs *>, FailInfo>
   ProvideUIStylesData() const;
 
   /////////////////////////////////////////////////
@@ -66,12 +66,12 @@ public:
   ProvideLogicConfigCollectionFbs() const;
 
   /////////////////////////////////////////////////
-  /// @brief Provides default UserPreferencesData from binary file
+  /// @brief Provides default UserPreferencesDataFbs from binary file
   ///
   /// This loads the default preferences from the binary file generated
   /// from the default.preferences.json file.
   /////////////////////////////////////////////////
-  std::expected<const UserPreferencesData *, FailInfo>
+  std::expected<const UserPreferencesDataFbs *, FailInfo>
   ProvideDefaultUserPreferencesData() const;
 
   /////////////////////////////////////////////////

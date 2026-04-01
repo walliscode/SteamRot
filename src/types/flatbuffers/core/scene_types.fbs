@@ -9,7 +9,7 @@ enum SceneTypeFbs: byte {
   CRAFTING = 3
 }
 
-table SceneChangePacketData {
+table SceneChangePacketDataFbs {
   uuid: string;
   scene_type: SceneTypeFbs;
 }

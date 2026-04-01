@@ -23,7 +23,7 @@ namespace steamrot;
 /// Display-related user preferences
 /// Note: Window size/framerate are in EngineCoreDataFbs, not here
 ////////////////////////////////////////////////////////////
-table DisplayPreferences {
+table DisplayPreferencesFbs {
   /// Fullscreen mode enabled
   fullscreen: bool = false;
   
@@ -34,7 +34,7 @@ table DisplayPreferences {
 ////////////////////////////////////////////////////////////
 /// Audio-related user preferences
 ////////////////////////////////////////////////////////////
-table AudioPreferences {
+table AudioPreferencesFbs {
   /// Master volume (0.0 - 1.0)
   master_volume: float = 1.0;
   
@@ -51,7 +51,7 @@ table AudioPreferences {
 ////////////////////////////////////////////////////////////
 /// Accessibility-related user preferences (extensible)
 ////////////////////////////////////////////////////////////
-table AccessibilityPreferences {
+table AccessibilityPreferencesFbs {
   /// UI scale factor (1.0 = default)
   ui_scale: float = 1.0;
   
@@ -62,18 +62,18 @@ table AccessibilityPreferences {
 ////////////////////////////////////////////////////////////
 /// Root table containing all user preferences
 ////////////////////////////////////////////////////////////
-table UserPreferencesData {
+table UserPreferencesDataFbs {
   /// Display settings
-  display: DisplayPreferences;
+  display: DisplayPreferencesFbs;
   
   /// Audio settings
-  audio: AudioPreferences;
+  audio: AudioPreferencesFbs;
   
   /// Accessibility settings
-  accessibility: AccessibilityPreferences;
+  accessibility: AccessibilityPreferencesFbs;
   
   /// Version number for migration support
   version: uint32 = 1;
 }
 
-root_type UserPreferencesData;
+root_type UserPreferencesDataFbs;

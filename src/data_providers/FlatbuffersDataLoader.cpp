@@ -70,14 +70,14 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
 }
 
 /////////////////////////////////////////////////
-std::expected<std::vector<const UIStyleData *>, FailInfo>
+std::expected<std::vector<const UIStyleDataFbs *>, FailInfo>
 FlatbuffersDataLoader::ProvideUIStylesData() const {
 
   // get the UIStyleDirectory
   std::filesystem::path ui_style_dir = paths::GetUIStylesDirectory();
 
   // find all fles in the directiry with styles.bin extension
-  std::vector<const UIStyleData *> ui_styles;
+  std::vector<const UIStyleDataFbs *> ui_styles;
 
   for (const auto &entry : std::filesystem::directory_iterator(ui_style_dir)) {
 
@@ -86,14 +86,14 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
         entry.path().filename().string().ends_with(".styles.bin")) {
 
       // load the style data using the generated function from flatbuffers
-      const steamrot::UIStyleData *style_data =
-          GetUIStyleData(LoadBinaryData(entry.path()));
+      const steamrot::UIStyleDataFbs *style_data =
+          GetUIStyleDataFbs(LoadBinaryData(entry.path()));
       if (style_data) {
         ui_styles.push_back(style_data);
       } else {
         // unexpected error if style data is null
         std::string error_message = std::format(
-            "UIStyleData pointer is null for file: {}", entry.path().string());
+            "UIStyleDataFbs pointer is null for file: {}", entry.path().string());
         return std::unexpected(
             FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
       }
@@ -179,7 +179,7 @@ FlatbuffersDataLoader::ProvideLogicConfigCollectionFbs() const {
 }
 
 /////////////////////////////////////////////////
-std::expected<const UserPreferencesData *, FailInfo>
+std::expected<const UserPreferencesDataFbs *, FailInfo>
 FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
   // get preferences directory
   std::filesystem::path preferences_dir = paths::GetPreferencesDirectory();
@@ -196,12 +196,12 @@ FlatbuffersDataLoader::ProvideDefaultUserPreferencesData() const {
   }
 
   // load the preferences data
-  const steamrot::UserPreferencesData *preferences_data =
-      GetUserPreferencesData(LoadBinaryData(preferences_path));
+  const steamrot::UserPreferencesDataFbs *preferences_data =
+      GetUserPreferencesDataFbs(LoadBinaryData(preferences_path));
 
   if (!preferences_data) {
     return std::unexpected(FailInfo(FailMode::FlatbuffersDataNotFound,
-                                    "UserPreferencesData pointer is null"));
+                                    "UserPreferencesDataFbs pointer is null"));
   }
 
   return preferences_data;

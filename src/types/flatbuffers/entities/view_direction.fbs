@@ -10,5 +10,5 @@ FRONT = 1,
 
 table ViewFbs {
     direction : ViewDirectionFbs;
-    triangles : [Triangle] (required);
+    triangles : [TriangleFbs] (required);
   }

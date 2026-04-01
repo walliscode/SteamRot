@@ -5,7 +5,7 @@ namespace steamrot;
 
 table JointFbs{
 name: string (required);
-sockets: [Vector2fData] (required);
+sockets: [Vector2fDataFbs] (required);
 movement_views: [ViewFbs] (required);
   }
 

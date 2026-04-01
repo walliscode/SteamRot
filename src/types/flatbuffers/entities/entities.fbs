@@ -6,7 +6,7 @@ namespace steamrot;
 table EntityDataFbs{
   index: uint32;
   c_user_interface: UserInterfaceFbs;
-  c_ui_state: UIStateCollectionData;
+  c_ui_state: UIStateCollectionDataFbs;
 
   }
 

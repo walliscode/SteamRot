@@ -15,73 +15,73 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct UserInputBitsetData;
-struct UserInputBitsetDataBuilder;
+struct UserInputBitsetDataFbs;
+struct UserInputBitsetDataFbsBuilder;
 
-enum KeyboardInput : uint8_t {
-  KeyboardInput_A = 0,
-  KeyboardInput_B = 1,
-  KeyboardInput_C = 2,
-  KeyboardInput_D = 3,
-  KeyboardInput_E = 4,
-  KeyboardInput_F = 5,
-  KeyboardInput_G = 6,
-  KeyboardInput_H = 7,
-  KeyboardInput_I = 8,
-  KeyboardInput_J = 9,
-  KeyboardInput_K = 10,
-  KeyboardInput_L = 11,
-  KeyboardInput_M = 12,
-  KeyboardInput_N = 13,
-  KeyboardInput_O = 14,
-  KeyboardInput_P = 15,
-  KeyboardInput_Q = 16,
-  KeyboardInput_R = 17,
-  KeyboardInput_S = 18,
-  KeyboardInput_T = 19,
-  KeyboardInput_U = 20,
-  KeyboardInput_V = 21,
-  KeyboardInput_W = 22,
-  KeyboardInput_X = 23,
-  KeyboardInput_Y = 24,
-  KeyboardInput_Z = 25,
-  KeyboardInput_MIN = KeyboardInput_A,
-  KeyboardInput_MAX = KeyboardInput_Z
+enum KeyboardInputFbs : uint8_t {
+  KeyboardInputFbs_A = 0,
+  KeyboardInputFbs_B = 1,
+  KeyboardInputFbs_C = 2,
+  KeyboardInputFbs_D = 3,
+  KeyboardInputFbs_E = 4,
+  KeyboardInputFbs_F = 5,
+  KeyboardInputFbs_G = 6,
+  KeyboardInputFbs_H = 7,
+  KeyboardInputFbs_I = 8,
+  KeyboardInputFbs_J = 9,
+  KeyboardInputFbs_K = 10,
+  KeyboardInputFbs_L = 11,
+  KeyboardInputFbs_M = 12,
+  KeyboardInputFbs_N = 13,
+  KeyboardInputFbs_O = 14,
+  KeyboardInputFbs_P = 15,
+  KeyboardInputFbs_Q = 16,
+  KeyboardInputFbs_R = 17,
+  KeyboardInputFbs_S = 18,
+  KeyboardInputFbs_T = 19,
+  KeyboardInputFbs_U = 20,
+  KeyboardInputFbs_V = 21,
+  KeyboardInputFbs_W = 22,
+  KeyboardInputFbs_X = 23,
+  KeyboardInputFbs_Y = 24,
+  KeyboardInputFbs_Z = 25,
+  KeyboardInputFbs_MIN = KeyboardInputFbs_A,
+  KeyboardInputFbs_MAX = KeyboardInputFbs_Z
 };
 
-inline const KeyboardInput (&EnumValuesKeyboardInput())[26] {
-  static const KeyboardInput values[] = {
-    KeyboardInput_A,
-    KeyboardInput_B,
-    KeyboardInput_C,
-    KeyboardInput_D,
-    KeyboardInput_E,
-    KeyboardInput_F,
-    KeyboardInput_G,
-    KeyboardInput_H,
-    KeyboardInput_I,
-    KeyboardInput_J,
-    KeyboardInput_K,
-    KeyboardInput_L,
-    KeyboardInput_M,
-    KeyboardInput_N,
-    KeyboardInput_O,
-    KeyboardInput_P,
-    KeyboardInput_Q,
-    KeyboardInput_R,
-    KeyboardInput_S,
-    KeyboardInput_T,
-    KeyboardInput_U,
-    KeyboardInput_V,
-    KeyboardInput_W,
-    KeyboardInput_X,
-    KeyboardInput_Y,
-    KeyboardInput_Z
+inline const KeyboardInputFbs (&EnumValuesKeyboardInputFbs())[26] {
+  static const KeyboardInputFbs values[] = {
+    KeyboardInputFbs_A,
+    KeyboardInputFbs_B,
+    KeyboardInputFbs_C,
+    KeyboardInputFbs_D,
+    KeyboardInputFbs_E,
+    KeyboardInputFbs_F,
+    KeyboardInputFbs_G,
+    KeyboardInputFbs_H,
+    KeyboardInputFbs_I,
+    KeyboardInputFbs_J,
+    KeyboardInputFbs_K,
+    KeyboardInputFbs_L,
+    KeyboardInputFbs_M,
+    KeyboardInputFbs_N,
+    KeyboardInputFbs_O,
+    KeyboardInputFbs_P,
+    KeyboardInputFbs_Q,
+    KeyboardInputFbs_R,
+    KeyboardInputFbs_S,
+    KeyboardInputFbs_T,
+    KeyboardInputFbs_U,
+    KeyboardInputFbs_V,
+    KeyboardInputFbs_W,
+    KeyboardInputFbs_X,
+    KeyboardInputFbs_Y,
+    KeyboardInputFbs_Z
   };
   return values;
 }
 
-inline const char * const *EnumNamesKeyboardInput() {
+inline const char * const *EnumNamesKeyboardInputFbs() {
   static const char * const names[27] = {
     "A",
     "B",
@@ -114,34 +114,34 @@ inline const char * const *EnumNamesKeyboardInput() {
   return names;
 }
 
-inline const char *EnumNameKeyboardInput(KeyboardInput e) {
-  if (::flatbuffers::IsOutRange(e, KeyboardInput_A, KeyboardInput_Z)) return "";
+inline const char *EnumNameKeyboardInputFbs(KeyboardInputFbs e) {
+  if (::flatbuffers::IsOutRange(e, KeyboardInputFbs_A, KeyboardInputFbs_Z)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesKeyboardInput()[index];
+  return EnumNamesKeyboardInputFbs()[index];
 }
 
-enum MouseInput : uint8_t {
-  MouseInput_LEFT_CLICK = 0,
-  MouseInput_RIGHT_CLICK = 1,
-  MouseInput_MIDDLE_CLICK = 2,
-  MouseInput_SCROLL_UP = 3,
-  MouseInput_SCROLL_DOWN = 4,
-  MouseInput_MIN = MouseInput_LEFT_CLICK,
-  MouseInput_MAX = MouseInput_SCROLL_DOWN
+enum MouseInputFbs : uint8_t {
+  MouseInputFbs_LEFT_CLICK = 0,
+  MouseInputFbs_RIGHT_CLICK = 1,
+  MouseInputFbs_MIDDLE_CLICK = 2,
+  MouseInputFbs_SCROLL_UP = 3,
+  MouseInputFbs_SCROLL_DOWN = 4,
+  MouseInputFbs_MIN = MouseInputFbs_LEFT_CLICK,
+  MouseInputFbs_MAX = MouseInputFbs_SCROLL_DOWN
 };
 
-inline const MouseInput (&EnumValuesMouseInput())[5] {
-  static const MouseInput values[] = {
-    MouseInput_LEFT_CLICK,
-    MouseInput_RIGHT_CLICK,
-    MouseInput_MIDDLE_CLICK,
-    MouseInput_SCROLL_UP,
-    MouseInput_SCROLL_DOWN
+inline const MouseInputFbs (&EnumValuesMouseInputFbs())[5] {
+  static const MouseInputFbs values[] = {
+    MouseInputFbs_LEFT_CLICK,
+    MouseInputFbs_RIGHT_CLICK,
+    MouseInputFbs_MIDDLE_CLICK,
+    MouseInputFbs_SCROLL_UP,
+    MouseInputFbs_SCROLL_DOWN
   };
   return values;
 }
 
-inline const char * const *EnumNamesMouseInput() {
+inline const char * const *EnumNamesMouseInputFbs() {
   static const char * const names[6] = {
     "LEFT_CLICK",
     "RIGHT_CLICK",
@@ -153,14 +153,14 @@ inline const char * const *EnumNamesMouseInput() {
   return names;
 }
 
-inline const char *EnumNameMouseInput(MouseInput e) {
-  if (::flatbuffers::IsOutRange(e, MouseInput_LEFT_CLICK, MouseInput_SCROLL_DOWN)) return "";
+inline const char *EnumNameMouseInputFbs(MouseInputFbs e) {
+  if (::flatbuffers::IsOutRange(e, MouseInputFbs_LEFT_CLICK, MouseInputFbs_SCROLL_DOWN)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesMouseInput()[index];
+  return EnumNamesMouseInputFbs()[index];
 }
 
-struct UserInputBitsetData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UserInputBitsetDataBuilder Builder;
+struct UserInputBitsetDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UserInputBitsetDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_KEYBOARD_PRESSED = 4,
     VT_KEYBOARD_RELEASED = 6,
@@ -193,40 +193,40 @@ struct UserInputBitsetData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   }
 };
 
-struct UserInputBitsetDataBuilder {
-  typedef UserInputBitsetData Table;
+struct UserInputBitsetDataFbsBuilder {
+  typedef UserInputBitsetDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_keyboard_pressed(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_pressed) {
-    fbb_.AddOffset(UserInputBitsetData::VT_KEYBOARD_PRESSED, keyboard_pressed);
+    fbb_.AddOffset(UserInputBitsetDataFbs::VT_KEYBOARD_PRESSED, keyboard_pressed);
   }
   void add_keyboard_released(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_released) {
-    fbb_.AddOffset(UserInputBitsetData::VT_KEYBOARD_RELEASED, keyboard_released);
+    fbb_.AddOffset(UserInputBitsetDataFbs::VT_KEYBOARD_RELEASED, keyboard_released);
   }
   void add_mouse_pressed(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_pressed) {
-    fbb_.AddOffset(UserInputBitsetData::VT_MOUSE_PRESSED, mouse_pressed);
+    fbb_.AddOffset(UserInputBitsetDataFbs::VT_MOUSE_PRESSED, mouse_pressed);
   }
   void add_mouse_released(::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_released) {
-    fbb_.AddOffset(UserInputBitsetData::VT_MOUSE_RELEASED, mouse_released);
+    fbb_.AddOffset(UserInputBitsetDataFbs::VT_MOUSE_RELEASED, mouse_released);
   }
-  explicit UserInputBitsetDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UserInputBitsetDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UserInputBitsetData> Finish() {
+  ::flatbuffers::Offset<UserInputBitsetDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UserInputBitsetData>(end);
+    auto o = ::flatbuffers::Offset<UserInputBitsetDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UserInputBitsetData> CreateUserInputBitsetData(
+inline ::flatbuffers::Offset<UserInputBitsetDataFbs> CreateUserInputBitsetDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_pressed = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> keyboard_released = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_pressed = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint8_t>> mouse_released = 0) {
-  UserInputBitsetDataBuilder builder_(_fbb);
+  UserInputBitsetDataFbsBuilder builder_(_fbb);
   builder_.add_mouse_released(mouse_released);
   builder_.add_mouse_pressed(mouse_pressed);
   builder_.add_keyboard_released(keyboard_released);
@@ -234,7 +234,7 @@ inline ::flatbuffers::Offset<UserInputBitsetData> CreateUserInputBitsetData(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UserInputBitsetData> CreateUserInputBitsetDataDirect(
+inline ::flatbuffers::Offset<UserInputBitsetDataFbs> CreateUserInputBitsetDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<uint8_t> *keyboard_pressed = nullptr,
     const std::vector<uint8_t> *keyboard_released = nullptr,
@@ -244,7 +244,7 @@ inline ::flatbuffers::Offset<UserInputBitsetData> CreateUserInputBitsetDataDirec
   auto keyboard_released__ = keyboard_released ? _fbb.CreateVector<uint8_t>(*keyboard_released) : 0;
   auto mouse_pressed__ = mouse_pressed ? _fbb.CreateVector<uint8_t>(*mouse_pressed) : 0;
   auto mouse_released__ = mouse_released ? _fbb.CreateVector<uint8_t>(*mouse_released) : 0;
-  return steamrot::CreateUserInputBitsetData(
+  return steamrot::CreateUserInputBitsetDataFbs(
       _fbb,
       keyboard_pressed__,
       keyboard_released__,
