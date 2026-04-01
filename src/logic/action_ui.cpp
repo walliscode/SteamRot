@@ -7,7 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_ui.h"
+#include "DataPopulationFunctions.h"
 #include "DropDownButtonElement.h"
+#include "DropDownItemElement.h"
+#include "action_grimoire_machina.h"
+#include <iostream>
 
 namespace steamrot::logic::action::ui {
 
@@ -122,8 +126,24 @@ void ProcessDropDownContainerElementActions(
   if (dropdown_button_element) {
 
     if (dropdown_list_element) {
+
+      // so we don't want the keep on calling the list element actions if it is
+      // already expanded so we will store the expanded state of the list
+      // element before calling the button element actions, and only call the
+      // list element actions if the button element is expanded and the list
+      // element is not already expanded
+      bool was_list_expanded = dropdown_list_element->is_expanded;
+
       // if the button is expanded, the list should be expanded
       dropdown_list_element->is_expanded = dropdown_button_element->is_expanded;
+
+      // call the list element actions to populate the list if it is expanded
+      if (dropdown_list_element->is_expanded && !was_list_expanded) {
+        std::cout << "Processing DropDownListElement actions" << std::endl;
+
+        ProcessDropDownListElementActions(*dropdown_list_element,
+                                          scene_context);
+      }
     }
 
     // deal with parent container
@@ -147,6 +167,38 @@ void ProcessDropDownButtonElementActions(
 /////////////////////////////////////////////////
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
-    const SceneContext &scene_context) {}
+    const SceneContext &scene_context) {
+
+  if (!dropdown_list_element.is_expanded) {
+    // if the list isn't expanded, then we don't want to populate it
+    return;
+  }
+
+  // set up any variables needed
+  std::vector<std::string> fragment_names;
+
+  // switch on the DataPopulationFunction enum
+  switch (dropdown_list_element.data_population_function) {
+
+  case DataPopulationFunction::GetAllFragmentNames:
+    fragment_names = grimoire_machina::GetAllFragmentNames(
+        *scene_context.asset_manager.GetGrimoireMachina().value());
+    break;
+
+  default:
+    // do nothing as there may be functions in the enum that are not relevant to
+    // this UI element
+    break;
+  }
+
+  // deal with variables
+  for (const auto &fragment_name : fragment_names) {
+    // create a new DropDownItemElement for each fragment name and add to the
+    // child elements of the list
+    auto dropdown_item = std::make_unique<DropDownItemElement>();
+    dropdown_item->label = fragment_name;
+    dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
+  }
+}
 
 } // namespace steamrot::logic::action::ui

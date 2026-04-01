@@ -9,6 +9,7 @@
 #include "action_ui.h"
 #include "DataPopulationFunctions.h"
 #include "DropDownButtonElement.h"
+#include "DropDownItemElement.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
 #include "EventType.h"
@@ -214,17 +215,67 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
   // set up
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
-
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up empty GrimoireMachina: " +
+         set_up_result.error().message);
+  }
   // set up a dropdown list element
   steamrot::DropDownListElement dropdown;
-  dropdown.data_population_function = steamrot::DataPopulationFunction::None;
+  REQUIRE(dropdown.child_elements.size() == 0);
+
   SECTION("No population when function is None") {
     steamrot::logic::action::ui::ProcessDropDownListElementActions(
         dropdown, scene_context);
     REQUIRE(dropdown.child_elements.size() == 0);
   }
-  // Further tests would require setting up a CGrimoireMachina entity in the
-  // scene context, which is beyond the scope of this unit test.
+
+  SECTION("No population when DataPopulationFunction is set but is_expanded is "
+          "false") {
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllFragmentNames;
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+    REQUIRE(dropdown.child_elements.size() == 0);
+  }
+
+  SECTION("DropDownItemElements are added when "
+          "DataPopulationFunction::GetAllFragmentNames is set and is_expanded "
+          "is true") {
+
+    // edit grimoice machina to have some fragments for testing
+    auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+    if (!get_grimoire_result.has_value()) {
+      FAIL("Failed to get GrimoireMachina from AssetManager: " +
+           get_grimoire_result.error().message);
+    }
+    steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
+
+    grimoire_machina.m_all_fragments.clear();
+    grimoire_machina.m_all_fragments.insert(
+        {"fragment1", steamrot::Fragment{}});
+    grimoire_machina.m_all_fragments.insert(
+        {"fragment2", steamrot::Fragment{}});
+    grimoire_machina.m_all_fragments.insert(
+        {"fragment3", steamrot::Fragment{}});
+
+    // set function
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllFragmentNames;
+    // set is_expanded to true
+    dropdown.is_expanded = true;
+
+    // run ProcessDropDownListElementActions, which will call the correct
+    // population function based on the enum and populate the dropdown
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+
+    REQUIRE(dropdown.child_elements.size() == 3);
+    for (const auto &child : dropdown.child_elements) {
+      REQUIRE(dynamic_cast<steamrot::DropDownItemElement *>(child.get()) !=
+              nullptr);
+    }
+  }
 }
 
 TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "
