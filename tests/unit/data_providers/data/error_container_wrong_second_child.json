@@ -26,7 +26,7 @@
                       "layout": "DropDown",
                       "spacing_strategy": "DropDownList"
                     },
-                    "label": "List",
+                    "unexpanded_label": "List",
                     "expanded_label": "Expanded",
                     "data_populate_function": "PopulateWithFragmentData"
                   }

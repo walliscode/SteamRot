@@ -62,10 +62,11 @@ enum DataPopulateFunction: byte {
     PopulateWithFragmentData = 1,
     PopulateWithJointData = 2,
   }
+
 table DropDownListData{
   base_data: UIElementData(required);
-    label: string (required);
-    expanded_label: string (required);
+    unexpanded_label: string;
+    expanded_label: string ;
     data_populate_function: DataPopulateFunction;
   }
 

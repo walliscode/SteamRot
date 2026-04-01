@@ -6,13 +6,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "action_ui.h"
+#include "DropDownButtonElement.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
 #include "EventType.h"
 #include "PanelElement.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
-#include "action_ui.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE(
@@ -49,6 +50,160 @@ TEST_CASE(
                                                              event_handler);
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
+  }
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions responds "
+          "to various cases",
+          "[logic][action][ProcessDropDownContainerElementActions]") {
+
+  // set up DropDownContainerElement with correct children
+  steamrot::DropDownContainerElement dropdown_container;
+  dropdown_container.subscription = std::make_shared<steamrot::Subscriber>();
+  REQUIRE(dropdown_container.child_elements.size() == 0);
+  REQUIRE_FALSE(dropdown_container.is_expanded);
+
+  auto dropdown_list = std::make_unique<steamrot::DropDownListElement>();
+  REQUIRE_FALSE(dropdown_list->is_expanded);
+
+  auto dropdown_button = std::make_unique<steamrot::DropDownButtonElement>();
+  REQUIRE_FALSE(dropdown_button->is_expanded);
+
+  dropdown_container.child_elements.push_back(std::move(dropdown_list));
+  dropdown_container.child_elements.push_back(std::move(dropdown_button));
+
+  auto dropdown_list_ptr = dynamic_cast<steamrot::DropDownListElement *>(
+      dropdown_container.child_elements[0].get());
+  REQUIRE(dropdown_list_ptr != nullptr);
+  auto dropdown_button_ptr = dynamic_cast<steamrot::DropDownButtonElement *>(
+      dropdown_container.child_elements[1].get());
+  REQUIRE(dropdown_button_ptr != nullptr);
+
+  REQUIRE(dropdown_container.child_elements.size() == 2);
+
+  SECTION(
+      "ProcessDropDownContainerElementActions does not change is_expanded") {
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(dropdown_container.is_expanded);
+  }
+
+  SECTION("ProcessDropDownContainerElmentActions is_expanded is false if just "
+          "moused over") {
+
+    dropdown_container.is_mouse_over = true;
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(dropdown_container.is_expanded);
+  }
+
+  SECTION("ProcessDropDownContainerElementActions is_expanded is false if "
+          "subscription active") {
+
+    dropdown_container.subscription->m_active = true;
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(dropdown_container.is_expanded);
+  }
+
+  SECTION("ProcessDropDownContainerElementActions is_expanded is false if "
+          "subscription active and moused over") {
+    dropdown_container.is_mouse_over = true;
+    dropdown_container.subscription->m_active = true;
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(dropdown_container.is_expanded);
+  }
+
+  SECTION("ProcessDropDownContainerElement (and DropDownListElement) "
+          "is_expanded is true if "
+          "DropDownButtonElement child[1] is_expanded is true") {
+    dropdown_button_ptr->is_expanded = true;
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE(dropdown_container.is_expanded);
+    REQUIRE(dropdown_list_ptr->is_expanded);
+  }
+
+  SECTION("ProcessDropDownContainerElement (and DropDownListElement) toggles "
+          "is_expanded if DropDownButtonElement is_mouse_over true and "
+          "subscription active") {
+    dropdown_button_ptr->is_mouse_over = true;
+    dropdown_button_ptr->subscription =
+        std::make_shared<steamrot::Subscriber>();
+    dropdown_button_ptr->subscription->m_active = true;
+    steamrot::tests::TestFixture fixture;
+    steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE(dropdown_container.is_expanded);
+    REQUIRE(dropdown_list_ptr->is_expanded);
+    // toggles back to false on second call
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(dropdown_container.is_expanded);
+    REQUIRE_FALSE(dropdown_list_ptr->is_expanded);
+  }
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownButtonElementActions responds to "
+          "various cases",
+          "[logic][action][ProcessDropDownButtonElementActions]") {
+  // set up
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  steamrot::DropDownButtonElement dropdown_button;
+  dropdown_button.subscription = std::make_shared<steamrot::Subscriber>();
+  // initial tests
+  REQUIRE_FALSE(dropdown_button.is_expanded);
+  REQUIRE_FALSE(dropdown_button.is_mouse_over);
+  REQUIRE_FALSE(dropdown_button.subscription->m_active);
+
+  SECTION("ProcessDropDownButtonElementActions does not change is_expanded if "
+          "mouse_over false and subscription inactive") {
+    steamrot::logic::action::ui::ProcessDropDownButtonElementActions(
+        dropdown_button);
+    REQUIRE_FALSE(dropdown_button.is_expanded);
+  }
+
+  SECTION("ProcessDropDownButtonElementActions does not change is_expanded if "
+          "mouse_over true and subscription inactive") {
+    dropdown_button.is_mouse_over = true;
+    steamrot::logic::action::ui::ProcessDropDownButtonElementActions(
+        dropdown_button);
+    REQUIRE_FALSE(dropdown_button.is_expanded);
+  }
+
+  SECTION("ProcessDropDownButtonElementActions does not change is_expanded if "
+          "mouse_over false and subscription active") {
+    dropdown_button.subscription->m_active = true;
+    steamrot::logic::action::ui::ProcessDropDownButtonElementActions(
+        dropdown_button);
+    REQUIRE_FALSE(dropdown_button.is_expanded);
+  }
+
+  SECTION("ProcessDropDownButtonElementActions toggles is_expanded if "
+          "mouse_over true and subscription active") {
+    dropdown_button.is_mouse_over = true;
+    dropdown_button.subscription->m_active = true;
+    steamrot::logic::action::ui::ProcessDropDownButtonElementActions(
+        dropdown_button);
+    REQUIRE(dropdown_button.is_expanded);
+
+    // toggles back to false on second call
+    steamrot::logic::action::ui::ProcessDropDownButtonElementActions(
+        dropdown_button);
+    REQUIRE_FALSE(dropdown_button.is_expanded);
   }
 }
 

@@ -25,12 +25,12 @@ struct DropDownListElement : public UIElement {
   /// @brief The name you see when the items are not expanded. It should
   /// indicate role of the dropdown
   /////////////////////////////////////////////////
-  std::string unexpanded_label{"items..."};
+  std::string unexpanded_label{"unexpanded items..."};
 
   /////////////////////////////////////////////////
   /// @brief The name you see when the items are expanded.
   /////////////////////////////////////////////////
-  std::string expanded_label{"items..."};
+  std::string expanded_label{"expanded items..."};
 
   /////////////////////////////////////////////////
   /// @brief Function to populate dropdown data dynamically
