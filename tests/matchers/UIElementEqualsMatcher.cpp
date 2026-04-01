@@ -100,8 +100,7 @@ bool UIElementEqualsMatcher::CompareDerivedFields(
   // Compare DropDownListElement fields
   else if (auto actual_dd_list =
                dynamic_cast<const DropDownListElement *>(&actual)) {
-    auto expected_dd_list =
-        static_cast<const DropDownListElement *>(&expected);
+    auto expected_dd_list = static_cast<const DropDownListElement *>(&expected);
     if (actual_dd_list->is_expanded != expected_dd_list->is_expanded) {
       oss << "DropDownListElement.is_expanded: actual="
           << actual_dd_list->is_expanded
@@ -121,12 +120,12 @@ bool UIElementEqualsMatcher::CompareDerivedFields(
           << expected_dd_list->expanded_label << "'; ";
       return false;
     }
-    if (actual_dd_list->data_populate_function !=
-        expected_dd_list->data_populate_function) {
+    if (actual_dd_list->data_population_function !=
+        expected_dd_list->data_population_function) {
       oss << "DropDownListElement.data_populate_function: actual="
-          << static_cast<int>(actual_dd_list->data_populate_function)
+          << static_cast<int>(actual_dd_list->data_population_function)
           << ", expected="
-          << static_cast<int>(expected_dd_list->data_populate_function)
+          << static_cast<int>(expected_dd_list->data_population_function)
           << "; ";
       return false;
     }
@@ -134,8 +133,7 @@ bool UIElementEqualsMatcher::CompareDerivedFields(
   // Compare DropDownItemElement fields
   else if (auto actual_dd_item =
                dynamic_cast<const DropDownItemElement *>(&actual)) {
-    auto expected_dd_item =
-        static_cast<const DropDownItemElement *>(&expected);
+    auto expected_dd_item = static_cast<const DropDownItemElement *>(&expected);
     if (actual_dd_item->label != expected_dd_item->label) {
       oss << "DropDownItemElement.label: actual='" << actual_dd_item->label
           << "', expected='" << expected_dd_item->label << "'; ";
@@ -187,9 +185,10 @@ bool UIElementEqualsMatcher::CompareChildren(const UIElement &actual,
 }
 
 /////////////////////////////////////////////////
-bool UIElementEqualsMatcher::CompareUIElements(
-    const UIElement &actual, const UIElement &expected,
-    std::ostringstream &output_oss, int depth) const {
+bool UIElementEqualsMatcher::CompareUIElements(const UIElement &actual,
+                                               const UIElement &expected,
+                                               std::ostringstream &output_oss,
+                                               int depth) const {
 
   std::ostringstream oss;
   std::string prefix =
@@ -230,8 +229,7 @@ bool UIElementEqualsMatcher::CompareUIElements(
   if (actual.spacing_strategy != expected.spacing_strategy) {
     oss << prefix << "spacing_strategy: actual="
         << static_cast<int>(actual.spacing_strategy)
-        << ", expected=" << static_cast<int>(expected.spacing_strategy)
-        << "; ";
+        << ", expected=" << static_cast<int>(expected.spacing_strategy) << "; ";
   }
 
   // Compare layout

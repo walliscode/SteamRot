@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_ui.h"
+#include "DataPopulationFunctions.h"
 #include "DropDownButtonElement.h"
 #include "EventPacket.h"
 #include "EventPayload.h"
@@ -216,8 +217,7 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
 
   // set up a dropdown list element
   steamrot::DropDownListElement dropdown;
-  dropdown.data_populate_function =
-      steamrot::DataPopulateFunction::DataPopulateFunction_None;
+  dropdown.data_population_function = steamrot::DataPopulationFunction::None;
   SECTION("No population when function is None") {
     steamrot::logic::action::ui::ProcessDropDownListElementActions(
         dropdown, scene_context);

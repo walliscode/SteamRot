@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
               FLATBUFFERS_VERSION_REVISION == 10,
              "Non-compatible flatbuffers version included");
 
+#include "data_population_function_generated.h"
 #include "types_generated.h"
 #include "event_packet_generated.h"
 #include "subscriber_generated.h"
@@ -196,39 +197,6 @@ template<> struct UIElementDataUnionTraits<steamrot::DropDownButtonData> {
 
 bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnion type);
 bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
-
-enum DataPopulateFunction : int8_t {
-  DataPopulateFunction_None = 0,
-  DataPopulateFunction_PopulateWithFragmentData = 1,
-  DataPopulateFunction_PopulateWithJointData = 2,
-  DataPopulateFunction_MIN = DataPopulateFunction_None,
-  DataPopulateFunction_MAX = DataPopulateFunction_PopulateWithJointData
-};
-
-inline const DataPopulateFunction (&EnumValuesDataPopulateFunction())[3] {
-  static const DataPopulateFunction values[] = {
-    DataPopulateFunction_None,
-    DataPopulateFunction_PopulateWithFragmentData,
-    DataPopulateFunction_PopulateWithJointData
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesDataPopulateFunction() {
-  static const char * const names[4] = {
-    "None",
-    "PopulateWithFragmentData",
-    "PopulateWithJointData",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameDataPopulateFunction(DataPopulateFunction e) {
-  if (::flatbuffers::IsOutRange(e, DataPopulateFunction_None, DataPopulateFunction_PopulateWithJointData)) return "";
-  const size_t index = static_cast<size_t>(e);
-  return EnumNamesDataPopulateFunction()[index];
-}
 
 struct child FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef childBuilder Builder;
@@ -641,7 +609,7 @@ struct DropDownListData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_BASE_DATA = 4,
     VT_UNEXPANDED_LABEL = 6,
     VT_EXPANDED_LABEL = 8,
-    VT_DATA_POPULATE_FUNCTION = 10
+    VT_DATA_POPULATION_FUNCTION = 10
   };
   const steamrot::UIElementData *base_data() const {
     return GetPointer<const steamrot::UIElementData *>(VT_BASE_DATA);
@@ -652,8 +620,8 @@ struct DropDownListData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *expanded_label() const {
     return GetPointer<const ::flatbuffers::String *>(VT_EXPANDED_LABEL);
   }
-  steamrot::DataPopulateFunction data_populate_function() const {
-    return static_cast<steamrot::DataPopulateFunction>(GetField<int8_t>(VT_DATA_POPULATE_FUNCTION, 0));
+  steamrot::DataPopulationFunctionFbs data_population_function() const {
+    return static_cast<steamrot::DataPopulationFunctionFbs>(GetField<int8_t>(VT_DATA_POPULATION_FUNCTION, 0));
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -663,7 +631,7 @@ struct DropDownListData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyString(unexpanded_label()) &&
            VerifyOffset(verifier, VT_EXPANDED_LABEL) &&
            verifier.VerifyString(expanded_label()) &&
-           VerifyField<int8_t>(verifier, VT_DATA_POPULATE_FUNCTION, 1) &&
+           VerifyField<int8_t>(verifier, VT_DATA_POPULATION_FUNCTION, 1) &&
            verifier.EndTable();
   }
 };
@@ -681,8 +649,8 @@ struct DropDownListDataBuilder {
   void add_expanded_label(::flatbuffers::Offset<::flatbuffers::String> expanded_label) {
     fbb_.AddOffset(DropDownListData::VT_EXPANDED_LABEL, expanded_label);
   }
-  void add_data_populate_function(steamrot::DataPopulateFunction data_populate_function) {
-    fbb_.AddElement<int8_t>(DropDownListData::VT_DATA_POPULATE_FUNCTION, static_cast<int8_t>(data_populate_function), 0);
+  void add_data_population_function(steamrot::DataPopulationFunctionFbs data_population_function) {
+    fbb_.AddElement<int8_t>(DropDownListData::VT_DATA_POPULATION_FUNCTION, static_cast<int8_t>(data_population_function), 0);
   }
   explicit DropDownListDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -701,12 +669,12 @@ inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListData(
     ::flatbuffers::Offset<steamrot::UIElementData> base_data = 0,
     ::flatbuffers::Offset<::flatbuffers::String> unexpanded_label = 0,
     ::flatbuffers::Offset<::flatbuffers::String> expanded_label = 0,
-    steamrot::DataPopulateFunction data_populate_function = steamrot::DataPopulateFunction_None) {
+    steamrot::DataPopulationFunctionFbs data_population_function = steamrot::DataPopulationFunctionFbs_None) {
   DropDownListDataBuilder builder_(_fbb);
   builder_.add_expanded_label(expanded_label);
   builder_.add_unexpanded_label(unexpanded_label);
   builder_.add_base_data(base_data);
-  builder_.add_data_populate_function(data_populate_function);
+  builder_.add_data_population_function(data_population_function);
   return builder_.Finish();
 }
 
@@ -715,7 +683,7 @@ inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListDataDirect(
     ::flatbuffers::Offset<steamrot::UIElementData> base_data = 0,
     const char *unexpanded_label = nullptr,
     const char *expanded_label = nullptr,
-    steamrot::DataPopulateFunction data_populate_function = steamrot::DataPopulateFunction_None) {
+    steamrot::DataPopulationFunctionFbs data_population_function = steamrot::DataPopulationFunctionFbs_None) {
   auto unexpanded_label__ = unexpanded_label ? _fbb.CreateString(unexpanded_label) : 0;
   auto expanded_label__ = expanded_label ? _fbb.CreateString(expanded_label) : 0;
   return steamrot::CreateDropDownListData(
@@ -723,7 +691,7 @@ inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListDataDirect(
       base_data,
       unexpanded_label__,
       expanded_label__,
-      data_populate_function);
+      data_population_function);
 }
 
 struct DropDownItemData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

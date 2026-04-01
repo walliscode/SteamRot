@@ -49,6 +49,19 @@ SpacingAndSizing ConvertSpacingAndSizing(int8_t fbs_spacing) {
   }
 }
 
+/////////////////////////////////////////////////
+DataPopulationFunction ConvertDataPopulationFunction(
+    DataPopulationFunctionFbs fbs_data_population_function) {
+  switch (fbs_data_population_function) {
+  case DataPopulationFunctionFbs_None:
+    return DataPopulationFunction::None;
+  case DataPopulationFunctionFbs_GetAllFragmentNames:
+    return DataPopulationFunction::GetAllFragmentNames;
+  default:
+    return DataPopulationFunction::None;
+  }
+}
+
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     UIElement &element, const UIElementData &data, EventHandler &event_handler,
@@ -156,8 +169,9 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
   if (data.expanded_label()) {
     dropdown_list_element.expanded_label = data.expanded_label()->str();
   }
-
-  dropdown_list_element.data_populate_function = data.data_populate_function();
+  // convert data population function from flatbuffers enum to C++ enum
+  dropdown_list_element.data_population_function =
+      ConvertDataPopulationFunction(data.data_population_function());
 
   return std::monostate{};
 }

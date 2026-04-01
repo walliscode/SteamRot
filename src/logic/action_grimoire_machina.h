@@ -67,4 +67,14 @@ void SetColor(FragmentInstance &fragment_instance);
 /// @param joint_instance JointInstance reference
 /////////////////////////////////////////////////
 void SetColor(JointInstance &joint_instance);
+
+/////////////////////////////////////////////////
+/// @brief Return the string names of all fragments in the GrimoireMachina.
+///
+/// @param grimoire_machina Instance of GrimoireMachina to get the fragment
+/// names from.
+/////////////////////////////////////////////////
+std::vector<std::string>
+GetAllFragmentNames(const GrimoireMachina &grimoire_machina);
+
 } // namespace steamrot::logic::action::grimoire_machina

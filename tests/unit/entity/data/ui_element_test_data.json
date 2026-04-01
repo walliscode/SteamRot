@@ -72,7 +72,7 @@
             },
             "unexpanded_label": "Select Option",
             "expanded_label": "Options:",
-            "data_populate_function": "PopulateWithFragmentData"
+            "data_population_function": "GetAllFragmentNames"
           }
         },
         {
@@ -108,7 +108,7 @@
                     },
                     "unexpanded_label": "Container List",
                     "expanded_label": "Container Options:",
-                    "data_populate_function": "PopulateWithFragmentData"
+                    "data_population_function": "GetAllFragmentNames"
                   }
                 },
                 {

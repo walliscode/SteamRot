@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DropDownListElement.h"
+#include "DataPopulationFunctions.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("DropDownListElement: Default Constructor", "[types]") {
@@ -24,8 +25,8 @@ TEST_CASE("DropDownListElement: Default Constructor", "[types]") {
   REQUIRE(dropdown.is_expanded == false);
   REQUIRE(dropdown.unexpanded_label == "unexpanded items...");
   REQUIRE(dropdown.expanded_label == "expanded items...");
-  REQUIRE(dropdown.data_populate_function ==
-          steamrot::DataPopulateFunction::DataPopulateFunction_None);
+  REQUIRE(dropdown.data_population_function ==
+          steamrot::DataPopulationFunction::None);
 }
 
 TEST_CASE("DropDownListElement: Clone Method", "[types]") {
@@ -39,8 +40,8 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   original.is_expanded = true;
   original.unexpanded_label = "Select item";
   original.expanded_label = "Hide items";
-  original.data_populate_function = steamrot::DataPopulateFunction::
-      DataPopulateFunction_PopulateWithFragmentData;
+  original.data_population_function =
+      steamrot::DataPopulationFunction::GetAllFragmentNames;
 
   auto cloned_ptr = original.Clone();
   auto *cloned =
@@ -56,7 +57,6 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   REQUIRE(cloned->is_expanded == true);
   REQUIRE(cloned->unexpanded_label == "Select item");
   REQUIRE(cloned->expanded_label == "Hide items");
-  REQUIRE(cloned->data_populate_function ==
-          steamrot::DataPopulateFunction::
-              DataPopulateFunction_PopulateWithFragmentData);
+  REQUIRE(cloned->data_population_function ==
+          steamrot::DataPopulationFunction::GetAllFragmentNames);
 }
