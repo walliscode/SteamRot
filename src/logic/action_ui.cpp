@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_ui.h"
+#include "DropDownButtonElement.h"
 #include <iostream>
 #include <ostream>
 
@@ -46,6 +47,13 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
                                      EventHandler &event_handler,
                                      const SceneContext &scene_context) {
+
+  // add specific processing for certain element types before generic recursion
+  // intercept DropDownContainerElement before generic recursion
+  if (auto *container = dynamic_cast<DropDownContainerElement *>(&ui_element)) {
+    ProcessDropDownContainerElementActions(*container, scene_context);
+    return; // ← generic recursion never runs for this element
+  }
   // bool to keep track if any child was processed
   bool child_processed = false;
 
@@ -91,6 +99,50 @@ void ProcessButtonElementActions(ButtonElement &button_element,
     for (const auto &event_packet : button_element.response_events) {
       event_handler.AddEvent(event_packet);
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void ProcessDropDownContainerElementActions(
+    DropDownContainerElement &dropdown_container_element,
+    const SceneContext &scene_context) {
+
+  // pull out the DropDownButtonElement child and the DropDownListElement child,
+  // if they exist. The button should be the second child and the list should be
+  // the first
+  auto *dropdown_button_element = dynamic_cast<DropDownButtonElement *>(
+      dropdown_container_element.child_elements[1].get());
+  auto *dropdown_list_element = dynamic_cast<DropDownListElement *>(
+      dropdown_container_element.child_elements[0].get());
+
+  // process the button element first, as it will control the expanded state of
+  // the container and list
+  ProcessDropDownButtonElementActions(*dropdown_button_element);
+
+  // if the DropDownButtonElement child is expanded, then the container should
+  // be expanded
+  if (dropdown_button_element) {
+
+    if (dropdown_list_element) {
+      // if the button is expanded, the list should be expanded
+      dropdown_list_element->is_expanded = dropdown_button_element->is_expanded;
+    }
+
+    // deal with parent container
+    dropdown_container_element.is_expanded =
+        dropdown_button_element->is_expanded;
+  }
+}
+
+void ProcessDropDownButtonElementActions(
+    DropDownButtonElement &dropdown_button_element) {
+  // for now, the only action for a dropdown button is to expand the list, so
+  // this will be the top level flow control
+  if (dropdown_button_element.is_mouse_over &&
+      dropdown_button_element.subscription &&
+      dropdown_button_element.subscription->m_active) {
+    // toggle the expanded state
+    dropdown_button_element.is_expanded = !dropdown_button_element.is_expanded;
   }
 }
 

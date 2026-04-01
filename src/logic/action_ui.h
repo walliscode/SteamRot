@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ButtonElement.h"
+#include "DropDownButtonElement.h"
+#include "DropDownContainerElement.h"
 #include "DropDownListElement.h"
 #include "EventHandler.h"
 #include "SceneContext.h"
@@ -56,6 +58,25 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
 /////////////////////////////////////////////////
 void ProcessButtonElementActions(ButtonElement &button_element,
                                  EventHandler &event_handler);
+
+/////////////////////////////////////////////////
+/// @brief Process actions for a DropDownContainerElement
+///
+/// @param dropdown_container_element DropDownContainerElement to process
+/// @param scene_context Instance of SceneContext containing scene entities and
+/// archetypes
+/////////////////////////////////////////////////
+void ProcessDropDownContainerElementActions(
+    DropDownContainerElement &dropdown_container_element,
+    const SceneContext &scene_context);
+
+/////////////////////////////////////////////////
+/// @brief Process actions for a DropDownButtonElement
+///
+/// @param dropdown_button_element DropDownButtonElement to process
+/////////////////////////////////////////////////
+void ProcessDropDownButtonElementActions(
+    DropDownButtonElement &dropdown_button_element);
 
 /////////////////////////////////////////////////
 /// @brief Process actions for a DropDownListElement

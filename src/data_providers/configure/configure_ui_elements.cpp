@@ -150,8 +150,8 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
 std::expected<std::monostate, FailInfo>
 ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
                              const DropDownListData &data) {
-  if (data.label()) {
-    dropdown_list_element.unexpanded_label = data.label()->str();
+  if (data.unexpanded_label()) {
+    dropdown_list_element.unexpanded_label = data.unexpanded_label()->str();
   }
   if (data.expanded_label()) {
     dropdown_list_element.expanded_label = data.expanded_label()->str();

@@ -639,15 +639,15 @@ struct DropDownListData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef DropDownListDataBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BASE_DATA = 4,
-    VT_LABEL = 6,
+    VT_UNEXPANDED_LABEL = 6,
     VT_EXPANDED_LABEL = 8,
     VT_DATA_POPULATE_FUNCTION = 10
   };
   const steamrot::UIElementData *base_data() const {
     return GetPointer<const steamrot::UIElementData *>(VT_BASE_DATA);
   }
-  const ::flatbuffers::String *label() const {
-    return GetPointer<const ::flatbuffers::String *>(VT_LABEL);
+  const ::flatbuffers::String *unexpanded_label() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_UNEXPANDED_LABEL);
   }
   const ::flatbuffers::String *expanded_label() const {
     return GetPointer<const ::flatbuffers::String *>(VT_EXPANDED_LABEL);
@@ -659,9 +659,9 @@ struct DropDownListData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_BASE_DATA) &&
            verifier.VerifyTable(base_data()) &&
-           VerifyOffsetRequired(verifier, VT_LABEL) &&
-           verifier.VerifyString(label()) &&
-           VerifyOffsetRequired(verifier, VT_EXPANDED_LABEL) &&
+           VerifyOffset(verifier, VT_UNEXPANDED_LABEL) &&
+           verifier.VerifyString(unexpanded_label()) &&
+           VerifyOffset(verifier, VT_EXPANDED_LABEL) &&
            verifier.VerifyString(expanded_label()) &&
            VerifyField<int8_t>(verifier, VT_DATA_POPULATE_FUNCTION, 1) &&
            verifier.EndTable();
@@ -675,8 +675,8 @@ struct DropDownListDataBuilder {
   void add_base_data(::flatbuffers::Offset<steamrot::UIElementData> base_data) {
     fbb_.AddOffset(DropDownListData::VT_BASE_DATA, base_data);
   }
-  void add_label(::flatbuffers::Offset<::flatbuffers::String> label) {
-    fbb_.AddOffset(DropDownListData::VT_LABEL, label);
+  void add_unexpanded_label(::flatbuffers::Offset<::flatbuffers::String> unexpanded_label) {
+    fbb_.AddOffset(DropDownListData::VT_UNEXPANDED_LABEL, unexpanded_label);
   }
   void add_expanded_label(::flatbuffers::Offset<::flatbuffers::String> expanded_label) {
     fbb_.AddOffset(DropDownListData::VT_EXPANDED_LABEL, expanded_label);
@@ -692,8 +692,6 @@ struct DropDownListDataBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<DropDownListData>(end);
     fbb_.Required(o, DropDownListData::VT_BASE_DATA);
-    fbb_.Required(o, DropDownListData::VT_LABEL);
-    fbb_.Required(o, DropDownListData::VT_EXPANDED_LABEL);
     return o;
   }
 };
@@ -701,12 +699,12 @@ struct DropDownListDataBuilder {
 inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementData> base_data = 0,
-    ::flatbuffers::Offset<::flatbuffers::String> label = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> unexpanded_label = 0,
     ::flatbuffers::Offset<::flatbuffers::String> expanded_label = 0,
     steamrot::DataPopulateFunction data_populate_function = steamrot::DataPopulateFunction_None) {
   DropDownListDataBuilder builder_(_fbb);
   builder_.add_expanded_label(expanded_label);
-  builder_.add_label(label);
+  builder_.add_unexpanded_label(unexpanded_label);
   builder_.add_base_data(base_data);
   builder_.add_data_populate_function(data_populate_function);
   return builder_.Finish();
@@ -715,15 +713,15 @@ inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListData(
 inline ::flatbuffers::Offset<DropDownListData> CreateDropDownListDataDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementData> base_data = 0,
-    const char *label = nullptr,
+    const char *unexpanded_label = nullptr,
     const char *expanded_label = nullptr,
     steamrot::DataPopulateFunction data_populate_function = steamrot::DataPopulateFunction_None) {
-  auto label__ = label ? _fbb.CreateString(label) : 0;
+  auto unexpanded_label__ = unexpanded_label ? _fbb.CreateString(unexpanded_label) : 0;
   auto expanded_label__ = expanded_label ? _fbb.CreateString(expanded_label) : 0;
   return steamrot::CreateDropDownListData(
       _fbb,
       base_data,
-      label__,
+      unexpanded_label__,
       expanded_label__,
       data_populate_function);
 }

@@ -140,6 +140,70 @@
               "children_active": true,
               "children": [
                 {
+                  "element_type": "DropDownContainerData",
+                  "element": {
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "DropDownListData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "layout": "Vertical",
+                              "spacing_strategy": "DropDownList"
+                            }
+                          }
+                        },
+                        {
+                          "element_type": "DropDownButtonData",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "subscriber_data": {
+                                "event_type": "USER_INPUT",
+                                "filter_payload_type": "InputPayloadFbs",
+                                "filter_payload": {
+                                  "action": "SELECT"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ],
+                      "layout": "DropDown",
+                      "spacing_strategy": "Ratioed"
+                    }
+                  }
+                },
+                {
                   "element_type": "ButtonData",
                   "element": {
                     "label": "Exit Construct Creation",

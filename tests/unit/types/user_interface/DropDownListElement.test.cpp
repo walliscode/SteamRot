@@ -22,8 +22,8 @@ TEST_CASE("DropDownListElement: Default Constructor", "[types]") {
   REQUIRE(dropdown.layout == steamrot::Layout::Vertical);
   REQUIRE(dropdown.spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(dropdown.is_expanded == false);
-  REQUIRE(dropdown.unexpanded_label == "items...");
-  REQUIRE(dropdown.expanded_label == "items...");
+  REQUIRE(dropdown.unexpanded_label == "unexpanded items...");
+  REQUIRE(dropdown.expanded_label == "expanded items...");
   REQUIRE(dropdown.data_populate_function ==
           steamrot::DataPopulateFunction::DataPopulateFunction_None);
 }
