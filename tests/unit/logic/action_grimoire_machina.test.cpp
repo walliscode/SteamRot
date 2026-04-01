@@ -127,3 +127,28 @@ TEST_CASE(
   REQUIRE(joint_instance.sockets[1].circle.getFillColor() ==
           socket_not_hovered.base_color);
 }
+
+TEST_CASE("GetAllFragmentNames returns the string names of all fragments in "
+          "the GrimoireMachina",
+          "[unit][actions][grimoire_machina]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  SECTION("No fragments in GrimoireMachina") {
+    auto fragment_names =
+        steamrot::logic::action::grimoire_machina::GetAllFragmentNames(
+            grimoire_machina);
+    REQUIRE(fragment_names.empty());
+  }
+
+  SECTION("Multiple fragments in GrimoireMachina") {
+    grimoire_machina.m_all_fragments = {{"Fragment1", steamrot::Fragment{}},
+                                        {"Fragment2", steamrot::Fragment{}},
+                                        {"Fragment3", steamrot::Fragment{}}};
+    auto fragment_names =
+        steamrot::logic::action::grimoire_machina::GetAllFragmentNames(
+            grimoire_machina);
+    REQUIRE(fragment_names.size() == 3);
+    REQUIRE(fragment_names[0] == "Fragment1");
+    REQUIRE(fragment_names[1] == "Fragment2");
+    REQUIRE(fragment_names[2] == "Fragment3");
+  }
+}

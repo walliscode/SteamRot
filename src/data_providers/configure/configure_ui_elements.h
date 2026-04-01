@@ -64,8 +64,9 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data);
 /// @param data FlatBuffers data to configure from
 /// @return std::expected with monostate on success, or FailInfo on error
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownListElement(
-    DropDownListElement &dropdown_list_element, const DropDownListData &data);
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
+                             const DropDownListData &data);
 
 ////////////////////////////////////////////////////////////
 /// @brief Configure a DropDownContainer UIElement from FlatBuffers data
@@ -85,8 +86,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
 /// @param data FlatBuffers data to configure from
 /// @return std::expected with monostate on success, or FailInfo on error
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
-    DropDownItemElement &dropdown_item_element, const DropDownItemData &data);
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
+                             const DropDownItemData &data);
 
 ////////////////////////////////////////////////////////////
 /// @brief Configure a DropDownButton UIElement from FlatBuffers data
@@ -95,9 +97,9 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownItemElement(
 /// @param data FlatBuffers data to configure from
 /// @return std::expected with monostate on success, or FailInfo on error
 ////////////////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo> ConfigureDropDownButtonElement(
-    DropDownButtonElement &dropdown_button_element,
-    const DropDownButtonData &data);
+std::expected<std::monostate, FailInfo>
+ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
+                               const DropDownButtonData &data);
 
 ////////////////////////////////////////////////////////////
 /// @brief Convert FlatBuffers LayoutFbs to native Layout
@@ -115,4 +117,16 @@ Layout ConvertLayout(int8_t fbs_layout);
 ////////////////////////////////////////////////////////////
 SpacingAndSizing ConvertSpacingAndSizing(int8_t fbs_spacing);
 
+/////////////////////////////////////////////////
+/// @brief Convert FlatBuffers DataPopulationFunctionFbs to native
+/// DataPopulationFunction
+///
+/// @param fbs_data_population_function FlatBuffers data population function
+/// value to convert
+/// @return DataPopulationFunction enum value corresponding to the input
+/// FlatBuffers value, or DataPopulationFunction::None if the input value is
+/// unrecognized
+/////////////////////////////////////////////////
+DataPopulationFunction ConvertDataPopulationFunction(
+    DataPopulationFunctionFbs fbs_data_population_function);
 } // namespace steamrot::data::configure

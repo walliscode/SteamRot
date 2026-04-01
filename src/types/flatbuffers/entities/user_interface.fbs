@@ -1,6 +1,8 @@
 include "../core/types.fbs";
+include "../core/data_population_function.fbs";
 include "../events/subscriber.fbs";
 include "../events/event_packet.fbs";
+
 namespace steamrot;
 
 
@@ -57,17 +59,12 @@ table DropDownContainerData{
 
   }
 
-enum DataPopulateFunction: byte {
-    None = 0,
-    PopulateWithFragmentData = 1,
-    PopulateWithJointData = 2,
-  }
 
 table DropDownListData{
   base_data: UIElementData(required);
     unexpanded_label: string;
     expanded_label: string ;
-    data_populate_function: DataPopulateFunction;
+    data_population_function: DataPopulationFunctionFbs;
   }
 
 table DropDownItemData {

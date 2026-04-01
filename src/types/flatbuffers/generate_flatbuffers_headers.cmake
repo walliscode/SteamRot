@@ -6,6 +6,7 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/core/types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/core/scene_types.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/core/engine_snapshot.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/data_population_function.fbs
 
 
     # Engine (already organized)

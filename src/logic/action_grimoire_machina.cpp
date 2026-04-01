@@ -9,6 +9,8 @@
 /////////////////////////////////////////////////
 #include "action_grimoire_machina.h"
 #include "MachinaFormScaffold.h"
+#include <string>
+#include <vector>
 
 namespace steamrot::logic::action::grimoire_machina {
 /////////////////////////////////////////////////
@@ -65,5 +67,17 @@ void SetColor(JointInstance &joint_instance) {
   for (auto &socket : joint_instance.sockets) {
     SetColor(socket);
   }
+}
+
+/////////////////////////////////////////////////
+std::vector<std::string>
+GetAllFragmentNames(const GrimoireMachina &grimoire_machina) {
+  std::vector<std::string> fragment_names;
+  // cycle through all fragments in the GrimoireMachina and add their names to
+  // the vector
+  for (const auto &[name, fragment] : grimoire_machina.m_all_fragments) {
+    fragment_names.push_back(name);
+  }
+  return fragment_names;
 }
 } // namespace steamrot::logic::action::grimoire_machina

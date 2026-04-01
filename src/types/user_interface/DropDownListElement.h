@@ -11,8 +11,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DataPopulationFunctions.h"
 #include "UIElement.h"
-#include "user_interface_generated.h"
 
 namespace steamrot {
 struct DropDownListElement : public UIElement {
@@ -35,8 +35,7 @@ struct DropDownListElement : public UIElement {
   /////////////////////////////////////////////////
   /// @brief Function to populate dropdown data dynamically
   /////////////////////////////////////////////////
-  DataPopulateFunction data_populate_function{
-      DataPopulateFunction::DataPopulateFunction_None};
+  DataPopulationFunction data_population_function{DataPopulationFunction::None};
 
   /////////////////////////////////////////////////
   /// @brief Create a deep copy of this DropDownListElement
@@ -49,7 +48,7 @@ struct DropDownListElement : public UIElement {
     cloned->is_expanded = is_expanded;
     cloned->unexpanded_label = unexpanded_label;
     cloned->expanded_label = expanded_label;
-    cloned->data_populate_function = data_populate_function;
+    cloned->data_population_function = data_population_function;
     return cloned;
   }
 };

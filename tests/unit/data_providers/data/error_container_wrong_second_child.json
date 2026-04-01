@@ -28,7 +28,7 @@
                     },
                     "unexpanded_label": "List",
                     "expanded_label": "Expanded",
-                    "data_populate_function": "PopulateWithFragmentData"
+                    "data_population_function": "GetAllFragmentNames"
                   }
                 },
                 {
