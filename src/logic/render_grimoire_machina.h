@@ -48,11 +48,35 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
                           sf::FloatRect &crafting_canvas);
 
 /////////////////////////////////////////////////
-/// @brief Draw the growth point on the crafting canvas.
+/// @brief Draw a GrowthPoint on the crafting canvas.
 ///
 /// @param texture RenderTexture to draw on.
 /// @param growth_point GrowthPoint to draw.
 /////////////////////////////////////////////////
-void DrawGrowthPoint(sf::RenderTexture &texture, GrowthPoint &growth_point);
+void Draw(sf::RenderTexture &texture, GrowthPoint &growth_point);
+
+/////////////////////////////////////////////////
+/// @brief Draw a Socket on the crafting canvas.
+///
+/// @param texture RenderTexture to draw on.
+/// @param socket Socket to draw.
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, Socket &socket);
+
+/////////////////////////////////////////////////
+/// @brief Draw all sockets of a FragmentInstance on the crafting canvas.
+///
+/// @param texture RenderTexture to draw on.
+/// @param fragment_instance FragmentInstance whose sockets are drawn.
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
+
+/////////////////////////////////////////////////
+/// @brief Draw all sockets of a JointInstance on the crafting canvas.
+///
+/// @param texture RenderTexture to draw on.
+/// @param joint_instance JointInstance whose sockets are drawn.
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
 
 } // namespace steamrot::logic::render::grimoire_machina

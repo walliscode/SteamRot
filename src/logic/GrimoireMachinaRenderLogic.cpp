@@ -44,7 +44,7 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
 
     // draw the growth point (a fill in for when no fragments or joins are
     // present)
-    render::grimoire_machina::DrawGrowthPoint(
+    render::grimoire_machina::Draw(
         m_scene_context.scene_texture,
         grimoire_machina.m_scaffold_form->growth_point);
   }

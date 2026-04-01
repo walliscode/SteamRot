@@ -73,7 +73,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
   // run action logic based on their being an active MachinFormScaffold
   if (active_scaffold_form)
-    actions::grimoire_machina::SetGrowthPointColor(
+    actions::grimoire_machina::SetColor(
         active_scaffold_form->growth_point);
 }
 } // namespace steamrot::logic

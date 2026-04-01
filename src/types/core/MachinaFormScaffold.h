@@ -47,6 +47,16 @@ struct Socket {
   /// @brief Toggle whether the mouse is currently over the socket
   /////////////////////////////////////////////////
   bool is_mouse_over{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Color of the socket when not hovered
+  /////////////////////////////////////////////////
+  sf::Color base_color{sf::Color::White};
+
+  /////////////////////////////////////////////////
+  /// @brief Color of the socket when hovered
+  /////////////////////////////////////////////////
+  sf::Color hover_color{sf::Color::Yellow};
 };
 
 struct JointInstance {
