@@ -62,8 +62,28 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
 }
 
 /////////////////////////////////////////////////
-void DrawGrowthPoint(sf::RenderTexture &texture, GrowthPoint &growth_point) {
+void Draw(sf::RenderTexture &texture, GrowthPoint &growth_point) {
   // draw the growth point on the texture
   texture.draw(growth_point.origin);
+}
+
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, Socket &socket) {
+  // draw the socket circle on the texture
+  texture.draw(socket.circle);
+}
+
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance) {
+  for (auto &socket : fragment_instance.sockets) {
+    Draw(texture, socket);
+  }
+}
+
+/////////////////////////////////////////////////
+void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
+  for (auto &socket : joint_instance.sockets) {
+    Draw(texture, socket);
+  }
 }
 } // namespace steamrot::logic::render::grimoire_machina

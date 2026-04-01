@@ -18,7 +18,7 @@
 #include <expected>
 #include <variant>
 
-namespace steamrot::logic::actions::grimoire_machina {
+namespace steamrot::logic::action::grimoire_machina {
 
 /////////////////////////////////////////////////
 /// @brief Intialise the MachinaFormScaffold in the GrimoireMachine.
@@ -39,9 +39,32 @@ std::expected<std::monostate, FailInfo>
 ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Change color based on is_mouse_over
+/// @brief Change color of a GrowthPoint based on is_mouse_over
 ///
 /// @param growth_point GrowthPoint reference
 /////////////////////////////////////////////////
-void SetGrowthPointColor(GrowthPoint &growth_point);
-} // namespace steamrot::logic::actions::grimoire_machina
+void SetColor(GrowthPoint &growth_point);
+
+/////////////////////////////////////////////////
+/// @brief Change color of a Socket based on is_mouse_over
+///
+/// @param socket Socket reference
+/////////////////////////////////////////////////
+void SetColor(Socket &socket);
+
+/////////////////////////////////////////////////
+/// @brief Change color of all sockets on a FragmentInstance based on
+/// is_mouse_over
+///
+/// @param fragment_instance FragmentInstance reference
+/////////////////////////////////////////////////
+void SetColor(FragmentInstance &fragment_instance);
+
+/////////////////////////////////////////////////
+/// @brief Change color of all sockets on a JointInstance based on
+/// is_mouse_over
+///
+/// @param joint_instance JointInstance reference
+/////////////////////////////////////////////////
+void SetColor(JointInstance &joint_instance);
+} // namespace steamrot::logic::action::grimoire_machina

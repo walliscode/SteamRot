@@ -10,7 +10,7 @@
 #include "action_grimoire_machina.h"
 #include "MachinaFormScaffold.h"
 
-namespace steamrot::logic::actions::grimoire_machina {
+namespace steamrot::logic::action::grimoire_machina {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
@@ -35,7 +35,7 @@ ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-void SetGrowthPointColor(GrowthPoint &growth_point) {
+void SetColor(GrowthPoint &growth_point) {
   if (growth_point.is_mouse_over) {
 
     growth_point.origin.setFillColor(growth_point.hover_color);
@@ -43,4 +43,27 @@ void SetGrowthPointColor(GrowthPoint &growth_point) {
     growth_point.origin.setFillColor(growth_point.base_color);
   }
 }
-} // namespace steamrot::logic::actions::grimoire_machina
+
+/////////////////////////////////////////////////
+void SetColor(Socket &socket) {
+  if (socket.is_mouse_over) {
+    socket.circle.setFillColor(socket.hover_color);
+  } else {
+    socket.circle.setFillColor(socket.base_color);
+  }
+}
+
+/////////////////////////////////////////////////
+void SetColor(FragmentInstance &fragment_instance) {
+  for (auto &socket : fragment_instance.sockets) {
+    SetColor(socket);
+  }
+}
+
+/////////////////////////////////////////////////
+void SetColor(JointInstance &joint_instance) {
+  for (auto &socket : joint_instance.sockets) {
+    SetColor(socket);
+  }
+}
+} // namespace steamrot::logic::action::grimoire_machina

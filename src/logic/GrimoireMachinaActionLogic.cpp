@@ -57,7 +57,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
       if (logic_payload.toggle_name ==
           LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
         auto initialise_result =
-            actions::grimoire_machina::InitialiseActiveMachinaFormScaffold(
+            action::grimoire_machina::InitialiseActiveMachinaFormScaffold(
                 grimoire_machina);
       }
 
@@ -65,7 +65,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
           LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
 
         auto clear_result =
-            actions::grimoire_machina::ClearActiveMachinaFormScaffold(
+            action::grimoire_machina::ClearActiveMachinaFormScaffold(
                 grimoire_machina);
       }
     }
@@ -73,7 +73,6 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
   // run action logic based on their being an active MachinFormScaffold
   if (active_scaffold_form)
-    actions::grimoire_machina::SetGrowthPointColor(
-        active_scaffold_form->growth_point);
+    action::grimoire_machina::SetColor(active_scaffold_form->growth_point);
 }
 } // namespace steamrot::logic
