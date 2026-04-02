@@ -88,6 +88,29 @@ bool MatchPayload(const SystemPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
+bool MatchPayload(const SelectAndPlacePayload &filter_payload,
+                  const SelectAndPlacePayload &event_payload) {
+
+  if (filter_payload.action != event_payload.action) {
+    return false;
+  }
+
+  // empty item_name in filter acts as a wildcard
+  if (!filter_payload.item_name.empty() &&
+      filter_payload.item_name != event_payload.item_name) {
+    return false;
+  }
+
+  // empty item_type in filter acts as a wildcard
+  if (!filter_payload.item_type.empty() &&
+      filter_payload.item_type != event_payload.item_type) {
+    return false;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 bool MatchPayload(const EventPayload &filter_payload,
                   const EventPayload &event_payload) {
 

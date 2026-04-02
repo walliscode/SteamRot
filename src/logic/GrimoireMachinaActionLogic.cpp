@@ -9,13 +9,25 @@
 #include "GrimoireMachinaActionLogic.h"
 #include "EventPayload.h"
 #include "EventType.h"
+#include "Subscriber.h"
 #include "action_grimoire_machina.h"
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
 GrimoireMachinaActionLogic::GrimoireMachinaActionLogic(
     const SceneContext scene_context)
-    : Logic(scene_context) {}
+    : Logic(scene_context) {
+
+  // Register a subscriber for SELECT_AND_PLACE PLACE_ITEM events so this
+  // Logic can place fragments on the scaffold when the user drops an item.
+  // Empty item_name and item_type act as wildcards - handle any item type.
+  auto place_subscriber = std::make_shared<Subscriber>();
+  place_subscriber->event_type = EventType::SELECT_AND_PLACE;
+  place_subscriber->filter_payload = SelectAndPlacePayload{
+      SelectAndPlacePayload::Action::PLACE_ITEM, "", ""};
+  AddSubscriber(place_subscriber);
+  m_scene_context.event_handler.RegisterSubscriber(place_subscriber);
+}
 
 /////////////////////////////////////////////////
 void GrimoireMachinaActionLogic::ProcessLogic() {
@@ -67,6 +79,22 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
         auto clear_result =
             action::grimoire_machina::ClearActiveMachinaFormScaffold(
                 grimoire_machina);
+      }
+    }
+
+    // Handle SELECT_AND_PLACE PLACE_ITEM: add the named item to the scaffold
+    if (event_type == EventType::SELECT_AND_PLACE &&
+        subscriber->captured_payload.has_value() &&
+        std::holds_alternative<SelectAndPlacePayload>(
+            subscriber->captured_payload.value())) {
+
+      const SelectAndPlacePayload &place_payload =
+          std::get<SelectAndPlacePayload>(subscriber->captured_payload.value());
+
+      if (place_payload.action == SelectAndPlacePayload::Action::PLACE_ITEM &&
+          place_payload.item_type == "fragment") {
+        action::grimoire_machina::AddFragmentToScaffold(grimoire_machina,
+                                                        place_payload.item_name);
       }
     }
   }

@@ -80,4 +80,47 @@ GetAllFragmentNames(const GrimoireMachina &grimoire_machina) {
   }
   return fragment_names;
 }
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+AddFragmentToScaffold(GrimoireMachina &grimoire_machina,
+                      const std::string &fragment_name) {
+
+  // ensure the scaffold exists
+  if (!grimoire_machina.m_scaffold_form) {
+    auto init_result = InitialiseActiveMachinaFormScaffold(grimoire_machina);
+    if (!init_result.has_value()) {
+      return std::unexpected(init_result.error());
+    }
+  }
+
+  // find the fragment by name
+  auto it = grimoire_machina.m_all_fragments.find(fragment_name);
+  if (it == grimoire_machina.m_all_fragments.end()) {
+    return std::unexpected(
+        FailInfo{FailMode::MissingRequiredField,
+                 "AddFragmentToScaffold: fragment not found: " + fragment_name});
+  }
+
+  Fragment &fragment = it->second;
+
+  // build socket list from the fragment's local socket positions
+  std::vector<Socket> sockets;
+  sockets.reserve(fragment.sockets.size());
+  for (const sf::Vector2f &socket_pos : fragment.sockets) {
+    Socket socket;
+    socket.circle.setPosition(socket_pos);
+    sockets.push_back(socket);
+  }
+
+  // place the fragment at the growth point's current position
+  sf::Transform transform = sf::Transform::Identity;
+  transform.translate(
+      grimoire_machina.m_scaffold_form->growth_point.origin.getPosition());
+
+  grimoire_machina.m_scaffold_form->fragments.push_back(
+      FragmentInstance{fragment, transform, std::move(sockets)});
+
+  return std::monostate{};
+}
 } // namespace steamrot::logic::action::grimoire_machina

@@ -7,6 +7,8 @@ logic_render_test_helpers.cpp
 ui_helpers.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp
+action_select_and_place.test.cpp
+SelectAndPlaceLogic.test.cpp
 
 render_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp

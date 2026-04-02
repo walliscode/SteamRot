@@ -29,7 +29,8 @@ enum class LogicClassEnum {
   GrimoireMachinaActionLogic,
   GrimoireMachinaPositioningLogic,
   GrimoireMachinaCollisionLogic,
-  GrimoireMachinaRenderLogic
+  GrimoireMachinaRenderLogic,
+  SelectAndPlaceLogic
 
 };
 

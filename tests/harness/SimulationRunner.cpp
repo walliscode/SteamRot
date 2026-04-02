@@ -11,6 +11,7 @@
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
+#include "SelectAndPlaceLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -77,6 +78,11 @@ ExecuteLogicClass(LogicClassEnum logic_class, SceneContext &context) {
   }
   case LogicClassEnum::GrimoireMachinaRenderLogic: {
     logic::GrimoireMachinaRenderLogic logic(context);
+    logic.RunLogic();
+    return std::monostate{};
+  }
+  case LogicClassEnum::SelectAndPlaceLogic: {
+    logic::SelectAndPlaceLogic logic(context);
     logic.RunLogic();
     return std::monostate{};
   }

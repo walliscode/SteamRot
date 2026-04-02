@@ -91,6 +91,21 @@ CreateSystemEventPacket(const uint8_t lifetime,
                         const SystemPayload::SystemAction action);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a SelectAndPlacePayload
+///
+/// @param lifetime   The lifetime of the event in ticks
+/// @param action     The select-and-place action being performed
+/// @param item_name  Name of the item being selected or placed
+/// @param item_type  Category of the item (e.g. "fragment", "joint")
+/// @return EventPacket with SelectAndPlacePayload or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateSelectAndPlaceEventPacket(const uint8_t lifetime,
+                                const SelectAndPlacePayload::Action action,
+                                const std::string &item_name,
+                                const std::string &item_type);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket();

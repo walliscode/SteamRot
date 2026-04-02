@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_grimoire_machina.h"
+#include "FailInfo.h"
 #include "MachinaFormScaffold.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -151,4 +152,54 @@ TEST_CASE("GetAllFragmentNames returns the string names of all fragments in "
     REQUIRE(fragment_names[1] == "Fragment2");
     REQUIRE(fragment_names[2] == "Fragment3");
   }
+}
+
+TEST_CASE("AddFragmentToScaffold returns error for unknown fragment name",
+          "[unit][actions][grimoire_machina]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  auto result = steamrot::logic::action::grimoire_machina::AddFragmentToScaffold(
+      grimoire_machina, "NonExistentFragment");
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::MissingRequiredField);
+}
+
+TEST_CASE("AddFragmentToScaffold adds a FragmentInstance to the scaffold",
+          "[unit][actions][grimoire_machina]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  steamrot::Fragment fragment;
+  fragment.name = "TestFragment";
+  fragment.sockets = {sf::Vector2f{10.f, 20.f}, sf::Vector2f{30.f, 40.f}};
+  grimoire_machina.m_all_fragments["TestFragment"] = fragment;
+
+  auto result = steamrot::logic::action::grimoire_machina::AddFragmentToScaffold(
+      grimoire_machina, "TestFragment");
+
+  REQUIRE(result.has_value());
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].sockets.size() == 2);
+}
+
+TEST_CASE(
+    "AddFragmentToScaffold initialises the scaffold when none is present",
+    "[unit][actions][grimoire_machina]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
+
+  steamrot::Fragment fragment;
+  fragment.name = "TestFragment";
+  grimoire_machina.m_all_fragments["TestFragment"] = fragment;
+
+  auto result = steamrot::logic::action::grimoire_machina::AddFragmentToScaffold(
+      grimoire_machina, "TestFragment");
+
+  REQUIRE(result.has_value());
+  REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
 }

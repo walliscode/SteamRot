@@ -23,7 +23,8 @@ enum class EventType : uint64_t {
   UI,
   SCENE,
   LOGIC,
-  SYSTEM
+  SYSTEM,
+  SELECT_AND_PLACE
 
 };
 

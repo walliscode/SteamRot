@@ -77,4 +77,19 @@ void SetColor(JointInstance &joint_instance);
 std::vector<std::string>
 GetAllFragmentNames(const GrimoireMachina &grimoire_machina);
 
+/////////////////////////////////////////////////
+/// @brief Add a fragment to the active MachinaFormScaffold.
+///
+/// Creates a FragmentInstance from the named fragment and appends it to the
+/// scaffold's fragment list. If the scaffold does not yet exist it is
+/// initialised first. Returns an error if the named fragment cannot be found.
+///
+/// @param grimoire_machina GrimoireMachina containing the fragment library and
+///                         the active scaffold.
+/// @param fragment_name    Name of the fragment to add.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+AddFragmentToScaffold(GrimoireMachina &grimoire_machina,
+                      const std::string &fragment_name);
+
 } // namespace steamrot::logic::action::grimoire_machina

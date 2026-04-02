@@ -12,6 +12,7 @@
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
+#include "SelectAndPlaceLogic.h"
 #include "TestFixture.h"
 #include "TestLogic.h"
 #include "UIActionLogic.h"
@@ -136,13 +137,15 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Action LogicType");
   }
   const auto &action_logics = action_it->second;
-  REQUIRE(action_logics.size() == 3);
+  REQUIRE(action_logics.size() == 4);
   REQUIRE(
       dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[0].get()));
   REQUIRE(
       dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
-  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
+  REQUIRE(dynamic_cast<steamrot::logic::SelectAndPlaceLogic *>(
       action_logics[2].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
+      action_logics[3].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);

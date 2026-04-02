@@ -13,6 +13,7 @@
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
 #include "LogicType.h"
+#include "SelectAndPlaceLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -141,6 +142,9 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     logic_ptr =
         std::make_unique<logic::GrimoireMachinaCollisionLogic>(m_scene_context);
     break;
+  case LogicType::SelectAndPlace:
+    logic_ptr = std::make_unique<logic::SelectAndPlaceLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -259,7 +263,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::UICollision, LogicType::GrimoireMachinaCollision};
 
   static constexpr std::array action_logic_types = {
-      LogicType::UIAction, LogicType::UIState,
+      LogicType::UIAction, LogicType::UIState, LogicType::SelectAndPlace,
       LogicType::GrimoireMachinaAction};
 
   static constexpr std::array render_logic_types = {

@@ -77,6 +77,18 @@ CreateSystemEventPacket(const uint8_t lifetime,
 }
 
 /////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateSelectAndPlaceEventPacket(const uint8_t lifetime,
+                                const SelectAndPlacePayload::Action action,
+                                const std::string &item_name,
+                                const std::string &item_type) {
+  EventContext context{lifetime};
+  SelectAndPlacePayload payload(action, item_name, item_type);
+  EventPacket packet{context, EventType::SELECT_AND_PLACE, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   // Initialize random number generator
   std::random_device rd;

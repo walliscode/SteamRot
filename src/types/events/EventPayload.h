@@ -202,7 +202,57 @@ struct SystemPayload {
   SystemPayload(const SystemPayload::SystemAction action) : action(action) {}
 };
 
-using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
-                                  LogicPayload, ScenePayload, SystemPayload>;
+/////////////////////////////////////////////////
+/// @class SelectAndPlacePayload
+/// @brief Event payload for the select-and-place system.
+///
+/// Carries the action being performed (selecting or placing an item),
+/// the name of the item, and its type (e.g. "fragment", "joint").
+/// This payload is used to communicate selection and placement intent
+/// across Logic classes and scenes, enabling different placement
+/// behaviours depending on context.
+/////////////////////////////////////////////////
+struct SelectAndPlacePayload {
+
+  /////////////////////////////////////////////////
+  /// @brief The action being performed in the select-and-place workflow
+  /////////////////////////////////////////////////
+  enum class Action {
+    NONE,
+    SELECT_ITEM, ///< An item has been selected for placement
+    PLACE_ITEM   ///< The selected item should be placed at the current position
+  } action{Action::NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Name of the item being selected or placed
+  /////////////////////////////////////////////////
+  std::string item_name;
+
+  /////////////////////////////////////////////////
+  /// @brief Category of the item (e.g. "fragment", "joint")
+  /////////////////////////////////////////////////
+  std::string item_type;
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor, sets action to NONE
+  /////////////////////////////////////////////////
+  SelectAndPlacePayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for SelectAndPlacePayload
+  ///
+  /// @param action  Action being performed
+  /// @param item_name Name of the item
+  /// @param item_type Category of the item
+  /////////////////////////////////////////////////
+  SelectAndPlacePayload(const Action action, std::string item_name,
+                        std::string item_type)
+      : action(action), item_name(std::move(item_name)),
+        item_type(std::move(item_type)) {}
+};
+
+using EventPayload =
+    std::variant<std::monostate, InputPayload, UIPayload, LogicPayload,
+                 ScenePayload, SystemPayload, SelectAndPlacePayload>;
 
 } // namespace steamrot

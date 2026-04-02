@@ -14,6 +14,7 @@
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "EventHandler.h"
 #include "SceneContext.h"
@@ -81,8 +82,10 @@ void ProcessDropDownButtonElementActions(
 /////////////////////////////////////////////////
 /// @brief Process actions for a DropDownListElement
 ///
-/// This function handles data population for dropdown lists based on their
-/// DataPopulateFunction enum value.
+/// Iterates the list's children looking for a hovered DropDownItemElement
+/// with an active subscription. When found, fires a SELECT_AND_PLACE
+/// SELECT_ITEM event whose item_type is derived from the list's
+/// DataPopulationFunction, then collapses the dropdown.
 ///
 /// @param dropdown_list_element DropDownListElement to process
 /// @param scene_context SceneContext containing scene entities and archetypes

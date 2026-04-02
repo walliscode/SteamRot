@@ -7,7 +7,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_ui.h"
+#include "DataPopulationFunctions.h"
 #include "DropDownButtonElement.h"
+#include "DropDownItemElement.h"
+#include "event_factory.h"
 
 namespace steamrot::logic::action::ui {
 
@@ -50,6 +53,12 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
   // intercept DropDownContainerElement before generic recursion
   if (auto *container = dynamic_cast<DropDownContainerElement *>(&ui_element)) {
     ProcessDropDownContainerElementActions(*container, scene_context);
+    return; // ← generic recursion never runs for this element
+  }
+
+  // intercept DropDownListElement to handle item selection before recursion
+  if (auto *list = dynamic_cast<DropDownListElement *>(&ui_element)) {
+    ProcessDropDownListElementActions(*list, scene_context);
     return; // ← generic recursion never runs for this element
   }
   // bool to keep track if any child was processed
@@ -130,6 +139,11 @@ void ProcessDropDownContainerElementActions(
     dropdown_container_element.is_expanded =
         dropdown_button_element->is_expanded;
   }
+
+  // if the list is expanded, check for item selection
+  if (dropdown_list_element && dropdown_list_element->is_expanded) {
+    ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
+  }
 }
 
 void ProcessDropDownButtonElementActions(
@@ -147,6 +161,48 @@ void ProcessDropDownButtonElementActions(
 /////////////////////////////////////////////////
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
-    const SceneContext &scene_context) {}
+    const SceneContext &scene_context) {
+
+  if (!dropdown_list_element.is_expanded) {
+    return;
+  }
+
+  // determine the item_type from the data_population_function
+  std::string item_type;
+  if (dropdown_list_element.data_population_function ==
+      DataPopulationFunction::GetAllFragmentNames) {
+    item_type = "fragment";
+  }
+
+  if (item_type.empty()) {
+    return;
+  }
+
+  // find the first hovered child item with an active subscription
+  for (auto &child : dropdown_list_element.child_elements) {
+    auto *item = dynamic_cast<DropDownItemElement *>(child.get());
+    if (!item) {
+      continue;
+    }
+    if (!item->is_mouse_over) {
+      continue;
+    }
+    if (!child->subscription || !child->subscription->m_active) {
+      continue;
+    }
+
+    // fire a SELECT_AND_PLACE SELECT_ITEM event for the chosen item
+    auto packet_result = events::CreateSelectAndPlaceEventPacket(
+        1, SelectAndPlacePayload::Action::SELECT_ITEM, item->value, item_type);
+    if (packet_result.has_value()) {
+      scene_context.event_handler.AddEvent(packet_result.value());
+    }
+
+    // collapse the dropdown after selection
+    dropdown_list_element.is_expanded = false;
+    child->subscription->m_active = false;
+    break;
+  }
+}
 
 } // namespace steamrot::logic::action::ui

@@ -72,6 +72,19 @@ bool MatchPayload(const SystemPayload &filter_payload,
 /////////////////////////////////////////////////
 /// @brief Returns true if the filter payload matches the event payload.
 ///
+/// Matches on action only. An empty item_name or item_type in the filter
+/// acts as a wildcard and matches any value in the event payload.
+///
+/// @param filter_payload SelectAndPlacePayload from Subscriber filter
+/// @param event_payload  SelectAndPlacePayload from EventBus
+/// @return True if they match
+/////////////////////////////////////////////////
+bool MatchPayload(const SelectAndPlacePayload &filter_payload,
+                  const SelectAndPlacePayload &event_payload);
+
+/////////////////////////////////////////////////
+/// @brief Returns true if the filter payload matches the event payload.
+///
 /// Wraps std::visit to dispatch to the correct MatchPayload overload based on
 /// the active variant type. Returns false if the variant types do not match.
 ///
