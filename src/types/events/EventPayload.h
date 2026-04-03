@@ -108,15 +108,14 @@ struct LogicPayload {
     // GhostItem toggles
     SELECT_GHOST_ITEM, // activate ghost preview with a given item key
     CLEAR_GHOST_ITEM,  // cancel / deactivate ghost preview
-    PLACE_GHOST_ITEM   // item has been placed at the current ghost position
+    PLACE_GHOST_ITEM,  // item has been placed at the current ghost position
 
     // add other categories as needed
 
-  } toggle_name;
+  } toggle_name{LogicToggle::NONE};
 
   /////////////////////////////////////////////////
-  /// @brief Default constructor for LogicPayload, sets toggle_name to
-  /// NONE
+  /// @brief Default constructor for LogicPayload, sets toggle_name to NONE.
   /////////////////////////////////////////////////
   LogicPayload() = default;
 
