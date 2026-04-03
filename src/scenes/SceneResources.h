@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////
 #include "EntityManager.h"
 #include "GameContext.h"
+#include "GhostItemState.h"
 #include "LogicFactory.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -52,6 +53,15 @@ struct SceneResources {
   /// drawn to the game window.
   /////////////////////////////////////////////////
   sf::RenderTexture scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief Ghost item placement state for this scene.
+  ///
+  /// Tracks which item (if any) is currently being previewed / dragged by
+  /// the player. Owned here so that its lifetime matches the Scene and so
+  /// that it is accessible via SceneContext without entering the ECS.
+  /////////////////////////////////////////////////
+  GhostItemState ghost_item_state;
 };
 
 } // namespace steamrot

@@ -8,6 +8,8 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "FailInfo.h"
+#include "GhostItemActionLogic.h"
+#include "GhostItemRenderLogic.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
@@ -141,6 +143,12 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     logic_ptr =
         std::make_unique<logic::GrimoireMachinaCollisionLogic>(m_scene_context);
     break;
+  case LogicType::GhostItemAction:
+    logic_ptr = std::make_unique<logic::GhostItemActionLogic>(m_scene_context);
+    break;
+  case LogicType::GhostItemRender:
+    logic_ptr = std::make_unique<logic::GhostItemRenderLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -260,10 +268,11 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 
   static constexpr std::array action_logic_types = {
       LogicType::UIAction, LogicType::UIState,
-      LogicType::GrimoireMachinaAction};
+      LogicType::GrimoireMachinaAction, LogicType::GhostItemAction};
 
   static constexpr std::array render_logic_types = {
-      LogicType::UIRender, LogicType::GrimoireMachinaRender};
+      LogicType::UIRender, LogicType::GrimoireMachinaRender,
+      LogicType::GhostItemRender};
 
   static constexpr std::array movement_logic_types = {
       LogicType::GrimoireMachinaPositioning};

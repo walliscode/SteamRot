@@ -12,6 +12,9 @@ add_library(logic
   GrimoireMachinaRenderLogic.cpp
   GrimoireMachinaCollisionLogic.cpp
 
+  GhostItemActionLogic.cpp
+  GhostItemRenderLogic.cpp
+
   action_ui.cpp
   ui_helpers.cpp
   render_ui.cpp

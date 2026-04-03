@@ -14,6 +14,7 @@
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "GameContext.h"
+#include "GhostItemState.h"
 #include "SceneContext.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
@@ -111,6 +112,11 @@ private:
   /// @brief Scene render texture
   /////////////////////////////////////////////////
   sf::RenderTexture m_scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief Ghost item placement state for use in SceneContext
+  /////////////////////////////////////////////////
+  GhostItemState m_ghost_item_state;
 
   /////////////////////////////////////////////////
   /// @brief Entity manager with entity pool and archetypes

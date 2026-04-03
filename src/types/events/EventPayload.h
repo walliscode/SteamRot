@@ -103,7 +103,12 @@ struct LogicPayload {
 
     // GrimoireMachina toggles
     INITIATE_MACHINA_FORM_SCAFFOLD,
-    CLEAR_MACHINA_FORM_SCAFFOLD
+    CLEAR_MACHINA_FORM_SCAFFOLD,
+
+    // GhostItem toggles
+    SELECT_GHOST_ITEM, // activate ghost preview with a given item key
+    CLEAR_GHOST_ITEM,  // cancel / deactivate ghost preview
+    PLACE_GHOST_ITEM   // item has been placed at the current ghost position
 
     // add other categories as needed
 
@@ -111,18 +116,26 @@ struct LogicPayload {
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for LogicPayload, sets toggle_name to
-  /// INITIATE_MACHINA_FORM_SCAFFOLD
+  /// NONE
   /////////////////////////////////////////////////
   LogicPayload() = default;
 
   /////////////////////////////////////////////////
   /// @brief Constructor for LogicPayload, takes a LogicToggle and sets the
-  /// toggle_name to NONE
+  /// toggle_name member.
   ///
   /// @param toggle_name Enum value to set the toggle_name member to
   /////////////////////////////////////////////////
   LogicPayload(const LogicPayload::LogicToggle toggle_name)
       : toggle_name(toggle_name) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Optional item key identifying which item is selected or placed.
+  ///
+  /// Populated on SELECT_GHOST_ITEM and PLACE_GHOST_ITEM events so that
+  /// receiving Logic classes know which item is involved.
+  /////////////////////////////////////////////////
+  std::optional<std::string> item_key{};
 };
 
 /////////////////////////////////////////////////

@@ -12,6 +12,9 @@ render_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp
 collision_mouse.test.cpp
 
+GhostItemActionLogic.test.cpp
+GhostItemRenderLogic.test.cpp
+
 )
 
 target_include_directories(test_logic

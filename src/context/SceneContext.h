@@ -13,6 +13,7 @@
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
+#include "GhostItemState.h"
 #include "containers.h"
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
@@ -40,10 +41,13 @@ struct SceneContext {
   /// assets, etc.)
   /// @param entity_manager Reference to EntityManager (contains
   /// entities/archetypes)
+  /// @param data_access_factory Reference to DataAccessFactory
+  /// @param ghost_item_state Reference to the scene's GhostItemState
   /////////////////////////////////////////////////
   SceneContext(sf::RenderTexture &scene_texture,
                EngineResources &engine_resources, EntityManager &entity_manager,
-               DataAccessFactory &data_access_factory);
+               DataAccessFactory &data_access_factory,
+               GhostItemState &ghost_item_state);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -86,6 +90,14 @@ struct SceneContext {
   /// @brief Reference to the DataAccessFactory for the game.
   /////////////////////////////////////////////////
   DataAccessFactory &data_access_factory;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the ghost item placement state for the scene.
+  ///
+  /// Allows Logic classes to read and mutate the active ghost item without
+  /// going through the ECS.
+  /////////////////////////////////////////////////
+  GhostItemState &ghost_item_state;
 };
 
 } // namespace steamrot
