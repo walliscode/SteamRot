@@ -61,7 +61,7 @@ endmacro()
 #   3 - json file extension pattern (e.g. .themes.json, .scenes.json, .fragment.json)
 #   4 - data subdirectory under root (e.g. themes, scenes, fragments)
 #
-flatbuffers_generate_for_type(ui_style "entities" ".styles.json" "ui_styles")
+flatbuffers_generate_for_type(ui_style "user_interface" ".styles.json" "ui_styles")
 flatbuffers_generate_for_type(scene_data "scenes" ".scene_data.json" "scenes")
 flatbuffers_generate_for_type(fragments "scenes" ".fragment.json" "fragments")
 flatbuffers_generate_for_type(scene_manager_data "scenes" ".scene_manager_data.json" "scene_manager")
