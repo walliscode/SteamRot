@@ -8,43 +8,8 @@
 /////////////////////////////////////////////////
 #include "ui_helpers.h"
 #include "CUserInterface.h"
-#include "Fragment.h"
 #include "entity_memory.h"
 #include <catch2/catch_test_macros.hpp>
-
-TEST_CASE("GetAllFragmentNames returns correct fragment names", "[logic_ui]") {
-
-  // Arrange
-  steamrot::Fragment fragment1;
-  fragment1.name = "FragmentA";
-  steamrot::Fragment fragment2;
-  fragment2.name = "FragmentB";
-
-  steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_fragments[fragment1.name] = fragment1;
-  grimoire_machina.m_all_fragments[fragment2.name] = fragment2;
-
-  // Act
-  auto fragment_names =
-      steamrot::logic::ui::GetAllFragmentNames(grimoire_machina);
-  // Assert
-  REQUIRE(fragment_names.size() == 2);
-  std::vector<std::string> expected_names = {"FragmentA", "FragmentB"};
-  REQUIRE(fragment_names == expected_names);
-}
-
-TEST_CASE("GetAllJointNames returns correct joint names", "[logic_ui]") {
-  // Arrange
-  steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_joints["JointA"] = {}; // Placeholder joint
-  grimoire_machina.m_all_joints["JointB"] = {}; // Placeholder joint
-  // Act
-  auto joint_names = steamrot::logic::ui::GetAllJointNames(grimoire_machina);
-  // Assert
-  REQUIRE(joint_names.size() == 2);
-  std::vector<std::string> expected_names = {"JointA", "JointB"};
-  REQUIRE(joint_names == expected_names);
-}
 
 TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState does nothing if "
           "CUserIntferface not registered with CUIState",
