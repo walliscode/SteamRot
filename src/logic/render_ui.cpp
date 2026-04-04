@@ -78,6 +78,7 @@ void DrawButtonElement(sf::RenderTexture &texture, const ButtonElement &button,
 /////////////////////////////////////////////////
 void DrawPanelElement(sf::RenderTexture &texture, const PanelElement &panel,
                       const UIStyle &style) {
+
   DrawBorderAndBackground(texture, panel, style.panel_style);
 }
 
@@ -109,6 +110,16 @@ void DrawDropDownItemElement(sf::RenderTexture &texture,
                              const DropDownItemElement &item,
                              const UIStyle &style) {
   DrawBorderAndBackground(texture, item, style.drop_down_item_style);
+
+  DrawText(texture, item.label,
+           sf::Vector2f{
+               item.position.x + style.drop_down_item_style.border_thickness +
+                   style.drop_down_item_style.inner_margin.x,
+               item.position.y + style.drop_down_item_style.border_thickness +
+                   style.drop_down_item_style.inner_margin.y},
+           item.size, style.drop_down_item_style.font,
+           style.drop_down_item_style.font_size,
+           style.drop_down_item_style.text_color);
 }
 
 /////////////////////////////////////////////////

@@ -71,7 +71,8 @@ void SetColor(JointInstance &joint_instance) {
 
 /////////////////////////////////////////////////
 std::vector<std::string>
-GetAllFragmentNames(const GrimoireMachina &grimoire_machina) {
+GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
+
   std::vector<std::string> fragment_names;
   // cycle through all fragments in the GrimoireMachina and add their names to
   // the vector

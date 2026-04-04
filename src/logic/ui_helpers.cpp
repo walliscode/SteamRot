@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////
+
 /// @file
 /// @brief Implementation of UI helper functions
 /////////////////////////////////////////////////
@@ -11,33 +11,6 @@
 #include "entity_memory.h"
 
 namespace steamrot::logic::ui {
-
-/////////////////////////////////////////////////
-std::vector<std::string>
-GetAllFragmentNames(const GrimoireMachina &grimoire_machina) {
-
-  std::vector<std::string> fragment_names;
-  fragment_names.reserve(grimoire_machina.m_all_fragments.size());
-
-  for (const auto &[name, fragment] : grimoire_machina.m_all_fragments) {
-    fragment_names.push_back(name);
-  }
-
-  return fragment_names;
-}
-
-/////////////////////////////////////////////////
-std::vector<std::string>
-GetAllJointNames(const GrimoireMachina &grimoire_machina) {
-  std::vector<std::string> joint_names;
-  joint_names.reserve(grimoire_machina.m_all_joints.size());
-
-  for (const auto &[name, joint] : grimoire_machina.m_all_joints) {
-    joint_names.push_back(name);
-  }
-
-  return joint_names;
-}
 
 /////////////////////////////////////////////////
 void UpdateCUserInterfaceVisibilityFromCUIState(

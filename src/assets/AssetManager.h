@@ -112,5 +112,15 @@ public:
   const UIStyle &GetDefaultUIStyle() const;
 
   const std::unordered_map<std::string, UIStyle> &GetAllUIStyles() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Set up an empty GrimoireMachina instance, mainly for testing
+  ///
+  /// @return returns std::monostate on success, or FailInfo on failure
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo> SetUpEmptyGrimoireMachina() {
+    m_grimoire_machina = std::make_unique<GrimoireMachina>();
+    return std::monostate{};
+  }
 };
 }; // namespace steamrot
