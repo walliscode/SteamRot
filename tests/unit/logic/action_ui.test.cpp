@@ -276,6 +276,141 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
               nullptr);
     }
   }
+
+  SECTION("children_active is set to true when list expands and items are "
+          "populated") {
+
+    auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+    if (!get_grimoire_result.has_value()) {
+      FAIL("Failed to get GrimoireMachina from AssetManager: " +
+           get_grimoire_result.error().message);
+    }
+    steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
+    grimoire_machina.m_all_fragments.clear();
+    grimoire_machina.m_all_fragments.insert({"fragment1", steamrot::Fragment{}});
+
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllFragmentNames;
+    dropdown.is_expanded = true;
+    REQUIRE_FALSE(dropdown.children_active);
+
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+
+    REQUIRE(dropdown.children_active);
+    REQUIRE(dropdown.child_elements.size() == 1);
+  }
+
+  SECTION("children_active is set to false and children are cleared when list "
+          "collapses") {
+
+    // pre-populate the list as if it were expanded
+    auto item = std::make_unique<steamrot::DropDownItemElement>();
+    item->label = "existing_item";
+    dropdown.child_elements.push_back(std::move(item));
+    dropdown.children_active = true;
+    dropdown.is_expanded = false;
+
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+
+    REQUIRE_FALSE(dropdown.children_active);
+    REQUIRE(dropdown.child_elements.empty());
+  }
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions manages "
+          "list children_active and population on expand and collapse",
+          "[logic][action][ProcessDropDownContainerElementActions]") {
+
+  // set up a container with list and button children
+  steamrot::DropDownContainerElement dropdown_container;
+  dropdown_container.subscription = std::make_shared<steamrot::Subscriber>();
+
+  auto dropdown_list = std::make_unique<steamrot::DropDownListElement>();
+  dropdown_list->data_population_function =
+      steamrot::DataPopulationFunction::GetAllFragmentNames;
+
+  auto dropdown_button = std::make_unique<steamrot::DropDownButtonElement>();
+  dropdown_button->subscription = std::make_shared<steamrot::Subscriber>();
+
+  dropdown_container.child_elements.push_back(std::move(dropdown_list));
+  dropdown_container.child_elements.push_back(std::move(dropdown_button));
+
+  auto *list_ptr = dynamic_cast<steamrot::DropDownListElement *>(
+      dropdown_container.child_elements[0].get());
+  auto *button_ptr = dynamic_cast<steamrot::DropDownButtonElement *>(
+      dropdown_container.child_elements[1].get());
+  REQUIRE(list_ptr != nullptr);
+  REQUIRE(button_ptr != nullptr);
+
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up GrimoireMachina: " + set_up_result.error().message);
+  }
+  auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+  if (!get_grimoire_result.has_value()) {
+    FAIL("Failed to get GrimoireMachina: " +
+         get_grimoire_result.error().message);
+  }
+  steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
+  grimoire_machina.m_all_fragments.clear();
+  grimoire_machina.m_all_fragments.insert({"fragment1", steamrot::Fragment{}});
+  grimoire_machina.m_all_fragments.insert({"fragment2", steamrot::Fragment{}});
+
+  SECTION("children_active is true and items are populated when container "
+          "expands") {
+    button_ptr->is_expanded = true;
+    REQUIRE_FALSE(list_ptr->children_active);
+    REQUIRE(list_ptr->child_elements.empty());
+
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+
+    REQUIRE(list_ptr->is_expanded);
+    REQUIRE(list_ptr->children_active);
+    REQUIRE(list_ptr->child_elements.size() == 2);
+  }
+
+  SECTION("children_active is false and children are cleared when container "
+          "collapses") {
+    // start in expanded state
+    button_ptr->is_expanded = true;
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE(list_ptr->children_active);
+    REQUIRE_FALSE(list_ptr->child_elements.empty());
+
+    // now collapse
+    button_ptr->is_expanded = false;
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+
+    REQUIRE_FALSE(list_ptr->is_expanded);
+    REQUIRE_FALSE(list_ptr->children_active);
+    REQUIRE(list_ptr->child_elements.empty());
+  }
+
+  SECTION("clicking button toggles expand then collapse with correct state") {
+    // first click: expand
+    button_ptr->is_mouse_over = true;
+    button_ptr->subscription->m_active = true;
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE(list_ptr->is_expanded);
+    REQUIRE(list_ptr->children_active);
+    REQUIRE(list_ptr->child_elements.size() == 2);
+
+    // second click: collapse
+    button_ptr->subscription->m_active = true;
+    steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+        dropdown_container, scene_context);
+    REQUIRE_FALSE(list_ptr->is_expanded);
+    REQUIRE_FALSE(list_ptr->children_active);
+    REQUIRE(list_ptr->child_elements.empty());
+  }
 }
 
 TEST_CASE("logic::ui::action::ProcessUIActionsAndEvents processes UI elements "

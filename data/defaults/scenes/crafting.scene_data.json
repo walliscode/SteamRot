@@ -168,7 +168,7 @@
                               },
                               "children_active": false,
                               "children": [],
-                              "layout": "Vertical",
+                              "layout": "DropDown",
                               "spacing_strategy": "DropDownList"
                             },
                             "data_population_function": "GetAllFragmentNames"

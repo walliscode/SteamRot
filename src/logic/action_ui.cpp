@@ -126,18 +126,15 @@ void ProcessDropDownContainerElementActions(
 
     if (dropdown_list_element) {
 
-      // so we don't want the keep on calling the list element actions if it is
-      // already expanded so we will store the expanded state of the list
-      // element before calling the button element actions, and only call the
-      // list element actions if the button element is expanded and the list
-      // element is not already expanded
+      // store the expanded state of the list before syncing with the button
       bool was_list_expanded = dropdown_list_element->is_expanded;
 
       // if the button is expanded, the list should be expanded
       dropdown_list_element->is_expanded = dropdown_button_element->is_expanded;
 
-      // call the list element actions to populate the list if it is expanded
-      if (dropdown_list_element->is_expanded && !was_list_expanded) {
+      // call the list element actions whenever the expanded state changes
+      // (populate on expand, clear on collapse)
+      if (dropdown_list_element->is_expanded != was_list_expanded) {
 
         ProcessDropDownListElementActions(*dropdown_list_element,
                                           scene_context);
@@ -168,7 +165,9 @@ void ProcessDropDownListElementActions(
     const SceneContext &scene_context) {
 
   if (!dropdown_list_element.is_expanded) {
-    // if the list isn't expanded, then we don't want to populate it
+    // list is collapsing: clear items and deactivate children
+    dropdown_list_element.child_elements.clear();
+    dropdown_list_element.children_active = false;
     return;
   }
 
@@ -198,6 +197,9 @@ void ProcessDropDownListElementActions(
     dropdown_item->label = fragment_name;
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
   }
+
+  // activate children so they are rendered
+  dropdown_list_element.children_active = true;
 }
 
 } // namespace steamrot::logic::action::ui
