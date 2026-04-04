@@ -61,10 +61,10 @@ set(FRAGMENT_BINARIES "")
 set(JOINT_BINARIES "")
 
 # Path to the fragment.fbs schema
-set(fragment_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/fragment.fbs")
+set(fragment_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entity/fragment.fbs")
 
 # Path to the joint.fbs schema
-set(joint_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/joint.fbs")
+set(joint_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entity/joint.fbs")
 
 # Find all .json files in fragments directory
 file(GLOB fragment_json_files
