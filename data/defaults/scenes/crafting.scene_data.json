@@ -170,7 +170,8 @@
                               "children": [],
                               "layout": "Vertical",
                               "spacing_strategy": "DropDownList"
-                            }
+                            },
+                            "data_population_function": "GetAllFragmentNames"
                           }
                         },
                         {

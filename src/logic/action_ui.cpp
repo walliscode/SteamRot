@@ -11,7 +11,6 @@
 #include "DropDownButtonElement.h"
 #include "DropDownItemElement.h"
 #include "action_grimoire_machina.h"
-#include <iostream>
 
 namespace steamrot::logic::action::ui {
 
@@ -139,7 +138,6 @@ void ProcessDropDownContainerElementActions(
 
       // call the list element actions to populate the list if it is expanded
       if (dropdown_list_element->is_expanded && !was_list_expanded) {
-        std::cout << "Processing DropDownListElement actions" << std::endl;
 
         ProcessDropDownListElementActions(*dropdown_list_element,
                                           scene_context);
@@ -183,6 +181,7 @@ void ProcessDropDownListElementActions(
   case DataPopulationFunction::GetAllFragmentNames:
     fragment_names = grimoire_machina::GetAllFragmentNames(
         *scene_context.asset_manager.GetGrimoireMachina().value());
+
     break;
 
   default:
