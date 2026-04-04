@@ -23,7 +23,7 @@
                   "children_active": true,
                   "children": [
                     {
-                      "element_type": "ButtonData",
+                      "element_type": "ButtonDataFbs",
                       "element": {
                         "base_data": {
                           "position": { "x": 250.0, "y": 150.0 },
@@ -37,7 +37,7 @@
                       }
                     },
                     {
-                      "element_type": "ButtonData",
+                      "element_type": "ButtonDataFbs",
                       "element": {
                         "base_data": {
                           "position": { "x": 250.0, "y": 220.0 },
@@ -84,7 +84,7 @@
                   "children_active": true,
                   "children": [
                     {
-                      "element_type": "ButtonData",
+                      "element_type": "ButtonDataFbs",
                       "element": {
                         "base_data": {
                           "position": { "x": 20.0, "y": 20.0 },

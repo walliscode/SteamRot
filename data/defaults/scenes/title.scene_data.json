@@ -28,7 +28,7 @@
               "children_active": true,
               "children": [
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
                   "element": {
                     "base_data": {
                       "position": {
@@ -48,7 +48,7 @@
                   }
                 },
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
                   "element": {
                     "base_data": {
                       "position": {
@@ -88,7 +88,7 @@
                   }
                 },
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
                   "element": {
                     "base_data": {
                       "position": {
