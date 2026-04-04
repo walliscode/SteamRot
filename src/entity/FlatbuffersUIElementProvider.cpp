@@ -33,8 +33,9 @@ FlatbuffersUIElementProvider::CreateRootUIElement() {
                  "UserInterfaceData missing root_ui_element"});
   }
 
-  return CreateUIElement(UIElementDataUnionFbs::UIElementDataUnion_PanelData,
-                         m_ui_data.root_ui_element());
+  return CreateUIElement(
+      UIElementDataUnionFbs::UIElementDataUnionFbs_PanelDataFbs,
+      m_ui_data.root_ui_element());
 }
 
 ////////////////////////////////////////////////////////////
@@ -60,8 +61,8 @@ FlatbuffersUIElementProvider::ConfigureRootUIElement(UIElement &root_element) {
   };
 
   return data::configure::ConfigureBaseUIElement(
-      root_element, *m_ui_data.root_ui_element()->base_data(),
-      m_event_handler, create_callback);
+      root_element, *m_ui_data.root_ui_element()->base_data(), m_event_handler,
+      create_callback);
 }
 
 ////////////////////////////////////////////////////////////
@@ -73,7 +74,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
   const UIElementDataFbs *base_data = nullptr;
 
   switch (data_type) {
-  case UIElementDataUnionFbs::UIElementDataUnion_PanelData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_PanelDataFbs: {
     auto panel_data = static_cast<const PanelDataFbs *>(data);
     auto panel = std::make_unique<PanelElement>();
     auto config_result =
@@ -84,7 +85,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = panel_data->base_data();
     break;
   }
-  case UIElementDataUnionFbs::UIElementDataUnion_ButtonData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_ButtonDataFbs: {
     auto button_data = static_cast<const ButtonDataFbs *>(data);
     auto button = std::make_unique<ButtonElement>();
     auto config_result =
@@ -95,7 +96,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = button_data->base_data();
     break;
   }
-  case UIElementDataUnionFbs::UIElementDataUnion_DropDownListData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownListDataFbs: {
     auto ddlist_data = static_cast<const DropDownListDataFbs *>(data);
     auto ddlist = std::make_unique<DropDownListElement>();
     auto config_result =
@@ -106,7 +107,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = ddlist_data->base_data();
     break;
   }
-  case UIElementDataUnionFbs::UIElementDataUnion_DropDownContainerData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownContainerDataFbs: {
     auto ddcont_data = static_cast<const DropDownContainerDataFbs *>(data);
     auto ddcont = std::make_unique<DropDownContainerElement>();
     auto config_result = data::configure::ConfigureDropDownContainerElement(
@@ -117,7 +118,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = ddcont_data->base_data();
     break;
   }
-  case UIElementDataUnionFbs::UIElementDataUnion_DropDownItemData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownItemDataFbs: {
     auto dditem_data = static_cast<const DropDownItemDataFbs *>(data);
     auto dditem = std::make_unique<DropDownItemElement>();
     auto config_result =
@@ -128,7 +129,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = dditem_data->base_data();
     break;
   }
-  case UIElementDataUnionFbs::UIElementDataUnion_DropDownButtonData: {
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownButtonDataFbs: {
     auto ddbtn_data = static_cast<const DropDownButtonDataFbs *>(data);
     auto ddbtn = std::make_unique<DropDownButtonElement>();
     auto config_result =

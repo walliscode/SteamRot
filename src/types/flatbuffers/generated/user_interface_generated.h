@@ -21,7 +21,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 namespace steamrot {
 
 struct ChildDataFbs;
-struct childBuilder;
+struct ChildDataFbsBuilder;
 
 struct UIElementDataFbs;
 struct UIElementDataFbsBuilder;
@@ -123,31 +123,31 @@ inline const char *EnumNameSpacingAndSizingFbs(SpacingAndSizingFbs e) {
 }
 
 enum UIElementDataUnionFbs : uint8_t {
-  UIElementDataUnion_NONE = 0,
-  UIElementDataUnion_PanelData = 1,
-  UIElementDataUnion_ButtonData = 2,
-  UIElementDataUnion_DropDownListData = 3,
-  UIElementDataUnion_DropDownContainerData = 4,
-  UIElementDataUnion_DropDownItemData = 5,
-  UIElementDataUnion_DropDownButtonData = 6,
-  UIElementDataUnion_MIN = UIElementDataUnion_NONE,
-  UIElementDataUnion_MAX = UIElementDataUnion_DropDownButtonData
+  UIElementDataUnionFbs_NONE = 0,
+  UIElementDataUnionFbs_PanelDataFbs = 1,
+  UIElementDataUnionFbs_ButtonDataFbs = 2,
+  UIElementDataUnionFbs_DropDownListDataFbs = 3,
+  UIElementDataUnionFbs_DropDownContainerDataFbs = 4,
+  UIElementDataUnionFbs_DropDownItemDataFbs = 5,
+  UIElementDataUnionFbs_DropDownButtonDataFbs = 6,
+  UIElementDataUnionFbs_MIN = UIElementDataUnionFbs_NONE,
+  UIElementDataUnionFbs_MAX = UIElementDataUnionFbs_DropDownButtonDataFbs
 };
 
-inline const UIElementDataUnionFbs (&EnumValuesUIElementDataUnion())[7] {
+inline const UIElementDataUnionFbs (&EnumValuesUIElementDataUnionFbs())[7] {
   static const UIElementDataUnionFbs values[] = {
-    UIElementDataUnion_NONE,
-    UIElementDataUnion_PanelData,
-    UIElementDataUnion_ButtonData,
-    UIElementDataUnion_DropDownListData,
-    UIElementDataUnion_DropDownContainerData,
-    UIElementDataUnion_DropDownItemData,
-    UIElementDataUnion_DropDownButtonData
+    UIElementDataUnionFbs_NONE,
+    UIElementDataUnionFbs_PanelDataFbs,
+    UIElementDataUnionFbs_ButtonDataFbs,
+    UIElementDataUnionFbs_DropDownListDataFbs,
+    UIElementDataUnionFbs_DropDownContainerDataFbs,
+    UIElementDataUnionFbs_DropDownItemDataFbs,
+    UIElementDataUnionFbs_DropDownButtonDataFbs
   };
   return values;
 }
 
-inline const char * const *EnumNamesUIElementDataUnion() {
+inline const char * const *EnumNamesUIElementDataUnionFbs() {
   static const char * const names[8] = {
     "NONE",
     "PanelDataFbs",
@@ -161,45 +161,45 @@ inline const char * const *EnumNamesUIElementDataUnion() {
   return names;
 }
 
-inline const char *EnumNameUIElementDataUnion(UIElementDataUnionFbs e) {
-  if (::flatbuffers::IsOutRange(e, UIElementDataUnion_NONE, UIElementDataUnion_DropDownButtonData)) return "";
+inline const char *EnumNameUIElementDataUnionFbs(UIElementDataUnionFbs e) {
+  if (::flatbuffers::IsOutRange(e, UIElementDataUnionFbs_NONE, UIElementDataUnionFbs_DropDownButtonDataFbs)) return "";
   const size_t index = static_cast<size_t>(e);
-  return EnumNamesUIElementDataUnion()[index];
+  return EnumNamesUIElementDataUnionFbs()[index];
 }
 
-template<typename T> struct UIElementDataUnionTraits {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_NONE;
+template<typename T> struct UIElementDataUnionFbsTraits {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_NONE;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::PanelDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_PanelData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::PanelDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_PanelDataFbs;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::ButtonDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_ButtonData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::ButtonDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_ButtonDataFbs;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::DropDownListDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_DropDownListData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::DropDownListDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_DropDownListDataFbs;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::DropDownContainerDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_DropDownContainerData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::DropDownContainerDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_DropDownContainerDataFbs;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::DropDownItemDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_DropDownItemData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::DropDownItemDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_DropDownItemDataFbs;
 };
 
-template<> struct UIElementDataUnionTraits<steamrot::DropDownButtonDataFbs> {
-  static const UIElementDataUnionFbs enum_value = UIElementDataUnion_DropDownButtonData;
+template<> struct UIElementDataUnionFbsTraits<steamrot::DropDownButtonDataFbs> {
+  static const UIElementDataUnionFbs enum_value = UIElementDataUnionFbs_DropDownButtonDataFbs;
 };
 
-bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnionFbs type);
-bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+bool VerifyUIElementDataUnionFbs(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnionFbs type);
+bool VerifyUIElementDataUnionFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
 struct ChildDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef childBuilder Builder;
+  typedef ChildDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ELEMENT_TYPE = 4,
     VT_ELEMENT = 6
@@ -211,58 +211,58 @@ struct ChildDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetPointer<const void *>(VT_ELEMENT);
   }
   template<typename T> const T *element_as() const;
-  const steamrot::PanelDataFbs *element_as_PanelData() const {
-    return element_type() == steamrot::UIElementDataUnion_PanelData ? static_cast<const steamrot::PanelDataFbs *>(element()) : nullptr;
+  const steamrot::PanelDataFbs *element_as_PanelDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_PanelDataFbs ? static_cast<const steamrot::PanelDataFbs *>(element()) : nullptr;
   }
-  const steamrot::ButtonDataFbs *element_as_ButtonData() const {
-    return element_type() == steamrot::UIElementDataUnion_ButtonData ? static_cast<const steamrot::ButtonDataFbs *>(element()) : nullptr;
+  const steamrot::ButtonDataFbs *element_as_ButtonDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_ButtonDataFbs ? static_cast<const steamrot::ButtonDataFbs *>(element()) : nullptr;
   }
-  const steamrot::DropDownListDataFbs *element_as_DropDownListData() const {
-    return element_type() == steamrot::UIElementDataUnion_DropDownListData ? static_cast<const steamrot::DropDownListDataFbs *>(element()) : nullptr;
+  const steamrot::DropDownListDataFbs *element_as_DropDownListDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_DropDownListDataFbs ? static_cast<const steamrot::DropDownListDataFbs *>(element()) : nullptr;
   }
-  const steamrot::DropDownContainerDataFbs *element_as_DropDownContainerData() const {
-    return element_type() == steamrot::UIElementDataUnion_DropDownContainerData ? static_cast<const steamrot::DropDownContainerDataFbs *>(element()) : nullptr;
+  const steamrot::DropDownContainerDataFbs *element_as_DropDownContainerDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_DropDownContainerDataFbs ? static_cast<const steamrot::DropDownContainerDataFbs *>(element()) : nullptr;
   }
-  const steamrot::DropDownItemDataFbs *element_as_DropDownItemData() const {
-    return element_type() == steamrot::UIElementDataUnion_DropDownItemData ? static_cast<const steamrot::DropDownItemDataFbs *>(element()) : nullptr;
+  const steamrot::DropDownItemDataFbs *element_as_DropDownItemDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_DropDownItemDataFbs ? static_cast<const steamrot::DropDownItemDataFbs *>(element()) : nullptr;
   }
-  const steamrot::DropDownButtonDataFbs *element_as_DropDownButtonData() const {
-    return element_type() == steamrot::UIElementDataUnion_DropDownButtonData ? static_cast<const steamrot::DropDownButtonDataFbs *>(element()) : nullptr;
+  const steamrot::DropDownButtonDataFbs *element_as_DropDownButtonDataFbs() const {
+    return element_type() == steamrot::UIElementDataUnionFbs_DropDownButtonDataFbs ? static_cast<const steamrot::DropDownButtonDataFbs *>(element()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_ELEMENT_TYPE, 1) &&
            VerifyOffsetRequired(verifier, VT_ELEMENT) &&
-           VerifyUIElementDataUnion(verifier, element(), element_type()) &&
+           VerifyUIElementDataUnionFbs(verifier, element(), element_type()) &&
            verifier.EndTable();
   }
 };
 
 template<> inline const steamrot::PanelDataFbs *ChildDataFbs::element_as<steamrot::PanelDataFbs>() const {
-  return element_as_PanelData();
+  return element_as_PanelDataFbs();
 }
 
 template<> inline const steamrot::ButtonDataFbs *ChildDataFbs::element_as<steamrot::ButtonDataFbs>() const {
-  return element_as_ButtonData();
+  return element_as_ButtonDataFbs();
 }
 
 template<> inline const steamrot::DropDownListDataFbs *ChildDataFbs::element_as<steamrot::DropDownListDataFbs>() const {
-  return element_as_DropDownListData();
+  return element_as_DropDownListDataFbs();
 }
 
 template<> inline const steamrot::DropDownContainerDataFbs *ChildDataFbs::element_as<steamrot::DropDownContainerDataFbs>() const {
-  return element_as_DropDownContainerData();
+  return element_as_DropDownContainerDataFbs();
 }
 
 template<> inline const steamrot::DropDownItemDataFbs *ChildDataFbs::element_as<steamrot::DropDownItemDataFbs>() const {
-  return element_as_DropDownItemData();
+  return element_as_DropDownItemDataFbs();
 }
 
 template<> inline const steamrot::DropDownButtonDataFbs *ChildDataFbs::element_as<steamrot::DropDownButtonDataFbs>() const {
-  return element_as_DropDownButtonData();
+  return element_as_DropDownButtonDataFbs();
 }
 
-struct childBuilder {
+struct ChildDataFbsBuilder {
   typedef ChildDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
@@ -272,7 +272,7 @@ struct childBuilder {
   void add_element(::flatbuffers::Offset<void> element) {
     fbb_.AddOffset(ChildDataFbs::VT_ELEMENT, element);
   }
-  explicit childBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit ChildDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
@@ -286,9 +286,9 @@ struct childBuilder {
 
 inline ::flatbuffers::Offset<ChildDataFbs> CreateChildDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    steamrot::UIElementDataUnionFbs element_type = steamrot::UIElementDataUnion_NONE,
+    steamrot::UIElementDataUnionFbs element_type = steamrot::UIElementDataUnionFbs_NONE,
     ::flatbuffers::Offset<void> element = 0) {
-  childBuilder builder_(_fbb);
+  ChildDataFbsBuilder builder_(_fbb);
   builder_.add_element(element);
   builder_.add_element_type(element_type);
   return builder_.Finish();
@@ -425,7 +425,7 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataDirect(
+inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::Vector2fDataFbs> position = 0,
     ::flatbuffers::Offset<steamrot::Vector2fDataFbs> size = 0,
@@ -549,7 +549,7 @@ inline ::flatbuffers::Offset<ButtonDataFbs> CreateButtonDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<ButtonDataFbs> CreateButtonDataDirect(
+inline ::flatbuffers::Offset<ButtonDataFbs> CreateButtonDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementDataFbs> base_data = 0,
     const char *label = nullptr) {
@@ -678,7 +678,7 @@ inline ::flatbuffers::Offset<DropDownListDataFbs> CreateDropDownListDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownListDataFbs> CreateDropDownListDataDirect(
+inline ::flatbuffers::Offset<DropDownListDataFbs> CreateDropDownListDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementDataFbs> base_data = 0,
     const char *unexpanded_label = nullptr,
@@ -749,7 +749,7 @@ inline ::flatbuffers::Offset<DropDownItemDataFbs> CreateDropDownItemDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownItemDataFbs> CreateDropDownItemDataDirect(
+inline ::flatbuffers::Offset<DropDownItemDataFbs> CreateDropDownItemDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::UIElementDataFbs> base_data = 0,
     const char *label = nullptr) {
@@ -890,32 +890,32 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbsDirect(
       is_visible);
 }
 
-inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnionFbs type) {
+inline bool VerifyUIElementDataUnionFbs(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnionFbs type) {
   switch (type) {
-    case UIElementDataUnion_NONE: {
+    case UIElementDataUnionFbs_NONE: {
       return true;
     }
-    case UIElementDataUnion_PanelData: {
+    case UIElementDataUnionFbs_PanelDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::PanelDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UIElementDataUnion_ButtonData: {
+    case UIElementDataUnionFbs_ButtonDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::ButtonDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UIElementDataUnion_DropDownListData: {
+    case UIElementDataUnionFbs_DropDownListDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::DropDownListDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UIElementDataUnion_DropDownContainerData: {
+    case UIElementDataUnionFbs_DropDownContainerDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::DropDownContainerDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UIElementDataUnion_DropDownItemData: {
+    case UIElementDataUnionFbs_DropDownItemDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::DropDownItemDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case UIElementDataUnion_DropDownButtonData: {
+    case UIElementDataUnionFbs_DropDownButtonDataFbs: {
       auto ptr = reinterpret_cast<const steamrot::DropDownButtonDataFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
@@ -923,11 +923,11 @@ inline bool VerifyUIElementDataUnion(::flatbuffers::Verifier &verifier, const vo
   }
 }
 
-inline bool VerifyUIElementDataUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+inline bool VerifyUIElementDataUnionFbsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
   if (!values || !types) return !values && !types;
   if (values->size() != types->size()) return false;
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
-    if (!VerifyUIElementDataUnion(
+    if (!VerifyUIElementDataUnionFbs(
         verifier,  values->Get(i), types->GetEnum<UIElementDataUnionFbs>(i))) {
       return false;
     }

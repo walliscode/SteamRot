@@ -84,7 +84,7 @@ inline ::flatbuffers::Offset<EventBusDataFbs> CreateEventBusDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<EventBusDataFbs> CreateEventBusDataDirect(
+inline ::flatbuffers::Offset<EventBusDataFbs> CreateEventBusDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::EventPacketFbs>> *events = nullptr,
     const char *description = nullptr) {

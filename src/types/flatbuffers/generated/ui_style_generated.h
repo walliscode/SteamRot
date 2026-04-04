@@ -284,7 +284,7 @@ inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataDirect(
+inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
@@ -443,7 +443,7 @@ inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDa
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDataDirect(
+inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
@@ -549,7 +549,7 @@ inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDa
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDataDirect(
+inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
@@ -748,7 +748,7 @@ inline ::flatbuffers::Offset<UIStyleDataFbs> CreateUIStyleDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStyleDataFbs> CreateUIStyleDataDirect(
+inline ::flatbuffers::Offset<UIStyleDataFbs> CreateUIStyleDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::PanelStyleDataFbs> panel_style = 0,
     ::flatbuffers::Offset<steamrot::ButtonStyleDataFbs> button_style = 0,
@@ -777,23 +777,23 @@ inline const steamrot::UIStyleDataFbs *GetSizePrefixedUIStyleDataFbs(const void 
   return ::flatbuffers::GetSizePrefixedRoot<steamrot::UIStyleDataFbs>(buf);
 }
 
-inline bool VerifyUIStyleDataBuffer(
+inline bool VerifyUIStyleDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
   return verifier.VerifyBuffer<steamrot::UIStyleDataFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedUIStyleDataBuffer(
+inline bool VerifySizePrefixedUIStyleDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
   return verifier.VerifySizePrefixedBuffer<steamrot::UIStyleDataFbs>(nullptr);
 }
 
-inline void FinishUIStyleDataBuffer(
+inline void FinishUIStyleDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<steamrot::UIStyleDataFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedUIStyleDataBuffer(
+inline void FinishSizePrefixedUIStyleDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<steamrot::UIStyleDataFbs> root) {
   fbb.FinishSizePrefixed(root);

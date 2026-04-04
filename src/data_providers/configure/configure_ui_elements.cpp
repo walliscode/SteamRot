@@ -64,7 +64,8 @@ DataPopulationFunction ConvertDataPopulationFunction(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
-    UIElement &element, const UIElementDataFbs &data, EventHandler &event_handler,
+    UIElement &element, const UIElementDataFbs &data,
+    EventHandler &event_handler,
     std::function<std::expected<std::unique_ptr<UIElement>, FailInfo>(
         const UIElementDataUnionFbs &, const void *)>
         create_ui_element_callback) {
@@ -152,7 +153,8 @@ ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureButtonElement(ButtonElement &button_element, const ButtonDataFbs &data) {
+ConfigureButtonElement(ButtonElement &button_element,
+                       const ButtonDataFbs &data) {
   if (data.label()) {
     button_element.label = data.label()->str();
   }
@@ -191,26 +193,26 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
   // ensure that the data contains only a list and a button as children
   if (data.base_data()->children()->size() != 2) {
     size_t num_children = data.base_data()->children()->size();
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "DropDownContainerDataFbs must have exactly 2 children: a "
-                 "DropDownListDataFbs and a DropDownButtonDataFbs. This one has " +
-                     std::to_string(num_children) + " children."});
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "DropDownContainerDataFbs must have exactly 2 children: a "
+        "DropDownListDataFbs and a DropDownButtonDataFbs. This one has " +
+            std::to_string(num_children) + " children."});
   }
   // ensure the first child in the data is DropDownListDataFbs
   auto first_child_fb = data.base_data()->children()->Get(0);
   if (!first_child_fb ||
       first_child_fb->element_type() !=
-          UIElementDataUnionFbs::UIElementDataUnion_DropDownListData) {
-    return std::unexpected(FailInfo{
-        FailMode::FlatbuffersDataNotFound,
-        "DropDownContainerDataFbs's first child must be a DropDownListDataFbs."});
+          UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownListDataFbs) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "DropDownContainerDataFbs's first child "
+                                    "must be a DropDownListDataFbs."});
   }
   // ensure the second child in the data is DropDownButtonDataFbs
   auto second_child_fb = data.base_data()->children()->Get(1);
   if (!second_child_fb ||
       second_child_fb->element_type() !=
-          UIElementDataUnionFbs::UIElementDataUnion_DropDownButtonData) {
+          UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownButtonDataFbs) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
                                     "DropDownContainerDataFbs's second child "
                                     "must be a DropDownButtonDataFbs."});

@@ -248,7 +248,7 @@ inline ::flatbuffers::Offset<TriangleFbs> CreateTriangleFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<TriangleFbs> CreateTriangleDirect(
+inline ::flatbuffers::Offset<TriangleFbs> CreateTriangleFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::VertexFbs>> *vertices = nullptr) {
   auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::VertexFbs>>(*vertices) : 0;

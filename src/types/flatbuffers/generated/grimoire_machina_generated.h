@@ -75,7 +75,7 @@ inline ::flatbuffers::Offset<GrimoireMachinaDataFbs> CreateGrimoireMachinaDataFb
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<GrimoireMachinaDataFbs> CreateGrimoireMachinaDataDirect(
+inline ::flatbuffers::Offset<GrimoireMachinaDataFbs> CreateGrimoireMachinaDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *fragments = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *joints = nullptr) {

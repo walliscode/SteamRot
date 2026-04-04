@@ -234,7 +234,7 @@ inline ::flatbuffers::Offset<UserInputBitsetDataFbs> CreateUserInputBitsetDataFb
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UserInputBitsetDataFbs> CreateUserInputBitsetDataDirect(
+inline ::flatbuffers::Offset<UserInputBitsetDataFbs> CreateUserInputBitsetDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<uint8_t> *keyboard_pressed = nullptr,
     const std::vector<uint8_t> *keyboard_released = nullptr,

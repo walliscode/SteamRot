@@ -219,7 +219,7 @@ inline ::flatbuffers::Offset<AccessibilityPreferencesFbs> CreateAccessibilityPre
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<AccessibilityPreferencesFbs> CreateAccessibilityPreferencesDirect(
+inline ::flatbuffers::Offset<AccessibilityPreferencesFbs> CreateAccessibilityPreferencesFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float ui_scale = 1.0f,
     const char *preferred_font = nullptr) {
@@ -319,23 +319,23 @@ inline const steamrot::UserPreferencesDataFbs *GetSizePrefixedUserPreferencesDat
   return ::flatbuffers::GetSizePrefixedRoot<steamrot::UserPreferencesDataFbs>(buf);
 }
 
-inline bool VerifyUserPreferencesDataBuffer(
+inline bool VerifyUserPreferencesDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
   return verifier.VerifyBuffer<steamrot::UserPreferencesDataFbs>(nullptr);
 }
 
-inline bool VerifySizePrefixedUserPreferencesDataBuffer(
+inline bool VerifySizePrefixedUserPreferencesDataFbsBuffer(
     ::flatbuffers::Verifier &verifier) {
   return verifier.VerifySizePrefixedBuffer<steamrot::UserPreferencesDataFbs>(nullptr);
 }
 
-inline void FinishUserPreferencesDataBuffer(
+inline void FinishUserPreferencesDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<steamrot::UserPreferencesDataFbs> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedUserPreferencesDataBuffer(
+inline void FinishSizePrefixedUserPreferencesDataFbsBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<steamrot::UserPreferencesDataFbs> root) {
   fbb.FinishSizePrefixed(root);

@@ -106,7 +106,7 @@ inline ::flatbuffers::Offset<SceneChangePacketDataFbs> CreateSceneChangePacketDa
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<SceneChangePacketDataFbs> CreateSceneChangePacketDataDirect(
+inline ::flatbuffers::Offset<SceneChangePacketDataFbs> CreateSceneChangePacketDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *uuid = nullptr,
     steamrot::SceneTypeFbs scene_type = steamrot::SceneTypeFbs_UNKNOWN) {

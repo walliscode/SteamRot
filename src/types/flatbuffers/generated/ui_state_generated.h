@@ -81,7 +81,7 @@ inline ::flatbuffers::Offset<UIStateMappingFbs> CreateUIStateMappingFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateMappingFbs> CreateUIStateMappingDirect(
+inline ::flatbuffers::Offset<UIStateMappingFbs> CreateUIStateMappingFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_on = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_off = nullptr) {
@@ -159,7 +159,7 @@ inline ::flatbuffers::Offset<UIStateDataFbs> CreateUIStateDataFbs(
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateDataFbs> CreateUIStateDataDirect(
+inline ::flatbuffers::Offset<UIStateDataFbs> CreateUIStateDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *state_key = nullptr,
     ::flatbuffers::Offset<steamrot::UIStateMappingFbs> state_to_ui_visibility = 0,
@@ -217,7 +217,7 @@ inline ::flatbuffers::Offset<UIStateCollectionDataFbs> CreateUIStateCollectionDa
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateCollectionDataFbs> CreateUIStateCollectionDataDirect(
+inline ::flatbuffers::Offset<UIStateCollectionDataFbs> CreateUIStateCollectionDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>> *ui_states = nullptr) {
   auto ui_states__ = ui_states ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIStateDataFbs>>(*ui_states) : 0;
