@@ -1,12 +1,12 @@
-include "user_interface.fbs";
-include "ui_state.fbs";
+include "../user_interface/user_interface.fbs";
+include "../components/ui_state.fbs";
 namespace steamrot;
 
 
 table EntityDataFbs{
   index: uint32;
   c_user_interface: UserInterfaceFbs;
-  c_ui_state: UIStateCollectionData;
+  c_ui_state: UIStateCollectionDataFbs;
 
   }
 

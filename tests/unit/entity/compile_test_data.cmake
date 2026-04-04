@@ -2,11 +2,11 @@
 
 set(ENTITY_TEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/entity_test_data.json")
 set(ENTITY_TEST_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/entity_test_data.bin")
-set(ENTITIES_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/entities.fbs")
+set(ENTITIES_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entity/entities.fbs")
 
 set(UI_ELEMENT_TEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/ui_element_test_data.json")
 set(UI_ELEMENT_TEST_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/ui_element_test_data.bin")
-set(UI_ELEMENT_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/user_interface.fbs")
+set(UI_ELEMENT_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/user_interface/user_interface.fbs")
 
 # Add custom command to compile JSON to binary
 add_custom_command(

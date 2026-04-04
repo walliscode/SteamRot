@@ -17,9 +17,9 @@
 
 namespace steamrot {
 
-// Forward declaration for UIStyleData (will be defined when implementing
+// Forward declaration for UIStyleDataFbs (will be defined when implementing
 // FlatBuffers configurator)
-struct UIStyleData;
+struct UIStyleDataFbs;
 
 ////////////////////////////////////////////////////////////
 /// @class IUIStyleConfigurator

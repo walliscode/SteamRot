@@ -18,7 +18,7 @@
             "children_active": false,
             "children": [
               {
-                "element_type": "ButtonData",
+                "element_type": "ButtonDataFbs",
                 "element": {
                   "base_data": {
                     "position": {

@@ -7,6 +7,11 @@ target_include_directories(types
   ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/
   ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/styles/
   ${CMAKE_CURRENT_SOURCE_DIR}/core/
+  ${CMAKE_CURRENT_SOURCE_DIR}/engine/
+  ${CMAKE_CURRENT_SOURCE_DIR}/scenes/
+  ${CMAKE_CURRENT_SOURCE_DIR}/logic/
+  ${CMAKE_CURRENT_SOURCE_DIR}/entity/
+  ${CMAKE_CURRENT_SOURCE_DIR}/configuration/
   ${CMAKE_CURRENT_SOURCE_DIR}/components/
   ${CMAKE_CURRENT_SOURCE_DIR}/interfaces/
   ${CMAKE_CURRENT_SOURCE_DIR}/events/

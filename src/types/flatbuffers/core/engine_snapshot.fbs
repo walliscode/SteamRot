@@ -24,7 +24,7 @@ table EngineSnapshotFbs {
   ///
   /// Captures all events in the global event bus at this tick.
   /// Useful for testing event lifetime, propagation, and processing.
-  global_event_bus: EventBusData;
+  global_event_bus: EventBusDataFbs;
   
   /// @brief Scene manager state data
   ///

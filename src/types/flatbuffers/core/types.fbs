@@ -1,13 +1,13 @@
 // general types to use in other schemas
 namespace steamrot;
 
-table Vector2fData {
+table Vector2fDataFbs {
     x: float;
     y: float;
   }
 
 
-table ColorData{
+table ColorDataFbs{
     r:uint8;
     g:uint8;
     b:uint8;
@@ -15,12 +15,12 @@ table ColorData{
   }
 
 
-table Vertex {
-  position: Vector2fData(required);
-  color: ColorData (required);
+table VertexFbs {
+  position: Vector2fDataFbs(required);
+  color: ColorDataFbs (required);
 }
 
 
-table Triangle {
-vertices: [Vertex] (required);
+table TriangleFbs {
+vertices: [VertexFbs] (required);
   }

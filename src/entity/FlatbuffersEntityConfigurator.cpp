@@ -193,11 +193,11 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
   if (!configure_result.has_value())
     return std::unexpected(configure_result.error());
 
-  // get the collection of UIStateData from the current entity data
-  const UIStateCollectionData *ui_state_collection_data =
+  // get the collection of UIStateDataFbs from the current entity data
+  const UIStateCollectionDataFbs *ui_state_collection_data =
       m_current_entity_data->c_ui_state();
 
-  // cycle through each UIStateData in the collection
+  // cycle through each UIStateDataFbs in the collection
   for (auto ui_state_data : *ui_state_collection_data->ui_states()) {
 
     // pull out state key
@@ -207,7 +207,7 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     // check that data for mapping ui visi
     if (!ui_state_data->state_to_ui_visibility()) {
       FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "No mappings found in UIStateData for ui visibility."};
+                         "No mappings found in UIStateDataFbs for ui visibility."};
       return std::unexpected(fail_info);
     }
 

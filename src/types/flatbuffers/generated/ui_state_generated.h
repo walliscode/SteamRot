@@ -17,17 +17,17 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct UIStateMapping;
-struct UIStateMappingBuilder;
+struct UIStateMappingFbs;
+struct UIStateMappingFbsBuilder;
 
-struct UIStateData;
-struct UIStateDataBuilder;
+struct UIStateDataFbs;
+struct UIStateDataFbsBuilder;
 
-struct UIStateCollectionData;
-struct UIStateCollectionDataBuilder;
+struct UIStateCollectionDataFbs;
+struct UIStateCollectionDataFbsBuilder;
 
-struct UIStateMapping FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UIStateMappingBuilder Builder;
+struct UIStateMappingFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UIStateMappingFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_UI_NAMES_ON = 4,
     VT_UI_NAMES_OFF = 6
@@ -50,51 +50,51 @@ struct UIStateMapping FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct UIStateMappingBuilder {
-  typedef UIStateMapping Table;
+struct UIStateMappingFbsBuilder {
+  typedef UIStateMappingFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_ui_names_on(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_on) {
-    fbb_.AddOffset(UIStateMapping::VT_UI_NAMES_ON, ui_names_on);
+    fbb_.AddOffset(UIStateMappingFbs::VT_UI_NAMES_ON, ui_names_on);
   }
   void add_ui_names_off(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_off) {
-    fbb_.AddOffset(UIStateMapping::VT_UI_NAMES_OFF, ui_names_off);
+    fbb_.AddOffset(UIStateMappingFbs::VT_UI_NAMES_OFF, ui_names_off);
   }
-  explicit UIStateMappingBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UIStateMappingFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UIStateMapping> Finish() {
+  ::flatbuffers::Offset<UIStateMappingFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UIStateMapping>(end);
+    auto o = ::flatbuffers::Offset<UIStateMappingFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UIStateMapping> CreateUIStateMapping(
+inline ::flatbuffers::Offset<UIStateMappingFbs> CreateUIStateMappingFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_on = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> ui_names_off = 0) {
-  UIStateMappingBuilder builder_(_fbb);
+  UIStateMappingFbsBuilder builder_(_fbb);
   builder_.add_ui_names_off(ui_names_off);
   builder_.add_ui_names_on(ui_names_on);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateMapping> CreateUIStateMappingDirect(
+inline ::flatbuffers::Offset<UIStateMappingFbs> CreateUIStateMappingFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_on = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *ui_names_off = nullptr) {
   auto ui_names_on__ = ui_names_on ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_names_on) : 0;
   auto ui_names_off__ = ui_names_off ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*ui_names_off) : 0;
-  return steamrot::CreateUIStateMapping(
+  return steamrot::CreateUIStateMappingFbs(
       _fbb,
       ui_names_on__,
       ui_names_off__);
 }
 
-struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UIStateDataBuilder Builder;
+struct UIStateDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UIStateDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STATE_KEY = 4,
     VT_STATE_TO_UI_VISIBILITY = 6,
@@ -103,8 +103,8 @@ struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *state_key() const {
     return GetPointer<const ::flatbuffers::String *>(VT_STATE_KEY);
   }
-  const steamrot::UIStateMapping *state_to_ui_visibility() const {
-    return GetPointer<const steamrot::UIStateMapping *>(VT_STATE_TO_UI_VISIBILITY);
+  const steamrot::UIStateMappingFbs *state_to_ui_visibility() const {
+    return GetPointer<const steamrot::UIStateMappingFbs *>(VT_STATE_TO_UI_VISIBILITY);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscribers() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *>(VT_SUBSCRIBERS);
@@ -122,64 +122,64 @@ struct UIStateData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct UIStateDataBuilder {
-  typedef UIStateData Table;
+struct UIStateDataFbsBuilder {
+  typedef UIStateDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_state_key(::flatbuffers::Offset<::flatbuffers::String> state_key) {
-    fbb_.AddOffset(UIStateData::VT_STATE_KEY, state_key);
+    fbb_.AddOffset(UIStateDataFbs::VT_STATE_KEY, state_key);
   }
-  void add_state_to_ui_visibility(::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility) {
-    fbb_.AddOffset(UIStateData::VT_STATE_TO_UI_VISIBILITY, state_to_ui_visibility);
+  void add_state_to_ui_visibility(::flatbuffers::Offset<steamrot::UIStateMappingFbs> state_to_ui_visibility) {
+    fbb_.AddOffset(UIStateDataFbs::VT_STATE_TO_UI_VISIBILITY, state_to_ui_visibility);
   }
   void add_subscribers(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscribers) {
-    fbb_.AddOffset(UIStateData::VT_SUBSCRIBERS, subscribers);
+    fbb_.AddOffset(UIStateDataFbs::VT_SUBSCRIBERS, subscribers);
   }
-  explicit UIStateDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UIStateDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UIStateData> Finish() {
+  ::flatbuffers::Offset<UIStateDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UIStateData>(end);
-    fbb_.Required(o, UIStateData::VT_STATE_KEY);
+    auto o = ::flatbuffers::Offset<UIStateDataFbs>(end);
+    fbb_.Required(o, UIStateDataFbs::VT_STATE_KEY);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UIStateData> CreateUIStateData(
+inline ::flatbuffers::Offset<UIStateDataFbs> CreateUIStateDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> state_key = 0,
-    ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
+    ::flatbuffers::Offset<steamrot::UIStateMappingFbs> state_to_ui_visibility = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SubscriberFbs>>> subscribers = 0) {
-  UIStateDataBuilder builder_(_fbb);
+  UIStateDataFbsBuilder builder_(_fbb);
   builder_.add_subscribers(subscribers);
   builder_.add_state_to_ui_visibility(state_to_ui_visibility);
   builder_.add_state_key(state_key);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateData> CreateUIStateDataDirect(
+inline ::flatbuffers::Offset<UIStateDataFbs> CreateUIStateDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *state_key = nullptr,
-    ::flatbuffers::Offset<steamrot::UIStateMapping> state_to_ui_visibility = 0,
+    ::flatbuffers::Offset<steamrot::UIStateMappingFbs> state_to_ui_visibility = 0,
     const std::vector<::flatbuffers::Offset<steamrot::SubscriberFbs>> *subscribers = nullptr) {
   auto state_key__ = state_key ? _fbb.CreateString(state_key) : 0;
   auto subscribers__ = subscribers ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SubscriberFbs>>(*subscribers) : 0;
-  return steamrot::CreateUIStateData(
+  return steamrot::CreateUIStateDataFbs(
       _fbb,
       state_key__,
       state_to_ui_visibility,
       subscribers__);
 }
 
-struct UIStateCollectionData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef UIStateCollectionDataBuilder Builder;
+struct UIStateCollectionDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UIStateCollectionDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_UI_STATES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateData>> *ui_states() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateData>> *>(VT_UI_STATES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>> *ui_states() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>> *>(VT_UI_STATES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -190,38 +190,38 @@ struct UIStateCollectionData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Ta
   }
 };
 
-struct UIStateCollectionDataBuilder {
-  typedef UIStateCollectionData Table;
+struct UIStateCollectionDataFbsBuilder {
+  typedef UIStateCollectionDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_ui_states(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateData>>> ui_states) {
-    fbb_.AddOffset(UIStateCollectionData::VT_UI_STATES, ui_states);
+  void add_ui_states(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>>> ui_states) {
+    fbb_.AddOffset(UIStateCollectionDataFbs::VT_UI_STATES, ui_states);
   }
-  explicit UIStateCollectionDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit UIStateCollectionDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<UIStateCollectionData> Finish() {
+  ::flatbuffers::Offset<UIStateCollectionDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<UIStateCollectionData>(end);
-    fbb_.Required(o, UIStateCollectionData::VT_UI_STATES);
+    auto o = ::flatbuffers::Offset<UIStateCollectionDataFbs>(end);
+    fbb_.Required(o, UIStateCollectionDataFbs::VT_UI_STATES);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<UIStateCollectionData> CreateUIStateCollectionData(
+inline ::flatbuffers::Offset<UIStateCollectionDataFbs> CreateUIStateCollectionDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateData>>> ui_states = 0) {
-  UIStateCollectionDataBuilder builder_(_fbb);
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>>> ui_states = 0) {
+  UIStateCollectionDataFbsBuilder builder_(_fbb);
   builder_.add_ui_states(ui_states);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<UIStateCollectionData> CreateUIStateCollectionDataDirect(
+inline ::flatbuffers::Offset<UIStateCollectionDataFbs> CreateUIStateCollectionDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::UIStateData>> *ui_states = nullptr) {
-  auto ui_states__ = ui_states ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIStateData>>(*ui_states) : 0;
-  return steamrot::CreateUIStateCollectionData(
+    const std::vector<::flatbuffers::Offset<steamrot::UIStateDataFbs>> *ui_states = nullptr) {
+  auto ui_states__ = ui_states ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::UIStateDataFbs>>(*ui_states) : 0;
+  return steamrot::CreateUIStateCollectionDataFbs(
       _fbb,
       ui_states__);
 }

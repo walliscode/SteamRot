@@ -15,11 +15,11 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct GrimoireMachinaData;
-struct GrimoireMachinaDataBuilder;
+struct GrimoireMachinaDataFbs;
+struct GrimoireMachinaDataFbsBuilder;
 
-struct GrimoireMachinaData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef GrimoireMachinaDataBuilder Builder;
+struct GrimoireMachinaDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GrimoireMachinaDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_FRAGMENTS = 4,
     VT_JOINTS = 6
@@ -42,46 +42,46 @@ struct GrimoireMachinaData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   }
 };
 
-struct GrimoireMachinaDataBuilder {
-  typedef GrimoireMachinaData Table;
+struct GrimoireMachinaDataFbsBuilder {
+  typedef GrimoireMachinaDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_fragments(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> fragments) {
-    fbb_.AddOffset(GrimoireMachinaData::VT_FRAGMENTS, fragments);
+    fbb_.AddOffset(GrimoireMachinaDataFbs::VT_FRAGMENTS, fragments);
   }
   void add_joints(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> joints) {
-    fbb_.AddOffset(GrimoireMachinaData::VT_JOINTS, joints);
+    fbb_.AddOffset(GrimoireMachinaDataFbs::VT_JOINTS, joints);
   }
-  explicit GrimoireMachinaDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit GrimoireMachinaDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<GrimoireMachinaData> Finish() {
+  ::flatbuffers::Offset<GrimoireMachinaDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<GrimoireMachinaData>(end);
-    fbb_.Required(o, GrimoireMachinaData::VT_FRAGMENTS);
-    fbb_.Required(o, GrimoireMachinaData::VT_JOINTS);
+    auto o = ::flatbuffers::Offset<GrimoireMachinaDataFbs>(end);
+    fbb_.Required(o, GrimoireMachinaDataFbs::VT_FRAGMENTS);
+    fbb_.Required(o, GrimoireMachinaDataFbs::VT_JOINTS);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<GrimoireMachinaData> CreateGrimoireMachinaData(
+inline ::flatbuffers::Offset<GrimoireMachinaDataFbs> CreateGrimoireMachinaDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> fragments = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<::flatbuffers::String>>> joints = 0) {
-  GrimoireMachinaDataBuilder builder_(_fbb);
+  GrimoireMachinaDataFbsBuilder builder_(_fbb);
   builder_.add_joints(joints);
   builder_.add_fragments(fragments);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<GrimoireMachinaData> CreateGrimoireMachinaDataDirect(
+inline ::flatbuffers::Offset<GrimoireMachinaDataFbs> CreateGrimoireMachinaDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *fragments = nullptr,
     const std::vector<::flatbuffers::Offset<::flatbuffers::String>> *joints = nullptr) {
   auto fragments__ = fragments ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*fragments) : 0;
   auto joints__ = joints ? _fbb.CreateVector<::flatbuffers::Offset<::flatbuffers::String>>(*joints) : 0;
-  return steamrot::CreateGrimoireMachinaData(
+  return steamrot::CreateGrimoireMachinaDataFbs(
       _fbb,
       fragments__,
       joints__);

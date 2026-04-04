@@ -9,7 +9,7 @@
         "type": "UI",
         "payload_type": "UIPayloadFbs",
         "payload": {
-          "c_user_interface_name": "test_ui_name",
+          "c_ui_state_name": "test_ui_name",
           "action": "TOGGLE"
         }
       },
@@ -28,3 +28,4 @@
     "description": "Test event bus with multiple events"
   }
 }
+

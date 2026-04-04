@@ -434,7 +434,7 @@ namespace {
 const steamrot::InputEventFbs *
 BuildMouseMoveEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
                        float y) {
-  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto pos = steamrot::CreateVector2fDataFbs(builder, x, y);
   auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, 0);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseMove,
@@ -448,7 +448,7 @@ BuildMouseMoveEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
 const steamrot::InputEventFbs *
 BuildMouseClickEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
                         float y, uint8_t button) {
-  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto pos = steamrot::CreateVector2fDataFbs(builder, x, y);
   auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, button);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseClick,
@@ -462,7 +462,7 @@ BuildMouseClickEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
 const steamrot::InputEventFbs *
 BuildMouseReleaseEventFbs(flatbuffers::FlatBufferBuilder &builder, float x,
                           float y, uint8_t button) {
-  auto pos = steamrot::CreateVector2fData(builder, x, y);
+  auto pos = steamrot::CreateVector2fDataFbs(builder, x, y);
   auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, button);
   auto evt = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseRelease,
@@ -724,7 +724,7 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with a MouseMove "
 
   flatbuffers::FlatBufferBuilder builder;
 
-  auto pos = steamrot::CreateVector2fData(builder, 10.0f, 20.0f);
+  auto pos = steamrot::CreateVector2fDataFbs(builder, 10.0f, 20.0f);
   auto mouse = steamrot::CreateMouseInputDataFbs(builder, pos, 0);
   auto evt_offset = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseMove,
@@ -768,7 +768,7 @@ TEST_CASE("ConfigureInputEventsByTick populates single tick with multiple "
   flatbuffers::FlatBufferBuilder builder;
 
   // Event 1: MouseMove
-  auto pos1 = steamrot::CreateVector2fData(builder, 5.0f, 6.0f);
+  auto pos1 = steamrot::CreateVector2fDataFbs(builder, 5.0f, 6.0f);
   auto mouse1 = steamrot::CreateMouseInputDataFbs(builder, pos1, 0);
   auto evt1 = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseMove,
@@ -813,7 +813,7 @@ TEST_CASE("ConfigureInputEventsByTick populates multiple ticks",
   flatbuffers::FlatBufferBuilder builder;
 
   // Tick 1: MouseMove
-  auto pos1 = steamrot::CreateVector2fData(builder, 1.0f, 2.0f);
+  auto pos1 = steamrot::CreateVector2fDataFbs(builder, 1.0f, 2.0f);
   auto m1 = steamrot::CreateMouseInputDataFbs(builder, pos1, 0);
   auto e1 = steamrot::CreateInputEventFbs(
       builder, steamrot::InputTypeFbs_MouseMove,

@@ -28,16 +28,20 @@ set(schema_files
 
 
 
-    # Entities and components
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/entities.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/user_interface.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/grimoire_machina.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/machina_form.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/view_direction.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_state.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/ui_style.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/joint.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/entities/fragment.fbs
+    # Entity and related types
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/entities.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/grimoire_machina.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/machina_form.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/view_direction.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/joint.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/entity/fragment.fbs
+
+    # Components
+    ${CMAKE_CURRENT_SOURCE_DIR}/components/ui_state.fbs
+
+    # User interface
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/user_interface.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/ui_style.fbs
 
     # Events
     ${CMAKE_CURRENT_SOURCE_DIR}/events/event_packet.fbs
@@ -59,10 +63,10 @@ set(schema_files
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/user_preferences.fbs
     ${CMAKE_CURRENT_SOURCE_DIR}/configuration/save_data.fbs
 
-    # Testing
-    ${CMAKE_CURRENT_SOURCE_DIR}/testing/test_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/testing/simulation_data.fbs
-    ${CMAKE_CURRENT_SOURCE_DIR}/testing/input_data.fbs
+    # Test structs
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/test_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/simulation_data.fbs
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/input_data.fbs
 )
 
 set(generated_headers)

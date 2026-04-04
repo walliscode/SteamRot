@@ -2,7 +2,7 @@
 
 set(UI_ELEMENT_TEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/ui_element_test_data.json")
 set(UI_ELEMENT_TEST_BIN "${CMAKE_CURRENT_SOURCE_DIR}/data/ui_element_test_data.bin")
-set(UI_ELEMENT_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/entities/user_interface.fbs")
+set(UI_ELEMENT_SCHEMA "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/user_interface/user_interface.fbs")
 
 # Error test data files
 set(ERROR_CONTAINER_NO_CHILDREN_JSON "${CMAKE_CURRENT_SOURCE_DIR}/data/error_container_no_children.json")

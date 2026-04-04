@@ -24,21 +24,21 @@ namespace {
 /// @param builder FlatBufferBuilder to use
 /// @return Offset to the created Triangle
 /////////////////////////////////////////////////
-flatbuffers::Offset<steamrot::Triangle>
+flatbuffers::Offset<steamrot::TriangleFbs>
 CreateTestTriangle(flatbuffers::FlatBufferBuilder &builder) {
-  auto red_color = steamrot::CreateColorData(builder, 255, 0, 0, 255);
-  auto green_color = steamrot::CreateColorData(builder, 0, 255, 0, 255);
-  auto blue_color = steamrot::CreateColorData(builder, 0, 0, 255, 255);
+  auto red_color = steamrot::CreateColorDataFbs(builder, 255, 0, 0, 255);
+  auto green_color = steamrot::CreateColorDataFbs(builder, 0, 255, 0, 255);
+  auto blue_color = steamrot::CreateColorDataFbs(builder, 0, 0, 255, 255);
 
-  auto vertex1 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 0.0f, 0.0f), red_color);
-  auto vertex2 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 10.0f, 0.0f), green_color);
-  auto vertex3 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 10.0f, 10.0f), blue_color);
+  auto vertex1 = steamrot::CreateVertexFbs(
+      builder, steamrot::CreateVector2fDataFbs(builder, 0.0f, 0.0f), red_color);
+  auto vertex2 = steamrot::CreateVertexFbs(
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f), green_color);
+  auto vertex3 = steamrot::CreateVertexFbs(
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 10.0f), blue_color);
 
-  return steamrot::CreateTriangle(
-      builder, builder.CreateVector<flatbuffers::Offset<steamrot::Vertex>>(
+  return steamrot::CreateTriangleFbs(
+      builder, builder.CreateVector<flatbuffers::Offset<steamrot::VertexFbs>>(
                    {vertex1, vertex2, vertex3}));
 }
 
@@ -53,13 +53,13 @@ CreateTestTriangle(flatbuffers::FlatBufferBuilder &builder) {
 flatbuffers::Offset<steamrot::ViewFbs>
 CreateTestView(flatbuffers::FlatBufferBuilder &builder,
                steamrot::ViewDirectionFbs direction, size_t num_triangles = 2) {
-  std::vector<flatbuffers::Offset<steamrot::Triangle>> triangles;
+  std::vector<flatbuffers::Offset<steamrot::TriangleFbs>> triangles;
   for (size_t i = 0; i < num_triangles; ++i) {
     triangles.push_back(CreateTestTriangle(builder));
   }
 
   auto triangles_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::Triangle>>(triangles);
+      builder.CreateVector<flatbuffers::Offset<steamrot::TriangleFbs>>(triangles);
   return steamrot::CreateViewFbs(builder, direction, triangles_vector);
 }
 
@@ -71,15 +71,15 @@ CreateTestView(flatbuffers::FlatBufferBuilder &builder,
 /// @return Offset to the created sockets vector
 /////////////////////////////////////////////////
 flatbuffers::Offset<
-    flatbuffers::Vector<flatbuffers::Offset<steamrot::Vector2fData>>>
+    flatbuffers::Vector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>>
 CreateTestSockets(flatbuffers::FlatBufferBuilder &builder,
                   size_t num_sockets = 2) {
-  std::vector<flatbuffers::Offset<steamrot::Vector2fData>> sockets;
+  std::vector<flatbuffers::Offset<steamrot::Vector2fDataFbs>> sockets;
   for (size_t i = 0; i < num_sockets; ++i) {
-    sockets.push_back(steamrot::CreateVector2fData(
+    sockets.push_back(steamrot::CreateVector2fDataFbs(
         builder, static_cast<float>(i * 10), static_cast<float>(i * 20)));
   }
-  return builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fData>>(
+  return builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>(
       sockets);
 }
 
@@ -233,7 +233,7 @@ TEST_CASE("ConfigureFragment returns unexpected when sockets are missing",
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
   // create empty sockets vector
   auto empty_sockets_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fData>>({});
+      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>({});
 
   // Create FragmentFbs without sockets (nullptr)
   auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
@@ -317,18 +317,18 @@ TEST_CASE(
   auto sockets_vector = CreateTestSockets(builder, 2);
 
   // Create a triangle with only 2 vertices (invalid)
-  auto red_color = steamrot::CreateColorData(builder, 255, 0, 0, 255);
-  auto vertex1 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 0.0f, 0.0f), red_color);
-  auto vertex2 = steamrot::CreateVertex(
-      builder, steamrot::CreateVector2fData(builder, 10.0f, 0.0f), red_color);
+  auto red_color = steamrot::CreateColorDataFbs(builder, 255, 0, 0, 255);
+  auto vertex1 = steamrot::CreateVertexFbs(
+      builder, steamrot::CreateVector2fDataFbs(builder, 0.0f, 0.0f), red_color);
+  auto vertex2 = steamrot::CreateVertexFbs(
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f), red_color);
 
-  auto bad_triangle = steamrot::CreateTriangle(
-      builder, builder.CreateVector<flatbuffers::Offset<steamrot::Vertex>>(
+  auto bad_triangle = steamrot::CreateTriangleFbs(
+      builder, builder.CreateVector<flatbuffers::Offset<steamrot::VertexFbs>>(
                    {vertex1, vertex2})); // Only 2 vertices!
 
   auto triangles_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::Triangle>>(
+      builder.CreateVector<flatbuffers::Offset<steamrot::TriangleFbs>>(
           {bad_triangle});
   auto view = steamrot::CreateViewFbs(builder, steamrot::ViewDirectionFbs_FRONT,
                                       triangles_vector);
@@ -437,7 +437,7 @@ TEST_CASE("ConfigureJoint returns unexpected when sockets are missing",
 
   // Create empty sockets vector to represent missing sockets
   auto empty_sockets_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fData>>({});
+      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>({});
 
   // Create JointFbs without sockets (empty vector)
   auto joint_fbs_offset = steamrot::CreateJointFbs(

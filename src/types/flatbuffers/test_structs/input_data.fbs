@@ -17,7 +17,7 @@ enum InputTypeFbs : byte {
 /// @brief Mouse input data for simulation
 ////////////////////////////////////////////////////////////
 table MouseInputDataFbs {
-  position: Vector2fData;
+  position: Vector2fDataFbs;
   button: uint8;  // SFML mouse button enum
 }
 

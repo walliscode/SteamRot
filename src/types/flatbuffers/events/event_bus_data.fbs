@@ -9,7 +9,7 @@ namespace steamrot;
 /// at a specific point in time. Used for testing to configure initial state
 /// or validate expected state.
 ////////////////////////////////////////////////////////////
-table EventBusData {
+table EventBusDataFbs {
   /// @brief Array of event packets in the bus
   /// Order matters - events are stored in the order they appear
   events: [EventPacketFbs];

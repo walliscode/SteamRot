@@ -59,8 +59,8 @@ struct ViewFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   steamrot::ViewDirectionFbs direction() const {
     return static_cast<steamrot::ViewDirectionFbs>(GetField<uint8_t>(VT_DIRECTION, 0));
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>> *>(VT_TRIANGLES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TriangleFbs>> *triangles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TriangleFbs>> *>(VT_TRIANGLES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -79,7 +79,7 @@ struct ViewFbsBuilder {
   void add_direction(steamrot::ViewDirectionFbs direction) {
     fbb_.AddElement<uint8_t>(ViewFbs::VT_DIRECTION, static_cast<uint8_t>(direction), 0);
   }
-  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles) {
+  void add_triangles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TriangleFbs>>> triangles) {
     fbb_.AddOffset(ViewFbs::VT_TRIANGLES, triangles);
   }
   explicit ViewFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -97,7 +97,7 @@ struct ViewFbsBuilder {
 inline ::flatbuffers::Offset<ViewFbs> CreateViewFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::ViewDirectionFbs direction = steamrot::ViewDirectionFbs_NONE,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Triangle>>> triangles = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::TriangleFbs>>> triangles = 0) {
   ViewFbsBuilder builder_(_fbb);
   builder_.add_triangles(triangles);
   builder_.add_direction(direction);
@@ -107,8 +107,8 @@ inline ::flatbuffers::Offset<ViewFbs> CreateViewFbs(
 inline ::flatbuffers::Offset<ViewFbs> CreateViewFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     steamrot::ViewDirectionFbs direction = steamrot::ViewDirectionFbs_NONE,
-    const std::vector<::flatbuffers::Offset<steamrot::Triangle>> *triangles = nullptr) {
-  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Triangle>>(*triangles) : 0;
+    const std::vector<::flatbuffers::Offset<steamrot::TriangleFbs>> *triangles = nullptr) {
+  auto triangles__ = triangles ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::TriangleFbs>>(*triangles) : 0;
   return steamrot::CreateViewFbs(
       _fbb,
       direction,

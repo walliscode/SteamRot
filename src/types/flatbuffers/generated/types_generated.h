@@ -15,20 +15,20 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
-struct Vector2fData;
-struct Vector2fDataBuilder;
+struct Vector2fDataFbs;
+struct Vector2fDataFbsBuilder;
 
-struct ColorData;
-struct ColorDataBuilder;
+struct ColorDataFbs;
+struct ColorDataFbsBuilder;
 
-struct Vertex;
-struct VertexBuilder;
+struct VertexFbs;
+struct VertexFbsBuilder;
 
-struct Triangle;
-struct TriangleBuilder;
+struct TriangleFbs;
+struct TriangleFbsBuilder;
 
-struct Vector2fData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef Vector2fDataBuilder Builder;
+struct Vector2fDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef Vector2fDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_X = 4,
     VT_Y = 6
@@ -47,39 +47,39 @@ struct Vector2fData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct Vector2fDataBuilder {
-  typedef Vector2fData Table;
+struct Vector2fDataFbsBuilder {
+  typedef Vector2fDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_x(float x) {
-    fbb_.AddElement<float>(Vector2fData::VT_X, x, 0.0f);
+    fbb_.AddElement<float>(Vector2fDataFbs::VT_X, x, 0.0f);
   }
   void add_y(float y) {
-    fbb_.AddElement<float>(Vector2fData::VT_Y, y, 0.0f);
+    fbb_.AddElement<float>(Vector2fDataFbs::VT_Y, y, 0.0f);
   }
-  explicit Vector2fDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit Vector2fDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Vector2fData> Finish() {
+  ::flatbuffers::Offset<Vector2fDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Vector2fData>(end);
+    auto o = ::flatbuffers::Offset<Vector2fDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Vector2fData> CreateVector2fData(
+inline ::flatbuffers::Offset<Vector2fDataFbs> CreateVector2fDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float x = 0.0f,
     float y = 0.0f) {
-  Vector2fDataBuilder builder_(_fbb);
+  Vector2fDataFbsBuilder builder_(_fbb);
   builder_.add_y(y);
   builder_.add_x(x);
   return builder_.Finish();
 }
 
-struct ColorData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ColorDataBuilder Builder;
+struct ColorDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ColorDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_R = 4,
     VT_G = 6,
@@ -108,40 +108,40 @@ struct ColorData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct ColorDataBuilder {
-  typedef ColorData Table;
+struct ColorDataFbsBuilder {
+  typedef ColorDataFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_r(uint8_t r) {
-    fbb_.AddElement<uint8_t>(ColorData::VT_R, r, 0);
+    fbb_.AddElement<uint8_t>(ColorDataFbs::VT_R, r, 0);
   }
   void add_g(uint8_t g) {
-    fbb_.AddElement<uint8_t>(ColorData::VT_G, g, 0);
+    fbb_.AddElement<uint8_t>(ColorDataFbs::VT_G, g, 0);
   }
   void add_b(uint8_t b) {
-    fbb_.AddElement<uint8_t>(ColorData::VT_B, b, 0);
+    fbb_.AddElement<uint8_t>(ColorDataFbs::VT_B, b, 0);
   }
   void add_a(uint8_t a) {
-    fbb_.AddElement<uint8_t>(ColorData::VT_A, a, 0);
+    fbb_.AddElement<uint8_t>(ColorDataFbs::VT_A, a, 0);
   }
-  explicit ColorDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit ColorDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<ColorData> Finish() {
+  ::flatbuffers::Offset<ColorDataFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ColorData>(end);
+    auto o = ::flatbuffers::Offset<ColorDataFbs>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<ColorData> CreateColorData(
+inline ::flatbuffers::Offset<ColorDataFbs> CreateColorDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint8_t r = 0,
     uint8_t g = 0,
     uint8_t b = 0,
     uint8_t a = 0) {
-  ColorDataBuilder builder_(_fbb);
+  ColorDataFbsBuilder builder_(_fbb);
   builder_.add_a(a);
   builder_.add_b(b);
   builder_.add_g(g);
@@ -149,17 +149,17 @@ inline ::flatbuffers::Offset<ColorData> CreateColorData(
   return builder_.Finish();
 }
 
-struct Vertex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef VertexBuilder Builder;
+struct VertexFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef VertexFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_POSITION = 4,
     VT_COLOR = 6
   };
-  const steamrot::Vector2fData *position() const {
-    return GetPointer<const steamrot::Vector2fData *>(VT_POSITION);
+  const steamrot::Vector2fDataFbs *position() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_POSITION);
   }
-  const steamrot::ColorData *color() const {
-    return GetPointer<const steamrot::ColorData *>(VT_COLOR);
+  const steamrot::ColorDataFbs *color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_COLOR);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -171,46 +171,46 @@ struct Vertex FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct VertexBuilder {
-  typedef Vertex Table;
+struct VertexFbsBuilder {
+  typedef VertexFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_position(::flatbuffers::Offset<steamrot::Vector2fData> position) {
-    fbb_.AddOffset(Vertex::VT_POSITION, position);
+  void add_position(::flatbuffers::Offset<steamrot::Vector2fDataFbs> position) {
+    fbb_.AddOffset(VertexFbs::VT_POSITION, position);
   }
-  void add_color(::flatbuffers::Offset<steamrot::ColorData> color) {
-    fbb_.AddOffset(Vertex::VT_COLOR, color);
+  void add_color(::flatbuffers::Offset<steamrot::ColorDataFbs> color) {
+    fbb_.AddOffset(VertexFbs::VT_COLOR, color);
   }
-  explicit VertexBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit VertexFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Vertex> Finish() {
+  ::flatbuffers::Offset<VertexFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Vertex>(end);
-    fbb_.Required(o, Vertex::VT_POSITION);
-    fbb_.Required(o, Vertex::VT_COLOR);
+    auto o = ::flatbuffers::Offset<VertexFbs>(end);
+    fbb_.Required(o, VertexFbs::VT_POSITION);
+    fbb_.Required(o, VertexFbs::VT_COLOR);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Vertex> CreateVertex(
+inline ::flatbuffers::Offset<VertexFbs> CreateVertexFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<steamrot::Vector2fData> position = 0,
-    ::flatbuffers::Offset<steamrot::ColorData> color = 0) {
-  VertexBuilder builder_(_fbb);
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> position = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> color = 0) {
+  VertexFbsBuilder builder_(_fbb);
   builder_.add_color(color);
   builder_.add_position(position);
   return builder_.Finish();
 }
 
-struct Triangle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef TriangleBuilder Builder;
+struct TriangleFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TriangleFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_VERTICES = 4
   };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vertex>> *vertices() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vertex>> *>(VT_VERTICES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::VertexFbs>> *vertices() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::VertexFbs>> *>(VT_VERTICES);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -221,38 +221,38 @@ struct Triangle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct TriangleBuilder {
-  typedef Triangle Table;
+struct TriangleFbsBuilder {
+  typedef TriangleFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vertex>>> vertices) {
-    fbb_.AddOffset(Triangle::VT_VERTICES, vertices);
+  void add_vertices(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::VertexFbs>>> vertices) {
+    fbb_.AddOffset(TriangleFbs::VT_VERTICES, vertices);
   }
-  explicit TriangleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit TriangleFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Triangle> Finish() {
+  ::flatbuffers::Offset<TriangleFbs> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Triangle>(end);
-    fbb_.Required(o, Triangle::VT_VERTICES);
+    auto o = ::flatbuffers::Offset<TriangleFbs>(end);
+    fbb_.Required(o, TriangleFbs::VT_VERTICES);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Triangle> CreateTriangle(
+inline ::flatbuffers::Offset<TriangleFbs> CreateTriangleFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vertex>>> vertices = 0) {
-  TriangleBuilder builder_(_fbb);
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::VertexFbs>>> vertices = 0) {
+  TriangleFbsBuilder builder_(_fbb);
   builder_.add_vertices(vertices);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<Triangle> CreateTriangleDirect(
+inline ::flatbuffers::Offset<TriangleFbs> CreateTriangleFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<steamrot::Vertex>> *vertices = nullptr) {
-  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Vertex>>(*vertices) : 0;
-  return steamrot::CreateTriangle(
+    const std::vector<::flatbuffers::Offset<steamrot::VertexFbs>> *vertices = nullptr) {
+  auto vertices__ = vertices ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::VertexFbs>>(*vertices) : 0;
+  return steamrot::CreateTriangleFbs(
       _fbb,
       vertices__);
 }

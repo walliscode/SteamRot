@@ -34,7 +34,7 @@ private:
   /// FailInfo on error
   ////////////////////////////////////////////////////////////
   std::expected<std::unique_ptr<UIElement>, FailInfo>
-  CreateUIElement(const UIElementDataUnion &data_type, const void *data);
+  CreateUIElement(const UIElementDataUnionFbs &data_type, const void *data);
 
 public:
   ////////////////////////////////////////////////////////////

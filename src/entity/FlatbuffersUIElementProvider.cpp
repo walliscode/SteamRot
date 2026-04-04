@@ -33,8 +33,9 @@ FlatbuffersUIElementProvider::CreateRootUIElement() {
                  "UserInterfaceData missing root_ui_element"});
   }
 
-  return CreateUIElement(UIElementDataUnion::UIElementDataUnion_PanelData,
-                         m_ui_data.root_ui_element());
+  return CreateUIElement(
+      UIElementDataUnionFbs::UIElementDataUnionFbs_PanelDataFbs,
+      m_ui_data.root_ui_element());
 }
 
 ////////////////////////////////////////////////////////////
@@ -53,28 +54,28 @@ FlatbuffersUIElementProvider::ConfigureRootUIElement(UIElement &root_element) {
   }
 
   // Create a callback that captures 'this' and calls CreateUIElement
-  auto create_callback = [this](const UIElementDataUnion &data_type,
+  auto create_callback = [this](const UIElementDataUnionFbs &data_type,
                                 const void *data)
       -> std::expected<std::unique_ptr<UIElement>, FailInfo> {
     return this->CreateUIElement(data_type, data);
   };
 
   return data::configure::ConfigureBaseUIElement(
-      root_element, *m_ui_data.root_ui_element()->base_data(),
-      m_event_handler, create_callback);
+      root_element, *m_ui_data.root_ui_element()->base_data(), m_event_handler,
+      create_callback);
 }
 
 ////////////////////////////////////////////////////////////
 std::expected<std::unique_ptr<UIElement>, FailInfo>
 FlatbuffersUIElementProvider::CreateUIElement(
-    const UIElementDataUnion &data_type, const void *data) {
+    const UIElementDataUnionFbs &data_type, const void *data) {
 
   std::unique_ptr<UIElement> element{nullptr};
-  const UIElementData *base_data = nullptr;
+  const UIElementDataFbs *base_data = nullptr;
 
   switch (data_type) {
-  case UIElementDataUnion::UIElementDataUnion_PanelData: {
-    auto panel_data = static_cast<const PanelData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_PanelDataFbs: {
+    auto panel_data = static_cast<const PanelDataFbs *>(data);
     auto panel = std::make_unique<PanelElement>();
     auto config_result =
         data::configure::ConfigurePanelElement(*panel, *panel_data);
@@ -84,8 +85,8 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = panel_data->base_data();
     break;
   }
-  case UIElementDataUnion::UIElementDataUnion_ButtonData: {
-    auto button_data = static_cast<const ButtonData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_ButtonDataFbs: {
+    auto button_data = static_cast<const ButtonDataFbs *>(data);
     auto button = std::make_unique<ButtonElement>();
     auto config_result =
         data::configure::ConfigureButtonElement(*button, *button_data);
@@ -95,8 +96,8 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = button_data->base_data();
     break;
   }
-  case UIElementDataUnion::UIElementDataUnion_DropDownListData: {
-    auto ddlist_data = static_cast<const DropDownListData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownListDataFbs: {
+    auto ddlist_data = static_cast<const DropDownListDataFbs *>(data);
     auto ddlist = std::make_unique<DropDownListElement>();
     auto config_result =
         data::configure::ConfigureDropDownListElement(*ddlist, *ddlist_data);
@@ -106,8 +107,8 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = ddlist_data->base_data();
     break;
   }
-  case UIElementDataUnion::UIElementDataUnion_DropDownContainerData: {
-    auto ddcont_data = static_cast<const DropDownContainerData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownContainerDataFbs: {
+    auto ddcont_data = static_cast<const DropDownContainerDataFbs *>(data);
     auto ddcont = std::make_unique<DropDownContainerElement>();
     auto config_result = data::configure::ConfigureDropDownContainerElement(
         *ddcont, *ddcont_data);
@@ -117,8 +118,8 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = ddcont_data->base_data();
     break;
   }
-  case UIElementDataUnion::UIElementDataUnion_DropDownItemData: {
-    auto dditem_data = static_cast<const DropDownItemData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownItemDataFbs: {
+    auto dditem_data = static_cast<const DropDownItemDataFbs *>(data);
     auto dditem = std::make_unique<DropDownItemElement>();
     auto config_result =
         data::configure::ConfigureDropDownItemElement(*dditem, *dditem_data);
@@ -128,8 +129,8 @@ FlatbuffersUIElementProvider::CreateUIElement(
     base_data = dditem_data->base_data();
     break;
   }
-  case UIElementDataUnion::UIElementDataUnion_DropDownButtonData: {
-    auto ddbtn_data = static_cast<const DropDownButtonData *>(data);
+  case UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownButtonDataFbs: {
+    auto ddbtn_data = static_cast<const DropDownButtonDataFbs *>(data);
     auto ddbtn = std::make_unique<DropDownButtonElement>();
     auto config_result =
         data::configure::ConfigureDropDownButtonElement(*ddbtn, *ddbtn_data);
@@ -148,7 +149,7 @@ FlatbuffersUIElementProvider::CreateUIElement(
   // Only call this once! for configuring the base data
   if (base_data) {
     // Create a callback that captures 'this' and calls CreateUIElement
-    auto create_callback = [this](const UIElementDataUnion &data_type,
+    auto create_callback = [this](const UIElementDataUnionFbs &data_type,
                                   const void *data)
         -> std::expected<std::unique_ptr<UIElement>, FailInfo> {
       return this->CreateUIElement(data_type, data);

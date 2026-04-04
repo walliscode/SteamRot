@@ -3,11 +3,11 @@ include "view_direction.fbs";
 
 namespace steamrot;
 
-table FragmentFbs{
+table JointFbs{
 name: string (required);
-sockets: [Vector2fData] (required);
+sockets: [Vector2fDataFbs] (required);
 movement_views: [ViewFbs] (required);
   }
 
-root_type FragmentFbs;
+root_type JointFbs;
 

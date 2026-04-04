@@ -23,58 +23,58 @@ enum SpacingAndSizingFbs: byte {
   }
 
 
-union UIElementDataUnion {
-  PanelData,
-  ButtonData,
-  DropDownListData,
-  DropDownContainerData,
-  DropDownItemData,
-  DropDownButtonData
+union UIElementDataUnionFbs {
+  PanelDataFbs,
+  ButtonDataFbs,
+  DropDownListDataFbs,
+  DropDownContainerDataFbs,
+  DropDownItemDataFbs,
+  DropDownButtonDataFbs
 }
 
-table child {
-  element: UIElementDataUnion (required);
+table ChildDataFbs {
+  element: UIElementDataUnionFbs (required);
 }
 
-table UIElementData{
-    position: Vector2fData (required);
-    size: Vector2fData (required);
+table UIElementDataFbs{
+    position: Vector2fDataFbs (required);
+    size: Vector2fDataFbs (required);
     subscriber_data: SubscriberFbs;
     response_event_data: [EventPacketFbs];
     children_active: bool ;
-    children: [child] (required);
+    children: [ChildDataFbs] (required);
     is_mouse_over: bool;
     layout: LayoutFbs;
     spacing_strategy: SpacingAndSizingFbs;
   }
-table PanelData{  base_data: UIElementData(required);}
+table PanelDataFbs{  base_data: UIElementDataFbs(required);}
 
-table ButtonData {
-  base_data: UIElementData(required);
+table ButtonDataFbs {
+  base_data: UIElementDataFbs(required);
  label: string (required);
 }
 
-table DropDownContainerData{
-  base_data: UIElementData(required);
+table DropDownContainerDataFbs{
+  base_data: UIElementDataFbs(required);
 
   }
 
 
-table DropDownListData{
-  base_data: UIElementData(required);
+table DropDownListDataFbs{
+  base_data: UIElementDataFbs(required);
     unexpanded_label: string;
     expanded_label: string ;
     data_population_function: DataPopulationFunctionFbs;
   }
 
-table DropDownItemData {
-  base_data: UIElementData(required);
+table DropDownItemDataFbs {
+  base_data: UIElementDataFbs(required);
     label: string (required);
 
   }
 
-table DropDownButtonData {
-  base_data: UIElementData(required);
+table DropDownButtonDataFbs {
+  base_data: UIElementDataFbs(required);
     is_expanded: bool;
   }
 
@@ -83,7 +83,7 @@ table DropDownButtonData {
 
 table UserInterfaceFbs{
   // first structure must be a PanelElement
-    root_ui_element: PanelData (required); 
+    root_ui_element: PanelDataFbs (required); 
     ui_name: string; 
     is_visible: bool;
   }

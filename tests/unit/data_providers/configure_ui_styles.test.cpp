@@ -37,19 +37,19 @@ TEST_CASE("ConfigureBaseStyle configures from valid data",
           "[unit][configure_ui_styles]") {
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 100, 150, 200, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 255, 128, 0, 255);
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 15.0f, 20.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 60.0f, 40.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 300.0f, 250.0f);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 100, 150, 200, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 255, 128, 0, 255);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 15.0f, 20.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 60.0f, 40.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 250.0f);
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 3.5f, 12,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 3.5f, 12,
                                 inner_margin, minimum_size, maximum_size);
 
   fbb.Finish(style_offset);
-  const steamrot::StyleData *style_fb =
-      flatbuffers::GetRoot<steamrot::StyleData>(fbb.GetBufferPointer());
+  const steamrot::StyleDataFbs *style_fb =
+      flatbuffers::GetRoot<steamrot::StyleDataFbs>(fbb.GetBufferPointer());
 
   Style style;
   auto result = steamrot::data::configure::ConfigureBaseStyle(
@@ -94,21 +94,21 @@ TEST_CASE("ConfigurePanelStyle configures from valid data",
           "[unit][configure_ui_styles]") {
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 50, 60, 70, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 200, 100, 50, 255);
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 8.0f, 8.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 100.0f, 100.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 400.0f, 400.0f);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 50, 60, 70, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 200, 100, 50, 255);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 8.0f, 8.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 100.0f, 100.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 400.0f, 400.0f);
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 1.5f, 8,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.5f, 8,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto panel_offset = steamrot::CreatePanelStyleData(fbb, style_offset);
+  auto panel_offset = steamrot::CreatePanelStyleDataFbs(fbb, style_offset);
   fbb.Finish(panel_offset);
 
-  const steamrot::PanelStyleData *panel_fb =
-      flatbuffers::GetRoot<steamrot::PanelStyleData>(fbb.GetBufferPointer());
+  const steamrot::PanelStyleDataFbs *panel_fb =
+      flatbuffers::GetRoot<steamrot::PanelStyleDataFbs>(fbb.GetBufferPointer());
 
   PanelStyle panel_style;
   auto result =
@@ -145,27 +145,27 @@ TEST_CASE("ConfigureButtonStyle fails with non-existent font",
 
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 50, 60, 70, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 200, 100, 50, 255);
-  auto text_color = steamrot::CreateColorData(fbb, 255, 255, 255, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 200, 200, 200, 255);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 50, 60, 70, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 200, 100, 50, 255);
+  auto text_color = steamrot::CreateColorDataFbs(fbb, 255, 255, 255, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 200, 200, 200, 255);
 
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 8.0f, 8.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 100.0f, 50.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 300.0f, 150.0f);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 8.0f, 8.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 100.0f, 50.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 150.0f);
   auto font_name = fbb.CreateString("non_existent_font");
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 2.0f, 10,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 2.0f, 10,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto button_offset = steamrot::CreateButtonStyleData(
+  auto button_offset = steamrot::CreateButtonStyleDataFbs(
       fbb, style_offset, text_color, hover_color, font_name, 16);
 
   fbb.Finish(button_offset);
 
-  const steamrot::ButtonStyleData *button_fb =
-      flatbuffers::GetRoot<steamrot::ButtonStyleData>(fbb.GetBufferPointer());
+  const steamrot::ButtonStyleDataFbs *button_fb =
+      flatbuffers::GetRoot<steamrot::ButtonStyleDataFbs>(fbb.GetBufferPointer());
 
   ButtonStyle button_style;
   auto result = steamrot::data::configure::ConfigureButtonStyle(
@@ -185,26 +185,26 @@ TEST_CASE("ConfigureButtonStyle configures from valid data",
 
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 50, 60, 70, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 200, 100, 50, 255);
-  auto text_color = steamrot::CreateColorData(fbb, 255, 255, 255, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 200, 200, 200, 255);
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 8.0f, 8.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 100.0f, 50.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 300.0f, 150.0f);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 50, 60, 70, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 200, 100, 50, 255);
+  auto text_color = steamrot::CreateColorDataFbs(fbb, 255, 255, 255, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 200, 200, 200, 255);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 8.0f, 8.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 100.0f, 50.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 150.0f);
   auto font_name = fbb.CreateString("test_font");
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 2.0f, 10,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 2.0f, 10,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto button_offset = steamrot::CreateButtonStyleData(
+  auto button_offset = steamrot::CreateButtonStyleDataFbs(
       fbb, style_offset, text_color, hover_color, font_name, 18);
 
   fbb.Finish(button_offset);
 
-  const steamrot::ButtonStyleData *button_fb =
-      flatbuffers::GetRoot<steamrot::ButtonStyleData>(fbb.GetBufferPointer());
+  const steamrot::ButtonStyleDataFbs *button_fb =
+      flatbuffers::GetRoot<steamrot::ButtonStyleDataFbs>(fbb.GetBufferPointer());
 
   ButtonStyle button_style;
   auto result = steamrot::data::configure::ConfigureButtonStyle(
@@ -240,23 +240,23 @@ TEST_CASE("ConfigureDropDownContainerStyle configures from valid data",
           "[unit][configure_ui_styles]") {
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 80, 80, 80, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 180, 180, 180, 255);
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 5.0f, 5.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 120.0f, 30.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 350.0f, 80.0f);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 80, 80, 80, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 180, 180, 180, 255);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 5.0f, 5.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 120.0f, 30.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 350.0f, 80.0f);
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 1.0f, 6,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 6,
                                 inner_margin, minimum_size, maximum_size);
 
   auto dd_container_offset =
-      steamrot::CreateDropDownContainerStyleData(fbb, style_offset, 0.25f);
+      steamrot::CreateDropDownContainerStyleDataFbs(fbb, style_offset, 0.25f);
 
   fbb.Finish(dd_container_offset);
 
-  const steamrot::DropDownContainerStyleData *dd_container_fb =
-      flatbuffers::GetRoot<steamrot::DropDownContainerStyleData>(
+  const steamrot::DropDownContainerStyleDataFbs *dd_container_fb =
+      flatbuffers::GetRoot<steamrot::DropDownContainerStyleDataFbs>(
           fbb.GetBufferPointer());
 
   DropDownContainerStyle dd_container_style;
@@ -292,27 +292,27 @@ TEST_CASE("ConfigureDropDownListStyle fails with missing font",
 
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 90, 90, 90, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 160, 160, 160, 255);
-  auto text_color = steamrot::CreateColorData(fbb, 255, 255, 255, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 200, 200, 200, 255);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 90, 90, 90, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 160, 160, 160, 255);
+  auto text_color = steamrot::CreateColorDataFbs(fbb, 255, 255, 255, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 200, 200, 200, 255);
 
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 4.0f, 4.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 100.0f, 150.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 300.0f, 400.0f);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 4.0f, 4.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 100.0f, 150.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 400.0f);
   auto font_name = fbb.CreateString("missing_font");
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 1.0f, 8,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 8,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto dd_list_offset = steamrot::CreateDropDownListStyleData(
+  auto dd_list_offset = steamrot::CreateDropDownListStyleDataFbs(
       fbb, style_offset, text_color, hover_color, font_name, 14);
 
   fbb.Finish(dd_list_offset);
 
-  const steamrot::DropDownListStyleData *dd_list_fb =
-      flatbuffers::GetRoot<steamrot::DropDownListStyleData>(
+  const steamrot::DropDownListStyleDataFbs *dd_list_fb =
+      flatbuffers::GetRoot<steamrot::DropDownListStyleDataFbs>(
           fbb.GetBufferPointer());
 
   DropDownListStyle dd_list_style;
@@ -333,27 +333,27 @@ TEST_CASE("ConfigureDropDownListStyle configures from valid data",
 
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 90, 90, 90, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 160, 160, 160, 255);
-  auto text_color = steamrot::CreateColorData(fbb, 255, 255, 255, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 200, 200, 200, 255);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 90, 90, 90, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 160, 160, 160, 255);
+  auto text_color = steamrot::CreateColorDataFbs(fbb, 255, 255, 255, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 200, 200, 200, 255);
 
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 4.0f, 4.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 100.0f, 150.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 300.0f, 400.0f);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 4.0f, 4.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 100.0f, 150.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 400.0f);
   auto font_name = fbb.CreateString("list_font");
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 1.0f, 8,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 8,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto dd_list_offset = steamrot::CreateDropDownListStyleData(
+  auto dd_list_offset = steamrot::CreateDropDownListStyleDataFbs(
       fbb, style_offset, text_color, hover_color, font_name, 14);
 
   fbb.Finish(dd_list_offset);
 
-  const steamrot::DropDownListStyleData *dd_list_fb =
-      flatbuffers::GetRoot<steamrot::DropDownListStyleData>(
+  const steamrot::DropDownListStyleDataFbs *dd_list_fb =
+      flatbuffers::GetRoot<steamrot::DropDownListStyleDataFbs>(
           fbb.GetBufferPointer());
 
   DropDownListStyle dd_list_style;
@@ -392,27 +392,27 @@ TEST_CASE("ConfigureDropDownItemStyle configures from valid data",
 
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 70, 70, 70, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 140, 140, 140, 255);
-  auto text_color = steamrot::CreateColorData(fbb, 240, 240, 240, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 180, 180, 180, 255);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 70, 70, 70, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 140, 140, 140, 255);
+  auto text_color = steamrot::CreateColorDataFbs(fbb, 240, 240, 240, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 180, 180, 180, 255);
 
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 3.0f, 3.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 90.0f, 25.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 280.0f, 50.0f);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 3.0f, 3.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 90.0f, 25.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 280.0f, 50.0f);
   auto font_name = fbb.CreateString("item_font");
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 0.5f, 6,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 0.5f, 6,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto dd_item_offset = steamrot::CreateDropDownItemStyleData(
+  auto dd_item_offset = steamrot::CreateDropDownItemStyleDataFbs(
       fbb, style_offset, text_color, hover_color, font_name, 12);
 
   fbb.Finish(dd_item_offset);
 
-  const steamrot::DropDownItemStyleData *dd_item_fb =
-      flatbuffers::GetRoot<steamrot::DropDownItemStyleData>(
+  const steamrot::DropDownItemStyleDataFbs *dd_item_fb =
+      flatbuffers::GetRoot<steamrot::DropDownItemStyleDataFbs>(
           fbb.GetBufferPointer());
 
   DropDownItemStyle dd_item_style;
@@ -446,26 +446,26 @@ TEST_CASE("ConfigureDropDownButtonStyle configures from valid data",
           "[unit][configure_ui_styles]") {
   flatbuffers::FlatBufferBuilder fbb;
 
-  auto background_color = steamrot::CreateColorData(fbb, 60, 60, 60, 255);
-  auto border_color = steamrot::CreateColorData(fbb, 120, 120, 120, 255);
-  auto triangle_color = steamrot::CreateColorData(fbb, 255, 200, 0, 255);
-  auto hover_color = steamrot::CreateColorData(fbb, 170, 170, 170, 255);
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 60, 60, 60, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 120, 120, 120, 255);
+  auto triangle_color = steamrot::CreateColorDataFbs(fbb, 255, 200, 0, 255);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 170, 170, 170, 255);
 
-  auto inner_margin = steamrot::CreateVector2fData(fbb, 2.0f, 2.0f);
-  auto minimum_size = steamrot::CreateVector2fData(fbb, 30.0f, 30.0f);
-  auto maximum_size = steamrot::CreateVector2fData(fbb, 50.0f, 50.0f);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 2.0f, 2.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 30.0f, 30.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 50.0f, 50.0f);
 
   auto style_offset =
-      steamrot::CreateStyleData(fbb, background_color, border_color, 1.0f, 5,
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 5,
                                 inner_margin, minimum_size, maximum_size);
 
-  auto dd_button_offset = steamrot::CreateDropDownButtonStyleData(
+  auto dd_button_offset = steamrot::CreateDropDownButtonStyleDataFbs(
       fbb, style_offset, triangle_color, hover_color);
 
   fbb.Finish(dd_button_offset);
 
-  const steamrot::DropDownButtonStyleData *dd_button_fb =
-      flatbuffers::GetRoot<steamrot::DropDownButtonStyleData>(
+  const steamrot::DropDownButtonStyleDataFbs *dd_button_fb =
+      flatbuffers::GetRoot<steamrot::DropDownButtonStyleDataFbs>(
           fbb.GetBufferPointer());
 
   DropDownButtonStyle dd_button_style;

@@ -83,7 +83,7 @@ TEST_CASE("FlatbuffersDataLoader provides ui_styles data",
     FAIL(result.error().message);
   }
 
-  std::vector<const steamrot::UIStyleData *> ui_styles = result.value();
+  std::vector<const steamrot::UIStyleDataFbs *> ui_styles = result.value();
   // check number of styles loaded
   REQUIRE(ui_styles.size() == 1);
 

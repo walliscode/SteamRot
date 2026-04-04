@@ -55,7 +55,7 @@ TEST_CASE(
     "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInputFbs_LEFT_CLICK};
   auto mouse_pressed = builder.CreateVector(mouse_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);
@@ -85,7 +85,7 @@ TEST_CASE("ConfigureInputActionMapping sets keyboard-pressed bit",
           "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<uint8_t> kb_pressed_vec{steamrot::KeyboardInput_A};
+  std::vector<uint8_t> kb_pressed_vec{steamrot::KeyboardInputFbs_A};
   auto kb_pressed = builder.CreateVector(kb_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);
@@ -139,7 +139,7 @@ TEST_CASE("ConfigureInputActionRegistry populates registry with one mapping",
           "[unit][configure_input_action]") {
   flatbuffers::FlatBufferBuilder builder;
 
-  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInput_LEFT_CLICK};
+  std::vector<uint8_t> mouse_pressed_vec{steamrot::MouseInputFbs_LEFT_CLICK};
   auto mouse_pressed = builder.CreateVector(mouse_pressed_vec);
 
   steamrot::InputActionMappingFbsBuilder mapping_builder(builder);

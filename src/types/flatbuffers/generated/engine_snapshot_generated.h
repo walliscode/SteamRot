@@ -50,8 +50,8 @@ struct EngineSnapshotFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   ///
   /// Captures all events in the global event bus at this tick.
   /// Useful for testing event lifetime, propagation, and processing.
-  const steamrot::EventBusData *global_event_bus() const {
-    return GetPointer<const steamrot::EventBusData *>(VT_GLOBAL_EVENT_BUS);
+  const steamrot::EventBusDataFbs *global_event_bus() const {
+    return GetPointer<const steamrot::EventBusDataFbs *>(VT_GLOBAL_EVENT_BUS);
   }
   /// @brief Scene manager state data
   ///
@@ -83,7 +83,7 @@ struct EngineSnapshotFbsBuilder {
   void add_tick_number(uint64_t tick_number) {
     fbb_.AddElement<uint64_t>(EngineSnapshotFbs::VT_TICK_NUMBER, tick_number, 0);
   }
-  void add_global_event_bus(::flatbuffers::Offset<steamrot::EventBusData> global_event_bus) {
+  void add_global_event_bus(::flatbuffers::Offset<steamrot::EventBusDataFbs> global_event_bus) {
     fbb_.AddOffset(EngineSnapshotFbs::VT_GLOBAL_EVENT_BUS, global_event_bus);
   }
   void add_scene_manager_data(::flatbuffers::Offset<steamrot::SceneManagerDataFbs> scene_manager_data) {
@@ -106,7 +106,7 @@ struct EngineSnapshotFbsBuilder {
 inline ::flatbuffers::Offset<EngineSnapshotFbs> CreateEngineSnapshotFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t tick_number = 0,
-    ::flatbuffers::Offset<steamrot::EventBusData> global_event_bus = 0,
+    ::flatbuffers::Offset<steamrot::EventBusDataFbs> global_event_bus = 0,
     ::flatbuffers::Offset<steamrot::SceneManagerDataFbs> scene_manager_data = 0,
     ::flatbuffers::Offset<steamrot::SceneCollectionDataFbs> scene_collection_data = 0) {
   EngineSnapshotFbsBuilder builder_(_fbb);

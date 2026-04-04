@@ -1,4 +1,4 @@
-include "../entities/entities.fbs";
+include "../entity/entities.fbs";
 include "../assets/asset_config.fbs";
 include "scene_resources_config.fbs";
 include "scene_info.fbs";

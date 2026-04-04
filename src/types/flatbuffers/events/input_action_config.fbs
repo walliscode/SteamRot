@@ -17,10 +17,10 @@ namespace steamrot;
 /// mapping to match.
 ////////////////////////////////////////////////////////////
 table InputActionMappingFbs {
-  keyboard_pressed:  [KeyboardInput];
-  keyboard_released: [KeyboardInput];
-  mouse_pressed:     [MouseInput];
-  mouse_released:    [MouseInput];
+  keyboard_pressed:  [KeyboardInputFbs];
+  keyboard_released: [KeyboardInputFbs];
+  mouse_pressed:     [MouseInputFbs];
+  mouse_released:    [MouseInputFbs];
   action:            InputActionFbs;
 }
 

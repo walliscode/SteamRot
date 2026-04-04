@@ -36,8 +36,8 @@ set(TEST_DATA_BINARIES "")
 
 
 
-# Path to the test_data.fbs schema (in testing subdirectory after Phase 3 reorganization)
-set(test_data_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/testing/test_data.fbs")
+# Path to the test_data.fbs schema
+set(test_data_schema "${CMAKE_SOURCE_DIR}/src/types/flatbuffers/test_structs/test_data.fbs")
 
 message("looking for files in ${CMAKE_SOURCE_DIR}")
 # Find all .test_data.json files in all data directories

@@ -64,9 +64,10 @@ DataPopulationFunction ConvertDataPopulationFunction(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
-    UIElement &element, const UIElementData &data, EventHandler &event_handler,
+    UIElement &element, const UIElementDataFbs &data,
+    EventHandler &event_handler,
     std::function<std::expected<std::unique_ptr<UIElement>, FailInfo>(
-        const UIElementDataUnion &, const void *)>
+        const UIElementDataUnionFbs &, const void *)>
         create_ui_element_callback) {
 
   element.position = sf::Vector2f({data.position()->x(), data.position()->y()});
@@ -145,14 +146,15 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigurePanelElement(PanelElement &panel_element, const PanelData &data) {
+ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
   // No extra fields for panel
   return std::monostate{};
 }
 
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
+ConfigureButtonElement(ButtonElement &button_element,
+                       const ButtonDataFbs &data) {
   if (data.label()) {
     button_element.label = data.label()->str();
   }
@@ -162,7 +164,7 @@ ConfigureButtonElement(ButtonElement &button_element, const ButtonData &data) {
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
-                             const DropDownListData &data) {
+                             const DropDownListDataFbs &data) {
   if (data.unexpanded_label()) {
     dropdown_list_element.unexpanded_label = data.unexpanded_label()->str();
   }
@@ -179,41 +181,41 @@ ConfigureDropDownListElement(DropDownListElement &dropdown_list_element,
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
     DropDownContainerElement &dropdown_container_element,
-    const DropDownContainerData &data) {
+    const DropDownContainerDataFbs &data) {
 
   // return if children are empty
   if (!data.base_data()->children()) {
     return std::unexpected(FailInfo{
         FailMode::FlatbuffersDataNotFound,
-        "DropDownContainerData must have exactly 2 children: a "
-        "DropDownListData and a DropDownButtonData. This one has none."});
+        "DropDownContainerDataFbs must have exactly 2 children: a "
+        "DropDownListDataFbs and a DropDownButtonDataFbs. This one has none."});
   }
   // ensure that the data contains only a list and a button as children
   if (data.base_data()->children()->size() != 2) {
     size_t num_children = data.base_data()->children()->size();
-    return std::unexpected(
-        FailInfo{FailMode::FlatbuffersDataNotFound,
-                 "DropDownContainerData must have exactly 2 children: a "
-                 "DropDownListData and a DropDownButtonData. This one has " +
-                     std::to_string(num_children) + " children."});
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "DropDownContainerDataFbs must have exactly 2 children: a "
+        "DropDownListDataFbs and a DropDownButtonDataFbs. This one has " +
+            std::to_string(num_children) + " children."});
   }
-  // ensure the first child in the data is DropDownListData
+  // ensure the first child in the data is DropDownListDataFbs
   auto first_child_fb = data.base_data()->children()->Get(0);
   if (!first_child_fb ||
       first_child_fb->element_type() !=
-          UIElementDataUnion::UIElementDataUnion_DropDownListData) {
-    return std::unexpected(FailInfo{
-        FailMode::FlatbuffersDataNotFound,
-        "DropDownContainerData's first child must be a DropDownListData."});
+          UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownListDataFbs) {
+    return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                    "DropDownContainerDataFbs's first child "
+                                    "must be a DropDownListDataFbs."});
   }
-  // ensure the second child in the data is DropDownButtonData
+  // ensure the second child in the data is DropDownButtonDataFbs
   auto second_child_fb = data.base_data()->children()->Get(1);
   if (!second_child_fb ||
       second_child_fb->element_type() !=
-          UIElementDataUnion::UIElementDataUnion_DropDownButtonData) {
+          UIElementDataUnionFbs::UIElementDataUnionFbs_DropDownButtonDataFbs) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "DropDownContainerData's second child "
-                                    "must be a DropDownButtonData."});
+                                    "DropDownContainerDataFbs's second child "
+                                    "must be a DropDownButtonDataFbs."});
   }
 
   return std::monostate{};
@@ -222,7 +224,7 @@ std::expected<std::monostate, FailInfo> ConfigureDropDownContainerElement(
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
-                             const DropDownItemData &data) {
+                             const DropDownItemDataFbs &data) {
   if (data.label()) {
     dropdown_item_element.label = data.label()->str();
   }
@@ -232,7 +234,7 @@ ConfigureDropDownItemElement(DropDownItemElement &dropdown_item_element,
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigureDropDownButtonElement(DropDownButtonElement &dropdown_button_element,
-                               const DropDownButtonData &data) {
+                               const DropDownButtonDataFbs &data) {
   dropdown_button_element.is_expanded = data.is_expanded();
   return std::monostate{};
 }

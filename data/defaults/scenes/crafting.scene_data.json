@@ -26,7 +26,7 @@
               "children_active": true,
               "children": [
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
                   "element": {
                     "base_data": {
                       "position": {
@@ -66,7 +66,7 @@
                   }
                 },
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
 
                   "element": {
                     "label": "New Construct",
@@ -140,7 +140,7 @@
               "children_active": true,
               "children": [
                 {
-                  "element_type": "DropDownContainerData",
+                  "element_type": "DropDownContainerDataFbs",
                   "element": {
                     "base_data": {
                       "position": {
@@ -155,7 +155,7 @@
                       "children_active": true,
                       "children": [
                         {
-                          "element_type": "DropDownListData",
+                          "element_type": "DropDownListDataFbs",
                           "element": {
                             "base_data": {
                               "position": {
@@ -175,7 +175,7 @@
                           }
                         },
                         {
-                          "element_type": "DropDownButtonData",
+                          "element_type": "DropDownButtonDataFbs",
                           "element": {
                             "base_data": {
                               "position": {
@@ -205,7 +205,7 @@
                   }
                 },
                 {
-                  "element_type": "ButtonData",
+                  "element_type": "ButtonDataFbs",
                   "element": {
                     "label": "Exit Construct Creation",
                     "base_data": {
