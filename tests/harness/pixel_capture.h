@@ -56,8 +56,7 @@ std::filesystem::path GetBaselineDirectory();
 /////////////////////////////////////////////////
 /// @brief Capture an sf::Image snapshot from a render texture.
 ///
-/// Calls display() is NOT called internally — the caller must call
-/// render_texture.display() before capturing if the texture was drawn to.
+/// Calls `render_texture.display()` before capturing if the texture was drawn to.
 ///
 /// @param render_texture The render texture to capture.
 /// @return Pixel snapshot as an sf::Image.

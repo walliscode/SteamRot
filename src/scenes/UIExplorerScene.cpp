@@ -18,8 +18,8 @@
 #include "render_ui.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <cctype>
 #include <chrono>
-#include <ctime>
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -419,24 +419,33 @@ void UIExplorerScene::SaveCanvasToPng() {
       paths::GetSavesDirectory() / "sandbox_captures";
   std::filesystem::create_directories(save_dir);
 
-  // timestamp-based name
+  // build a UTC-based timestamp using C++20 chrono (thread-safe, no localtime)
   auto now = std::chrono::system_clock::now();
-  auto time_t_now = std::chrono::system_clock::to_time_t(now);
-  char time_buf[32];
-  std::strftime(time_buf, sizeof(time_buf), "%Y%m%d_%H%M%S",
-                std::localtime(&time_t_now));
+  auto seconds = std::chrono::floor<std::chrono::seconds>(now);
+  auto dp = std::chrono::floor<std::chrono::days>(seconds);
+  std::chrono::year_month_day ymd{dp};
+  std::chrono::hh_mm_ss<std::chrono::seconds> hms{seconds - dp};
+
+  std::string timestamp =
+      std::format("{:04}{:02}{:02}_{:02}{:02}{:02}",
+                  static_cast<int>(ymd.year()),
+                  static_cast<unsigned>(ymd.month()),
+                  static_cast<unsigned>(ymd.day()),
+                  static_cast<long long>(hms.hours().count()),
+                  static_cast<long long>(hms.minutes().count()),
+                  static_cast<long long>(hms.seconds().count()));
 
   std::string element_name =
       m_catalog.empty() ? "element" : m_catalog[m_selected_index].name;
-  // replace spaces with underscores for the filename
+  // sanitize element_name: keep only alphanumeric characters and underscores
   for (char &c : element_name) {
-    if (c == ' ' || c == '(' || c == ')') {
+    if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
       c = '_';
     }
   }
 
   std::filesystem::path save_path =
-      save_dir / (element_name + "_" + time_buf + ".png");
+      save_dir / (element_name + "_" + timestamp + ".png");
 
   sf::Image capture = m_scene_resources.scene_texture.getTexture().copyToImage();
   if (capture.saveToFile(save_path.string())) {
