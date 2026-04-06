@@ -36,6 +36,19 @@ sf::RenderTexture &Scene::GetRenderTexture() {
 }
 
 /////////////////////////////////////////////////
+void Scene::SetResizeStrategy(std::shared_ptr<IResizeStrategy> strategy) {
+  m_scene_resources.resize_strategy = std::move(strategy);
+}
+
+/////////////////////////////////////////////////
+void Scene::HandleResize(sf::Vector2u new_size) {
+  if (m_scene_resources.resize_strategy) {
+    m_scene_resources.resize_strategy->OnResize(new_size,
+                                                 m_scene_resources.scene_texture);
+  }
+}
+
+/////////////////////////////////////////////////
 const SceneInfo Scene::GetSceneInfo() const {
   SceneInfo scene_info;
 

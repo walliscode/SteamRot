@@ -14,6 +14,7 @@
 
 #include "EventPacket.h"
 #include "FailInfo.h"
+#include <SFML/System/Vector2.hpp>
 #include <expected>
 
 namespace steamrot::events {
@@ -89,6 +90,21 @@ CreateSceneEventPacket(const uint8_t lifetime,
 std::expected<EventPacket, FailInfo>
 CreateSystemEventPacket(const uint8_t lifetime,
                         const SystemPayload::SystemAction action);
+
+/////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a SystemPayload carrying resize data.
+///
+/// Convenience overload for RESIZE events that carries the new window size.
+///
+/// @param lifetime    The lifetime of the event in ticks.
+/// @param action      The system action (should be SystemAction::RESIZE).
+/// @param resize_size New window dimensions in pixels.
+/// @return EventPacket with SystemPayload or FailInfo on error.
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateSystemEventPacket(const uint8_t lifetime,
+                        const SystemPayload::SystemAction action,
+                        const sf::Vector2u resize_size);
 
 /////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes

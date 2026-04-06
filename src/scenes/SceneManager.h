@@ -173,6 +173,16 @@ public:
   /////////////////////////////////////////////////
   std::expected<SceneCollectionData, FailInfo>
   CaptureSceneCollectionData() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Apply each scene's resize strategy to its render texture.
+  ///
+  /// Called by the engine when the game window is resized.  Each scene's
+  /// IResizeStrategy::OnResize() is invoked in turn.
+  ///
+  /// @param new_size New window dimensions in pixels.
+  /////////////////////////////////////////////////
+  void HandleResize(sf::Vector2u new_size);
 };
 
 } // namespace steamrot

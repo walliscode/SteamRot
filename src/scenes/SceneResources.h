@@ -10,8 +10,10 @@
 /////////////////////////////////////////////////
 #include "EntityManager.h"
 #include "GameContext.h"
+#include "IResizeStrategy.h"
 #include "LogicFactory.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <memory>
 
 namespace steamrot {
 
@@ -52,6 +54,17 @@ struct SceneResources {
   /// drawn to the game window.
   /////////////////////////////////////////////////
   sf::RenderTexture scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief Strategy controlling how this scene responds to window resize
+  /// events.
+  ///
+  /// Defaults to nullptr (no resize handling).  Set via
+  /// Scene::SetResizeStrategy() or during scene construction in
+  /// SceneFactory.  Swap at runtime to change resize behaviour without
+  /// altering any other scene state.
+  /////////////////////////////////////////////////
+  std::shared_ptr<IResizeStrategy> resize_strategy{nullptr};
 };
 
 } // namespace steamrot

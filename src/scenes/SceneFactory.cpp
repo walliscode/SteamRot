@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
 #include "CraftingScene.h"
+#include "DirectScaleResizeStrategy.h"
 #include "IEntityConfigurator.h"
 #include "LogicFactory.h"
 #include "Scene.h"
@@ -176,6 +177,12 @@ SceneFactory::ConfigureSceneResources(Scene &scene,
   if (!texture_resize_result)
     return std::unexpected(FailInfo(FailMode::ResourceCreationFailure,
                                     "Failed to resize scene render texture"));
+
+  // Apply the default resize strategy (Direct Scale) so that scenes respond
+  // to window resize events out of the box.  Call Scene::SetResizeStrategy()
+  // to override this for a specific scene.
+  scene.SetResizeStrategy(std::make_shared<DirectScaleResizeStrategy>());
+
   return std::monostate{};
 }
 

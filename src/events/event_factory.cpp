@@ -10,6 +10,7 @@
 #include "EventContext.h"
 #include "EventPayload.h"
 #include "EventType.h"
+#include <SFML/System/Vector2.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <random>
 
@@ -72,6 +73,19 @@ CreateSystemEventPacket(const uint8_t lifetime,
                         const SystemPayload::SystemAction action) {
   EventContext context{lifetime};
   SystemPayload payload(action);
+  EventPacket packet{context, EventType::SYSTEM, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateSystemEventPacket(const uint8_t lifetime,
+                        const SystemPayload::SystemAction action,
+                        const sf::Vector2u resize_size) {
+  // Construct a SystemPayload with resize data and reuse the core creation
+  // logic from the base overload via the EventContext/EventPacket path.
+  EventContext context{lifetime};
+  SystemPayload payload(action, resize_size);
   EventPacket packet{context, EventType::SYSTEM, payload};
   return packet;
 }
@@ -185,12 +199,14 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   }
 
   case EventType::SYSTEM: {
-    // Get all SystemAction values and filter out NONE
+    // Get all SystemAction values and filter out NONE and RESIZE
+    // (RESIZE carries required size data and has a dedicated overload)
     constexpr auto system_actions =
         magic_enum::enum_values<SystemPayload::SystemAction>();
     std::vector<SystemPayload::SystemAction> valid_actions;
     for (const auto &action : system_actions) {
-      if (action != SystemPayload::SystemAction::NONE) {
+      if (action != SystemPayload::SystemAction::NONE &&
+          action != SystemPayload::SystemAction::RESIZE) {
         valid_actions.push_back(action);
       }
     }

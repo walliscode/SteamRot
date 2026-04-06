@@ -94,6 +94,26 @@ public:
   sf::RenderTexture &GetRenderTexture();
 
   /////////////////////////////////////////////////
+  /// @brief Set the resize strategy for this scene.
+  ///
+  /// Replaces the current strategy.  Passing nullptr disables resize
+  /// handling for this scene.
+  ///
+  /// @param strategy Shared pointer to the new resize strategy.
+  /////////////////////////////////////////////////
+  void SetResizeStrategy(std::shared_ptr<IResizeStrategy> strategy);
+
+  /////////////////////////////////////////////////
+  /// @brief Apply the scene's resize strategy to the render texture.
+  ///
+  /// Called by SceneManager::HandleResize() when the game window changes
+  /// size.  If no strategy is set this method is a no-op.
+  ///
+  /// @param new_size New window dimensions in pixels.
+  /////////////////////////////////////////////////
+  void HandleResize(sf::Vector2u new_size);
+
+  /////////////////////////////////////////////////
   /// @brief Returns the active state of the Scene.
   ///
   /// @return Boolean indicating if the Scene is active.

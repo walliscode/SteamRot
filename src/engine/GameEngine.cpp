@@ -9,7 +9,9 @@
 
 #include "GameEngine.h"
 #include "EventPayload.h"
+#include "EventType.h"
 #include "FailInfo.h"
+#include "Subscriber.h"
 #include <expected>
 #include <variant>
 
@@ -25,6 +27,19 @@ std::expected<std::monostate, FailInfo> GameEngine::StartUp() {
   auto base_startup_result = Engine::StartUp();
   if (!base_startup_result.has_value()) {
     return std::unexpected(base_startup_result.error());
+  }
+
+  // Register a window-resize subscriber so that ProcessSubscriptions() can
+  // forward the new size to the SceneManager.
+  auto resize_subscriber = std::make_shared<Subscriber>();
+  resize_subscriber->event_type = EventType::SYSTEM;
+  resize_subscriber->filter_payload =
+      SystemPayload{SystemPayload::SystemAction::RESIZE};
+  m_engine_state.subscriptions.push_back(resize_subscriber);
+  auto register_result =
+      m_game_context.event_handler.RegisterSubscriber(resize_subscriber);
+  if (!register_result.has_value()) {
+    return std::unexpected(register_result.error());
   }
 
   // GameEngine-specific: Load the title scene to start the game
@@ -88,6 +103,21 @@ std::expected<std::monostate, FailInfo> GameEngine::ProcessSubscriptions() {
 
           // close the window to quit the game
           m_engine_resources.game_window.close();
+          break;
+        }
+
+        case SystemPayload::SystemAction::RESIZE: {
+          // Extract the new size from the captured event payload and forward
+          // it to the SceneManager so each scene's resize strategy fires.
+          if (subscriber->captured_payload.has_value()) {
+            if (const auto *resize_payload = std::get_if<SystemPayload>(
+                    &subscriber->captured_payload.value())) {
+              if (resize_payload->optional_resize_size.has_value()) {
+                m_scene_manager.HandleResize(
+                    *resize_payload->optional_resize_size);
+              }
+            }
+          }
           break;
         }
 

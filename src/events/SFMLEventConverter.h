@@ -51,7 +51,9 @@ public:
   ///      bitset.
   ///   2. Resolve an InputAction from the registry.
   ///   3. Create an EventPacket for each resolved action.
-  ///   4. Reset the waiting-room bitset for the next tick.
+  ///   4. Convert window-close event to SystemPayload::QUIT.
+  ///   5. Convert window-resize event to SystemPayload::RESIZE.
+  ///   6. Reset the waiting-room bitset for the next tick.
   ///
   /// @param sfml_events SFML events gathered this tick.
   /// @return EventPackets to be added to the EventHandler waiting room.

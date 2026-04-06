@@ -18,6 +18,7 @@ target_include_directories(types
   ${CMAKE_CURRENT_SOURCE_DIR}/assets/
   ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/
   ${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/generated/
+  ${CMAKE_CURRENT_SOURCE_DIR}/display/
 
 
 

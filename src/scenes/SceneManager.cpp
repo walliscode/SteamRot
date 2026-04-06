@@ -365,4 +365,12 @@ SceneManager::CaptureSceneCollectionData() const {
   }
   return scene_collection_data;
 }
+
+/////////////////////////////////////////////////
+void SceneManager::HandleResize(sf::Vector2u new_size) {
+  for (auto &[id, scene] : m_scenes) {
+    scene->HandleResize(new_size);
+  }
+}
+
 } // namespace steamrot

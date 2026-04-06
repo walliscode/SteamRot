@@ -16,3 +16,5 @@ target_link_libraries(test_display
 )
 
 catch_discover_tests(test_display)
+
+add_subdirectory(resize_strategies)

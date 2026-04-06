@@ -157,3 +157,108 @@ TEST_CASE("ResolveInputAction does not match an all-zeros pattern",
       steamrot::events::convert::ResolveInputAction(accumulated, registry);
   REQUIRE_FALSE(result.has_value());
 }
+
+// ---------------------------------------------------------------------------
+// HasWindowCloseEvent
+// ---------------------------------------------------------------------------
+
+TEST_CASE("HasWindowCloseEvent returns false for empty event list",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> no_events;
+  REQUIRE_FALSE(
+      steamrot::events::convert::HasWindowCloseEvent(no_events));
+}
+
+TEST_CASE("HasWindowCloseEvent returns false when only input events present",
+          "[unit][sfml_event_convert]") {
+  sf::Event::KeyPressed key_event;
+  key_event.code = sf::Keyboard::Key::Escape;
+  key_event.scancode = sf::Keyboard::Scan::Escape;
+  key_event.alt = false;
+  key_event.control = false;
+  key_event.shift = false;
+  key_event.system = false;
+
+  std::vector<sf::Event> events{sf::Event{key_event}};
+  REQUIRE_FALSE(
+      steamrot::events::convert::HasWindowCloseEvent(events));
+}
+
+TEST_CASE("HasWindowCloseEvent returns true when sf::Event::Closed is present",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> events{sf::Event{sf::Event::Closed{}}};
+  REQUIRE(steamrot::events::convert::HasWindowCloseEvent(events));
+}
+
+TEST_CASE(
+    "HasWindowCloseEvent returns true when Closed event is mixed with others",
+    "[unit][sfml_event_convert]") {
+  sf::Event::KeyPressed key_event;
+  key_event.code = sf::Keyboard::Key::A;
+  key_event.scancode = sf::Keyboard::Scan::A;
+  key_event.alt = false;
+  key_event.control = false;
+  key_event.shift = false;
+  key_event.system = false;
+
+  std::vector<sf::Event> events{sf::Event{key_event},
+                                sf::Event{sf::Event::Closed{}}};
+  REQUIRE(steamrot::events::convert::HasWindowCloseEvent(events));
+}
+
+// ---------------------------------------------------------------------------
+// ExtractWindowResizeSize
+// ---------------------------------------------------------------------------
+
+TEST_CASE("ExtractWindowResizeSize returns nullopt for empty event list",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> no_events;
+  REQUIRE_FALSE(
+      steamrot::events::convert::ExtractWindowResizeSize(no_events)
+          .has_value());
+}
+
+TEST_CASE("ExtractWindowResizeSize returns nullopt when only input events "
+          "are present",
+          "[unit][sfml_event_convert]") {
+  sf::Event::MouseButtonPressed mouse_event;
+  mouse_event.button = sf::Mouse::Button::Left;
+  mouse_event.position = {0, 0};
+
+  std::vector<sf::Event> events{sf::Event{mouse_event}};
+  REQUIRE_FALSE(
+      steamrot::events::convert::ExtractWindowResizeSize(events)
+          .has_value());
+}
+
+TEST_CASE(
+    "ExtractWindowResizeSize returns the new size from an Resized event",
+    "[unit][sfml_event_convert]") {
+  sf::Event::Resized resized_event;
+  resized_event.size = {1024u, 768u};
+
+  std::vector<sf::Event> events{sf::Event{resized_event}};
+  auto result = steamrot::events::convert::ExtractWindowResizeSize(events);
+
+  REQUIRE(result.has_value());
+  REQUIRE(result.value().x == 1024u);
+  REQUIRE(result.value().y == 768u);
+}
+
+TEST_CASE("ExtractWindowResizeSize returns the first resize size when multiple "
+          "resize events are present",
+          "[unit][sfml_event_convert]") {
+  sf::Event::Resized first_resize;
+  first_resize.size = {800u, 600u};
+
+  sf::Event::Resized second_resize;
+  second_resize.size = {1920u, 1080u};
+
+  std::vector<sf::Event> events{sf::Event{first_resize},
+                                sf::Event{second_resize}};
+  auto result = steamrot::events::convert::ExtractWindowResizeSize(events);
+
+  REQUIRE(result.has_value());
+  REQUIRE(result.value().x == 800u);
+  REQUIRE(result.value().y == 600u);
+}
