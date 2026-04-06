@@ -279,13 +279,13 @@ SceneFactory::CreateUIExplorerScene() {
   // Step 4: Configure an empty logic collection
   // UIExplorerScene overrides sRender/sCollision/sAction directly.
   scene->m_scene_resources.logic_map.clear();
-  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Collision,
+  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Collision,
                                              logic::LogicVector{});
-  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Action,
+  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Action,
                                              logic::LogicVector{});
-  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Render,
+  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Render,
                                              logic::LogicVector{});
-  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Movement,
+  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Movement,
                                              logic::LogicVector{});
 
   return scene;
