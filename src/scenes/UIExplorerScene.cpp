@@ -36,72 +36,70 @@ UIExplorerScene::UIExplorerScene(const GameContext &game_context)
 
 /////////////////////////////////////////////////
 void UIExplorerScene::BuildCatalog() {
-  m_catalog.push_back(
-      {"PanelElement", []() -> std::unique_ptr<UIElement> {
-         auto el = std::make_unique<PanelElement>();
-         el->position = {0.0f, 0.0f};
-         el->size = {200.0f, 150.0f};
-         return el;
-       }});
+  m_catalog.push_back({"PanelElement", []() -> std::unique_ptr<UIElement> {
+                         auto el = std::make_unique<PanelElement>();
+                         el->position = {0.0f, 0.0f};
+                         el->size = {200.0f, 150.0f};
+                         return el;
+                       }});
 
-  m_catalog.push_back(
-      {"ButtonElement", []() -> std::unique_ptr<UIElement> {
-         auto el = std::make_unique<ButtonElement>();
-         el->position = {0.0f, 0.0f};
-         el->size = {160.0f, 50.0f};
-         el->label = "Click Me";
-         return el;
-       }});
+  m_catalog.push_back({"ButtonElement", []() -> std::unique_ptr<UIElement> {
+                         auto el = std::make_unique<ButtonElement>();
+                         el->position = {0.0f, 0.0f};
+                         el->size = {160.0f, 50.0f};
+                         el->label = "Click Me";
+                         return el;
+                       }});
 
-  m_catalog.push_back(
-      {"DropDownContainerElement (collapsed)",
-       []() -> std::unique_ptr<UIElement> {
-         auto container = std::make_unique<DropDownContainerElement>();
-         container->position = {0.0f, 0.0f};
-         container->size = {220.0f, 45.0f};
-         container->is_expanded = false;
-         container->children_active = true;
+  m_catalog.push_back({"DropDownContainerElement (collapsed)",
+                       []() -> std::unique_ptr<UIElement> {
+                         auto container =
+                             std::make_unique<DropDownContainerElement>();
+                         container->position = {0.0f, 0.0f};
+                         container->size = {220.0f, 45.0f};
+                         container->is_expanded = false;
+                         container->children_active = true;
 
-         auto list = std::make_unique<DropDownListElement>();
-         list->is_expanded = false;
-         list->unexpanded_label = "Select item...";
+                         auto list = std::make_unique<DropDownListElement>();
+                         list->is_expanded = false;
+                         list->unexpanded_label = "Select item...";
 
-         auto btn = std::make_unique<DropDownButtonElement>();
-         btn->is_expanded = false;
+                         auto btn = std::make_unique<DropDownButtonElement>();
+                         btn->is_expanded = false;
 
-         container->child_elements.push_back(std::move(list));
-         container->child_elements.push_back(std::move(btn));
-         return container;
-       }});
+                         container->child_elements.push_back(std::move(list));
+                         container->child_elements.push_back(std::move(btn));
+                         return container;
+                       }});
 
-  m_catalog.push_back(
-      {"DropDownContainerElement (expanded)",
-       []() -> std::unique_ptr<UIElement> {
-         auto container = std::make_unique<DropDownContainerElement>();
-         container->position = {0.0f, 0.0f};
-         container->size = {220.0f, 45.0f};
-         container->is_expanded = true;
-         container->children_active = true;
+  m_catalog.push_back({"DropDownContainerElement (expanded)",
+                       []() -> std::unique_ptr<UIElement> {
+                         auto container =
+                             std::make_unique<DropDownContainerElement>();
+                         container->position = {0.0f, 0.0f};
+                         container->size = {220.0f, 45.0f};
+                         container->is_expanded = true;
+                         container->children_active = true;
 
-         auto list = std::make_unique<DropDownListElement>();
-         list->is_expanded = true;
-         list->expanded_label = "Select item...";
-         list->children_active = true;
+                         auto list = std::make_unique<DropDownListElement>();
+                         list->is_expanded = true;
+                         list->expanded_label = "Select item...";
+                         list->children_active = true;
 
-         for (int i = 0; i < 3; ++i) {
-           auto item = std::make_unique<DropDownItemElement>();
-           item->label = std::format("Item {}", i + 1);
-           item->value = std::format("value_{}", i + 1);
-           list->child_elements.push_back(std::move(item));
-         }
+                         for (int i = 0; i < 3; ++i) {
+                           auto item = std::make_unique<DropDownItemElement>();
+                           item->label = std::format("Item {}", i + 1);
+                           item->value = std::format("value_{}", i + 1);
+                           list->child_elements.push_back(std::move(item));
+                         }
 
-         auto btn = std::make_unique<DropDownButtonElement>();
-         btn->is_expanded = true;
+                         auto btn = std::make_unique<DropDownButtonElement>();
+                         btn->is_expanded = true;
 
-         container->child_elements.push_back(std::move(list));
-         container->child_elements.push_back(std::move(btn));
-         return container;
-       }});
+                         container->child_elements.push_back(std::move(list));
+                         container->child_elements.push_back(std::move(btn));
+                         return container;
+                       }});
 
   m_catalog.push_back(
       {"DropDownListElement", []() -> std::unique_ptr<UIElement> {
@@ -171,8 +169,8 @@ void UIExplorerScene::SelectElement(size_t index) {
 }
 
 /////////////////////////////////////////////////
-sf::Vector2f
-UIExplorerScene::ComputeElementPosition(const sf::Vector2f &element_size) const {
+sf::Vector2f UIExplorerScene::ComputeElementPosition(
+    const sf::Vector2f &element_size) const {
   // canvas area spans x: kSelectorWidth → kSceneWidth,
   //                   y: 0             → kSceneHeight - kHudHeight
   float canvas_x = kSelectorWidth;
@@ -187,8 +185,8 @@ UIExplorerScene::ComputeElementPosition(const sf::Vector2f &element_size) const 
 
 /////////////////////////////////////////////////
 sf::FloatRect UIExplorerScene::SelectorEntryRect(size_t entry_index) const {
-  float y = kEntryPadding + static_cast<float>(entry_index) *
-                                (kEntryHeight + kEntryPadding);
+  float y = kEntryPadding +
+            static_cast<float>(entry_index) * (kEntryHeight + kEntryPadding);
   // leave a small horizontal margin
   return {{8.0f, y}, {kSelectorWidth - 16.0f, kEntryHeight}};
 }
@@ -219,8 +217,7 @@ void UIExplorerScene::sAction() {
   m_esc_was_pressed = esc_now;
 
   // --- mouse click detection (rising edge) ---
-  bool mouse_now_pressed =
-      sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+  bool mouse_now_pressed = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
   bool mouse_clicked = mouse_now_pressed && !m_mouse_was_pressed;
   m_mouse_was_pressed = mouse_now_pressed;
 
@@ -238,10 +235,11 @@ void UIExplorerScene::sAction() {
   }
 
   // --- keyboard: Left/Right arrows = navigate catalog ---
+
   bool left_now = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
   if (left_now && !m_left_was_pressed && !m_catalog.empty()) {
-    size_t next = (m_selected_index == 0) ? m_catalog.size() - 1
-                                           : m_selected_index - 1;
+    size_t next =
+        (m_selected_index == 0) ? m_catalog.size() - 1 : m_selected_index - 1;
     SelectElement(next);
   }
   m_left_was_pressed = left_now;
@@ -266,13 +264,19 @@ void UIExplorerScene::sAction() {
   }
   m_s_was_pressed = s_now;
 
-  // --- arrow keys: pan the canvas ---
+  // --- shift + arrow keys: pan the canvas ---
   constexpr float kPanStep = 4.0f;
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
-    m_canvas_offset.y -= kPanStep;
-  }
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
-    m_canvas_offset.y += kPanStep;
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift) ||
+      sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RShift)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+      m_canvas_offset.y -= kPanStep;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+      m_canvas_offset.y += kPanStep;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+      m_canvas_offset.x -= kPanStep;
+    }
   }
 }
 
@@ -292,8 +296,7 @@ void UIExplorerScene::DrawSelectorPanel() {
   sf::RenderTexture &tex = m_scene_resources.scene_texture;
 
   // selector panel background
-  sf::RectangleShape panel_bg(
-      {kSelectorWidth, kSceneHeight - kHudHeight});
+  sf::RectangleShape panel_bg({kSelectorWidth, kSceneHeight - kHudHeight});
   panel_bg.setPosition({0.0f, 0.0f});
   panel_bg.setFillColor(sf::Color{35, 35, 45, 255});
   panel_bg.setOutlineColor(sf::Color{70, 70, 90, 255});
@@ -365,12 +368,12 @@ void UIExplorerScene::DrawCanvas() {
   // render the element using the stored UIStyle
   if (m_style.has_value()) {
     logic::render::ui::DrawNestedUIElements(tex, *m_active_element,
-                                           m_style.value());
+                                            m_style.value());
   } else {
     // fall back to a minimal inline style if AssetManager had no style
     UIStyle fallback_style;
     logic::render::ui::DrawNestedUIElements(tex, *m_active_element,
-                                           fallback_style);
+                                            fallback_style);
   }
 }
 
@@ -387,24 +390,21 @@ void UIExplorerScene::DrawHud() {
   tex.draw(hud_bg);
 
   // element name
-  std::string element_name = m_catalog.empty()
-                                 ? "(none)"
-                                 : m_catalog[m_selected_index].name;
+  std::string element_name =
+      m_catalog.empty() ? "(none)" : m_catalog[m_selected_index].name;
   DrawText("Element: " + element_name, {8.0f, kSceneHeight - kHudHeight + 6.0f},
            sf::Color{220, 220, 180, 255}, 14u);
 
   // mouse position
   const sf::Vector2i &mouse = m_scene_resources.game_context.mouse_position;
-  std::string mouse_str =
-      std::format("Mouse: ({},{})", mouse.x, mouse.y);
+  std::string mouse_str = std::format("Mouse: ({},{})", mouse.x, mouse.y);
   DrawText(mouse_str, {500.0f, kSceneHeight - kHudHeight + 6.0f},
            sf::Color{180, 210, 180, 255}, 14u);
 
   // keyboard hints
-  DrawText(
-      "← → Navigate   R Reset   S Save PNG   ↑↓ Pan   Esc Quit",
-      {820.0f, kSceneHeight - kHudHeight + 6.0f},
-      sf::Color{160, 160, 180, 255}, 12u);
+  DrawText("← → Navigate   R Reset   S Save PNG   ↑↓ Pan   Esc Quit",
+           {820.0f, kSceneHeight - kHudHeight + 6.0f},
+           sf::Color{160, 160, 180, 255}, 12u);
 }
 
 /////////////////////////////////////////////////
@@ -433,14 +433,12 @@ void UIExplorerScene::SaveCanvasToPng() {
   std::chrono::year_month_day ymd{dp};
   std::chrono::hh_mm_ss<std::chrono::seconds> hms{seconds - dp};
 
-  std::string timestamp =
-      std::format("{:04}{:02}{:02}_{:02}{:02}{:02}",
-                  static_cast<int>(ymd.year()),
-                  static_cast<unsigned>(ymd.month()),
-                  static_cast<unsigned>(ymd.day()),
-                  static_cast<long long>(hms.hours().count()),
-                  static_cast<long long>(hms.minutes().count()),
-                  static_cast<long long>(hms.seconds().count()));
+  std::string timestamp = std::format(
+      "{:04}{:02}{:02}_{:02}{:02}{:02}", static_cast<int>(ymd.year()),
+      static_cast<unsigned>(ymd.month()), static_cast<unsigned>(ymd.day()),
+      static_cast<long long>(hms.hours().count()),
+      static_cast<long long>(hms.minutes().count()),
+      static_cast<long long>(hms.seconds().count()));
 
   std::string element_name =
       m_catalog.empty() ? "element" : m_catalog[m_selected_index].name;
@@ -454,10 +452,11 @@ void UIExplorerScene::SaveCanvasToPng() {
   std::filesystem::path save_path =
       save_dir / (element_name + "_" + timestamp + ".png");
 
-  sf::Image capture = m_scene_resources.scene_texture.getTexture().copyToImage();
+  sf::Image capture =
+      m_scene_resources.scene_texture.getTexture().copyToImage();
   if (capture.saveToFile(save_path.string())) {
-    std::cout << "UIExplorerScene: saved canvas PNG to '"
-              << save_path.string() << "'\n";
+    std::cout << "UIExplorerScene: saved canvas PNG to '" << save_path.string()
+              << "'\n";
   } else {
     std::cerr << "UIExplorerScene: failed to save canvas PNG to '"
               << save_path.string() << "'\n";
