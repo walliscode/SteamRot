@@ -83,6 +83,11 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
     }
     break;
   }
+  case SceneType::UI_EXPLORER: {
+    // UIExplorerScene handles all logic directly via its sRender/sCollision/
+    // sAction overrides.  No Logic objects are needed.
+    break;
+  }
 
   // other SceneTypes can be added here
   default:

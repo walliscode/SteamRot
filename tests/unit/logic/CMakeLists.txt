@@ -11,6 +11,7 @@ action_grimoire_machina.test.cpp
 render_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp
 collision_mouse.test.cpp
+pixel_render.test.cpp
 
 )
 
@@ -28,6 +29,7 @@ target_link_libraries(test_logic
   entity
   matchers
   context_test_helpers
+  harness
 
 
 )

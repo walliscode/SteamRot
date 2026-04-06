@@ -107,6 +107,14 @@ public:
   std::expected<uuids::uuid, FailInfo> LoadCraftingScene();
 
   /////////////////////////////////////////////////
+  /// @brief Load the UIExplorer sandbox scene.
+  ///
+  /// Clears all existing scenes and creates a UIExplorerScene with a fixed
+  /// 1280x720 render texture.  Intended for use by the ui_sandbox executable.
+  /////////////////////////////////////////////////
+  std::expected<uuids::uuid, FailInfo> LoadUIExplorerScene();
+
+  /////////////////////////////////////////////////
   /// @brief Cause the cascade of events that will add a scene from default
   /// data.
   ///

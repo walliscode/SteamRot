@@ -163,6 +163,30 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadCraftingScene() {
 }
 
 /////////////////////////////////////////////////
+std::expected<uuids::uuid, FailInfo> SceneManager::LoadUIExplorerScene() {
+  // clear existing scenes
+  m_scenes.clear();
+
+  SceneFactory scene_factory(m_game_context);
+
+  auto scene_result = scene_factory.CreateUIExplorerScene();
+  if (!scene_result.has_value()) {
+    return std::unexpected(scene_result.error());
+  }
+
+  const uuids::uuid id = scene_result.value()->GetSceneInfo().id;
+
+  auto adding_result = m_scenes.emplace(id, std::move(scene_result.value()));
+  if (!adding_result.second) {
+    return std::unexpected(
+        FailInfo{FailMode::NotAddedToMap,
+                 "UIExplorerScene was not added correctly"});
+  }
+
+  return id;
+}
+
+/////////////////////////////////////////////////
 const std::expected<
     std::unordered_map<uuids::uuid, std::reference_wrapper<sf::RenderTexture>>,
     FailInfo>
