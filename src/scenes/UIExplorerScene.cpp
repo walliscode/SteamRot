@@ -211,6 +211,13 @@ void UIExplorerScene::sCollision() {
 
 /////////////////////////////////////////////////
 void UIExplorerScene::sAction() {
+  // --- keyboard: Escape = quit / close window ---
+  bool esc_now = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape);
+  if (esc_now && !m_esc_was_pressed) {
+    m_scene_resources.game_context.game_window.close();
+  }
+  m_esc_was_pressed = esc_now;
+
   // --- mouse click detection (rising edge) ---
   bool mouse_now_pressed =
       sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
@@ -395,7 +402,7 @@ void UIExplorerScene::DrawHud() {
 
   // keyboard hints
   DrawText(
-      "← → Navigate   R Reset   S Save PNG   ↑↓ Pan",
+      "← → Navigate   R Reset   S Save PNG   ↑↓ Pan   Esc Quit",
       {820.0f, kSceneHeight - kHudHeight + 6.0f},
       sf::Color{160, 160, 180, 255}, 12u);
 }

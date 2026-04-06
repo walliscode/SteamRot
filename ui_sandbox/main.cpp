@@ -11,6 +11,7 @@
 ///   R key                         → reset current element to defaults
 ///   S key                         → save canvas render to PNG
 ///   ↑↓ arrow keys                 → pan canvas vertically
+///   Esc key                       → quit
 ///   Window close / Alt+F4         → exit
 /////////////////////////////////////////////////
 

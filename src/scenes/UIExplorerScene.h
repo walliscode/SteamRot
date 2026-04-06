@@ -131,6 +131,11 @@ private:
   bool m_mouse_was_pressed{false};
 
   /////////////////////////////////////////////////
+  /// @brief Whether the Escape key was pressed last tick (for debounce).
+  /////////////////////////////////////////////////
+  bool m_esc_was_pressed{false};
+
+  /////////////////////////////////////////////////
   /// @brief Whether the R key was pressed last tick (for debounce).
   /////////////////////////////////////////////////
   bool m_r_was_pressed{false};
