@@ -4,6 +4,7 @@ add_library(harness
   SimulationRunner.cpp
   input_simulation.cpp
   add_uuids.cpp
+  pixel_capture.cpp
 )
 
 target_include_directories(harness
@@ -16,5 +17,6 @@ target_link_libraries(harness
   engine
   types
   matchers
+  SFML::Graphics
 )
 

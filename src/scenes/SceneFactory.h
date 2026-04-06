@@ -122,5 +122,14 @@ public:
   /// @param scene  Scene to configure
   /////////////////////////////////////////////////
   std::expected<std::monostate, FailInfo> ConfigureLogicMap(Scene &scene);
+
+  /////////////////////////////////////////////////
+  /// @brief Create and configure a UIExplorerScene without data files.
+  ///
+  /// Creates a UIExplorerScene with a fixed 1280x720 render texture and an
+  /// empty logic collection (the scene handles all logic directly).
+  /////////////////////////////////////////////////
+  std::expected<std::unique_ptr<Scene>, FailInfo>
+  CreateUIExplorerScene();
 };
 } // namespace steamrot

@@ -12,6 +12,7 @@
 #include "LogicFactory.h"
 #include "Scene.h"
 #include "TitleScene.h"
+#include "UIExplorerScene.h"
 #include "uuid.h"
 #include <SFML/System/Vector2.hpp>
 #include <memory>
@@ -45,6 +46,11 @@ SceneFactory::CreateEmptyScene(const SceneType scene_type) {
   case SceneType::CRAFTING: {
     auto crafting_ptr = new CraftingScene(m_game_context);
     scene_ptr = std::unique_ptr<CraftingScene>(crafting_ptr);
+    return scene_ptr;
+  }
+  case SceneType::UI_EXPLORER: {
+    auto explorer_ptr = new UIExplorerScene(m_game_context);
+    scene_ptr = std::unique_ptr<UIExplorerScene>(explorer_ptr);
     return scene_ptr;
   }
   default: {
@@ -246,6 +252,43 @@ SceneFactory::ConfigureLogicMap(Scene &scene) {
   scene.m_scene_resources.logic_map = std::move(logic_map_result.value());
 
   return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::unique_ptr<Scene>, FailInfo>
+SceneFactory::CreateUIExplorerScene() {
+
+  // Step 1: Create the scene instance directly (no data file required)
+  auto explorer_ptr = new UIExplorerScene(m_game_context);
+  std::unique_ptr<Scene> scene = std::unique_ptr<UIExplorerScene>(explorer_ptr);
+
+  // Step 2: Assign a new UUID and set the scene type
+  scene->GetSceneInfo().id = uuids::uuid_system_generator{}();
+  scene->GetSceneInfo().type = SceneType::UI_EXPLORER;
+
+  // Step 3: Create a 1280×720 render texture
+  static constexpr uint32_t kWidth = 1280u;
+  static constexpr uint32_t kHeight = 720u;
+  if (!scene->m_scene_resources.scene_texture.resize(
+          sf::Vector2u{kWidth, kHeight})) {
+    return std::unexpected(
+        FailInfo{FailMode::ResourceCreationFailure,
+                 "UIExplorerScene: failed to create 1280x720 render texture"});
+  }
+
+  // Step 4: Configure an empty logic collection
+  // UIExplorerScene overrides sRender/sCollision/sAction directly.
+  scene->m_scene_resources.logic_map.clear();
+  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Collision,
+                                             logic::LogicVector{});
+  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Action,
+                                             logic::LogicVector{});
+  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Render,
+                                             logic::LogicVector{});
+  scene->m_scene_resources.logic_map.emplace(logic::LogicGrouping::Movement,
+                                             logic::LogicVector{});
+
+  return scene;
 }
 
 } // namespace steamrot

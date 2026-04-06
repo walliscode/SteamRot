@@ -17,6 +17,7 @@ add_library(matchers
   SceneCollectionDataEqualsMatcher.cpp
   EngineSnapshotEqualsMatcher.cpp
   Vector2fEqualsMatcher.cpp
+  PixelImageEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
@@ -32,4 +33,5 @@ PUBLIC
   events
   conmat
   magic_enum
+  SFML::Graphics
 )

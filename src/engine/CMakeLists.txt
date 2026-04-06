@@ -3,6 +3,7 @@ add_library(engine
     Engine.cpp
     GameEngine.cpp
     engine_configuration.cpp
+    SandboxEngine.cpp
 )
 
 
