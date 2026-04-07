@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
-#include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
@@ -29,11 +28,10 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements does nothing when element has "
 
   // Act - should not modify anything, just not crash
   steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(panel,
-                                                                          style);
+                                                                         style);
 
   // Assert - panel remains unchanged
-  REQUIRE_THAT(panel.position,
-               steamrot::tests::EqualsVector2f({10.0f, 10.0f}));
+  REQUIRE_THAT(panel.position, steamrot::tests::EqualsVector2f({10.0f, 10.0f}));
   REQUIRE_THAT(panel.size, steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
 }
 
@@ -58,7 +56,7 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions Vertical layout "
 
   // Act
   steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                          style);
+                                                                         style);
 
   // Assert
   // available_width = 200 - 2*5 - 2*10 = 170
@@ -100,7 +98,7 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions Horizontal layout "
 
   // Act
   steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                          style);
+                                                                         style);
 
   // Assert
   // available_width = 300 - 2*5 - 2*10 = 270
@@ -111,13 +109,15 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions Horizontal layout "
   float available_height = 100.0f - 2 * 5.0f - 2 * 10.0f;
   float child_width = (available_width - 1 * 10.0f) / 2.0f;
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({child_width, available_height}));
+  REQUIRE_THAT(
+      parent.child_elements[0]->size,
+      steamrot::tests::EqualsVector2f({child_width, available_height}));
   REQUIRE_THAT(parent.child_elements[0]->position,
                steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
 
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f({child_width, available_height}));
+  REQUIRE_THAT(
+      parent.child_elements[1]->size,
+      steamrot::tests::EqualsVector2f({child_width, available_height}));
   REQUIRE_THAT(
       parent.child_elements[1]->position,
       steamrot::tests::EqualsVector2f({15.0f + child_width + 10.0f, 15.0f}));
@@ -142,7 +142,7 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions DropDown layout "
 
   // Act
   steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                          style);
+                                                                         style);
 
   // Assert
   // available_width = 200 - 2*5 = 190
@@ -151,18 +151,18 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions DropDown layout "
   float available_width = 200.0f - 2 * 5.0f;
   float available_height = 50.0f - 2 * 5.0f;
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f(
-                   {available_width, available_height}));
+  REQUIRE_THAT(
+      parent.child_elements[0]->size,
+      steamrot::tests::EqualsVector2f({available_width, available_height}));
   REQUIRE_THAT(parent.child_elements[0]->position,
                steamrot::tests::EqualsVector2f({5.0f, 5.0f}));
 
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f(
-                   {available_width, available_height}));
-  REQUIRE_THAT(parent.child_elements[1]->position,
-               steamrot::tests::EqualsVector2f(
-                   {5.0f, 5.0f + available_height}));
+  REQUIRE_THAT(
+      parent.child_elements[1]->size,
+      steamrot::tests::EqualsVector2f({available_width, available_height}));
+  REQUIRE_THAT(
+      parent.child_elements[1]->position,
+      steamrot::tests::EqualsVector2f({5.0f, 5.0f + available_height}));
 }
 
 TEST_CASE("UpdateSizeAndPositionOfChildElements positions "
@@ -199,18 +199,17 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements positions "
   float dd_list_width = available_width * (1.0f - ratio);
   float dd_button_width = available_width * ratio;
 
-  REQUIRE_THAT(dd_container.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f(
-                   {dd_list_width, available_height}));
+  REQUIRE_THAT(
+      dd_container.child_elements[0]->size,
+      steamrot::tests::EqualsVector2f({dd_list_width, available_height}));
   REQUIRE_THAT(dd_container.child_elements[0]->position,
                steamrot::tests::EqualsVector2f({2.0f, 2.0f}));
 
-  REQUIRE_THAT(dd_container.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f(
-                   {dd_button_width, available_height}));
+  REQUIRE_THAT(
+      dd_container.child_elements[1]->size,
+      steamrot::tests::EqualsVector2f({dd_button_width, available_height}));
   REQUIRE_THAT(dd_container.child_elements[1]->position,
-               steamrot::tests::EqualsVector2f(
-                   {2.0f + dd_list_width, 2.0f}));
+               steamrot::tests::EqualsVector2f({2.0f + dd_list_width, 2.0f}));
 }
 
 TEST_CASE("PositionNestedUIElements recursively positions active children",

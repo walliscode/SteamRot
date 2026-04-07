@@ -13,8 +13,8 @@
     }
   },
   "engine_resources_config": {
-    "window_width": 1270,
-    "window_height": 800,
+    "window_width": 800,
+    "window_height": 600,
     "window_title": "SteamRot",
     "framerate_limit": 60
   },
