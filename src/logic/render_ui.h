@@ -32,6 +32,9 @@ namespace steamrot::logic::render::ui {
 /////////////////////////////////////////////////
 /// @brief Draw nested UI elements recursively to a render texture
 ///
+/// Positioning of child elements must be calculated before calling this
+/// function (see positioning_ui.h).
+///
 /// @param texture Render texture to draw to
 /// @param element Element to draw
 /// @param style Style to use for drawing
@@ -139,8 +142,5 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,
               const sf::Color &color);
-
-void UpdateSizeAndPositionOfChildElements(const UIElement &element,
-                                          const UIStyle &style);
 
 } // namespace steamrot::logic::render::ui
