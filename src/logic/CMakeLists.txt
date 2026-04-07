@@ -4,6 +4,7 @@ add_library(logic
   UICollisionLogic.cpp
   UIActionLogic.cpp
   UIStateLogic.cpp
+  UIPositioningLogic.cpp
   Logic.cpp
 
 
@@ -22,6 +23,8 @@ add_library(logic
   action_grimoire_machina.cpp
 
   positioning_grimoire_machina.cpp
+
+  positioning_ui.cpp
 
   collision_mouse.cpp
 )

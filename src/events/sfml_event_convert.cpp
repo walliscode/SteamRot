@@ -39,4 +39,19 @@ ResolveInputAction(const UserInputBitset &accumulated,
   return std::nullopt;
 }
 
+/////////////////////////////////////////////////
+bool CollectSystemEvents(const std::vector<sf::Event> &sfml_events) {
+  for (const auto &event : sfml_events) {
+    if (event.is<sf::Event::Closed>()) {
+      return true;
+    }
+    if (const auto *key_pressed = event.getIf<sf::Event::KeyPressed>()) {
+      if (key_pressed->code == sf::Keyboard::Key::Escape) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 } // namespace steamrot::events::convert
