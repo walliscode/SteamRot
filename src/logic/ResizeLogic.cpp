@@ -57,8 +57,13 @@ void ResizeLogic::ProcessLogic() {
       continue;
     }
 
-    resize::ResizeSceneTexture(m_scene_context.scene_texture,
-                               system_payload.optional_resize_size.value());
+    auto resize_result = resize::ResizeSceneTexture(
+        m_scene_context.scene_texture,
+        system_payload.optional_resize_size.value());
+    if (!resize_result.has_value()) {
+      // resize failed; skip remaining processing for this subscriber
+      continue;
+    }
   }
 }
 

@@ -37,8 +37,10 @@ TEST_CASE("resize::ResizeSceneTexture updates texture to the given size",
   sf::RenderTexture texture;
   REQUIRE(texture.resize({50u, 50u}));
 
-  steamrot::logic::resize::ResizeSceneTexture(texture, {1920u, 1080u});
+  auto result =
+      steamrot::logic::resize::ResizeSceneTexture(texture, {1920u, 1080u});
 
+  REQUIRE(result.has_value());
   REQUIRE(texture.getSize().x == 1920u);
   REQUIRE(texture.getSize().y == 1080u);
 }
