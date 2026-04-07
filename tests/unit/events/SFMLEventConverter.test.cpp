@@ -108,3 +108,43 @@ TEST_CASE("SFMLEventConverter::ConvertSFMLEvents resets waiting-room bitset "
   auto result2 = converter.ConvertSFMLEvents({});
   REQUIRE(result2.empty());
 }
+
+TEST_CASE("SFMLEventConverter::ConvertSFMLEvents emits SYSTEM QUIT packet "
+          "when window is closed",
+          "[unit][SFMLEventConverter]") {
+  steamrot::SFMLEventConverter converter;
+
+  std::vector<sf::Event> events{sf::Event{sf::Event::Closed{}}};
+  auto result = converter.ConvertSFMLEvents(events);
+
+  REQUIRE(result.size() == 1);
+  REQUIRE(result[0].type == steamrot::EventType::SYSTEM);
+
+  auto *payload = std::get_if<steamrot::SystemPayload>(&result[0].payload);
+  REQUIRE(payload != nullptr);
+  REQUIRE(payload->action == steamrot::SystemPayload::SystemAction::QUIT);
+}
+
+TEST_CASE("SFMLEventConverter::ConvertSFMLEvents emits SYSTEM QUIT packet "
+          "when Escape key is pressed",
+          "[unit][SFMLEventConverter]") {
+  steamrot::SFMLEventConverter converter;
+
+  sf::Event::KeyPressed key_event;
+  key_event.code = sf::Keyboard::Key::Escape;
+  key_event.scancode = sf::Keyboard::Scan::Escape;
+  key_event.alt = false;
+  key_event.control = false;
+  key_event.shift = false;
+  key_event.system = false;
+
+  std::vector<sf::Event> events{sf::Event{key_event}};
+  auto result = converter.ConvertSFMLEvents(events);
+
+  REQUIRE(result.size() == 1);
+  REQUIRE(result[0].type == steamrot::EventType::SYSTEM);
+
+  auto *payload = std::get_if<steamrot::SystemPayload>(&result[0].payload);
+  REQUIRE(payload != nullptr);
+  REQUIRE(payload->action == steamrot::SystemPayload::SystemAction::QUIT);
+}

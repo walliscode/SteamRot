@@ -52,6 +52,8 @@ public:
   ///   2. Resolve an InputAction from the registry.
   ///   3. Create an EventPacket for each resolved action.
   ///   4. Reset the waiting-room bitset for the next tick.
+  ///   5. Collect system events (window close / Escape key).
+  ///   6. Emit a SYSTEM QUIT EventPacket if a quit event was detected.
   ///
   /// @param sfml_events SFML events gathered this tick.
   /// @return EventPackets to be added to the EventHandler waiting room.

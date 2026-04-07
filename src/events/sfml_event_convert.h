@@ -51,4 +51,15 @@ std::optional<InputPayload::InputAction>
 ResolveInputAction(const UserInputBitset &accumulated,
                    const InputActionRegistry &registry);
 
+/////////////////////////////////////////////////
+/// @brief Collect system-level SFML events (window close and Escape key).
+///
+/// Checks for sf::Event::Closed and sf::Event::KeyPressed with the Escape
+/// key.  Either of these signals that the user wants to quit the application.
+///
+/// @param sfml_events Vector of SFML events gathered this tick.
+/// @return true if a QUIT-triggering event was found, false otherwise.
+/////////////////////////////////////////////////
+bool CollectSystemEvents(const std::vector<sf::Event> &sfml_events);
+
 } // namespace steamrot::events::convert

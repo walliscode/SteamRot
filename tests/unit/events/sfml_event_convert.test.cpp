@@ -157,3 +157,57 @@ TEST_CASE("ResolveInputAction does not match an all-zeros pattern",
       steamrot::events::convert::ResolveInputAction(accumulated, registry);
   REQUIRE_FALSE(result.has_value());
 }
+
+// ---------------------------------------------------------------------------
+// CollectSystemEvents
+// ---------------------------------------------------------------------------
+
+TEST_CASE("CollectSystemEvents returns false for empty event list",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> no_events;
+  REQUIRE_FALSE(steamrot::events::convert::CollectSystemEvents(no_events));
+}
+
+TEST_CASE("CollectSystemEvents returns true for sf::Event::Closed",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> events{sf::Event{sf::Event::Closed{}}};
+  REQUIRE(steamrot::events::convert::CollectSystemEvents(events));
+}
+
+TEST_CASE("CollectSystemEvents returns true when Escape key is pressed",
+          "[unit][sfml_event_convert]") {
+  sf::Event::KeyPressed key_event;
+  key_event.code = sf::Keyboard::Key::Escape;
+  key_event.scancode = sf::Keyboard::Scan::Escape;
+  key_event.alt = false;
+  key_event.control = false;
+  key_event.shift = false;
+  key_event.system = false;
+
+  std::vector<sf::Event> events{sf::Event{key_event}};
+  REQUIRE(steamrot::events::convert::CollectSystemEvents(events));
+}
+
+TEST_CASE("CollectSystemEvents returns false for non-quit keyboard event",
+          "[unit][sfml_event_convert]") {
+  sf::Event::KeyPressed key_event;
+  key_event.code = sf::Keyboard::Key::A;
+  key_event.scancode = sf::Keyboard::Scan::A;
+  key_event.alt = false;
+  key_event.control = false;
+  key_event.shift = false;
+  key_event.system = false;
+
+  std::vector<sf::Event> events{sf::Event{key_event}};
+  REQUIRE_FALSE(steamrot::events::convert::CollectSystemEvents(events));
+}
+
+TEST_CASE("CollectSystemEvents returns false for mouse events",
+          "[unit][sfml_event_convert]") {
+  sf::Event::MouseButtonPressed mouse_event;
+  mouse_event.button = sf::Mouse::Button::Left;
+  mouse_event.position = {0, 0};
+
+  std::vector<sf::Event> events{sf::Event{mouse_event}};
+  REQUIRE_FALSE(steamrot::events::convert::CollectSystemEvents(events));
+}
