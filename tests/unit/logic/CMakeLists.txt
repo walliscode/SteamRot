@@ -13,6 +13,8 @@ positioning_grimoire_machina.test.cpp
 collision_mouse.test.cpp
 pixel_render.test.cpp
 
+resize_logic.test.cpp
+
 )
 
 target_include_directories(test_logic

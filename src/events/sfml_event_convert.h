@@ -51,4 +51,18 @@ std::optional<InputPayload::InputAction>
 ResolveInputAction(const UserInputBitset &accumulated,
                    const InputActionRegistry &registry);
 
+/////////////////////////////////////////////////
+/// @brief Convert sf::Event::Resized events into SystemPayload RESIZE packets.
+///
+/// Scans the provided SFML events for any Resized event and converts the
+/// first one found into an EventPacket with a SystemPayload carrying the
+/// new window size.
+///
+/// @param sfml_events Vector of SFML events gathered this tick.
+/// @return An EventPacket with SystemAction::RESIZE, or std::nullopt if no
+///         resize event was found.
+/////////////////////////////////////////////////
+std::optional<EventPacket>
+ConvertResizeEvents(const std::vector<sf::Event> &sfml_events);
+
 } // namespace steamrot::events::convert

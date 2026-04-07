@@ -13,6 +13,7 @@
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
 #include "LogicType.h"
+#include "ResizeLogic.h"
 #include "UIActionLogic.h"
 #include "UICollisionLogic.h"
 #include "UIRenderLogic.h"
@@ -146,6 +147,9 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     logic_ptr =
         std::make_unique<logic::GrimoireMachinaCollisionLogic>(m_scene_context);
     break;
+  case LogicType::Resize:
+    logic_ptr = std::make_unique<ResizeLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -219,7 +223,8 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
   // These are compile-time constants that define the scene's Logic
   // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
-  static constexpr std::array action_logic_types = {LogicType::UIAction,
+  static constexpr std::array action_logic_types = {LogicType::Resize,
+                                                    LogicType::UIAction,
                                                     LogicType::UIState};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
 
@@ -264,7 +269,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::UICollision, LogicType::GrimoireMachinaCollision};
 
   static constexpr std::array action_logic_types = {
-      LogicType::UIAction, LogicType::UIState,
+      LogicType::Resize, LogicType::UIAction, LogicType::UIState,
       LogicType::GrimoireMachinaAction};
 
   static constexpr std::array render_logic_types = {
@@ -319,7 +324,8 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
   // These are compile-time constants that define the scene's Logic
   // configuration
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
-  static constexpr std::array action_logic_types = {LogicType::UIAction};
+  static constexpr std::array action_logic_types = {LogicType::Resize,
+                                                    LogicType::UIAction};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
 
   // Add Logics to collection using the helper function

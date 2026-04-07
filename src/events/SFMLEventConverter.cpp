@@ -41,6 +41,12 @@ SFMLEventConverter::ConvertSFMLEvents(const std::vector<sf::Event> &sfml_events)
   // Step 4: Reset the waiting-room bitset for the next tick.
   m_waiting_room_bitset.reset();
 
+  // Step 5: Convert any sf::Event::Resized into a RESIZE SystemPayload packet.
+  auto resize_packet = events::convert::ConvertResizeEvents(sfml_events);
+  if (resize_packet.has_value()) {
+    result.push_back(resize_packet.value());
+  }
+
   return result;
 }
 

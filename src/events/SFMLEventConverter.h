@@ -52,6 +52,7 @@ public:
   ///   2. Resolve an InputAction from the registry.
   ///   3. Create an EventPacket for each resolved action.
   ///   4. Reset the waiting-room bitset for the next tick.
+  ///   5. Convert any sf::Event::Resized into a RESIZE SystemPayload packet.
   ///
   /// @param sfml_events SFML events gathered this tick.
   /// @return EventPackets to be added to the EventHandler waiting room.

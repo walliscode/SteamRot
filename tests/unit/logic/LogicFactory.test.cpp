@@ -12,6 +12,7 @@
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
 #include "GrimoireMachinaRenderLogic.h"
+#include "ResizeLogic.h"
 #include "TestFixture.h"
 #include "TestLogic.h"
 #include "UIActionLogic.h"
@@ -84,11 +85,13 @@ TEST_CASE(
     FAIL("LogicCollection does not contain Action LogicType");
   }
   const auto &action_logics = action_it->second;
-  REQUIRE(action_logics.size() == 2);
+  REQUIRE(action_logics.size() == 3);
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[0].get()));
+      dynamic_cast<steamrot::logic::ResizeLogic *>(action_logics[0].get()));
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
+      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[1].get()));
+  REQUIRE(
+      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[2].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
@@ -136,13 +139,15 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Action LogicType");
   }
   const auto &action_logics = action_it->second;
-  REQUIRE(action_logics.size() == 3);
+  REQUIRE(action_logics.size() == 4);
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[0].get()));
+      dynamic_cast<steamrot::logic::ResizeLogic *>(action_logics[0].get()));
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
+      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[1].get()));
+  REQUIRE(
+      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[2].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
-      action_logics[2].get()));
+      action_logics[3].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);

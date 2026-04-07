@@ -108,3 +108,68 @@ TEST_CASE("SFMLEventConverter::ConvertSFMLEvents resets waiting-room bitset "
   auto result2 = converter.ConvertSFMLEvents({});
   REQUIRE(result2.empty());
 }
+
+TEST_CASE(
+    "SFMLEventConverter::ConvertSFMLEvents converts sf::Event::Resized to a "
+    "SYSTEM RESIZE EventPacket",
+    "[unit][SFMLEventConverter]") {
+  steamrot::SFMLEventConverter converter;
+
+  sf::Event::Resized resized_event;
+  resized_event.size = {1280u, 720u};
+  std::vector<sf::Event> sfml_events{sf::Event{resized_event}};
+
+  auto result = converter.ConvertSFMLEvents(sfml_events);
+
+  REQUIRE(result.size() == 1);
+  REQUIRE(result[0].type == steamrot::EventType::SYSTEM);
+
+  auto *payload = std::get_if<steamrot::SystemPayload>(&result[0].payload);
+  REQUIRE(payload != nullptr);
+  REQUIRE(payload->action == steamrot::SystemPayload::SystemAction::RESIZE);
+  REQUIRE(payload->optional_resize_size.has_value());
+  REQUIRE(payload->optional_resize_size->x == 1280u);
+  REQUIRE(payload->optional_resize_size->y == 720u);
+}
+
+TEST_CASE("SFMLEventConverter::ConvertSFMLEvents emits both InputPayload and "
+          "RESIZE packets when both events are present",
+          "[unit][SFMLEventConverter]") {
+  steamrot::InputActionRegistry registry;
+  steamrot::UserInputBitset pattern;
+  pattern.setMousePressed(sf::Mouse::Button::Left);
+  registry.emplace(pattern, steamrot::InputPayload::InputAction::SELECT);
+
+  steamrot::SFMLEventConverter converter;
+  converter.SetInputActionRegistry(std::move(registry));
+
+  sf::Event::MouseButtonPressed press;
+  press.button = sf::Mouse::Button::Left;
+  press.position = {0, 0};
+  sf::Event::Resized resized_event;
+  resized_event.size = {800u, 600u};
+
+  std::vector<sf::Event> sfml_events{sf::Event{press},
+                                     sf::Event{resized_event}};
+
+  auto result = converter.ConvertSFMLEvents(sfml_events);
+
+  REQUIRE(result.size() == 2);
+
+  bool found_input = false;
+  bool found_resize = false;
+  for (const auto &packet : result) {
+    if (packet.type == steamrot::EventType::USER_INPUT) {
+      found_input = true;
+    }
+    if (packet.type == steamrot::EventType::SYSTEM) {
+      auto *sys = std::get_if<steamrot::SystemPayload>(&packet.payload);
+      if (sys &&
+          sys->action == steamrot::SystemPayload::SystemAction::RESIZE) {
+        found_resize = true;
+      }
+    }
+  }
+  REQUIRE(found_input);
+  REQUIRE(found_resize);
+}

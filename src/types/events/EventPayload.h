@@ -10,6 +10,7 @@
 
 #include "SceneType.h"
 #include "uuid.h"
+#include <SFML/System/Vector2.hpp>
 #include <optional>
 #include <string>
 #include <variant>
@@ -186,7 +187,7 @@ struct SystemPayload {
   /// @brief SystemAction enum provides the name of the system action being
   /// triggered
   /////////////////////////////////////////////////
-  enum class SystemAction { NONE, QUIT } action;
+  enum class SystemAction { NONE, QUIT, RESIZE } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for SystemPayload, sets action to NONE
@@ -200,6 +201,21 @@ struct SystemPayload {
   /// @param action SystemAction enum value to set the action member to
   /////////////////////////////////////////////////
   SystemPayload(const SystemPayload::SystemAction action) : action(action) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for SystemPayload with a resize size.
+  ///
+  /// @param action SystemAction enum value (should be RESIZE)
+  /// @param new_size The new window size after resizing
+  /////////////////////////////////////////////////
+  SystemPayload(const SystemPayload::SystemAction action,
+                const sf::Vector2u new_size)
+      : action(action), optional_resize_size(new_size) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Optional new window size, populated when action is RESIZE
+  /////////////////////////////////////////////////
+  std::optional<sf::Vector2u> optional_resize_size{std::nullopt};
 };
 
 using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,

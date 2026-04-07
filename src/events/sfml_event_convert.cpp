@@ -7,6 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "sfml_event_convert.h"
+#include "EventContext.h"
+#include "EventType.h"
 #include "InputActionRegistry.h"
 #include "UserInputBitset.h"
 #include <bitset>
@@ -36,6 +38,20 @@ ResolveInputAction(const UserInputBitset &accumulated,
     }
   }
 
+  return std::nullopt;
+}
+
+/////////////////////////////////////////////////
+std::optional<EventPacket>
+ConvertResizeEvents(const std::vector<sf::Event> &sfml_events) {
+  for (const auto &event : sfml_events) {
+    if (const auto *resized = event.getIf<sf::Event::Resized>()) {
+      EventContext context{1};
+      SystemPayload payload{SystemPayload::SystemAction::RESIZE,
+                            resized->size};
+      return EventPacket{context, EventType::SYSTEM, payload};
+    }
+  }
   return std::nullopt;
 }
 

@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPayload.h"
+#include "EventType.h"
 #include "InputActionRegistry.h"
 #include "UserInputBitset.h"
 #include "sfml_event_convert.h"
@@ -156,4 +157,66 @@ TEST_CASE("ResolveInputAction does not match an all-zeros pattern",
   auto result =
       steamrot::events::convert::ResolveInputAction(accumulated, registry);
   REQUIRE_FALSE(result.has_value());
+}
+
+// ---------------------------------------------------------------------------
+// ConvertResizeEvents
+// ---------------------------------------------------------------------------
+
+TEST_CASE("ConvertResizeEvents returns nullopt for empty event list",
+          "[unit][sfml_event_convert]") {
+  std::vector<sf::Event> no_events;
+  auto result = steamrot::events::convert::ConvertResizeEvents(no_events);
+  REQUIRE_FALSE(result.has_value());
+}
+
+TEST_CASE("ConvertResizeEvents returns nullopt when no resize event present",
+          "[unit][sfml_event_convert]") {
+  sf::Event::MouseButtonPressed press;
+  press.button = sf::Mouse::Button::Left;
+  press.position = {0, 0};
+  std::vector<sf::Event> events{sf::Event{press}};
+
+  auto result = steamrot::events::convert::ConvertResizeEvents(events);
+  REQUIRE_FALSE(result.has_value());
+}
+
+TEST_CASE("ConvertResizeEvents converts sf::Event::Resized to RESIZE "
+          "SystemPayload packet",
+          "[unit][sfml_event_convert]") {
+  sf::Event::Resized resized_event;
+  resized_event.size = {1920u, 1080u};
+  std::vector<sf::Event> events{sf::Event{resized_event}};
+
+  auto result = steamrot::events::convert::ConvertResizeEvents(events);
+
+  REQUIRE(result.has_value());
+  REQUIRE(result->type == steamrot::EventType::SYSTEM);
+
+  auto *payload = std::get_if<steamrot::SystemPayload>(&result->payload);
+  REQUIRE(payload != nullptr);
+  REQUIRE(payload->action == steamrot::SystemPayload::SystemAction::RESIZE);
+  REQUIRE(payload->optional_resize_size.has_value());
+  REQUIRE(payload->optional_resize_size->x == 1920u);
+  REQUIRE(payload->optional_resize_size->y == 1080u);
+}
+
+TEST_CASE("ConvertResizeEvents returns first resize event when multiple are "
+          "present",
+          "[unit][sfml_event_convert]") {
+  sf::Event::Resized first_resize;
+  first_resize.size = {800u, 600u};
+  sf::Event::Resized second_resize;
+  second_resize.size = {1280u, 720u};
+
+  std::vector<sf::Event> events{sf::Event{first_resize},
+                                 sf::Event{second_resize}};
+
+  auto result = steamrot::events::convert::ConvertResizeEvents(events);
+
+  REQUIRE(result.has_value());
+  auto *payload = std::get_if<steamrot::SystemPayload>(&result->payload);
+  REQUIRE(payload != nullptr);
+  REQUIRE(payload->optional_resize_size->x == 800u);
+  REQUIRE(payload->optional_resize_size->y == 600u);
 }
