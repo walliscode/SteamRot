@@ -258,4 +258,28 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     event_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
+
+  SECTION("Matching JointTag selections match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::JointTag{"square"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::JointTag{"square"};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Different JointTag keys do not match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::JointTag{"square"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::JointTag{"circle"};
+    REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("JointTag and FragmentTag with same key do not match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::JointTag{"copper"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::FragmentTag{"copper"};
+    REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
 }

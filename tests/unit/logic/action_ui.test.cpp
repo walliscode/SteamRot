@@ -320,6 +320,84 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
   }
 }
 
+TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
+          "joint dropdowns",
+          "[unit][logic][action][ProcessDropDownListElementActions]") {
+  // set up
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up empty GrimoireMachina: " +
+         set_up_result.error().message);
+  }
+  steamrot::DropDownListElement dropdown;
+  REQUIRE(dropdown.child_elements.size() == 0);
+
+  SECTION("No population when DataPopulationFunction::GetAllJointNames is set "
+          "but is_expanded is false") {
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllJointNames;
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+    REQUIRE(dropdown.child_elements.size() == 0);
+  }
+
+  SECTION("DropDownItemElements are added when "
+          "DataPopulationFunction::GetAllJointNames is set and is_expanded "
+          "is true") {
+
+    auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+    if (!get_grimoire_result.has_value()) {
+      FAIL("Failed to get GrimoireMachina from AssetManager: " +
+           get_grimoire_result.error().message);
+    }
+    steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
+
+    grimoire_machina.m_all_joints.clear();
+    grimoire_machina.m_all_joints.insert({"joint1", steamrot::Joint{}});
+    grimoire_machina.m_all_joints.insert({"joint2", steamrot::Joint{}});
+    grimoire_machina.m_all_joints.insert({"joint3", steamrot::Joint{}});
+
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllJointNames;
+    dropdown.is_expanded = true;
+
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+
+    REQUIRE(dropdown.child_elements.size() == 3);
+    for (const auto &child : dropdown.child_elements) {
+      REQUIRE(dynamic_cast<steamrot::DropDownItemElement *>(child.get()) !=
+              nullptr);
+    }
+  }
+
+  SECTION("children_active is set to true when joint list expands and items "
+          "are populated") {
+
+    auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+    if (!get_grimoire_result.has_value()) {
+      FAIL("Failed to get GrimoireMachina from AssetManager: " +
+           get_grimoire_result.error().message);
+    }
+    steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
+    grimoire_machina.m_all_joints.clear();
+    grimoire_machina.m_all_joints.insert({"joint1", steamrot::Joint{}});
+
+    dropdown.data_population_function =
+        steamrot::DataPopulationFunction::GetAllJointNames;
+    dropdown.is_expanded = true;
+    REQUIRE_FALSE(dropdown.children_active);
+
+    steamrot::logic::action::ui::ProcessDropDownListElementActions(
+        dropdown, scene_context);
+
+    REQUIRE(dropdown.children_active);
+    REQUIRE(dropdown.child_elements.size() == 1);
+  }
+}
+
 TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions manages "
           "list children_active and population on expand and collapse",
           "[logic][action][ProcessDropDownContainerElementActions]") {

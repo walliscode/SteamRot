@@ -257,6 +257,30 @@ TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
           "iron_fragment");
 }
 
+TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
+          "GhostPayload (JointTag)",
+          "[unit][events][event_factory]") {
+  const uint8_t lifetime = 3;
+  const auto action = steamrot::GhostPayload::GhostAction::SELECT;
+  const steamrot::GhostSelection selection = steamrot::JointTag{"iron_joint"};
+
+  auto result =
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
+
+  REQUIRE(result.has_value());
+  const auto &packet = result.value();
+
+  REQUIRE(packet.context.lifetime == lifetime);
+  REQUIRE(packet.type == steamrot::EventType::GHOST);
+  REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
+
+  const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
+  REQUIRE(payload.action == action);
+  REQUIRE(std::holds_alternative<steamrot::JointTag>(payload.m_selection));
+  REQUIRE(std::get<steamrot::JointTag>(payload.m_selection).key ==
+          "iron_joint");
+}
+
 TEST_CASE("CreateGhostEventPacket: Creates packet with CLEAR action",
           "[unit][events][event_factory]") {
   const uint8_t lifetime = 1;
