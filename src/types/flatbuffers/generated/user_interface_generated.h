@@ -304,9 +304,7 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CHILDREN_ACTIVE = 12,
     VT_CHILDREN = 14,
     VT_IS_MOUSE_OVER = 16,
-    VT_LAYOUT = 18,
-    VT_SPACING_STRATEGY = 20,
-    VT_PRIORITY = 22
+    VT_PRIORITY = 18
   };
   const steamrot::Vector2fDataFbs *position() const {
     return GetPointer<const steamrot::Vector2fDataFbs *>(VT_POSITION);
@@ -329,12 +327,6 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool is_mouse_over() const {
     return GetField<uint8_t>(VT_IS_MOUSE_OVER, 0) != 0;
   }
-  steamrot::LayoutFbs layout() const {
-    return static_cast<steamrot::LayoutFbs>(GetField<int8_t>(VT_LAYOUT, 0));
-  }
-  steamrot::SpacingAndSizingFbs spacing_strategy() const {
-    return static_cast<steamrot::SpacingAndSizingFbs>(GetField<int8_t>(VT_SPACING_STRATEGY, 0));
-  }
   int32_t priority() const {
     return GetField<int32_t>(VT_PRIORITY, 0);
   }
@@ -354,8 +346,6 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOUSE_OVER, 1) &&
-           VerifyField<int8_t>(verifier, VT_LAYOUT, 1) &&
-           VerifyField<int8_t>(verifier, VT_SPACING_STRATEGY, 1) &&
            VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
            verifier.EndTable();
   }
@@ -386,12 +376,6 @@ struct UIElementDataFbsBuilder {
   void add_is_mouse_over(bool is_mouse_over) {
     fbb_.AddElement<uint8_t>(UIElementDataFbs::VT_IS_MOUSE_OVER, static_cast<uint8_t>(is_mouse_over), 0);
   }
-  void add_layout(steamrot::LayoutFbs layout) {
-    fbb_.AddElement<int8_t>(UIElementDataFbs::VT_LAYOUT, static_cast<int8_t>(layout), 0);
-  }
-  void add_spacing_strategy(steamrot::SpacingAndSizingFbs spacing_strategy) {
-    fbb_.AddElement<int8_t>(UIElementDataFbs::VT_SPACING_STRATEGY, static_cast<int8_t>(spacing_strategy), 0);
-  }
   void add_priority(int32_t priority) {
     fbb_.AddElement<int32_t>(UIElementDataFbs::VT_PRIORITY, priority, 0);
   }
@@ -418,8 +402,6 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbs(
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ChildDataFbs>>> children = 0,
     bool is_mouse_over = false,
-    steamrot::LayoutFbs layout = steamrot::LayoutFbs_None,
-    steamrot::SpacingAndSizingFbs spacing_strategy = steamrot::SpacingAndSizingFbs_None,
     int32_t priority = 0) {
   UIElementDataFbsBuilder builder_(_fbb);
   builder_.add_priority(priority);
@@ -442,8 +424,6 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::ChildDataFbs>> *children = nullptr,
     bool is_mouse_over = false,
-    steamrot::LayoutFbs layout = steamrot::LayoutFbs_None,
-    steamrot::SpacingAndSizingFbs spacing_strategy = steamrot::SpacingAndSizingFbs_None,
     int32_t priority = 0) {
   auto response_event_data__ = response_event_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*response_event_data) : 0;
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ChildDataFbs>>(*children) : 0;
@@ -456,8 +436,6 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
       children_active,
       children__,
       is_mouse_over,
-      layout,
-      spacing_strategy,
       priority);
 }
 
