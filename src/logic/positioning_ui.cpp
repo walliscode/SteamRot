@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
 #include "DropDownContainerElement.h"
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::ui {
 
@@ -25,42 +26,6 @@ sf::Vector2f CalculateStartPosition(const sf::Vector2f &element_position,
                                     const sf::Vector2f &inner_margin) {
   return {element_position.x + border_thickness + inner_margin.x,
           element_position.y + border_thickness + inner_margin.y};
-}
-
-/////////////////////////////////////////////////
-void PositionDropDownContainerChildren(const DropDownContainerElement &element,
-                                       const UIStyle &style) {
-  float border_thickness = style.drop_down_container_style.border_thickness;
-  float ratio = style.drop_down_container_style.drop_symbol_ratio;
-
-  // ignore inner margins for dropdown container children
-  sf::Vector2f available_size =
-      CalculateAvailableSize(element.size, border_thickness);
-  sf::Vector2f start_position =
-      CalculateStartPosition(element.position, border_thickness);
-
-  // calculate the size and position of the dropdown list (child 0)
-  sf::Vector2f dd_list_size{available_size.x * (1 - ratio), available_size.y};
-  if (!element.child_elements.empty()) {
-    element.child_elements[0]->size = dd_list_size;
-    element.child_elements[0]->position = start_position;
-  }
-
-  // calculate the size and position of the dropdown button (child 1)
-  sf::Vector2f dd_button_position{start_position.x + dd_list_size.x,
-                                  start_position.y};
-  sf::Vector2f dd_button_size{available_size.x * ratio, available_size.y};
-  if (element.child_elements.size() > 1) {
-    element.child_elements[1]->size = dd_button_size;
-    element.child_elements[1]->position = dd_button_position;
-  }
-
-  // position the DropDownListElement children
-  // this assumes that if it has any children they are all DropDownItemElements
-  if (!element.child_elements.empty()) {
-    // PositionDropDownListChildren(element.child_elements[0]->child_elements,
-    //                              style);
-  }
 }
 
 /////////////////////////////////////////////////
@@ -120,7 +85,43 @@ void PositionHorizontalLayoutChildren(const UIElement &element,
                      start_position.y};
   }
 }
+/////////////////////////////////////////////////
+void PositionDropDownContainerChildren(const DropDownContainerElement &element,
+                                       const UIStyle &style) {
+  float border_thickness = style.drop_down_container_style.border_thickness;
+  float ratio = style.drop_down_container_style.drop_symbol_ratio;
 
+  // ignore inner margins for dropdown container children
+  sf::Vector2f available_size =
+      CalculateAvailableSize(element.size, border_thickness);
+  sf::Vector2f start_position =
+      CalculateStartPosition(element.position, border_thickness);
+
+  // calculate the size and position of the dropdown list (child 0)
+  sf::Vector2f dd_list_size{available_size.x * (1 - ratio), available_size.y};
+  if (!element.child_elements.empty()) {
+    element.child_elements[0]->size = dd_list_size;
+    element.child_elements[0]->position = start_position;
+  }
+
+  // calculate the size and position of the dropdown button (child 1)
+  sf::Vector2f dd_button_position{start_position.x + dd_list_size.x,
+                                  start_position.y};
+  sf::Vector2f dd_button_size{available_size.x * ratio, available_size.y};
+  if (element.child_elements.size() > 1) {
+    element.child_elements[1]->size = dd_button_size;
+    element.child_elements[1]->position = dd_button_position;
+  }
+
+  // position the dropdown list children if not empty (assumed to be expanded if
+  // not empty)
+  if (!element.child_elements.empty()) {
+    sf::Vector2f dd_item_start_position{start_position.x,
+                                        start_position.y + dd_list_size.y};
+    PositionDropDownListChildren(element.child_elements[0]->child_elements,
+                                 dd_list_size, dd_item_start_position, style);
+  }
+}
 /////////////////////////////////////////////////
 void PositionDropDownListChildren(
     const std::vector<std::unique_ptr<UIElement>> &child_elements,
