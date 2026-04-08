@@ -173,12 +173,17 @@ TEST_CASE("FlatbuffersUIElementProvider handles element properties",
   REQUIRE(root_result.has_value());
   auto &root_element = root_result.value();
 
+  // cast to PanelElement to access properties
+  auto *panel_element =
+      dynamic_cast<steamrot::PanelElement *>(root_element.get());
+  REQUIRE(panel_element != nullptr);
+
   // Check root element basic properties
   REQUIRE(root_element->position.x == 10.0f);
   REQUIRE(root_element->position.y == 20.0f);
   REQUIRE(root_element->size.x == 100.0f);
   REQUIRE(root_element->size.y == 50.0f);
-  REQUIRE(root_element->layout == steamrot::Layout::Horizontal);
+  REQUIRE(panel_element->layout == steamrot::Layout::Horizontal);
 
   // Check a child element's properties (first button)
   auto &button = root_element->child_elements[0];

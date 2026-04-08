@@ -121,8 +121,6 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     }
   }
 
-  element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
-  element.layout = ConvertLayout(data.layout());
   element.children_active = data.children_active();
   element.priority = data.priority();
 
@@ -148,7 +146,10 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
-  // No extra fields for panel
+  // layout() and spacing_strategy() return scalar enum values (not pointers)
+  // so no null-check is required; missing fields default to 0 (None/None).
+  panel_element.layout = ConvertLayout(data.layout());
+  panel_element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
   return std::monostate{};
 }
 

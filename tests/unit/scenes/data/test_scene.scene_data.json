@@ -39,17 +39,15 @@
                         "y": 30.0
                       },
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "label": "Test Button"
                   }
                 }
-              ],
-              "layout": "Vertical",
-              "spacing_strategy": "Even"
-            }
+              ]
+            },
+            "layout": "Vertical",
+            "spacing_strategy": "Even"
           }
         }
       }

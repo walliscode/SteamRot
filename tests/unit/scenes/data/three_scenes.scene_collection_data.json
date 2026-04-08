@@ -29,9 +29,7 @@
                           "position": { "x": 250.0, "y": 150.0 },
                           "size": { "x": 200.0, "y": 50.0 },
                           "children_active": false,
-                          "children": [],
-                          "layout": "Horizontal",
-                          "spacing_strategy": "None"
+                          "children": []
                         },
                         "label": "Start Game"
                       }
@@ -43,17 +41,15 @@
                           "position": { "x": 250.0, "y": 220.0 },
                           "size": { "x": 200.0, "y": 50.0 },
                           "children_active": false,
-                          "children": [],
-                          "layout": "Horizontal",
-                          "spacing_strategy": "None"
+                          "children": []
                         },
                         "label": "Options"
                       }
                     }
-                  ],
-                  "layout": "Vertical",
-                  "spacing_strategy": "Even"
-                }
+                  ]
+                },
+                "layout": "Vertical",
+                "spacing_strategy": "Even"
               }
             }
           }
@@ -90,17 +86,15 @@
                           "position": { "x": 20.0, "y": 20.0 },
                           "size": { "x": 120.0, "y": 40.0 },
                           "children_active": false,
-                          "children": [],
-                          "layout": "Horizontal",
-                          "spacing_strategy": "None"
+                          "children": []
                         },
                         "label": "Item Slot 1"
                       }
                     }
-                  ],
-                  "layout": "Vertical",
-                  "spacing_strategy": "None"
-                }
+                  ]
+                },
+                "layout": "Vertical",
+                "spacing_strategy": "None"
               }
             }
           },
@@ -114,10 +108,10 @@
                   "position": { "x": 350.0, "y": 10.0 },
                   "size": { "x": 650.0, "y": 700.0 },
                   "children_active": false,
-                  "children": [],
-                  "layout": "Horizontal",
-                  "spacing_strategy": "Even"
-                }
+                  "children": []
+                },
+                "layout": "Horizontal",
+                "spacing_strategy": "Even"
               }
             }
           }
@@ -146,10 +140,10 @@
                   "position": { "x": 400.0, "y": 300.0 },
                   "size": { "x": 600.0, "y": 500.0 },
                   "children_active": false,
-                  "children": [],
-                  "layout": "Horizontal",
-                  "spacing_strategy": "Even"
-                }
+                  "children": []
+                },
+                "layout": "Horizontal",
+                "spacing_strategy": "Even"
               }
             }
           }

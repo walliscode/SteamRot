@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
 #include "DropDownContainerElement.h"
+#include "PanelElement.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::ui {
@@ -150,20 +151,20 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
     return;
   }
 
-  // generic layout-based dispatch for any other UIElement with children
-  switch (element.layout) {
+  // layout dispatch is only defined for PanelElement
+  const auto *panel = dynamic_cast<const PanelElement *>(&element);
+  if (!panel) {
+    return;
+  }
+
+  // panel->layout is a value-type enum; no additional null-check is needed
+  switch (panel->layout) {
   case Layout::Vertical: {
     PositionVerticalLayoutChildren(element, style);
     break;
   }
   case Layout::Horizontal: {
     PositionHorizontalLayoutChildren(element, style);
-    break;
-  }
-  case Layout::DropDown: {
-
-    // possibly redundant to be depreciated, as we are handling
-    // DropDownContainerElement children separately
     break;
   }
   default: {

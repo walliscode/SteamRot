@@ -67,23 +67,13 @@ struct UIElement {
   std::vector<std::unique_ptr<UIElement>> child_elements;
 
   /////////////////////////////////////////////////
-  /// @brief Spacing and sizing strategy for the children elements defaulting to
-  /// Even
-  /////////////////////////////////////////////////
-  SpacingAndSizing spacing_strategy{SpacingAndSizing::Even};
-
-  /////////////////////////////////////////////////
-  /// @brief Layout type of the children elements
-  /////////////////////////////////////////////////
-  Layout layout{Layout::Vertical};
-
-  /////////////////////////////////////////////////
   /// @brief Priority for rendering and collision ordering among sibling
   /// elements. Higher values are rendered on top and receive input first.
   /////////////////////////////////////////////////
   int priority{0};
 
   /////////////////////////////////////////////////
+
   /// @brief Create a deep copy of this UI element and its children
   ///
   /// @return A new unique_ptr to a cloned UIElement
@@ -102,9 +92,8 @@ struct UIElement {
     target.response_events = response_events;
     target.is_mouse_over = is_mouse_over;
     target.children_active = children_active;
-    target.spacing_strategy = spacing_strategy;
-    target.layout = layout;
     target.priority = priority;
+
 
     // Deep copy children
     target.child_elements.clear();

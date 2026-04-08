@@ -46,9 +46,7 @@
                 }
               ],
               "children_active": false,
-              "children": [],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
+              "children": []
             },
             "label": "Test Tab"
           }
@@ -66,9 +64,7 @@
                 "y": 0
               },
               "children_active": false,
-              "children": [],
-              "layout": "DropDown",
-              "spacing_strategy": "DropDownList"
+              "children": []
             },
             "unexpanded_label": "Select Option",
             "expanded_label": "Options:",
@@ -102,9 +98,7 @@
                         "y": 0
                       },
                       "children_active": false,
-                      "children": [],
-                      "layout": "DropDown",
-                      "spacing_strategy": "DropDownList"
+                      "children": []
                     },
                     "unexpanded_label": "Container List",
                     "expanded_label": "Container Options:",
@@ -124,16 +118,12 @@
                         "y": 0
                       },
                       "children_active": false,
-                      "children": [],
-                      "layout": "None",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "is_expanded": false
                   }
                 }
-              ],
-              "layout": "Horizontal",
-              "spacing_strategy": "None"
+              ]
             }
           }
         },
@@ -150,9 +140,7 @@
                 "y": 20
               },
               "children_active": false,
-              "children": [],
-              "layout": "None",
-              "spacing_strategy": "None"
+              "children": []
             },
             "label": "Item Label"
           }
@@ -170,16 +158,14 @@
                 "y": 50
               },
               "children_active": false,
-              "children": [],
-              "layout": "None",
-              "spacing_strategy": "None"
+              "children": []
             },
             "is_expanded": true
           }
         }
-      ],
-      "layout": "Horizontal",
-      "spacing_strategy": "None"
-    }
+      ]
+    },
+    "layout": "Horizontal",
+    "spacing_strategy": "None"
   }
 }

@@ -20,8 +20,6 @@ TEST_CASE("DropDownListElement: Default Constructor", "[types]") {
   REQUIRE(dropdown.response_events.empty());
   REQUIRE(dropdown.children_active == false);
   REQUIRE(dropdown.child_elements.empty());
-  REQUIRE(dropdown.layout == steamrot::Layout::Vertical);
-  REQUIRE(dropdown.spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(dropdown.is_expanded == false);
   REQUIRE(dropdown.unexpanded_label == "unexpanded items...");
   REQUIRE(dropdown.expanded_label == "expanded items...");
@@ -35,8 +33,6 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   original.size = sf::Vector2f{100.f, 50.f};
   original.is_mouse_over = true;
   original.children_active = true;
-  original.layout = steamrot::Layout::Horizontal;
-  original.spacing_strategy = steamrot::SpacingAndSizing::Even;
   original.is_expanded = true;
   original.unexpanded_label = "Select item";
   original.expanded_label = "Hide items";
@@ -52,8 +48,6 @@ TEST_CASE("DropDownListElement: Clone Method", "[types]") {
   REQUIRE(cloned->size == sf::Vector2f{100.f, 50.f});
   REQUIRE(cloned->is_mouse_over == true);
   REQUIRE(cloned->children_active == true);
-  REQUIRE(cloned->layout == steamrot::Layout::Horizontal);
-  REQUIRE(cloned->spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(cloned->is_expanded == true);
   REQUIRE(cloned->unexpanded_label == "Select item");
   REQUIRE(cloned->expanded_label == "Hide items");

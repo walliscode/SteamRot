@@ -61,10 +61,10 @@
                         "y": 30
                       },
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
-                    }
+                      "children": []
+                    },
+                    "layout": "Horizontal",
+                    "spacing_strategy": "None"
                   }
                 }
               }
