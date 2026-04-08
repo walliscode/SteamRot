@@ -157,6 +157,7 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
     return;
   }
 
+  // panel->layout is a value-type enum; no additional null-check is needed
   switch (panel->layout) {
   case Layout::Vertical: {
     PositionVerticalLayoutChildren(element, style);
