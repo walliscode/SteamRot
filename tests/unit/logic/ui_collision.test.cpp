@@ -341,3 +341,197 @@ TEST_CASE("CheckMouseOver UIElement with high-priority container having nested "
     REQUIRE(root.is_mouse_over == false);
   }
 }
+
+// ---------------------------------------------------------------------------
+// children_active gating tests
+// ---------------------------------------------------------------------------
+
+TEST_CASE("CheckMouseOver UIElement does not hover inactive children",
+          "[unit][collision]") {
+  // Parent with children_active = false: even though the mouse is directly
+  // over a child's bounds, the child must NOT receive hover (it is not
+  // visible).  The parent itself should receive hover because no active child
+  // claimed it.
+
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+  parent.children_active = false; // children are invisible
+
+  auto child = std::make_unique<steamrot::PanelElement>();
+  child->position = {50, 50};
+  child->size = {100, 100};
+  parent.child_elements.push_back(std::move(child));
+
+  auto &child_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+
+  // Mouse directly over the child's bounds
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("Inactive child does not receive hover") {
+    REQUIRE(child_ref.is_mouse_over == false);
+  }
+
+  SECTION("Parent receives hover because no active child claimed it") {
+    REQUIRE(parent.is_mouse_over == true);
+  }
+}
+
+TEST_CASE("CheckMouseOver UIElement clears stale hover on inactive children",
+          "[unit][collision]") {
+  // Simulate a stale hover state: a child was hovered in a previous frame,
+  // then children_active is set to false (e.g. a dropdown collapses).
+  // CheckMouseOver must clear the stale is_mouse_over on the child so that
+  // action processing cannot fire for an invisible element.
+
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+  parent.children_active = true; // active initially
+
+  auto child = std::make_unique<steamrot::PanelElement>();
+  child->position = {50, 50};
+  child->size = {100, 100};
+  parent.child_elements.push_back(std::move(child));
+
+  auto &child_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+
+  // Frame 1: children are active; child is hovered
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+  REQUIRE(child_ref.is_mouse_over == true);
+
+  // Frame 2: children become inactive (dropdown collapses)
+  parent.children_active = false;
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("Stale hover is cleared on now-inactive child") {
+    REQUIRE(child_ref.is_mouse_over == false);
+  }
+
+  SECTION("Parent is now hovered (no active child claimed it)") {
+    REQUIRE(parent.is_mouse_over == true);
+  }
+}
+
+TEST_CASE("CheckMouseOver UIElement respects children_active on nested "
+          "grandchild containers",
+          "[unit][collision]") {
+  // Multi-level: root → container (children_active=true) →
+  //                     list (children_active=false) → item
+  //
+  // Mouse is over the item's bounds. Because the list's children are inactive
+  // the item must NOT be hovered. The list element itself can be hovered
+  // (its own bounds contain the mouse).
+
+  steamrot::PanelElement root;
+  root.position = {0, 0};
+  root.size = {400, 400};
+  root.children_active = true;
+
+  auto container = std::make_unique<steamrot::PanelElement>();
+  container->position = {0, 0};
+  container->size = {300, 300};
+  container->children_active = true;
+
+  auto list = std::make_unique<steamrot::PanelElement>();
+  list->position = {0, 100};
+  list->size = {200, 200};
+  list->children_active = false; // list is collapsed
+
+  auto item = std::make_unique<steamrot::PanelElement>();
+  item->position = {0, 100}; // same area as list, but list is inactive
+  item->size = {200, 50};
+  list->child_elements.push_back(std::move(item));
+
+  container->child_elements.push_back(std::move(list));
+  root.child_elements.push_back(std::move(container));
+
+  auto &container_ref =
+      *static_cast<steamrot::PanelElement *>(root.child_elements[0].get());
+  auto &list_ref = *static_cast<steamrot::PanelElement *>(
+      container_ref.child_elements[0].get());
+  auto &item_ref = *static_cast<steamrot::PanelElement *>(
+      list_ref.child_elements[0].get());
+
+  // Mouse is over item's bounds (and also the list's bounds)
+  sf::Vector2i mouse_position(50, 150);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, root);
+
+  SECTION("Inactive item does not receive hover") {
+    REQUIRE(item_ref.is_mouse_over == false);
+  }
+
+  SECTION("List element itself is hovered (mouse is within its bounds)") {
+    REQUIRE(list_ref.is_mouse_over == true);
+  }
+
+  SECTION("Root and container are not hovered (list claimed it)") {
+    REQUIRE(container_ref.is_mouse_over == false);
+    REQUIRE(root.is_mouse_over == false);
+  }
+}
+
+TEST_CASE("CheckMouseOver UIElement with inactive high-priority sibling does "
+          "not block lower-priority sibling",
+          "[unit][collision]") {
+  // A high-priority sibling with children_active=false should NOT prevent a
+  // lower-priority sibling from being hovered, since the inactive element's
+  // bounds are treated as a leaf (tested against the mouse directly).  Here
+  // the mouse is NOT over the high-priority sibling, so the lower-priority
+  // sibling should win.
+
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {400, 400};
+  parent.children_active = true;
+
+  // High-priority sibling – positioned to the right, mouse will not be over it
+  auto high_pri = std::make_unique<steamrot::PanelElement>();
+  high_pri->position = {200, 0};
+  high_pri->size = {100, 100};
+  high_pri->priority = 10;
+  high_pri->children_active = false;
+
+  // High-priority also has a child whose bounds DO cover the mouse position –
+  // because children_active=false, this child must NOT steal the hover
+  auto high_pri_child = std::make_unique<steamrot::PanelElement>();
+  high_pri_child->position = {0, 0};
+  high_pri_child->size = {100, 100};
+  high_pri->child_elements.push_back(std::move(high_pri_child));
+
+  // Low-priority sibling – mouse IS over this one
+  auto low_pri = std::make_unique<steamrot::PanelElement>();
+  low_pri->position = {0, 0};
+  low_pri->size = {100, 100};
+  low_pri->priority = 0;
+  low_pri->children_active = true;
+
+  parent.child_elements.push_back(std::move(high_pri));
+  parent.child_elements.push_back(std::move(low_pri));
+
+  auto &high_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+  auto &high_child_ref = *static_cast<steamrot::PanelElement *>(
+      high_ref.child_elements[0].get());
+  auto &low_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[1].get());
+
+  sf::Vector2i mouse_position(50, 50);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("High-priority inactive child does not receive hover") {
+    REQUIRE(high_child_ref.is_mouse_over == false);
+  }
+
+  SECTION("High-priority element itself is not hovered (mouse not over it)") {
+    REQUIRE(high_ref.is_mouse_over == false);
+  }
+
+  SECTION("Low-priority element receives hover") {
+    REQUIRE(low_ref.is_mouse_over == true);
+  }
+}
