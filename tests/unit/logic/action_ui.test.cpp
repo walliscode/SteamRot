@@ -287,7 +287,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
     }
     steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
     grimoire_machina.m_all_fragments.clear();
-    grimoire_machina.m_all_fragments.insert({"fragment1", steamrot::Fragment{}});
+    grimoire_machina.m_all_fragments.insert(
+        {"fragment1", steamrot::Fragment{}});
 
     dropdown.data_population_function =
         steamrot::DataPopulationFunction::GetAllFragmentNames;
@@ -543,9 +544,9 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents skips children "
   panel.children_active = false; // children are inactive
 
   auto button = std::make_unique<steamrot::ButtonElement>();
-  button->is_mouse_over = true;                                   // stale hover
+  button->is_mouse_over = true; // stale hover
   button->subscription = std::make_shared<steamrot::Subscriber>();
-  button->subscription->m_active = true;                          // active sub
+  button->subscription->m_active = true; // active sub
   steamrot::EventPacket event_packet;
   event_packet.type = steamrot::EventType::USER_INPUT;
   event_packet.payload =
@@ -597,7 +598,7 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents with siblings: "
   steamrot::EventPacket container_evt;
   container_evt.type = steamrot::EventType::USER_INPUT;
   container_evt.payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::BACK};
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
   container->response_events.push_back(container_evt);
 
   // exit button: children_active default (false, no children), hovered

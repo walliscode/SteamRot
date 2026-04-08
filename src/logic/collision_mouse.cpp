@@ -43,6 +43,7 @@ bool AnyMouseOver(const UIElement &element) {
 
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
+
   // bool to keep track if any child is hovered over
   bool child_hovered = false;
 
@@ -86,9 +87,8 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   } else {
     // this will occur if no child is hovered (or no children exist), or
     // when children are inactive and the element itself should be tested
-    element.is_mouse_over =
-        IsMouseOverBounds(mouse_position,
-                          sf::FloatRect(element.position, element.size));
+    element.is_mouse_over = IsMouseOverBounds(
+        mouse_position, sf::FloatRect(element.position, element.size));
   }
 }
 

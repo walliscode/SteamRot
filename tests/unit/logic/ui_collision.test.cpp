@@ -6,9 +6,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "collision_mouse.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
+#include "collision_mouse.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -17,8 +17,8 @@ TEST_CASE("IsMouseOverBounds returns false for point outside bounds",
   sf::Vector2i mouse_position(150, 150);
   sf::FloatRect bounds({0, 0}, {100, 100});
 
-  bool result =
-      steamrot::logic::collision::mouse::IsMouseOverBounds(mouse_position, bounds);
+  bool result = steamrot::logic::collision::mouse::IsMouseOverBounds(
+      mouse_position, bounds);
   REQUIRE(result == false);
 }
 
@@ -60,8 +60,8 @@ TEST_CASE("IsMouseOverBounds returns correct results for various bounds and "
       IsMouseOverTestCase{
           {320, 430}, sf::FloatRect({250, 350}, {60, 70}), false});
 
-  bool result = steamrot::logic::collision::mouse::IsMouseOverBounds(cases.mouse_pos,
-                                                              cases.bounds);
+  bool result = steamrot::logic::collision::mouse::IsMouseOverBounds(
+      cases.mouse_pos, cases.bounds);
   REQUIRE(result == cases.expected);
 }
 
@@ -105,6 +105,9 @@ TEST_CASE("CheckMouseOver UIElement toggles nested Panel Elements",
   // get reference to the moved child for easy access
   auto &child_element = *static_cast<steamrot::PanelElement *>(
       parent_element.child_elements[0].get());
+
+  // activate children so that they can receive hover
+  parent_element.children_active = true;
 
   // ensure both are not hovered initially
   REQUIRE(parent_element.is_mouse_over == false);
@@ -191,9 +194,10 @@ TEST_CASE("AnyMouseOver returns true when any element in tree is hovered",
   }
 }
 
-TEST_CASE("CheckMouseOver UIElement respects priority among overlapping sibling "
-          "children",
-          "[unit][collision]") {
+TEST_CASE(
+    "CheckMouseOver UIElement respects priority among overlapping sibling "
+    "children",
+    "[unit][collision]") {
 
   // Parent that covers the whole test area
   steamrot::PanelElement parent;
@@ -216,6 +220,9 @@ TEST_CASE("CheckMouseOver UIElement respects priority among overlapping sibling 
   // hover; priority must override this
   parent.child_elements.push_back(std::move(low_priority));
   parent.child_elements.push_back(std::move(high_priority));
+
+  // activate children so that they can receive hover
+  parent.children_active = true;
 
   auto &low =
       *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
@@ -260,6 +267,9 @@ TEST_CASE("CheckMouseOver UIElement selects lower priority sibling when higher "
 
   parent.child_elements.push_back(std::move(low_priority));
   parent.child_elements.push_back(std::move(high_priority));
+
+  // activate children so that they can receive hover
+  parent.children_active = true;
 
   auto &low =
       *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
@@ -314,12 +324,15 @@ TEST_CASE("CheckMouseOver UIElement with high-priority container having nested "
   root.child_elements.push_back(std::move(exit_button));
   root.child_elements.push_back(std::move(dropdown_container));
 
+  // activate children so that they can receive hover
+  root.children_active = true;
+
   auto &exit_btn =
       *static_cast<steamrot::PanelElement *>(root.child_elements[0].get());
   auto &container =
       *static_cast<steamrot::PanelElement *>(root.child_elements[1].get());
-  auto &item = *static_cast<steamrot::PanelElement *>(
-      container.child_elements[0].get());
+  auto &item =
+      *static_cast<steamrot::PanelElement *>(container.child_elements[0].get());
 
   // Mouse is over the area shared by exit_button and dropdown_item
   sf::Vector2i mouse_position(75, 75);
@@ -337,9 +350,7 @@ TEST_CASE("CheckMouseOver UIElement with high-priority container having nested "
     REQUIRE(container.is_mouse_over == false);
   }
 
-  SECTION("Root is not hovered") {
-    REQUIRE(root.is_mouse_over == false);
-  }
+  SECTION("Root is not hovered") { REQUIRE(root.is_mouse_over == false); }
 }
 
 // ---------------------------------------------------------------------------
@@ -454,8 +465,8 @@ TEST_CASE("CheckMouseOver UIElement respects children_active on nested "
       *static_cast<steamrot::PanelElement *>(root.child_elements[0].get());
   auto &list_ref = *static_cast<steamrot::PanelElement *>(
       container_ref.child_elements[0].get());
-  auto &item_ref = *static_cast<steamrot::PanelElement *>(
-      list_ref.child_elements[0].get());
+  auto &item_ref =
+      *static_cast<steamrot::PanelElement *>(list_ref.child_elements[0].get());
 
   // Mouse is over item's bounds (and also the list's bounds)
   sf::Vector2i mouse_position(50, 150);
@@ -515,8 +526,8 @@ TEST_CASE("CheckMouseOver UIElement with inactive high-priority sibling does "
 
   auto &high_ref =
       *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
-  auto &high_child_ref = *static_cast<steamrot::PanelElement *>(
-      high_ref.child_elements[0].get());
+  auto &high_child_ref =
+      *static_cast<steamrot::PanelElement *>(high_ref.child_elements[0].get());
   auto &low_ref =
       *static_cast<steamrot::PanelElement *>(parent.child_elements[1].get());
 
