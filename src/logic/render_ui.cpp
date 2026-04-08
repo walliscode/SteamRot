@@ -13,6 +13,8 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include <algorithm>
+#include <vector>
 #include <cstdint>
 
 namespace steamrot::logic::render::ui {
@@ -48,7 +50,19 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
 
   // if children are active, draw them
   if (element.children_active) {
+    // Build a sorted view of children in ascending priority order so that
+    // lower-priority siblings are drawn first and higher-priority ones are
+    // drawn on top (painter's algorithm)
+    std::vector<const UIElement *> sorted_children;
+    sorted_children.reserve(element.child_elements.size());
     for (const auto &child : element.child_elements) {
+      sorted_children.push_back(child.get());
+    }
+    std::stable_sort(sorted_children.begin(), sorted_children.end(),
+                     [](const UIElement *a, const UIElement *b) {
+                       return a->priority < b->priority;
+                     });
+    for (const auto *child : sorted_children) {
       DrawNestedUIElements(texture, *child, style);
     }
   }

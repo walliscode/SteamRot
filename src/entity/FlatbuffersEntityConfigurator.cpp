@@ -162,6 +162,10 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   // Always read the boolean value, not just when it's true
   ui_component.m_visible = ui_data->is_visible();
 
+  // Read priority (z-order) for rendering and collision ordering
+  if (ui_data->priority())
+    ui_component.m_priority = ui_data->priority();
+
   // data must contain a root element so throw unexpected if it is not set
   if (!ui_data->root_ui_element()) {
     FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
@@ -206,8 +210,9 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     //
     // check that data for mapping ui visi
     if (!ui_state_data->state_to_ui_visibility()) {
-      FailInfo fail_info{FailMode::FlatbuffersDataNotFound,
-                         "No mappings found in UIStateDataFbs for ui visibility."};
+      FailInfo fail_info{
+          FailMode::FlatbuffersDataNotFound,
+          "No mappings found in UIStateDataFbs for ui visibility."};
       return std::unexpected(fail_info);
     }
 
