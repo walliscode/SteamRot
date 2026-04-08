@@ -26,9 +26,9 @@ namespace steamrot::logic::positioning::ui {
 /// @param inner_margin Additional margin inside the border (default {0, 0})
 /// @return Available size after subtracting border and margin on both sides
 /////////////////////////////////////////////////
-sf::Vector2f CalculateAvailableSize(
-    const sf::Vector2f &element_size, float border_thickness,
-    const sf::Vector2f &inner_margin = sf::Vector2f());
+sf::Vector2f
+CalculateAvailableSize(const sf::Vector2f &element_size, float border_thickness,
+                       const sf::Vector2f &inner_margin = sf::Vector2f());
 
 /////////////////////////////////////////////////
 /// @brief Calculate the inner start position after border and optional margin
@@ -38,9 +38,10 @@ sf::Vector2f CalculateAvailableSize(
 /// @param inner_margin Additional margin inside the border (default {0, 0})
 /// @return Start position inside the border and margin
 /////////////////////////////////////////////////
-sf::Vector2f CalculateStartPosition(
-    const sf::Vector2f &element_position, float border_thickness,
-    const sf::Vector2f &inner_margin = sf::Vector2f());
+sf::Vector2f
+CalculateStartPosition(const sf::Vector2f &element_position,
+                       float border_thickness,
+                       const sf::Vector2f &inner_margin = sf::Vector2f());
 
 /////////////////////////////////////////////////
 /// @brief Position the children of a DropDownContainerElement
@@ -80,23 +81,27 @@ void PositionHorizontalLayoutChildren(const UIElement &element,
                                       const UIStyle &style);
 
 /////////////////////////////////////////////////
-/// @brief Position children of an element using the DropDown layout
+/// @brief Position children (DropDownItemElements) of a DropDownListElement
 ///
 /// Children are stacked vertically without inner margins; each child takes the
 /// full available width and height, offset by their index.
 ///
-/// @param element Parent element whose children will be positioned
-/// @param style Style containing panel_style border thickness
+/// @param drop_down_list_children Vector of child elements to position (should
+/// be DropDownItemElements)
+/// @param style
 /////////////////////////////////////////////////
-void PositionDropDownLayoutChildren(const UIElement &element,
-                                    const UIStyle &style);
+void PositionDropDownListChildren(
+    const std::vector<std::unique_ptr<UIElement>> &drop_down_list_children,
+    const sf::Vector2f &available_size, const sf::Vector2f &start_position,
+    const UIStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Update the size and position of child elements based on the parent
 /// element's layout and style
 ///
-/// Dispatches to PositionDropDownContainerChildren for DropDownContainerElement,
-/// or to the appropriate layout-specific function otherwise.
+/// Dispatches to PositionDropDownContainerChildren for
+/// DropDownContainerElement, or to the appropriate layout-specific function
+/// otherwise.
 ///
 /// @param element Parent element whose children will be positioned
 /// @param style Style containing layout margins, border thickness, and ratios

@@ -15,655 +15,683 @@
 #include "PanelElement.h"
 #include "Vector2fEqualsMatcher.h"
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
 
 // ---------------------------------------------------------------------------
 // CalculateAvailableSize
 // ---------------------------------------------------------------------------
 
-TEST_CASE("CalculateAvailableSize with border only",
-          "[unit][positioning_ui]") {
-  sf::Vector2f size{200.0f, 100.0f};
-  // available = size - 2 * border on each axis
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateAvailableSize(size, 5.0f),
-      steamrot::tests::EqualsVector2f({190.0f, 90.0f}));
-}
+TEST_CASE("CalculateAvailableSize", "[unit][positioning_ui]") {
 
-TEST_CASE("CalculateAvailableSize with border and margin",
-          "[unit][positioning_ui]") {
-  sf::Vector2f size{200.0f, 100.0f};
-  sf::Vector2f margin{10.0f, 8.0f};
-  // available = size - 2*border - 2*margin on each axis
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateAvailableSize(size, 5.0f,
-                                                               margin),
-      steamrot::tests::EqualsVector2f({170.0f, 74.0f}));
-}
+  SECTION("with border only") {
+    sf::Vector2f size{200.0f, 100.0f};
+    // available = size - 2 * border on each axis
+    REQUIRE_THAT(
+        steamrot::logic::positioning::ui::CalculateAvailableSize(size, 5.0f),
+        steamrot::tests::EqualsVector2f({190.0f, 90.0f}));
+  }
 
-TEST_CASE("CalculateAvailableSize with zero border and margin",
-          "[unit][positioning_ui]") {
-  sf::Vector2f size{300.0f, 150.0f};
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateAvailableSize(size, 0.0f),
-      steamrot::tests::EqualsVector2f({300.0f, 150.0f}));
+  SECTION("with border and margin") {
+    sf::Vector2f size{200.0f, 100.0f};
+    sf::Vector2f margin{10.0f, 8.0f};
+    // available = size - 2*border - 2*margin on each axis
+    REQUIRE_THAT(steamrot::logic::positioning::ui::CalculateAvailableSize(
+                     size, 5.0f, margin),
+                 steamrot::tests::EqualsVector2f({170.0f, 74.0f}));
+  }
+
+  SECTION("with zero border and margin") {
+    sf::Vector2f size{300.0f, 150.0f};
+    REQUIRE_THAT(
+        steamrot::logic::positioning::ui::CalculateAvailableSize(size, 0.0f),
+        steamrot::tests::EqualsVector2f({300.0f, 150.0f}));
+  }
 }
 
 // ---------------------------------------------------------------------------
 // CalculateStartPosition
 // ---------------------------------------------------------------------------
 
-TEST_CASE("CalculateStartPosition with border only",
-          "[unit][positioning_ui]") {
-  sf::Vector2f position{20.0f, 10.0f};
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateStartPosition(position, 5.0f),
-      steamrot::tests::EqualsVector2f({25.0f, 15.0f}));
-}
+TEST_CASE("CalculateStartPosition", "[unit][positioning_ui]") {
 
-TEST_CASE("CalculateStartPosition with border and margin",
-          "[unit][positioning_ui]") {
-  sf::Vector2f position{20.0f, 10.0f};
-  sf::Vector2f margin{10.0f, 8.0f};
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateStartPosition(position, 5.0f,
-                                                               margin),
-      steamrot::tests::EqualsVector2f({35.0f, 23.0f}));
-}
+  SECTION("with border only") {
+    sf::Vector2f position{20.0f, 10.0f};
+    REQUIRE_THAT(steamrot::logic::positioning::ui::CalculateStartPosition(
+                     position, 5.0f),
+                 steamrot::tests::EqualsVector2f({25.0f, 15.0f}));
+  }
 
-TEST_CASE("CalculateStartPosition with zero border and margin",
-          "[unit][positioning_ui]") {
-  sf::Vector2f position{50.0f, 30.0f};
-  REQUIRE_THAT(
-      steamrot::logic::positioning::ui::CalculateStartPosition(position, 0.0f),
-      steamrot::tests::EqualsVector2f({50.0f, 30.0f}));
+  SECTION("with border and margin") {
+    sf::Vector2f position{20.0f, 10.0f};
+    sf::Vector2f margin{10.0f, 8.0f};
+    REQUIRE_THAT(steamrot::logic::positioning::ui::CalculateStartPosition(
+                     position, 5.0f, margin),
+                 steamrot::tests::EqualsVector2f({35.0f, 23.0f}));
+  }
+
+  SECTION("with zero border and margin") {
+    sf::Vector2f position{50.0f, 30.0f};
+    REQUIRE_THAT(steamrot::logic::positioning::ui::CalculateStartPosition(
+                     position, 0.0f),
+                 steamrot::tests::EqualsVector2f({50.0f, 30.0f}));
+  }
 }
 
 // ---------------------------------------------------------------------------
 // PositionDropDownContainerChildren
 // ---------------------------------------------------------------------------
 
-TEST_CASE("PositionDropDownContainerChildren positions list and button "
-          "children correctly",
-          "[unit][positioning_ui]") {
-  steamrot::DropDownContainerElement container;
-  container.position = {0.0f, 0.0f};
-  container.size = {200.0f, 50.0f};
-  container.child_elements.push_back(
-      std::make_unique<steamrot::DropDownListElement>());
-  container.child_elements.push_back(
-      std::make_unique<steamrot::DropDownButtonElement>());
+TEST_CASE("PositionDropDownContainerChildren", "[unit][positioning_ui]") {
 
-  steamrot::UIStyle style;
-  style.drop_down_container_style.border_thickness = 2.0f;
-  style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+  SECTION("positions list and button children correctly") {
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 50.0f};
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
 
-  steamrot::logic::positioning::ui::PositionDropDownContainerChildren(container,
-                                                                      style);
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 2.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.2f;
 
-  // available = {200 - 4, 50 - 4} = {196, 46}
-  // list_size  = {196 * 0.8, 46} = {156.8, 46}
-  // button_size = {196 * 0.2, 46} = {39.2, 46}
-  // list_pos   = {2, 2}
-  // button_pos = {2 + 156.8, 2} = {158.8, 2}
-  float available_width = 200.0f - 2 * 2.0f;
-  float available_height = 50.0f - 2 * 2.0f;
-  float ratio = 0.2f;
-  float list_width = available_width * (1.0f - ratio);
-  float button_width = available_width * ratio;
+    steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+        container, style);
 
-  REQUIRE_THAT(container.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({list_width, available_height}));
-  REQUIRE_THAT(container.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({2.0f, 2.0f}));
+    // available = {200 - 4, 50 - 4} = {196, 46}
+    // list_size  = {196 * 0.8, 46} = {156.8, 46}
+    // button_size = {196 * 0.2, 46} = {39.2, 46}
+    // list_pos   = {2, 2}
+    // button_pos = {2 + 156.8, 2} = {158.8, 2}
+    float available_width = 200.0f - 2 * 2.0f;
+    float available_height = 50.0f - 2 * 2.0f;
+    float ratio = 0.2f;
+    float list_width = available_width * (1.0f - ratio);
+    float button_width = available_width * ratio;
 
-  REQUIRE_THAT(
-      container.child_elements[1]->size,
-      steamrot::tests::EqualsVector2f({button_width, available_height}));
-  REQUIRE_THAT(container.child_elements[1]->position,
-               steamrot::tests::EqualsVector2f({2.0f + list_width, 2.0f}));
-}
+    REQUIRE_THAT(
+        container.child_elements[0]->size,
+        steamrot::tests::EqualsVector2f({list_width, available_height}));
+    REQUIRE_THAT(container.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({2.0f, 2.0f}));
 
-TEST_CASE("PositionDropDownContainerChildren handles missing second child",
-          "[unit][positioning_ui]") {
-  steamrot::DropDownContainerElement container;
-  container.position = {0.0f, 0.0f};
-  container.size = {100.0f, 40.0f};
-  container.child_elements.push_back(
-      std::make_unique<steamrot::DropDownListElement>());
+    REQUIRE_THAT(
+        container.child_elements[1]->size,
+        steamrot::tests::EqualsVector2f({button_width, available_height}));
+    REQUIRE_THAT(container.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({2.0f + list_width, 2.0f}));
+  }
 
-  steamrot::UIStyle style;
-  style.drop_down_container_style.border_thickness = 0.0f;
-  style.drop_down_container_style.drop_symbol_ratio = 0.25f;
+  SECTION("handles missing second child") {
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {100.0f, 40.0f};
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
 
-  // Should not crash with only one child
-  REQUIRE_NOTHROW(
-      steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
-          container, style));
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 0.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.25f;
 
-  REQUIRE_THAT(container.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({75.0f, 40.0f}));
-}
+    // Should not crash with only one child
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+            container, style));
 
-TEST_CASE("PositionDropDownContainerChildren handles empty child list",
-          "[unit][positioning_ui]") {
-  steamrot::DropDownContainerElement container;
-  container.position = {0.0f, 0.0f};
-  container.size = {100.0f, 40.0f};
+    REQUIRE_THAT(container.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({75.0f, 40.0f}));
+  }
 
-  steamrot::UIStyle style;
-  style.drop_down_container_style.border_thickness = 2.0f;
-  style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+  SECTION("handles empty child list") {
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {100.0f, 40.0f};
 
-  // Should not crash with no children
-  REQUIRE_NOTHROW(
-      steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
-          container, style));
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 2.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+
+    // Should not crash with no children
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+            container, style));
+  }
+
+  SECTION("positions DropDownItemElement children via "
+          "PositionDropDownListChildren") {
+    // container: position={0,0}, size={200,60}, border=0, ratio=0.2
+    // list_size = {200*0.8, 60} = {160, 60}, list_pos = {0, 0}
+    // with 2 items: item_height = 60/2 = 30
+    // item[0]: position={0,0}, size={160,30}
+    // item[1]: position={0,30}, size={160,30}
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 30.0f};
+
+    auto list = std::make_unique<steamrot::DropDownListElement>();
+    list->child_elements.push_back(
+        std::make_unique<steamrot::DropDownItemElement>());
+    list->child_elements.push_back(
+        std::make_unique<steamrot::DropDownItemElement>());
+    container.child_elements.push_back(std::move(list));
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
+
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 0.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+
+    auto available_size =
+        steamrot::logic::positioning::ui::CalculateAvailableSize(
+            container.size, style.drop_down_container_style.border_thickness);
+
+    auto dd_list_size = sf::Vector2f{
+        available_size.x *
+            (1 - style.drop_down_container_style.drop_symbol_ratio),
+        available_size.y};
+
+    steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+        container, style);
+
+    const auto &list_children = container.child_elements[0]->child_elements;
+
+    // DropDownItemElement children start below the DropDownContainerElement
+    // position, not the DropDownListElement position itself
+    REQUIRE_THAT(list_children[0]->size,
+                 steamrot::tests::EqualsVector2f(dd_list_size));
+    REQUIRE_THAT(
+        list_children[0]->position,
+        steamrot::tests::EqualsVector2f({0.0f, 0.0f + (dd_list_size.y * 1)}));
+
+    REQUIRE_THAT(list_children[1]->size,
+                 steamrot::tests::EqualsVector2f(dd_list_size));
+    REQUIRE_THAT(
+        list_children[1]->position,
+        steamrot::tests::EqualsVector2f({0.0f, 0.0f + (dd_list_size.y * 2)}));
+  }
 }
 
 // ---------------------------------------------------------------------------
 // PositionVerticalLayoutChildren
 // ---------------------------------------------------------------------------
 
-TEST_CASE("PositionVerticalLayoutChildren does nothing when element has no "
-          "children",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {10.0f, 10.0f};
-  parent.size = {200.0f, 100.0f};
-  parent.layout = steamrot::Layout::Vertical;
+TEST_CASE("PositionVerticalLayoutChildren", "[unit][positioning_ui]") {
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
+  SECTION("does nothing when element has no children") {
+    steamrot::PanelElement parent;
+    parent.position = {10.0f, 10.0f};
+    parent.size = {200.0f, 100.0f};
+    parent.layout = steamrot::Layout::Vertical;
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
-                                                                       style));
-}
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-TEST_CASE("PositionVerticalLayoutChildren divides height equally among "
-          "children",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {200.0f, 300.0f};
-  parent.layout = steamrot::Layout::Vertical;
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(
+            parent, style));
+  }
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
+  SECTION("divides height equally among children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {200.0f, 300.0f};
+    parent.layout = steamrot::Layout::Vertical;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
-                                                                   style);
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-  // available = {200-10-20, 300-10-20} = {170, 270}
-  // start     = {0+5+10, 0+5+10}       = {15, 15}
-  // height    = (270 - 1*10) / 2       = 130
-  float child_height = (270.0f - 10.0f) / 2.0f;
+    steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
+                                                                     style);
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({170.0f, child_height}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
+    // available = {200-10-20, 300-10-20} = {170, 270}
+    // start     = {0+5+10, 0+5+10}       = {15, 15}
+    // height    = (270 - 1*10) / 2       = 130
+    float child_height = (270.0f - 10.0f) / 2.0f;
 
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f({170.0f, child_height}));
-  REQUIRE_THAT(
-      parent.child_elements[1]->position,
-      steamrot::tests::EqualsVector2f({15.0f, 15.0f + child_height + 10.0f}));
-}
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({170.0f, child_height}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
 
-TEST_CASE("PositionVerticalLayoutChildren positions a single child correctly",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {10.0f, 20.0f};
-  parent.size = {100.0f, 80.0f};
-  parent.layout = steamrot::Layout::Vertical;
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({170.0f, child_height}));
+    REQUIRE_THAT(
+        parent.child_elements[1]->position,
+        steamrot::tests::EqualsVector2f({15.0f, 15.0f + child_height + 10.0f}));
+  }
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 0.0f;
-  style.panel_style.inner_margin = {0.0f, 0.0f};
+  SECTION("positions a single child correctly") {
+    steamrot::PanelElement parent;
+    parent.position = {10.0f, 20.0f};
+    parent.size = {100.0f, 80.0f};
+    parent.layout = steamrot::Layout::Vertical;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
-                                                                   style);
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
 
-  // single child fills available space entirely
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({100.0f, 80.0f}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({10.0f, 20.0f}));
+    steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
+                                                                     style);
+
+    // single child fills available space entirely
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({100.0f, 80.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({10.0f, 20.0f}));
+  }
+
+  SECTION("does not position DropDownContainerElement children") {
+    // DropDownContainerElement has a specialist positioning function
+    // (PositionDropDownContainerChildren); the generic layout functions should
+    // not be dispatched for it. UpdateSizeAndPositionOfChildElements guards
+    // this via the Layout::DropDown case (no-op). Verify that a
+    // DropDownContainerElement with Layout::DropDown passed through
+    // UpdateSizeAndPositionOfChildElements leaves children unchanged.
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 50.0f};
+    container.layout = steamrot::Layout::DropDown;
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
+
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        container, style);
+
+    // Children should remain at their default zero position/size — the generic
+    // vertical layout was not applied because Layout::DropDown is a no-op in
+    // UpdateSizeAndPositionOfChildElements.
+    REQUIRE_THAT(container.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+  }
 }
 
 // ---------------------------------------------------------------------------
 // PositionHorizontalLayoutChildren
 // ---------------------------------------------------------------------------
 
-TEST_CASE("PositionHorizontalLayoutChildren does nothing when element has no "
-          "children",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {10.0f, 10.0f};
-  parent.size = {200.0f, 100.0f};
-  parent.layout = steamrot::Layout::Horizontal;
+TEST_CASE("PositionHorizontalLayoutChildren", "[unit][positioning_ui]") {
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
+  SECTION("does nothing when element has no children") {
+    steamrot::PanelElement parent;
+    parent.position = {10.0f, 10.0f};
+    parent.size = {200.0f, 100.0f};
+    parent.layout = steamrot::Layout::Horizontal;
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(
-          parent, style));
-}
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-TEST_CASE("PositionHorizontalLayoutChildren divides width equally among "
-          "children",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {300.0f, 100.0f};
-  parent.layout = steamrot::Layout::Horizontal;
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(
+            parent, style));
+  }
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
+  SECTION("divides width equally among children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {300.0f, 100.0f};
+    parent.layout = steamrot::Layout::Horizontal;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
-                                                                     style);
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-  // available = {300-10-20, 100-10-20} = {270, 70}
-  // start     = {15, 15}
-  // width     = (270 - 1*10) / 2       = 130
-  float child_width = (270.0f - 10.0f) / 2.0f;
+    steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
+                                                                       style);
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({child_width, 70.0f}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
+    // available = {300-10-20, 100-10-20} = {270, 70}
+    // start     = {15, 15}
+    // width     = (270 - 1*10) / 2       = 130
+    float child_width = (270.0f - 10.0f) / 2.0f;
 
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f({child_width, 70.0f}));
-  REQUIRE_THAT(
-      parent.child_elements[1]->position,
-      steamrot::tests::EqualsVector2f({15.0f + child_width + 10.0f, 15.0f}));
-}
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({child_width, 70.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
 
-TEST_CASE("PositionHorizontalLayoutChildren positions a single child correctly",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {5.0f, 5.0f};
-  parent.size = {120.0f, 60.0f};
-  parent.layout = steamrot::Layout::Horizontal;
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({child_width, 70.0f}));
+    REQUIRE_THAT(
+        parent.child_elements[1]->position,
+        steamrot::tests::EqualsVector2f({15.0f + child_width + 10.0f, 15.0f}));
+  }
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 0.0f;
-  style.panel_style.inner_margin = {0.0f, 0.0f};
+  SECTION("positions a single child correctly") {
+    steamrot::PanelElement parent;
+    parent.position = {5.0f, 5.0f};
+    parent.size = {120.0f, 60.0f};
+    parent.layout = steamrot::Layout::Horizontal;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
-                                                                     style);
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({120.0f, 60.0f}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({5.0f, 5.0f}));
-}
+    steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
+                                                                       style);
 
-// ---------------------------------------------------------------------------
-// PositionDropDownLayoutChildren
-// ---------------------------------------------------------------------------
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({120.0f, 60.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({5.0f, 5.0f}));
+  }
 
-TEST_CASE("PositionDropDownLayoutChildren stacks children vertically without "
-          "inner margin",
-          "[unit][positioning_ui]") {
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {200.0f, 50.0f};
-  parent.layout = steamrot::Layout::DropDown;
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+  SECTION("does not position DropDownContainerElement children") {
+    // DropDownContainerElement has a specialist positioning function
+    // (PositionDropDownContainerChildren); the generic layout functions should
+    // not be dispatched for it. UpdateSizeAndPositionOfChildElements guards
+    // this via the Layout::DropDown case (no-op). Verify that a
+    // DropDownContainerElement with Layout::DropDown passed through
+    // UpdateSizeAndPositionOfChildElements leaves children unchanged.
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {300.0f, 100.0f};
+    container.layout = steamrot::Layout::DropDown;
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f}; // should be ignored
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-  steamrot::logic::positioning::ui::PositionDropDownLayoutChildren(parent,
-                                                                   style);
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        container, style);
 
-  // available = {200 - 10, 50 - 10} = {190, 40}
-  // start     = {5, 5}
-  float available_width = 190.0f;
-  float available_height = 40.0f;
-
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f(
-                   {available_width, available_height}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({5.0f, 5.0f}));
-
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f(
-                   {available_width, available_height}));
-  REQUIRE_THAT(parent.child_elements[1]->position,
-               steamrot::tests::EqualsVector2f(
-                   {5.0f, 5.0f + available_height}));
-}
-
-TEST_CASE("PositionDropDownLayoutChildren ignores inner_margin",
-          "[unit][positioning_ui]") {
-  // Two setups: one with margin, one without — results must be identical
-  steamrot::PanelElement parent_with_margin;
-  parent_with_margin.position = {0.0f, 0.0f};
-  parent_with_margin.size = {100.0f, 40.0f};
-  parent_with_margin.layout = steamrot::Layout::DropDown;
-  parent_with_margin.child_elements.push_back(
-      std::make_unique<steamrot::PanelElement>());
-
-  steamrot::PanelElement parent_no_margin;
-  parent_no_margin.position = {0.0f, 0.0f};
-  parent_no_margin.size = {100.0f, 40.0f};
-  parent_no_margin.layout = steamrot::Layout::DropDown;
-  parent_no_margin.child_elements.push_back(
-      std::make_unique<steamrot::PanelElement>());
-
-  steamrot::UIStyle style_with_margin;
-  style_with_margin.panel_style.border_thickness = 2.0f;
-  style_with_margin.panel_style.inner_margin = {20.0f, 20.0f};
-
-  steamrot::UIStyle style_no_margin;
-  style_no_margin.panel_style.border_thickness = 2.0f;
-  style_no_margin.panel_style.inner_margin = {0.0f, 0.0f};
-
-  steamrot::logic::positioning::ui::PositionDropDownLayoutChildren(
-      parent_with_margin, style_with_margin);
-  steamrot::logic::positioning::ui::PositionDropDownLayoutChildren(
-      parent_no_margin, style_no_margin);
-
-  REQUIRE_THAT(parent_with_margin.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f(
-                   parent_no_margin.child_elements[0]->size));
-  REQUIRE_THAT(parent_with_margin.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f(
-                   parent_no_margin.child_elements[0]->position));
+    // Children should remain at their default zero position/size — the generic
+    // horizontal layout was not applied because Layout::DropDown is a no-op in
+    // UpdateSizeAndPositionOfChildElements.
+    REQUIRE_THAT(container.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+  }
 }
 
 // ---------------------------------------------------------------------------
-// UpdateSizeAndPositionOfChildElements (existing tests preserved)
+// PositionDropDownListChildren
 // ---------------------------------------------------------------------------
 
-TEST_CASE("UpdateSizeAndPositionOfChildElements does nothing when element has "
-          "no children",
-          "[unit][positioning_ui]") {
-  // Arrange
-  steamrot::PanelElement panel;
-  panel.position = {10.0f, 10.0f};
-  panel.size = {200.0f, 100.0f};
+TEST_CASE("PositionDropDownListChildren", "[unit][positioning_ui]") {
 
+  std::vector<std::unique_ptr<steamrot::UIElement>> children;
   steamrot::UIStyle style;
+  sf::Vector2f available_size{300.0f, 15.0f};
+  sf::Vector2f start_position{10.0f, 20.0f};
 
-  // Act - should not modify anything, just not crash
-  steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(panel,
-                                                                         style);
+  SECTION("does nothing with empty child list") {
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::ui::PositionDropDownListChildren(
+            children, available_size, start_position, style));
+  }
 
-  // Assert - panel remains unchanged
-  REQUIRE_THAT(panel.position, steamrot::tests::EqualsVector2f({10.0f, 10.0f}));
-  REQUIRE_THAT(panel.size, steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
-}
+  SECTION("stacks single child at provided start position") {
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
 
-TEST_CASE("UpdateSizeAndPositionOfChildElements positions Vertical layout "
-          "children correctly",
-          "[unit][positioning_ui]") {
-  // Arrange
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {200.0f, 300.0f};
-  parent.layout = steamrot::Layout::Vertical;
+    steamrot::logic::positioning::ui::PositionDropDownListChildren(
+        children, available_size, start_position, style);
 
-  // Add two children
-  auto child1 = std::make_unique<steamrot::PanelElement>();
-  auto child2 = std::make_unique<steamrot::PanelElement>();
-  parent.child_elements.push_back(std::move(child1));
-  parent.child_elements.push_back(std::move(child2));
+    REQUIRE_THAT(children[0]->size,
+                 steamrot::tests::EqualsVector2f(available_size));
+    REQUIRE_THAT(children[0]->position,
+                 steamrot::tests::EqualsVector2f(start_position));
+  }
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
+  SECTION("stacks multiple children vertically with no spacing, each child "
+          "taking full available width and height") {
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
 
-  // Act
-  steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                         style);
+    steamrot::logic::positioning::ui::PositionDropDownListChildren(
+        children, available_size, start_position, style);
 
-  // Assert
-  // available_width = 200 - 2*5 - 2*10 = 170
-  // available_height = 300 - 2*5 - 2*10 = 270
-  // child_height = (270 - 1*10) / 2 = 130
-  // start_position = {0+5+10, 0+5+10} = {15, 15}
-  float expected_width = 200.0f - 2 * 5.0f - 2 * 10.0f;
-  float expected_height = 300.0f - 2 * 5.0f - 2 * 10.0f;
-  float child_height = (expected_height - 1 * 10.0f) / 2.0f;
+    REQUIRE_THAT(children[0]->size,
+                 steamrot::tests::EqualsVector2f(available_size));
+    REQUIRE_THAT(children[0]->position,
+                 steamrot::tests::EqualsVector2f(start_position));
 
-  REQUIRE_THAT(parent.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({expected_width, child_height}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
+    REQUIRE_THAT(children[1]->size,
+                 steamrot::tests::EqualsVector2f(available_size));
+    REQUIRE_THAT(children[1]->position,
+                 steamrot::tests::EqualsVector2f(
+                     start_position + sf::Vector2f{0.0f, available_size.y}));
 
-  REQUIRE_THAT(parent.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f({expected_width, child_height}));
-  REQUIRE_THAT(
-      parent.child_elements[1]->position,
-      steamrot::tests::EqualsVector2f({15.0f, 15.0f + child_height + 10.0f}));
-}
-
-TEST_CASE("UpdateSizeAndPositionOfChildElements positions Horizontal layout "
-          "children correctly",
-          "[unit][positioning_ui]") {
-  // Arrange
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {300.0f, 100.0f};
-  parent.layout = steamrot::Layout::Horizontal;
-
-  // Add two children
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
-
-  // Act
-  steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                         style);
-
-  // Assert
-  // available_width = 300 - 2*5 - 2*10 = 270
-  // available_height = 100 - 2*5 - 2*10 = 70
-  // child_width = (270 - 1*10) / 2 = 130
-  // start_position = {0+5+10, 0+5+10} = {15, 15}
-  float available_width = 300.0f - 2 * 5.0f - 2 * 10.0f;
-  float available_height = 100.0f - 2 * 5.0f - 2 * 10.0f;
-  float child_width = (available_width - 1 * 10.0f) / 2.0f;
-
-  REQUIRE_THAT(
-      parent.child_elements[0]->size,
-      steamrot::tests::EqualsVector2f({child_width, available_height}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
-
-  REQUIRE_THAT(
-      parent.child_elements[1]->size,
-      steamrot::tests::EqualsVector2f({child_width, available_height}));
-  REQUIRE_THAT(
-      parent.child_elements[1]->position,
-      steamrot::tests::EqualsVector2f({15.0f + child_width + 10.0f, 15.0f}));
-}
-
-TEST_CASE("UpdateSizeAndPositionOfChildElements positions DropDown layout "
-          "children correctly",
-          "[unit][positioning_ui]") {
-  // Arrange
-  steamrot::PanelElement parent;
-  parent.position = {0.0f, 0.0f};
-  parent.size = {200.0f, 50.0f};
-  parent.layout = steamrot::Layout::DropDown;
-
-  // Add two children (items stack vertically)
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 5.0f;
-  style.panel_style.inner_margin = {10.0f, 10.0f};
-
-  // Act
-  steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(parent,
-                                                                         style);
-
-  // Assert
-  // available_width = 200 - 2*5 = 190
-  // available_height = 50 - 2*5 = 40
-  // start_position = {0+5, 0+5} = {5, 5}
-  float available_width = 200.0f - 2 * 5.0f;
-  float available_height = 50.0f - 2 * 5.0f;
-
-  REQUIRE_THAT(
-      parent.child_elements[0]->size,
-      steamrot::tests::EqualsVector2f({available_width, available_height}));
-  REQUIRE_THAT(parent.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({5.0f, 5.0f}));
-
-  REQUIRE_THAT(
-      parent.child_elements[1]->size,
-      steamrot::tests::EqualsVector2f({available_width, available_height}));
-  REQUIRE_THAT(
-      parent.child_elements[1]->position,
-      steamrot::tests::EqualsVector2f({5.0f, 5.0f + available_height}));
-}
-
-TEST_CASE("UpdateSizeAndPositionOfChildElements positions "
-          "DropDownContainerElement children correctly",
-          "[unit][positioning_ui]") {
-  // Arrange
-  steamrot::DropDownContainerElement dd_container;
-  dd_container.position = {0.0f, 0.0f};
-  dd_container.size = {200.0f, 50.0f};
-
-  dd_container.child_elements.push_back(
-      std::make_unique<steamrot::DropDownListElement>());
-  dd_container.child_elements.push_back(
-      std::make_unique<steamrot::DropDownButtonElement>());
-
-  steamrot::UIStyle style;
-  style.drop_down_container_style.border_thickness = 2.0f;
-  style.drop_down_container_style.drop_symbol_ratio = 0.2f;
-
-  // Act
-  steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
-      dd_container, style);
-
-  // Assert
-  // available_width = 200 - 2*2 = 196
-  // available_height = 50 - 2*2 = 46
-  // dd_list_size = {196 * (1 - 0.2), 46} = {156.8, 46}
-  // dd_button_size = {196 * 0.2, 46} = {39.2, 46}
-  // dd_list_position = {0+2, 0+2} = {2, 2}
-  // dd_button_position = {2+156.8, 2} = {158.8, 2}
-  float available_width = 200.0f - 2 * 2.0f;
-  float available_height = 50.0f - 2 * 2.0f;
-  float ratio = 0.2f;
-  float dd_list_width = available_width * (1.0f - ratio);
-  float dd_button_width = available_width * ratio;
-
-  REQUIRE_THAT(
-      dd_container.child_elements[0]->size,
-      steamrot::tests::EqualsVector2f({dd_list_width, available_height}));
-  REQUIRE_THAT(dd_container.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({2.0f, 2.0f}));
-
-  REQUIRE_THAT(
-      dd_container.child_elements[1]->size,
-      steamrot::tests::EqualsVector2f({dd_button_width, available_height}));
-  REQUIRE_THAT(dd_container.child_elements[1]->position,
-               steamrot::tests::EqualsVector2f({2.0f + dd_list_width, 2.0f}));
+    REQUIRE_THAT(children[2]->size,
+                 steamrot::tests::EqualsVector2f(available_size));
+    REQUIRE_THAT(
+        children[2]->position,
+        steamrot::tests::EqualsVector2f(
+            start_position + sf::Vector2f{0.0f, 2 * available_size.y}));
+  }
 }
 
 // ---------------------------------------------------------------------------
-// PositionNestedUIElements (existing tests preserved)
+// UpdateSizeAndPositionOfChildElements
 // ---------------------------------------------------------------------------
 
-TEST_CASE("PositionNestedUIElements recursively positions active children",
-          "[unit][positioning_ui]") {
-  // Arrange - parent with one active child that itself has a child
-  steamrot::PanelElement root;
-  root.position = {0.0f, 0.0f};
-  root.size = {200.0f, 200.0f};
-  root.layout = steamrot::Layout::Vertical;
-  root.children_active = true;
+TEST_CASE("UpdateSizeAndPositionOfChildElements", "[unit][positioning_ui]") {
 
-  auto child = std::make_unique<steamrot::PanelElement>();
-  child->layout = steamrot::Layout::Horizontal;
-  child->children_active = true;
+  SECTION("does nothing when element has no children") {
+    steamrot::PanelElement panel;
+    panel.position = {10.0f, 10.0f};
+    panel.size = {200.0f, 100.0f};
 
-  // grandchild - will be positioned by child's UpdateSizeAndPosition call
-  child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
-  child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    steamrot::UIStyle style;
 
-  root.child_elements.push_back(std::move(child));
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        panel, style);
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 0.0f;
-  style.panel_style.inner_margin = {0.0f, 0.0f};
+    REQUIRE_THAT(panel.position,
+                 steamrot::tests::EqualsVector2f({10.0f, 10.0f}));
+    REQUIRE_THAT(panel.size, steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
+  }
 
-  // Act
-  steamrot::logic::positioning::ui::PositionNestedUIElements(root, style);
+  SECTION("positions Vertical layout children correctly") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {200.0f, 300.0f};
+    parent.layout = steamrot::Layout::Vertical;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  // Assert - root's child was positioned
-  REQUIRE_THAT(root.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
-  REQUIRE_THAT(root.child_elements[0]->position,
-               steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
 
-  // grandchildren were also positioned by recursive call
-  const auto &child_ref = *root.child_elements[0];
-  REQUIRE_THAT(child_ref.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({100.0f, 200.0f}));
-  REQUIRE_THAT(child_ref.child_elements[1]->size,
-               steamrot::tests::EqualsVector2f({100.0f, 200.0f}));
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        parent, style);
+
+    // available_width = 200 - 2*5 - 2*10 = 170
+    // available_height = 300 - 2*5 - 2*10 = 270
+    // child_height = (270 - 1*10) / 2 = 130
+    // start_position = {0+5+10, 0+5+10} = {15, 15}
+    float expected_width = 200.0f - 2 * 5.0f - 2 * 10.0f;
+    float expected_height = 300.0f - 2 * 5.0f - 2 * 10.0f;
+    float child_height = (expected_height - 1 * 10.0f) / 2.0f;
+
+    REQUIRE_THAT(
+        parent.child_elements[0]->size,
+        steamrot::tests::EqualsVector2f({expected_width, child_height}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
+
+    REQUIRE_THAT(
+        parent.child_elements[1]->size,
+        steamrot::tests::EqualsVector2f({expected_width, child_height}));
+    REQUIRE_THAT(
+        parent.child_elements[1]->position,
+        steamrot::tests::EqualsVector2f({15.0f, 15.0f + child_height + 10.0f}));
+  }
+
+  SECTION("positions Horizontal layout children correctly") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {300.0f, 100.0f};
+    parent.layout = steamrot::Layout::Horizontal;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
+
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        parent, style);
+
+    // available_width = 300 - 2*5 - 2*10 = 270
+    // available_height = 100 - 2*5 - 2*10 = 70
+    // child_width = (270 - 1*10) / 2 = 130
+    // start_position = {0+5+10, 0+5+10} = {15, 15}
+    float available_width = 300.0f - 2 * 5.0f - 2 * 10.0f;
+    float available_height = 100.0f - 2 * 5.0f - 2 * 10.0f;
+    float child_width = (available_width - 1 * 10.0f) / 2.0f;
+
+    REQUIRE_THAT(
+        parent.child_elements[0]->size,
+        steamrot::tests::EqualsVector2f({child_width, available_height}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({15.0f, 15.0f}));
+
+    REQUIRE_THAT(
+        parent.child_elements[1]->size,
+        steamrot::tests::EqualsVector2f({child_width, available_height}));
+    REQUIRE_THAT(
+        parent.child_elements[1]->position,
+        steamrot::tests::EqualsVector2f({15.0f + child_width + 10.0f, 15.0f}));
+  }
+
+  SECTION("does not position DropDownContainerElement children (specialist "
+          "approach)") {
+    // DropDownContainerElement uses PositionDropDownContainerChildren as its
+    // specialist approach. When its layout is Layout::DropDown,
+    // UpdateSizeAndPositionOfChildElements must not dispatch to the generic
+    // Vertical or Horizontal layout functions — the DropDown case is a no-op.
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 50.0f};
+    container.layout = steamrot::Layout::DropDown;
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 5.0f;
+    style.panel_style.inner_margin = {10.0f, 10.0f};
+
+    steamrot::logic::positioning::ui::UpdateSizeAndPositionOfChildElements(
+        container, style);
+
+    // Children must remain at default zero values — no generic layout applied.
+    REQUIRE_THAT(container.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    REQUIRE_THAT(container.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+  }
 }
 
-TEST_CASE("PositionNestedUIElements does not recurse into inactive children",
-          "[unit][positioning_ui]") {
-  // Arrange - parent with an inactive child
-  steamrot::PanelElement root;
-  root.position = {0.0f, 0.0f};
-  root.size = {200.0f, 200.0f};
-  root.layout = steamrot::Layout::Vertical;
-  root.children_active = false; // children inactive
+// ---------------------------------------------------------------------------
+// PositionNestedUIElements
+// ---------------------------------------------------------------------------
 
-  auto child = std::make_unique<steamrot::PanelElement>();
-  child->layout = steamrot::Layout::Horizontal;
-  child->children_active = true;
-  child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+TEST_CASE("PositionNestedUIElements", "[unit][positioning_ui]") {
 
-  root.child_elements.push_back(std::move(child));
+  SECTION("recursively positions active children") {
+    // parent with one active child that itself has children
+    steamrot::PanelElement root;
+    root.position = {0.0f, 0.0f};
+    root.size = {200.0f, 200.0f};
+    root.layout = steamrot::Layout::Vertical;
+    root.children_active = true;
 
-  steamrot::UIStyle style;
-  style.panel_style.border_thickness = 0.0f;
-  style.panel_style.inner_margin = {0.0f, 0.0f};
+    auto child = std::make_unique<steamrot::PanelElement>();
+    child->layout = steamrot::Layout::Horizontal;
+    child->children_active = true;
 
-  // Act
-  steamrot::logic::positioning::ui::PositionNestedUIElements(root, style);
+    // grandchildren — will be positioned by child's UpdateSizeAndPosition call
+    child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
 
-  // Assert - root's child was still positioned by UpdateSizeAndPosition
-  // but grandchild was not touched because children_active is false on root
-  REQUIRE_THAT(root.child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
+    root.child_elements.push_back(std::move(child));
 
-  // grandchild should remain at default zero size (not positioned)
-  REQUIRE_THAT(root.child_elements[0]->child_elements[0]->size,
-               steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionNestedUIElements(root, style);
+
+    // root's child was positioned
+    REQUIRE_THAT(root.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
+    REQUIRE_THAT(root.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    // grandchildren were also positioned by recursive call
+    const auto &child_ref = *root.child_elements[0];
+    REQUIRE_THAT(child_ref.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({100.0f, 200.0f}));
+    REQUIRE_THAT(child_ref.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({100.0f, 200.0f}));
+  }
+
+  SECTION("does not recurse into inactive children") {
+    // parent with an inactive child
+    steamrot::PanelElement root;
+    root.position = {0.0f, 0.0f};
+    root.size = {200.0f, 200.0f};
+    root.layout = steamrot::Layout::Vertical;
+    root.children_active = false;
+
+    auto child = std::make_unique<steamrot::PanelElement>();
+    child->layout = steamrot::Layout::Horizontal;
+    child->children_active = true;
+    child->child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    root.child_elements.push_back(std::move(child));
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionNestedUIElements(root, style);
+
+    // root's child was still positioned by UpdateSizeAndPosition
+    // but grandchild was not touched because children_active is false on root
+    REQUIRE_THAT(root.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
+
+    // grandchild should remain at default zero size (not positioned)
+    REQUIRE_THAT(root.child_elements[0]->child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+  }
 }

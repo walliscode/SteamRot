@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
 #include "DropDownContainerElement.h"
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::ui {
 
@@ -28,10 +29,66 @@ sf::Vector2f CalculateStartPosition(const sf::Vector2f &element_position,
 }
 
 /////////////////////////////////////////////////
+void PositionVerticalLayoutChildren(const UIElement &element,
+                                    const UIStyle &style) {
+  if (element.child_elements.empty()) {
+    return;
+  }
+
+  float border_thickness = style.panel_style.border_thickness;
+  sf::Vector2f inner_margin = style.panel_style.inner_margin;
+
+  sf::Vector2f available_size =
+      CalculateAvailableSize(element.size, border_thickness, inner_margin);
+  sf::Vector2f start_position =
+      CalculateStartPosition(element.position, border_thickness, inner_margin);
+
+  // divide available height equally among children with inner_margin.y spacing
+  float child_height = (available_size.y -
+                        (element.child_elements.size() - 1) * inner_margin.y) /
+                       static_cast<float>(element.child_elements.size());
+
+  for (size_t i = 0; i < element.child_elements.size(); i++) {
+    element.child_elements[i]->size.x = available_size.x;
+    element.child_elements[i]->size.y = child_height;
+    element.child_elements[i]->position =
+        sf::Vector2f{start_position.x,
+                     start_position.y + i * (child_height + inner_margin.y)};
+  }
+}
+
+/////////////////////////////////////////////////
+void PositionHorizontalLayoutChildren(const UIElement &element,
+                                      const UIStyle &style) {
+  if (element.child_elements.empty()) {
+    return;
+  }
+
+  float border_thickness = style.panel_style.border_thickness;
+  sf::Vector2f inner_margin = style.panel_style.inner_margin;
+
+  sf::Vector2f available_size =
+      CalculateAvailableSize(element.size, border_thickness, inner_margin);
+  sf::Vector2f start_position =
+      CalculateStartPosition(element.position, border_thickness, inner_margin);
+
+  // divide available width equally among children with inner_margin.x spacing
+  float child_width = (available_size.x -
+                       (element.child_elements.size() - 1) * inner_margin.x) /
+                      static_cast<float>(element.child_elements.size());
+
+  for (size_t i = 0; i < element.child_elements.size(); i++) {
+    element.child_elements[i]->size.x = child_width;
+    element.child_elements[i]->size.y = available_size.y;
+    element.child_elements[i]->position =
+        sf::Vector2f{start_position.x + i * (child_width + inner_margin.x),
+                     start_position.y};
+  }
+}
+/////////////////////////////////////////////////
 void PositionDropDownContainerChildren(const DropDownContainerElement &element,
                                        const UIStyle &style) {
-  float border_thickness =
-      style.drop_down_container_style.border_thickness;
+  float border_thickness = style.drop_down_container_style.border_thickness;
   float ratio = style.drop_down_container_style.drop_symbol_ratio;
 
   // ignore inner margins for dropdown container children
@@ -55,84 +112,33 @@ void PositionDropDownContainerChildren(const DropDownContainerElement &element,
     element.child_elements[1]->size = dd_button_size;
     element.child_elements[1]->position = dd_button_position;
   }
-}
 
+  // position the dropdown list children if not empty (assumed to be expanded if
+  // not empty)
+  if (!element.child_elements.empty()) {
+    sf::Vector2f dd_item_start_position{start_position.x,
+                                        start_position.y + dd_list_size.y};
+    PositionDropDownListChildren(element.child_elements[0]->child_elements,
+                                 dd_list_size, dd_item_start_position, style);
+  }
+}
 /////////////////////////////////////////////////
-void PositionVerticalLayoutChildren(const UIElement &element,
-                                    const UIStyle &style) {
-  if (element.child_elements.empty()) {
+void PositionDropDownListChildren(
+    const std::vector<std::unique_ptr<UIElement>> &child_elements,
+    const sf::Vector2f &available_size, const sf::Vector2f &start_position,
+    const UIStyle &style) {
+
+  if (child_elements.empty()) {
     return;
   }
 
-  float border_thickness = style.panel_style.border_thickness;
-  sf::Vector2f inner_margin = style.panel_style.inner_margin;
-
-  sf::Vector2f available_size =
-      CalculateAvailableSize(element.size, border_thickness, inner_margin);
-  sf::Vector2f start_position =
-      CalculateStartPosition(element.position, border_thickness, inner_margin);
-
-  // divide available height equally among children with inner_margin.y spacing
-  float child_height =
-      (available_size.y -
-       (element.child_elements.size() - 1) * inner_margin.y) /
-      static_cast<float>(element.child_elements.size());
-
-  for (size_t i = 0; i < element.child_elements.size(); i++) {
-    element.child_elements[i]->size.x = available_size.x;
-    element.child_elements[i]->size.y = child_height;
-    element.child_elements[i]->position = sf::Vector2f{
-        start_position.x,
-        start_position.y + i * (child_height + inner_margin.y)};
-  }
-}
-
-/////////////////////////////////////////////////
-void PositionHorizontalLayoutChildren(const UIElement &element,
-                                      const UIStyle &style) {
-  if (element.child_elements.empty()) {
-    return;
-  }
-
-  float border_thickness = style.panel_style.border_thickness;
-  sf::Vector2f inner_margin = style.panel_style.inner_margin;
-
-  sf::Vector2f available_size =
-      CalculateAvailableSize(element.size, border_thickness, inner_margin);
-  sf::Vector2f start_position =
-      CalculateStartPosition(element.position, border_thickness, inner_margin);
-
-  // divide available width equally among children with inner_margin.x spacing
-  float child_width =
-      (available_size.x -
-       (element.child_elements.size() - 1) * inner_margin.x) /
-      static_cast<float>(element.child_elements.size());
-
-  for (size_t i = 0; i < element.child_elements.size(); i++) {
-    element.child_elements[i]->size.x = child_width;
-    element.child_elements[i]->size.y = available_size.y;
-    element.child_elements[i]->position =
-        sf::Vector2f{start_position.x + i * (child_width + inner_margin.x),
-                     start_position.y};
-  }
-}
-
-/////////////////////////////////////////////////
-void PositionDropDownLayoutChildren(const UIElement &element,
-                                    const UIStyle &style) {
-  float border_thickness = style.panel_style.border_thickness;
-
-  // DropDown layout ignores inner margins
-  sf::Vector2f available_size =
-      CalculateAvailableSize(element.size, border_thickness);
-  sf::Vector2f start_position =
-      CalculateStartPosition(element.position, border_thickness);
-
-  for (size_t i = 0; i < element.child_elements.size(); i++) {
-    element.child_elements[i]->size.x = available_size.x;
-    element.child_elements[i]->size.y = available_size.y;
-    element.child_elements[i]->position = sf::Vector2f{
-        start_position.x, start_position.y + i * available_size.y};
+  // position children veritcally without inner margins; each child takes the
+  // full available width and height, offset by their index this assumes that
+  // all children are DropDownItemElements
+  for (size_t i = 0; i < child_elements.size(); i++) {
+    child_elements[i]->size = available_size;
+    child_elements[i]->position = sf::Vector2f{
+        start_position.x, start_position.y + (i * available_size.y)};
   }
 }
 
@@ -141,13 +147,6 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
                                           const UIStyle &style) {
   // guard clause for no children
   if (element.child_elements.empty()) {
-    return;
-  }
-
-  // handle DropDownContainer children with type-specific positioning
-  if (const auto *dd_container =
-          dynamic_cast<const DropDownContainerElement *>(&element)) {
-    PositionDropDownContainerChildren(*dd_container, style);
     return;
   }
 
@@ -162,7 +161,9 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
     break;
   }
   case Layout::DropDown: {
-    PositionDropDownLayoutChildren(element, style);
+
+    // possibly redundant to be depreciated, as we are handling
+    // DropDownContainerElement children separately
     break;
   }
   default: {
@@ -177,6 +178,13 @@ void PositionNestedUIElements(const UIElement &element, const UIStyle &style) {
   // position the children of this element
   UpdateSizeAndPositionOfChildElements(element, style);
 
+  // handle DropDownContainer and return early since it has special handling for
+  // its children
+  if (const auto *dd_container =
+          dynamic_cast<const DropDownContainerElement *>(&element)) {
+    PositionDropDownContainerChildren(*dd_container, style);
+    return;
+  }
   // recursively position active children
   if (element.children_active) {
     for (const auto &child : element.child_elements) {

@@ -21,6 +21,8 @@ std::expected<std::monostate, FailInfo> SandboxEngine::StartUp() {
     return std::unexpected(base_startup_result.error());
   }
 
+  // modify the size of the window for the sandbox
+  // m_engine_resources.game_window.setSize({1270, 800});
   // Load the UIExplorer scene instead of the Title scene
   auto load_result = m_scene_manager.LoadUIExplorerScene();
   if (!load_result.has_value()) {

@@ -82,8 +82,8 @@ private:
   /////////////////////////////////////////////////
   /// @brief Scene canvas width and height (must match texture dimensions).
   /////////////////////////////////////////////////
-  static constexpr float kSceneWidth = 1280.0f;
-  static constexpr float kSceneHeight = 720.0f;
+  static constexpr float kSceneWidth = 800.0f;
+  static constexpr float kSceneHeight = 600.0f;
 
   /////////////////////////////////////////////////
   /// @brief Vertical padding between selector entries.
@@ -207,8 +207,8 @@ private:
   /////////////////////////////////////////////////
   /// @brief Draw a single line of text to the scene texture.
   /////////////////////////////////////////////////
-  void DrawText(const std::string &text, sf::Vector2f position,
-                sf::Color color, unsigned int character_size = 16u);
+  void DrawText(const std::string &text, sf::Vector2f position, sf::Color color,
+                unsigned int character_size = 16u);
 
   /////////////////////////////////////////////////
   /// @brief Save the current canvas render to a PNG file.
