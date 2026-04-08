@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <bitset>
 #include <cstddef>
+#include <numeric>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -119,20 +120,31 @@ std::vector<size_t> GetEntitiesSortedByPriority(
   std::vector<size_t> entity_indexes(entity_index_set.begin(),
                                      entity_index_set.end());
 
-  // sort by m_priority, using entity index as tie-breaker for stability
-  std::stable_sort(
-      entity_indexes.begin(), entity_indexes.end(),
-      [&](size_t a, size_t b) {
-        const Component &comp_a =
-            entity::memory::GetComponent<Component>(a, entity_memory_pool);
-        const Component &comp_b =
-            entity::memory::GetComponent<Component>(b, entity_memory_pool);
-        if (ascending) {
-          return comp_a.m_priority < comp_b.m_priority;
-        }
-        return comp_a.m_priority > comp_b.m_priority;
-      });
+  // cache priority values to avoid repeated GetComponent calls during sort
+  std::vector<int> priorities;
+  priorities.reserve(entity_indexes.size());
+  for (size_t id : entity_indexes) {
+    priorities.push_back(
+        entity::memory::GetComponent<Component>(id, entity_memory_pool)
+            .m_priority);
+  }
 
-  return entity_indexes;
+  // sort by cached priority, using original position as tie-breaker for
+  // stability (std::stable_sort preserves equal-priority ordering)
+  std::vector<size_t> indices(entity_indexes.size());
+  std::iota(indices.begin(), indices.end(), 0);
+
+  std::stable_sort(indices.begin(), indices.end(), [&](size_t a, size_t b) {
+    return ascending ? priorities[a] < priorities[b]
+                     : priorities[a] > priorities[b];
+  });
+
+  std::vector<size_t> result;
+  result.reserve(entity_indexes.size());
+  for (size_t i : indices) {
+    result.push_back(entity_indexes[i]);
+  }
+
+  return result;
 }
 } // namespace steamrot::archetypes

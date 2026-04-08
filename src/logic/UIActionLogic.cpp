@@ -41,7 +41,11 @@ void UIActionLogic::ProcessLogic() {
       continue;
     }
 
-    // check hover state before processing (used for early-exit below)
+    // check hover state BEFORE processing actions: we need to know whether this
+    // entity owned the mouse going into this frame so we can stop processing
+    // lower-priority entities afterwards. Actions cannot retroactively change
+    // another entity's hover state, and UICollisionLogic has already cleared
+    // is_mouse_over on all lower-priority entities.
     bool entity_has_hover =
         collision::mouse::AnyMouseOver(*ui_component.m_root_element);
 
