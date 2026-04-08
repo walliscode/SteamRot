@@ -124,6 +124,7 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
   element.layout = ConvertLayout(data.layout());
   element.children_active = data.children_active();
+  element.priority = data.priority();
 
   // Recursively create and attach children
   if (data.children()) {

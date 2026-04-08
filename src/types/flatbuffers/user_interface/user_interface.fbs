@@ -46,6 +46,7 @@ table UIElementDataFbs{
     is_mouse_over: bool;
     layout: LayoutFbs;
     spacing_strategy: SpacingAndSizingFbs;
+    priority: int;
   }
 table PanelDataFbs{  base_data: UIElementDataFbs(required);}
 

@@ -9,6 +9,8 @@
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
 #include "UIElement.h"
+#include <algorithm>
+#include <vector>
 
 namespace steamrot::logic::collision::mouse {
 
@@ -44,8 +46,20 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   // bool to keep track if any child is hovered over
   bool child_hovered = false;
 
-  // cycle through all child elements and check if any are hovered
+  // Build a sorted view of children in descending priority order so that
+  // higher-priority siblings are evaluated before lower-priority ones
+  std::vector<UIElement *> sorted_children;
+  sorted_children.reserve(element.child_elements.size());
   for (auto &child : element.child_elements) {
+    sorted_children.push_back(child.get());
+  }
+  std::stable_sort(sorted_children.begin(), sorted_children.end(),
+                   [](const UIElement *a, const UIElement *b) {
+                     return a->priority > b->priority;
+                   });
+
+  // cycle through all child elements and check if any are hovered
+  for (auto *child : sorted_children) {
     // go as deep as possible first; stops when no children are detected
     CheckMouseOver(mouse_position, *child);
     if (child->is_mouse_over) {

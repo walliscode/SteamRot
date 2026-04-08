@@ -190,3 +190,86 @@ TEST_CASE("AnyMouseOver returns true when any element in tree is hovered",
     REQUIRE(steamrot::logic::collision::mouse::AnyMouseOver(parent) == true);
   }
 }
+
+TEST_CASE("CheckMouseOver UIElement respects priority among overlapping sibling "
+          "children",
+          "[unit][collision]") {
+
+  // Parent that covers the whole test area
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+
+  // Both siblings occupy the same bounds so without priority they would both
+  // be candidates for hover on the same mouse position
+  auto low_priority = std::make_unique<steamrot::PanelElement>();
+  low_priority->position = {50, 50};
+  low_priority->size = {100, 100};
+  low_priority->priority = 0;
+
+  auto high_priority = std::make_unique<steamrot::PanelElement>();
+  high_priority->position = {50, 50};
+  high_priority->size = {100, 100};
+  high_priority->priority = 10;
+
+  // Insert low-priority first so that insertion order alone would give it
+  // hover; priority must override this
+  parent.child_elements.push_back(std::move(low_priority));
+  parent.child_elements.push_back(std::move(high_priority));
+
+  auto &low =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+  auto &high =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[1].get());
+
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("Higher priority sibling receives hover") {
+    REQUIRE(high.is_mouse_over == true);
+  }
+
+  SECTION("Lower priority sibling does not receive hover") {
+    REQUIRE(low.is_mouse_over == false);
+  }
+
+  SECTION("Parent does not receive hover when a child is hovered") {
+    REQUIRE(parent.is_mouse_over == false);
+  }
+}
+
+TEST_CASE("CheckMouseOver UIElement selects lower priority sibling when higher "
+          "priority is not under mouse",
+          "[unit][collision]") {
+
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {300, 300};
+
+  // High priority child placed to the right - mouse will NOT be over it
+  auto high_priority = std::make_unique<steamrot::PanelElement>();
+  high_priority->position = {150, 0};
+  high_priority->size = {100, 100};
+  high_priority->priority = 10;
+
+  // Low priority child on the left - mouse WILL be over it
+  auto low_priority = std::make_unique<steamrot::PanelElement>();
+  low_priority->position = {0, 0};
+  low_priority->size = {100, 100};
+  low_priority->priority = 0;
+
+  parent.child_elements.push_back(std::move(low_priority));
+  parent.child_elements.push_back(std::move(high_priority));
+
+  auto &low =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+  auto &high =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[1].get());
+
+  // Mouse is over the low-priority child only
+  sf::Vector2i mouse_position(50, 50);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  REQUIRE(high.is_mouse_over == false);
+  REQUIRE(low.is_mouse_over == true);
+}
