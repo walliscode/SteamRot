@@ -11,6 +11,7 @@
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
+#include "MrGhost.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot {
@@ -52,6 +53,15 @@ struct SceneResources {
   /// drawn to the game window.
   /////////////////////////////////////////////////
   sf::RenderTexture scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief MrGhost state for the scene.
+  ///
+  /// Tracks the currently selected item (type + key) from menus, dropdowns,
+  /// blueprint lists, etc. A single instance lives here and is exposed to
+  /// all Logic classes via SceneContext::mr_ghost.
+  /////////////////////////////////////////////////
+  MrGhost mr_ghost{};
 };
 
 } // namespace steamrot

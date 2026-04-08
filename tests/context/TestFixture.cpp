@@ -43,7 +43,7 @@ void TestFixture::CreateContexts() {
   // manager
   m_scene_context = std::make_unique<SceneContext>(
       m_scene_texture, m_engine_resources, *m_entity_manager,
-      m_engine_resources.data_access_factory);
+      m_engine_resources.data_access_factory, m_mr_ghost);
 }
 
 /////////////////////////////////////////////////

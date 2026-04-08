@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "MrGhost.h"
 #include "SceneType.h"
 #include "uuid.h"
 #include <optional>
@@ -202,7 +203,53 @@ struct SystemPayload {
   SystemPayload(const SystemPayload::SystemAction action) : action(action) {}
 };
 
+/////////////////////////////////////////////////
+/// @class GhostPayload
+/// @brief Event payload for MrGhost selection changes.
+///
+/// Emitted by Logic classes that write to MrGhost (e.g. a UI action logic
+/// that detects a menu item click). Logic classes that need to react to
+/// selection changes subscribe to EventType::GHOST and inspect this payload.
+/////////////////////////////////////////////////
+struct GhostPayload {
+
+  /////////////////////////////////////////////////
+  /// @brief Discriminates between selecting and clearing the ghost state.
+  /////////////////////////////////////////////////
+  enum class GhostAction { NONE, SELECT, CLEAR } action{GhostAction::NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor for GhostPayload, sets action to NONE.
+  /////////////////////////////////////////////////
+  GhostPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for a SELECT action carrying the chosen item.
+  ///
+  /// @param selection The GhostSelection variant describing what was selected.
+  /////////////////////////////////////////////////
+  GhostPayload(const GhostSelection &selection)
+      : action(GhostAction::SELECT), m_selection(selection) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking an explicit action and optional selection.
+  ///
+  /// @param ghost_action GhostAction enum value to set the action member to.
+  /// @param selection The GhostSelection variant (relevant for SELECT action).
+  /////////////////////////////////////////////////
+  GhostPayload(const GhostAction ghost_action, const GhostSelection &selection)
+      : action(ghost_action), m_selection(selection) {}
+
+  /////////////////////////////////////////////////
+  /// @brief The typed selection carried by this payload.
+  ///
+  /// std::monostate when action is CLEAR or NONE.
+  /////////////////////////////////////////////////
+  GhostSelection m_selection{std::monostate{}};
+};
+
 using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
-                                  LogicPayload, ScenePayload, SystemPayload>;
+                                  LogicPayload, ScenePayload, SystemPayload,
+                                  GhostPayload>;
 
 } // namespace steamrot
