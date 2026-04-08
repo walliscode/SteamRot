@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "EventPayload.h"
+#include "GhostPositioningLogic.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
@@ -173,11 +174,13 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Movement LogicType");
   }
   const auto &movement_logics = movement_it->second;
-  REQUIRE(movement_logics.size() == 2);
+  REQUIRE(movement_logics.size() == 3);
   REQUIRE(dynamic_cast<steamrot::logic::UIPositioningLogic *>(
       movement_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
       movement_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
+      movement_logics[2].get()));
 }
 
 TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "
