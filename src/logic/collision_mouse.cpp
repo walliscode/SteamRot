@@ -62,10 +62,12 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   for (auto *child : sorted_children) {
     // go as deep as possible first; stops when no children are detected
     CheckMouseOver(mouse_position, *child);
-    if (child->is_mouse_over) {
+    // Use AnyMouseOver so that a hover on any descendant (not just the
+    // immediate child) short-circuits the remaining lower-priority siblings
+    if (AnyMouseOver(*child)) {
       // for the parent to evaluate
       child_hovered = true;
-      // if a child is hovered, no need to check further children
+      // if any descendant is hovered, no need to check further siblings
       break;
     }
   }

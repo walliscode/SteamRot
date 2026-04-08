@@ -273,3 +273,71 @@ TEST_CASE("CheckMouseOver UIElement selects lower priority sibling when higher "
   REQUIRE(high.is_mouse_over == false);
   REQUIRE(low.is_mouse_over == true);
 }
+
+TEST_CASE("CheckMouseOver UIElement with high-priority container having nested "
+          "hovered child blocks low-priority sibling",
+          "[unit][collision]") {
+
+  // Simulate the dropdown-over-exit-button scenario:
+  //   root
+  //   ├── exit_button       (priority 0)
+  //   └── dropdown_container (priority 10)
+  //         └── dropdown_item (position overlaps exit_button)
+  //
+  // When the mouse is over the dropdown_item, exit_button must NOT be hovered.
+
+  steamrot::PanelElement root;
+  root.position = {0, 0};
+  root.size = {300, 300};
+
+  // Exit button at the same position that the dropdown item will cover
+  auto exit_button = std::make_unique<steamrot::PanelElement>();
+  exit_button->position = {50, 50};
+  exit_button->size = {100, 100};
+  exit_button->priority = 0;
+
+  // High-priority dropdown container that overlaps the exit button area
+  auto dropdown_container = std::make_unique<steamrot::PanelElement>();
+  dropdown_container->position = {0, 0};
+  dropdown_container->size = {200, 200};
+  dropdown_container->priority = 10;
+  dropdown_container->children_active = true;
+
+  // Dropdown item nested inside the container, overlapping the exit button
+  auto dropdown_item = std::make_unique<steamrot::PanelElement>();
+  dropdown_item->position = {50, 50};
+  dropdown_item->size = {100, 100};
+  dropdown_container->child_elements.push_back(std::move(dropdown_item));
+
+  // Insert exit_button first (insertion order would give it hover without
+  // priority)
+  root.child_elements.push_back(std::move(exit_button));
+  root.child_elements.push_back(std::move(dropdown_container));
+
+  auto &exit_btn =
+      *static_cast<steamrot::PanelElement *>(root.child_elements[0].get());
+  auto &container =
+      *static_cast<steamrot::PanelElement *>(root.child_elements[1].get());
+  auto &item = *static_cast<steamrot::PanelElement *>(
+      container.child_elements[0].get());
+
+  // Mouse is over the area shared by exit_button and dropdown_item
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, root);
+
+  SECTION("Nested dropdown item receives hover") {
+    REQUIRE(item.is_mouse_over == true);
+  }
+
+  SECTION("Exit button (lower-priority sibling of container) is not hovered") {
+    REQUIRE(exit_btn.is_mouse_over == false);
+  }
+
+  SECTION("Dropdown container itself is not hovered (descendant is)") {
+    REQUIRE(container.is_mouse_over == false);
+  }
+
+  SECTION("Root is not hovered") {
+    REQUIRE(root.is_mouse_over == false);
+  }
+}
