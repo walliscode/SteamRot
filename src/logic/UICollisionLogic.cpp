@@ -20,6 +20,13 @@ void UICollisionLogic::ProcessLogic() {
           m_scene_context.archetypes, m_scene_context.scene_entities,
           /*ascending=*/false);
 
+  // first clear all mouse hover state to clear any stale state
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
+        entity_id, m_scene_context.scene_entities);
+    collision::mouse::ClearMouseOver(*ui_component.m_root_element);
+  }
+
   // track whether any higher-priority entity has already claimed the mouse
   bool higher_priority_claimed_mouse = false;
 
