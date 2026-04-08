@@ -40,9 +40,8 @@ GhostActionLogic::GhostActionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void GhostActionLogic::ProcessLogic() {
 
-  // Process GHOST event subscribers and apply payloads to MrGhost.
-  // GHOST CLEAR events (e.g. from Q key press, emitted by SFMLEventConverter)
-  // are handled here via the clear subscriber just like SELECT events.
+  // Iterate active GHOST subscribers and dispatch to the correct free function
+  // based on the GhostPayload::GhostAction enum value.
   for (auto &subscriber : m_subscribers) {
     if (!subscriber->m_active) {
       continue;
@@ -60,10 +59,17 @@ void GhostActionLogic::ProcessLogic() {
     const GhostPayload &ghost_payload =
         std::get<GhostPayload>(subscriber->captured_payload.value());
 
-    auto attach_result =
-        action::ghost::AttachGhostPayload(m_scene_context.mr_ghost, ghost_payload);
-    if (!attach_result.has_value()) {
-      continue;
+    switch (ghost_payload.action) {
+    case GhostPayload::GhostAction::SELECT:
+      action::ghost::SelectGhostItem(m_scene_context.mr_ghost,
+                                     ghost_payload.m_selection);
+      break;
+    case GhostPayload::GhostAction::CLEAR:
+    case GhostPayload::GhostAction::NONE:
+      action::ghost::ClearGhostSelection(m_scene_context.mr_ghost);
+      break;
+    default:
+      break;
     }
   }
 }

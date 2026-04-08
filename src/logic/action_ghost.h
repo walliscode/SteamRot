@@ -12,32 +12,28 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventPayload.h"
-#include "FailInfo.h"
 #include "MrGhost.h"
-#include <expected>
 
 namespace steamrot::logic::action::ghost {
 
 /////////////////////////////////////////////////
-/// @brief Attach a GhostPayload to MrGhost, updating its selection state.
+/// @brief Apply a ghost selection to MrGhost.
 ///
-/// Applies the action carried by @p payload to @p mr_ghost:
-///   - SELECT → sets mr_ghost.m_selection to payload.m_selection.
-///   - CLEAR / NONE → resets mr_ghost.m_selection to std::monostate.
+/// Sets mr_ghost.m_selection to the provided @p selection value.
+/// Callers are responsible for choosing this function when the relevant
+/// GhostPayload::GhostAction is SELECT.
 ///
-/// @param mr_ghost MrGhost instance to update.
-/// @param payload  GhostPayload describing the change to apply.
-/// @return std::monostate on success.
+/// @param mr_ghost  MrGhost instance to update.
+/// @param selection GhostSelection variant describing the chosen item.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-AttachGhostPayload(MrGhost &mr_ghost, const GhostPayload &payload);
+void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection);
 
 /////////////////////////////////////////////////
 /// @brief Clear the current GhostSelection on MrGhost.
 ///
 /// Sets mr_ghost.m_selection to std::monostate, indicating no active
-/// selection.
+/// selection. Callers are responsible for choosing this function when
+/// the relevant GhostPayload::GhostAction is CLEAR or NONE.
 ///
 /// @param mr_ghost MrGhost instance whose selection will be cleared.
 /////////////////////////////////////////////////
