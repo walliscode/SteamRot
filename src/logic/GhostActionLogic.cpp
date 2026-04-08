@@ -11,7 +11,6 @@
 #include "EventType.h"
 #include "Subscriber.h"
 #include "action_ghost.h"
-#include <SFML/Window/Keyboard.hpp>
 
 namespace steamrot::logic {
 
@@ -41,13 +40,9 @@ GhostActionLogic::GhostActionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void GhostActionLogic::ProcessLogic() {
 
-  // Clear the GhostSelection when the Q key is pressed.
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-    action::ghost::ClearGhostSelection(m_scene_context.mr_ghost);
-    return;
-  }
-
   // Process GHOST event subscribers and apply payloads to MrGhost.
+  // GHOST CLEAR events (e.g. from Q key press, emitted by SFMLEventConverter)
+  // are handled here via the clear subscriber just like SELECT events.
   for (auto &subscriber : m_subscribers) {
     if (!subscriber->m_active) {
       continue;

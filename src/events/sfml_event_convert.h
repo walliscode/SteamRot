@@ -62,4 +62,15 @@ ResolveInputAction(const UserInputBitset &accumulated,
 /////////////////////////////////////////////////
 bool CollectSystemEvents(const std::vector<sf::Event> &sfml_events);
 
+/////////////////////////////////////////////////
+/// @brief Detect a ghost-clear request from SFML events (Q key press).
+///
+/// Checks for sf::Event::KeyPressed with the Q key.  A Q press signals
+/// that the user wants to clear the current ghost selection.
+///
+/// @param sfml_events Vector of SFML events gathered this tick.
+/// @return true if a ghost-clear-triggering event was found, false otherwise.
+/////////////////////////////////////////////////
+bool CollectGhostClearEvents(const std::vector<sf::Event> &sfml_events);
+
 } // namespace steamrot::events::convert
