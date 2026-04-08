@@ -223,7 +223,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
         steamrot::GhostPayload::GhostAction::SELECT,
         steamrot::FragmentTag{"copper"}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::EntityTypeTag{"copper"}};
+                                  std::monostate{}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;

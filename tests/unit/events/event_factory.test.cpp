@@ -257,32 +257,6 @@ TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
           "iron_fragment");
 }
 
-TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
-          "GhostPayload (EntityTypeTag)",
-          "[unit][events][event_factory]") {
-  const uint8_t lifetime = 5;
-  const auto action = steamrot::GhostPayload::GhostAction::SELECT;
-  const steamrot::GhostSelection selection =
-      steamrot::EntityTypeTag{"enemy_soldier"};
-
-  auto result =
-      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
-
-  REQUIRE(result.has_value());
-  const auto &packet = result.value();
-
-  REQUIRE(packet.context.lifetime == lifetime);
-  REQUIRE(packet.type == steamrot::EventType::GHOST);
-  REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
-
-  const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
-  REQUIRE(payload.action == action);
-  REQUIRE(
-      std::holds_alternative<steamrot::EntityTypeTag>(payload.m_selection));
-  REQUIRE(std::get<steamrot::EntityTypeTag>(payload.m_selection).key ==
-          "enemy_soldier");
-}
-
 TEST_CASE("CreateGhostEventPacket: Creates packet with CLEAR action",
           "[unit][events][event_factory]") {
   const uint8_t lifetime = 1;

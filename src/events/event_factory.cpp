@@ -212,12 +212,8 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   }
 
   case EventType::GHOST: {
-    // Pick randomly between FragmentTag and EntityTypeTag
-    std::uniform_int_distribution<int> tag_dist(0, 1);
     const std::string random_key = "key_" + std::to_string(lifetime_dist(gen));
-    GhostSelection selection = (tag_dist(gen) == 0)
-                                   ? GhostSelection{FragmentTag{random_key}}
-                                   : GhostSelection{EntityTypeTag{random_key}};
+    GhostSelection selection{FragmentTag{random_key}};
     return CreateGhostEventPacket(lifetime, GhostPayload::GhostAction::SELECT,
                                   selection);
   }

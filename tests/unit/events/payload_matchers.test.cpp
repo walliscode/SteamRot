@@ -245,19 +245,11 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Matching EntityTypeTag selections match") {
-    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_selection = steamrot::EntityTypeTag{"goblin"};
-    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_selection = steamrot::EntityTypeTag{"goblin"};
-    REQUIRE(MatchPayload(filter_payload, event_payload));
-  }
-
   SECTION("Mismatched selection variant types do not match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
     filter_payload.m_selection = steamrot::FragmentTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_selection = steamrot::EntityTypeTag{"copper"};
+    event_payload.m_selection = std::monostate{};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
