@@ -158,8 +158,6 @@ TEST_CASE("PositionDropDownContainerChildren", "[unit][positioning_ui]") {
             container, style));
   }
 
-  // TODO: this section is expected to FAIL until the user implements the call
-  // to PositionDropDownListChildren inside PositionDropDownContainerChildren.
   SECTION("positions DropDownItemElement children via "
           "PositionDropDownListChildren") {
     // container: position={0,0}, size={200,60}, border=0, ratio=0.2
