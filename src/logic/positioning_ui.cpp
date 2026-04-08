@@ -7,7 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
+#include "ButtonElement.h"
+#include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
+#include "DropDownListElement.h"
 #include "PanelElement.h"
 #include <SFML/System/Vector2.hpp>
 
@@ -30,6 +34,34 @@ sf::Vector2f CalculateStartPosition(const sf::Vector2f &element_position,
 }
 
 /////////////////////////////////////////////////
+const Style &GetStyleForElement(const UIElement &element,
+                                const UIStyle &style) {
+  if (dynamic_cast<const ButtonElement *>(&element))
+    return style.button_style;
+  if (dynamic_cast<const DropDownContainerElement *>(&element))
+    return style.drop_down_container_style;
+  if (dynamic_cast<const DropDownListElement *>(&element))
+    return style.drop_down_list_style;
+  if (dynamic_cast<const DropDownItemElement *>(&element))
+    return style.drop_down_item_style;
+  if (dynamic_cast<const DropDownButtonElement *>(&element))
+    return style.drop_down_button_style;
+  return style.panel_style;
+}
+
+/////////////////////////////////////////////////
+void ApplyMinMaxSizing(sf::Vector2f &size, const Style &element_style) {
+  if (element_style.minimum_size.x > 0.f && size.x < element_style.minimum_size.x)
+    size.x = element_style.minimum_size.x;
+  if (element_style.minimum_size.y > 0.f && size.y < element_style.minimum_size.y)
+    size.y = element_style.minimum_size.y;
+  if (element_style.maximum_size.x > 0.f && size.x > element_style.maximum_size.x)
+    size.x = element_style.maximum_size.x;
+  if (element_style.maximum_size.y > 0.f && size.y > element_style.maximum_size.y)
+    size.y = element_style.maximum_size.y;
+}
+
+/////////////////////////////////////////////////
 void PositionVerticalLayoutChildren(const UIElement &element,
                                     const UIStyle &style) {
   if (element.child_elements.empty()) {
@@ -49,12 +81,14 @@ void PositionVerticalLayoutChildren(const UIElement &element,
                         (element.child_elements.size() - 1) * inner_margin.y) /
                        static_cast<float>(element.child_elements.size());
 
+  float current_y = start_position.y;
   for (size_t i = 0; i < element.child_elements.size(); i++) {
-    element.child_elements[i]->size.x = available_size.x;
-    element.child_elements[i]->size.y = child_height;
+    sf::Vector2f child_size{available_size.x, child_height};
+    ApplyMinMaxSizing(child_size, GetStyleForElement(*element.child_elements[i], style));
+    element.child_elements[i]->size = child_size;
     element.child_elements[i]->position =
-        sf::Vector2f{start_position.x,
-                     start_position.y + i * (child_height + inner_margin.y)};
+        sf::Vector2f{start_position.x, current_y};
+    current_y += child_size.y + inner_margin.y;
   }
 }
 
@@ -78,12 +112,14 @@ void PositionHorizontalLayoutChildren(const UIElement &element,
                        (element.child_elements.size() - 1) * inner_margin.x) /
                       static_cast<float>(element.child_elements.size());
 
+  float current_x = start_position.x;
   for (size_t i = 0; i < element.child_elements.size(); i++) {
-    element.child_elements[i]->size.x = child_width;
-    element.child_elements[i]->size.y = available_size.y;
+    sf::Vector2f child_size{child_width, available_size.y};
+    ApplyMinMaxSizing(child_size, GetStyleForElement(*element.child_elements[i], style));
+    element.child_elements[i]->size = child_size;
     element.child_elements[i]->position =
-        sf::Vector2f{start_position.x + i * (child_width + inner_margin.x),
-                     start_position.y};
+        sf::Vector2f{current_x, start_position.y};
+    current_x += child_size.x + inner_margin.x;
   }
 }
 /////////////////////////////////////////////////
@@ -101,6 +137,7 @@ void PositionDropDownContainerChildren(const DropDownContainerElement &element,
   // calculate the size and position of the dropdown list (child 0)
   sf::Vector2f dd_list_size{available_size.x * (1 - ratio), available_size.y};
   if (!element.child_elements.empty()) {
+    ApplyMinMaxSizing(dd_list_size, style.drop_down_list_style);
     element.child_elements[0]->size = dd_list_size;
     element.child_elements[0]->position = start_position;
   }
@@ -110,6 +147,7 @@ void PositionDropDownContainerChildren(const DropDownContainerElement &element,
                                   start_position.y};
   sf::Vector2f dd_button_size{available_size.x * ratio, available_size.y};
   if (element.child_elements.size() > 1) {
+    ApplyMinMaxSizing(dd_button_size, style.drop_down_button_style);
     element.child_elements[1]->size = dd_button_size;
     element.child_elements[1]->position = dd_button_position;
   }
@@ -136,10 +174,14 @@ void PositionDropDownListChildren(
   // position children veritcally without inner margins; each child takes the
   // full available width and height, offset by their index this assumes that
   // all children are DropDownItemElements
+  float current_y = start_position.y;
   for (size_t i = 0; i < child_elements.size(); i++) {
-    child_elements[i]->size = available_size;
-    child_elements[i]->position = sf::Vector2f{
-        start_position.x, start_position.y + (i * available_size.y)};
+    sf::Vector2f child_size = available_size;
+    ApplyMinMaxSizing(child_size, style.drop_down_item_style);
+    child_elements[i]->size = child_size;
+    child_elements[i]->position =
+        sf::Vector2f{start_position.x, current_y};
+    current_y += child_size.y;
   }
 }
 

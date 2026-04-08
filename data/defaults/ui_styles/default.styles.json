@@ -126,8 +126,8 @@
         "y": 0
       },
       "minimum_size": {
-        "x": 100,
-        "y": 30
+        "x": 0,
+        "y": 0
       },
       "maximum_size": {
         "x": 400,
@@ -152,11 +152,12 @@
   "drop_down_item_style": {
     "style": {
       "background_color": {
-        "r": 0,
-        "g": 0,
-        "b": 200,
+        "r": 150,
+        "g": 197,
+        "b": 176,
         "a": 255
       },
+
       "border_color": {
         "r": 117,
         "g": 91,
@@ -170,8 +171,8 @@
         "y": 0
       },
       "minimum_size": {
-        "x": 150,
-        "y": 30
+        "x": 0,
+        "y": 0
       },
       "maximum_size": {
         "x": 400,
@@ -207,15 +208,15 @@
         "b": 238,
         "a": 255
       },
-      "border_thickness": 0,
+      "border_thickness": 2,
       "radius_resolution": 100,
       "inner_margin": {
         "x": 0,
         "y": 0
       },
       "minimum_size": {
-        "x": 30,
-        "y": 30
+        "x": 0,
+        "y": 0
       },
       "maximum_size": {
         "x": 30,

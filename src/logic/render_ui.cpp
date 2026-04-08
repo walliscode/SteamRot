@@ -14,8 +14,8 @@
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include <algorithm>
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace steamrot::logic::render::ui {
 

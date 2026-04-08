@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "DropDownContainerElement.h"
+#include "Style.h"
 #include "UIElement.h"
 #include "UIStyle.h"
 #include <SFML/System/Vector2.hpp>
@@ -119,5 +120,34 @@ void UpdateSizeAndPositionOfChildElements(const UIElement &element,
 /// @param style Style to use for layout calculations
 /////////////////////////////////////////////////
 void PositionNestedUIElements(const UIElement &element, const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Return the Style sub-object that corresponds to the runtime type of
+/// an element
+///
+/// Maps ButtonElement → button_style, DropDownContainerElement →
+/// drop_down_container_style, DropDownListElement → drop_down_list_style,
+/// DropDownItemElement → drop_down_item_style, DropDownButtonElement →
+/// drop_down_button_style, and everything else (including PanelElement) →
+/// panel_style.
+///
+/// @param element UIElement whose concrete type drives the lookup
+/// @param style UIStyle from which the sub-style reference is taken
+/// @return Reference to the matching Style sub-object inside style
+/////////////////////////////////////////////////
+const Style &GetStyleForElement(const UIElement &element,
+                                const UIStyle &style);
+
+/////////////////////////////////////////////////
+/// @brief Clamp a size vector to the minimum and maximum sizes in a Style
+///
+/// A zero component in minimum_size or maximum_size means that axis is
+/// unconstrained.  Minimum is applied before maximum so that if both are
+/// non-zero and contradictory the maximum wins.
+///
+/// @param size Size vector to clamp in-place
+/// @param element_style Style whose minimum_size and maximum_size are used
+/////////////////////////////////////////////////
+void ApplyMinMaxSizing(sf::Vector2f &size, const Style &element_style);
 
 } // namespace steamrot::logic::positioning::ui

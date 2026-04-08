@@ -27,44 +27,6 @@
               "children": [
                 {
                   "element_type": "ButtonDataFbs",
-                  "element": {
-                    "base_data": {
-                      "position": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "size": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "subscriber_data": {
-                        "event_type": "USER_INPUT",
-                        "filter_payload_type": "InputPayloadFbs",
-                        "filter_payload": {
-                          "action": "SELECT"
-                        }
-                      },
-                      "response_event_data": [
-                        {
-                          "context": {
-                            "lifetime": 1
-                          },
-                          "type": "SCENE",
-                          "payload_type": "ScenePayloadFbs",
-                          "payload": {
-                            "scene_type": "TITLE",
-                            "action": "CHANGE"
-                          }
-                        }
-                      ],
-                      "children_active": false,
-                      "children": []
-                    },
-                    "label": "Return"
-                  }
-                },
-                {
-                  "element_type": "ButtonDataFbs",
 
                   "element": {
                     "label": "New Construct",
@@ -111,6 +73,44 @@
                       ]
                     }
                   }
+                },
+                {
+                  "element_type": "ButtonDataFbs",
+                  "element": {
+                    "label": "Return",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "subscriber_data": {
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
+                        }
+                      },
+                      "response_event_data": [
+                        {
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "type": "SCENE",
+                          "payload_type": "ScenePayloadFbs",
+                          "payload": {
+                            "scene_type": "TITLE",
+                            "action": "CHANGE"
+                          }
+                        }
+                      ],
+                      "children_active": false,
+                      "children": []
+                    }
+                  }
                 }
               ]
             },
@@ -154,6 +154,8 @@
                         {
                           "element_type": "DropDownListDataFbs",
                           "element": {
+                            "unexpanded_label": "Select Fragment...",
+                            "expanded_label": "Fragment List",
                             "base_data": {
                               "position": {
                                 "x": 0,

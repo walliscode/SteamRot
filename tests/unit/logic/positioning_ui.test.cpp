@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
+#include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
@@ -687,5 +688,394 @@ TEST_CASE("PositionNestedUIElements", "[unit][positioning_ui]") {
     // grandchild should remain at default zero size (not positioned)
     REQUIRE_THAT(root.child_elements[0]->child_elements[0]->size,
                  steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GetStyleForElement
+// ---------------------------------------------------------------------------
+
+TEST_CASE("GetStyleForElement", "[unit][positioning_ui]") {
+
+  steamrot::UIStyle style;
+  // give each sub-style a unique border thickness to distinguish them
+  style.panel_style.border_thickness = 1.0f;
+  style.button_style.border_thickness = 2.0f;
+  style.drop_down_container_style.border_thickness = 3.0f;
+  style.drop_down_list_style.border_thickness = 4.0f;
+  style.drop_down_item_style.border_thickness = 5.0f;
+  style.drop_down_button_style.border_thickness = 6.0f;
+
+  SECTION("PanelElement returns panel_style") {
+    steamrot::PanelElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 1.0f);
+  }
+
+  SECTION("ButtonElement returns button_style") {
+    steamrot::ButtonElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 2.0f);
+  }
+
+  SECTION("DropDownContainerElement returns drop_down_container_style") {
+    steamrot::DropDownContainerElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 3.0f);
+  }
+
+  SECTION("DropDownListElement returns drop_down_list_style") {
+    steamrot::DropDownListElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 4.0f);
+  }
+
+  SECTION("DropDownItemElement returns drop_down_item_style") {
+    steamrot::DropDownItemElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 5.0f);
+  }
+
+  SECTION("DropDownButtonElement returns drop_down_button_style") {
+    steamrot::DropDownButtonElement element;
+    const Style &result =
+        steamrot::logic::positioning::ui::GetStyleForElement(element, style);
+    REQUIRE(result.border_thickness == 6.0f);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ApplyMinMaxSizing
+// ---------------------------------------------------------------------------
+
+TEST_CASE("ApplyMinMaxSizing", "[unit][positioning_ui]") {
+
+  SECTION("does nothing when minimum and maximum are zero") {
+    Style style;
+    style.minimum_size = {0.0f, 0.0f};
+    style.maximum_size = {0.0f, 0.0f};
+    sf::Vector2f size{100.0f, 50.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({100.0f, 50.0f}));
+  }
+
+  SECTION("clamps x up to minimum when size is below minimum_size.x") {
+    Style style;
+    style.minimum_size = {80.0f, 0.0f};
+    sf::Vector2f size{40.0f, 50.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({80.0f, 50.0f}));
+  }
+
+  SECTION("clamps y up to minimum when size is below minimum_size.y") {
+    Style style;
+    style.minimum_size = {0.0f, 30.0f};
+    sf::Vector2f size{100.0f, 10.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({100.0f, 30.0f}));
+  }
+
+  SECTION("clamps x down to maximum when size exceeds maximum_size.x") {
+    Style style;
+    style.maximum_size = {60.0f, 0.0f};
+    sf::Vector2f size{100.0f, 50.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({60.0f, 50.0f}));
+  }
+
+  SECTION("clamps y down to maximum when size exceeds maximum_size.y") {
+    Style style;
+    style.maximum_size = {0.0f, 25.0f};
+    sf::Vector2f size{100.0f, 50.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({100.0f, 25.0f}));
+  }
+
+  SECTION("does not change size when already within min and max bounds") {
+    Style style;
+    style.minimum_size = {20.0f, 10.0f};
+    style.maximum_size = {200.0f, 100.0f};
+    sf::Vector2f size{100.0f, 50.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({100.0f, 50.0f}));
+  }
+
+  SECTION("maximum wins when both minimum and maximum are set and contradict") {
+    Style style;
+    style.minimum_size = {100.0f, 100.0f};
+    style.maximum_size = {50.0f, 50.0f};
+    sf::Vector2f size{0.0f, 0.0f};
+    steamrot::logic::positioning::ui::ApplyMinMaxSizing(size, style);
+    // minimum raises to 100, then maximum clamps back to 50
+    REQUIRE_THAT(size, steamrot::tests::EqualsVector2f({50.0f, 50.0f}));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PositionVerticalLayoutChildren – min/max sizing
+// ---------------------------------------------------------------------------
+
+TEST_CASE("PositionVerticalLayoutChildren respects minimum_size",
+          "[unit][positioning_ui]") {
+
+  SECTION("minimum height raises child size and shifts subsequent children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {200.0f, 300.0f};
+    parent.layout = steamrot::Layout::Vertical;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+    // computed child_height = 300/2 = 150; minimum forces it to 200
+    style.panel_style.minimum_size = {0.0f, 200.0f};
+
+    steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
+                                                                     style);
+
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    // second child starts after the clamped height of the first
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 200.0f}));
+    REQUIRE_THAT(parent.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 200.0f}));
+  }
+}
+
+TEST_CASE("PositionVerticalLayoutChildren respects maximum_size",
+          "[unit][positioning_ui]") {
+
+  SECTION("maximum height reduces child size and shifts subsequent children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {200.0f, 300.0f};
+    parent.layout = steamrot::Layout::Vertical;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+    // computed child_height = 300/2 = 150; maximum caps it at 100
+    style.panel_style.maximum_size = {0.0f, 100.0f};
+
+    steamrot::logic::positioning::ui::PositionVerticalLayoutChildren(parent,
+                                                                     style);
+
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    // second child starts after the clamped height of the first
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 100.0f}));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PositionHorizontalLayoutChildren – min/max sizing
+// ---------------------------------------------------------------------------
+
+TEST_CASE("PositionHorizontalLayoutChildren respects minimum_size",
+          "[unit][positioning_ui]") {
+
+  SECTION("minimum width raises child size and shifts subsequent children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {300.0f, 100.0f};
+    parent.layout = steamrot::Layout::Horizontal;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+    // computed child_width = 300/2 = 150; minimum forces it to 200
+    style.panel_style.minimum_size = {200.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
+                                                                       style);
+
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    // second child starts after the clamped width of the first
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({200.0f, 0.0f}));
+  }
+}
+
+TEST_CASE("PositionHorizontalLayoutChildren respects maximum_size",
+          "[unit][positioning_ui]") {
+
+  SECTION("maximum width reduces child size and shifts subsequent children") {
+    steamrot::PanelElement parent;
+    parent.position = {0.0f, 0.0f};
+    parent.size = {300.0f, 100.0f};
+    parent.layout = steamrot::Layout::Horizontal;
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+    parent.child_elements.push_back(std::make_unique<steamrot::PanelElement>());
+
+    steamrot::UIStyle style;
+    style.panel_style.border_thickness = 0.0f;
+    style.panel_style.inner_margin = {0.0f, 0.0f};
+    // computed child_width = 300/2 = 150; maximum caps it at 80
+    style.panel_style.maximum_size = {80.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionHorizontalLayoutChildren(parent,
+                                                                       style);
+
+    REQUIRE_THAT(parent.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({80.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    // second child starts after the clamped width of the first
+    REQUIRE_THAT(parent.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({80.0f, 100.0f}));
+    REQUIRE_THAT(parent.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({80.0f, 0.0f}));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PositionDropDownListChildren – min/max sizing
+// ---------------------------------------------------------------------------
+
+TEST_CASE("PositionDropDownListChildren respects drop_down_item_style min/max",
+          "[unit][positioning_ui]") {
+
+  SECTION("minimum height raises item size and stacks subsequent items "
+          "below the clamped height") {
+    std::vector<std::unique_ptr<steamrot::UIElement>> children;
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+
+    sf::Vector2f available_size{200.0f, 10.0f};
+    sf::Vector2f start_position{0.0f, 0.0f};
+
+    steamrot::UIStyle style;
+    // computed item height = 10; minimum forces it to 30
+    style.drop_down_item_style.minimum_size = {0.0f, 30.0f};
+
+    steamrot::logic::positioning::ui::PositionDropDownListChildren(
+        children, available_size, start_position, style);
+
+    REQUIRE_THAT(children[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 30.0f}));
+    REQUIRE_THAT(children[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
+
+    REQUIRE_THAT(children[1]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 30.0f}));
+    REQUIRE_THAT(children[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 30.0f}));
+  }
+
+  SECTION("maximum height reduces item size and stacks subsequent items "
+          "below the clamped height") {
+    std::vector<std::unique_ptr<steamrot::UIElement>> children;
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+    children.push_back(std::make_unique<steamrot::DropDownItemElement>());
+
+    sf::Vector2f available_size{200.0f, 50.0f};
+    sf::Vector2f start_position{0.0f, 100.0f};
+
+    steamrot::UIStyle style;
+    // computed item height = 50; maximum caps it at 20
+    style.drop_down_item_style.maximum_size = {0.0f, 20.0f};
+
+    steamrot::logic::positioning::ui::PositionDropDownListChildren(
+        children, available_size, start_position, style);
+
+    REQUIRE_THAT(children[0]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 20.0f}));
+    REQUIRE_THAT(children[0]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 100.0f}));
+
+    REQUIRE_THAT(children[1]->size,
+                 steamrot::tests::EqualsVector2f({200.0f, 20.0f}));
+    REQUIRE_THAT(children[1]->position,
+                 steamrot::tests::EqualsVector2f({0.0f, 120.0f}));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PositionDropDownContainerChildren – min/max sizing
+// ---------------------------------------------------------------------------
+
+TEST_CASE(
+    "PositionDropDownContainerChildren respects drop_down_list_style min/max",
+    "[unit][positioning_ui]") {
+
+  SECTION("minimum width on drop_down_list_style raises the list child width") {
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 50.0f};
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
+
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 0.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+    // computed list_width = 200 * 0.8 = 160; minimum forces it to 180
+    style.drop_down_list_style.minimum_size = {180.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+        container, style);
+
+    REQUIRE_THAT(container.child_elements[0]->size,
+                 steamrot::tests::EqualsVector2f({180.0f, 50.0f}));
+    // button position x is after the clamped list width
+    REQUIRE_THAT(container.child_elements[1]->position,
+                 steamrot::tests::EqualsVector2f({180.0f, 0.0f}));
+  }
+}
+
+TEST_CASE(
+    "PositionDropDownContainerChildren respects drop_down_button_style min/max",
+    "[unit][positioning_ui]") {
+
+  SECTION("maximum width on drop_down_button_style reduces the button child "
+          "width") {
+    steamrot::DropDownContainerElement container;
+    container.position = {0.0f, 0.0f};
+    container.size = {200.0f, 50.0f};
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownListElement>());
+    container.child_elements.push_back(
+        std::make_unique<steamrot::DropDownButtonElement>());
+
+    steamrot::UIStyle style;
+    style.drop_down_container_style.border_thickness = 0.0f;
+    style.drop_down_container_style.drop_symbol_ratio = 0.2f;
+    // computed button_width = 200 * 0.2 = 40; maximum caps it at 20
+    style.drop_down_button_style.maximum_size = {20.0f, 0.0f};
+
+    steamrot::logic::positioning::ui::PositionDropDownContainerChildren(
+        container, style);
+
+    REQUIRE_THAT(container.child_elements[1]->size,
+                 steamrot::tests::EqualsVector2f({20.0f, 50.0f}));
   }
 }
