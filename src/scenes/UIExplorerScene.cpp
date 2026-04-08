@@ -15,6 +15,7 @@
 #include "PanelElement.h"
 #include "collision_mouse.h"
 #include "paths.h"
+#include "positioning_ui.h"
 #include "render_ui.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -365,16 +366,14 @@ void UIExplorerScene::DrawCanvas() {
   sf::Vector2f element_pos = ComputeElementPosition(m_active_element->size);
   m_active_element->position = element_pos;
 
+  // apply positioning logic so nested child elements inherit correct positions
+  const UIStyle &active_style =
+      m_style.has_value() ? m_style.value() : UIStyle{};
+  logic::positioning::ui::PositionNestedUIElements(*m_active_element,
+                                                   active_style);
+
   // render the element using the stored UIStyle
-  if (m_style.has_value()) {
-    logic::render::ui::DrawNestedUIElements(tex, *m_active_element,
-                                            m_style.value());
-  } else {
-    // fall back to a minimal inline style if AssetManager had no style
-    UIStyle fallback_style;
-    logic::render::ui::DrawNestedUIElements(tex, *m_active_element,
-                                            fallback_style);
-  }
+  logic::render::ui::DrawNestedUIElements(tex, *m_active_element, active_style);
 }
 
 /////////////////////////////////////////////////
