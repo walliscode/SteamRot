@@ -57,6 +57,8 @@ DataPopulationFunction ConvertDataPopulationFunction(
     return DataPopulationFunction::None;
   case DataPopulationFunctionFbs_GetAllFragmentNames:
     return DataPopulationFunction::GetAllFragmentNames;
+  case DataPopulationFunctionFbs_GetAllJointNames:
+    return DataPopulationFunction::GetAllJointNames;
   default:
     return DataPopulationFunction::None;
   }

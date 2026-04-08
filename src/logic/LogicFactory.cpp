@@ -9,6 +9,7 @@
 #include "LogicFactory.h"
 #include "FailInfo.h"
 #include "GhostActionLogic.h"
+#include "GhostPositioningLogic.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
@@ -154,6 +155,10 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
   case LogicType::GhostAction:
     logic_ptr = std::make_unique<logic::GhostActionLogic>(m_scene_context);
     break;
+  case LogicType::GhostPositioning:
+    logic_ptr =
+        std::make_unique<logic::GhostPositioningLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -289,7 +294,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::UIRender, LogicType::GrimoireMachinaRender};
 
   static constexpr std::array movement_logic_types = {
-      LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning};
+      LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning,
+      LogicType::GhostPositioning};
 
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(

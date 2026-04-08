@@ -152,3 +152,28 @@ TEST_CASE("GetAllFragmentNames returns the string names of all fragments in "
     REQUIRE(fragment_names[2] == "Fragment3");
   }
 }
+
+TEST_CASE("GetAllJointNames returns the string names of all joints in "
+          "the GrimoireMachina",
+          "[unit][actions][grimoire_machina]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  SECTION("No joints in GrimoireMachina") {
+    auto joint_names =
+        steamrot::logic::action::grimoire_machina::GetAllJointNames(
+            grimoire_machina);
+    REQUIRE(joint_names.empty());
+  }
+
+  SECTION("Multiple joints in GrimoireMachina") {
+    grimoire_machina.m_all_joints = {{"Joint1", steamrot::Joint{}},
+                                     {"Joint2", steamrot::Joint{}},
+                                     {"Joint3", steamrot::Joint{}}};
+    auto joint_names =
+        steamrot::logic::action::grimoire_machina::GetAllJointNames(
+            grimoire_machina);
+    REQUIRE(joint_names.size() == 3);
+    REQUIRE(joint_names[0] == "Joint1");
+    REQUIRE(joint_names[1] == "Joint2");
+    REQUIRE(joint_names[2] == "Joint3");
+  }
+}

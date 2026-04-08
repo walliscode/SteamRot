@@ -242,6 +242,43 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
     REQUIRE(matcher.match(actual_payload));
   }
+
+  SECTION("Matcher detects equality for GhostPayload (JointTag)") {
+    steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
+                                    steamrot::JointTag{"square"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::JointTag{"square"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects inequality for different GhostPayload JointTag key") {
+    steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
+                                    steamrot::JointTag{"square"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::JointTag{"circle"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(!matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects inequality between FragmentTag and JointTag with "
+          "the same key") {
+    steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
+                                    steamrot::FragmentTag{"copper"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::JointTag{"copper"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(!matcher.match(actual_payload));
+  }
 }
 
 TEST_CASE("EventPayloadEqualsMatcher detects different variant types",
