@@ -194,11 +194,76 @@ TEST_CASE("MatchPayload deals with various configurations of EventPayload",
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
+  SECTION("Matching GhostPayload EventPayloads match") {
+    steamrot::GhostSelection selection = steamrot::FragmentTag{"iron"};
+    steamrot::EventPayload filter_payload = steamrot::GhostPayload(
+        steamrot::GhostPayload::GhostAction::SELECT, selection);
+    steamrot::EventPayload event_payload = steamrot::GhostPayload(
+        steamrot::GhostPayload::GhostAction::SELECT, selection);
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
   SECTION("Mismatched InputPayload EventPayloads do not match") {
     steamrot::EventPayload filter_payload =
         steamrot::InputPayload(steamrot::InputPayload::InputAction::SELECT);
     steamrot::EventPayload event_payload =
         steamrot::InputPayload(steamrot::InputPayload::InputAction::NONE);
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+}
+
+TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
+          "[unit][MatchPayload][GhostPayload]") {
+
+  using namespace steamrot::events;
+  steamrot::GhostPayload filter_payload;
+  steamrot::GhostPayload event_payload;
+
+  SECTION("Empty payloads (monostate selection) match") {
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Mismatched actions do not match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
+    REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Matching FragmentTag selections match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::FragmentTag{"copper"};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Different FragmentTag keys do not match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::FragmentTag{"iron"};
+    REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Matching EntityTypeTag selections match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::EntityTypeTag{"goblin"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::EntityTypeTag{"goblin"};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Mismatched selection variant types do not match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::EntityTypeTag{"copper"};
+    REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("CLEAR action with monostate selections match") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
+    event_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
+    REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 }

@@ -33,6 +33,8 @@ EventPayloadEqualsMatcher::GetNameForEventPayloadIndex(size_t index) const {
     return "ScenePayload";
   case 5:
     return "SystemPayload";
+  case 6:
+    return "GhostPayload";
   default:
     return "Unknown";
   }
@@ -238,6 +240,61 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
           << conmat::Colorize(static_cast<int>(expected_payload.action),
                               conmat::Color::Blue)
           << "\n";
+    }
+  } else if (std::holds_alternative<GhostPayload>(actual)) {
+    const auto &actual_payload = std::get<GhostPayload>(actual);
+    const auto &expected_payload = std::get<GhostPayload>(m_expected);
+
+    // Compare action
+    if (actual_payload.action != expected_payload.action) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "GhostPayload action differs:" << "\n";
+      oss << conmat::Indent(2) << "actual: "
+          << conmat::Colorize(static_cast<int>(actual_payload.action),
+                              conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected: "
+          << conmat::Colorize(static_cast<int>(expected_payload.action),
+                              conmat::Color::Blue)
+          << "\n";
+    }
+
+    // Compare selection variant type index
+    if (actual_payload.m_selection.index() !=
+        expected_payload.m_selection.index()) {
+      oss << conmat::Indent(1) << conmat::TestFailed()
+          << "GhostPayload selection type differs:" << "\n";
+      oss << conmat::Indent(2) << "actual index: "
+          << conmat::Colorize(
+                 static_cast<int>(actual_payload.m_selection.index()),
+                 conmat::Color::Red)
+          << "\n";
+      oss << conmat::Indent(2) << "expected index: "
+          << conmat::Colorize(
+                 static_cast<int>(expected_payload.m_selection.index()),
+                 conmat::Color::Blue)
+          << "\n";
+    } else {
+      // Same type — compare keys (monostate has no key)
+      std::visit(
+          [&](const auto &actual_sel, const auto &expected_sel) {
+            if constexpr (std::is_same_v<decltype(actual_sel),
+                                         decltype(expected_sel)> &&
+                          !std::is_same_v<std::decay_t<decltype(actual_sel)>,
+                                          std::monostate>) {
+              if (actual_sel.key != expected_sel.key) {
+                oss << conmat::Indent(1) << conmat::TestFailed()
+                    << "GhostPayload selection key differs:" << "\n";
+                oss << conmat::Indent(2) << "actual: "
+                    << conmat::Colorize(actual_sel.key, conmat::Color::Red)
+                    << "\n";
+                oss << conmat::Indent(2) << "expected: "
+                    << conmat::Colorize(expected_sel.key, conmat::Color::Blue)
+                    << "\n";
+              }
+            }
+          },
+          actual_payload.m_selection, expected_payload.m_selection);
     }
   }
 

@@ -91,6 +91,19 @@ CreateSystemEventPacket(const uint8_t lifetime,
                         const SystemPayload::SystemAction action);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a GhostPayload
+///
+/// @param lifetime The lifetime of the event in ticks
+/// @param action The ghost action to be performed
+/// @param selection The GhostSelection variant describing the selected item
+/// @return EventPacket with GhostPayload or FailInfo on error
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateGhostEventPacket(const uint8_t lifetime,
+                       const GhostPayload::GhostAction action,
+                       const GhostSelection &selection);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket();

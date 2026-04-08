@@ -232,6 +232,74 @@ TEST_CASE("CreateSystemEventPacket: Creates packet with NONE action",
   REQUIRE(payload.action == action);
 }
 
+TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
+          "GhostPayload (FragmentTag)",
+          "[unit][events][event_factory]") {
+  const uint8_t lifetime = 3;
+  const auto action = steamrot::GhostPayload::GhostAction::SELECT;
+  const steamrot::GhostSelection selection =
+      steamrot::FragmentTag{"iron_fragment"};
+
+  auto result =
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
+
+  REQUIRE(result.has_value());
+  const auto &packet = result.value();
+
+  REQUIRE(packet.context.lifetime == lifetime);
+  REQUIRE(packet.type == steamrot::EventType::GHOST);
+  REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
+
+  const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
+  REQUIRE(payload.action == action);
+  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(payload.m_selection));
+  REQUIRE(std::get<steamrot::FragmentTag>(payload.m_selection).key ==
+          "iron_fragment");
+}
+
+TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
+          "GhostPayload (EntityTypeTag)",
+          "[unit][events][event_factory]") {
+  const uint8_t lifetime = 5;
+  const auto action = steamrot::GhostPayload::GhostAction::SELECT;
+  const steamrot::GhostSelection selection =
+      steamrot::EntityTypeTag{"enemy_soldier"};
+
+  auto result =
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
+
+  REQUIRE(result.has_value());
+  const auto &packet = result.value();
+
+  REQUIRE(packet.context.lifetime == lifetime);
+  REQUIRE(packet.type == steamrot::EventType::GHOST);
+  REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
+
+  const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
+  REQUIRE(payload.action == action);
+  REQUIRE(
+      std::holds_alternative<steamrot::EntityTypeTag>(payload.m_selection));
+  REQUIRE(std::get<steamrot::EntityTypeTag>(payload.m_selection).key ==
+          "enemy_soldier");
+}
+
+TEST_CASE("CreateGhostEventPacket: Creates packet with CLEAR action",
+          "[unit][events][event_factory]") {
+  const uint8_t lifetime = 1;
+  const auto action = steamrot::GhostPayload::GhostAction::CLEAR;
+  const steamrot::GhostSelection selection = std::monostate{};
+
+  auto result =
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
+
+  REQUIRE(result.has_value());
+  const auto &packet = result.value();
+
+  const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
+  REQUIRE(payload.action == action);
+  REQUIRE(std::holds_alternative<std::monostate>(payload.m_selection));
+}
+
 TEST_CASE("Event factory: All functions respect custom lifetime values",
           "[unit][events][event_factory]") {
   const uint8_t custom_lifetime = 42;
@@ -277,6 +345,16 @@ TEST_CASE("Event factory: All functions respect custom lifetime values",
   SECTION("SystemEventPacket") {
     auto result = steamrot::events::CreateSystemEventPacket(
         custom_lifetime, steamrot::SystemPayload::SystemAction::QUIT);
+    REQUIRE(result.has_value());
+    REQUIRE(result.value().context.lifetime == custom_lifetime);
+  }
+
+  SECTION("GhostEventPacket") {
+    steamrot::GhostSelection selection =
+        steamrot::FragmentTag{"lifetime_test_key"};
+    auto result = steamrot::events::CreateGhostEventPacket(
+        custom_lifetime, steamrot::GhostPayload::GhostAction::SELECT,
+        selection);
     REQUIRE(result.has_value());
     REQUIRE(result.value().context.lifetime == custom_lifetime);
   }
@@ -342,6 +420,16 @@ TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
       break;
     }
 
+    case steamrot::EventType::GHOST: {
+      REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
+      const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
+      // Random generation always uses SELECT with a non-empty key
+      REQUIRE(payload.action == steamrot::GhostPayload::GhostAction::SELECT);
+      REQUIRE_FALSE(
+          std::holds_alternative<std::monostate>(payload.m_selection));
+      break;
+    }
+
     default:
       FAIL("Unexpected event type encountered");
     }
@@ -370,7 +458,7 @@ TEST_CASE("CreateRandomEventPacket: Generates different packets across "
   }
 
   // Note: There's a small chance this could fail due to randomness,
-  // but with 10 packets and 5 event types, it's very unlikely
+  // but with 10 packets and 6 event types, it's very unlikely
   REQUIRE(has_variation);
 }
 

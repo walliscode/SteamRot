@@ -88,6 +88,34 @@ bool MatchPayload(const SystemPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
+bool MatchPayload(const GhostPayload &filter_payload,
+                  const GhostPayload &event_payload) {
+
+  if (filter_payload.action != event_payload.action) {
+    return false;
+  }
+
+  // Compare the selection variant (type + key must both match)
+  if (filter_payload.m_selection.index() != event_payload.m_selection.index()) {
+    return false;
+  }
+
+  return std::visit(
+      [](const auto &filter_sel, const auto &event_sel) -> bool {
+        if constexpr (std::is_same_v<decltype(filter_sel), decltype(event_sel)>) {
+          if constexpr (std::is_same_v<std::decay_t<decltype(filter_sel)>,
+                                       std::monostate>) {
+            return true;
+          } else {
+            return filter_sel.key == event_sel.key;
+          }
+        }
+        return false;
+      },
+      filter_payload.m_selection, event_payload.m_selection);
+}
+
+/////////////////////////////////////////////////
 bool MatchPayload(const EventPayload &filter_payload,
                   const EventPayload &event_payload) {
 

@@ -176,6 +176,74 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for SystemPayload",
   }
 }
 
+TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
+          "[unit][Events][EventPayload][matcher]") {
+  SECTION("Matcher detects equality for GhostPayload (FragmentTag)") {
+    steamrot::GhostPayload expected{
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"copper"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::FragmentTag{"copper"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects inequality for different GhostPayload key") {
+    steamrot::GhostPayload expected{
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"copper"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::FragmentTag{"iron"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(!matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects inequality for different GhostPayload action") {
+    steamrot::GhostPayload expected{
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"copper"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::CLEAR,
+                                  steamrot::FragmentTag{"copper"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(!matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects inequality for different GhostPayload selection "
+          "variant type") {
+    steamrot::GhostPayload expected{
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"copper"}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
+                                  steamrot::EntityTypeTag{"copper"}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(!matcher.match(actual_payload));
+  }
+
+  SECTION("Matcher detects equality for CLEAR action with monostate") {
+    steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::CLEAR,
+                                    std::monostate{}};
+    steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::CLEAR,
+                                  std::monostate{}};
+
+    steamrot::EventPayload expected_payload = expected;
+    steamrot::EventPayload actual_payload = actual;
+    auto matcher = steamrot::tests::EventPayloadEqualsMatcher(expected_payload);
+    REQUIRE(matcher.match(actual_payload));
+  }
+}
+
 TEST_CASE("EventPayloadEqualsMatcher detects different variant types",
           "[unit][Events][EventPayload][matcher]") {
   steamrot::InputPayload input{steamrot::InputPayload::InputAction::SELECT};
