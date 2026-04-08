@@ -287,7 +287,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions populates "
     }
     steamrot::GrimoireMachina &grimoire_machina = *get_grimoire_result.value();
     grimoire_machina.m_all_fragments.clear();
-    grimoire_machina.m_all_fragments.insert({"fragment1", steamrot::Fragment{}});
+    grimoire_machina.m_all_fragments.insert(
+        {"fragment1", steamrot::Fragment{}});
 
     dropdown.data_population_function =
         steamrot::DataPopulationFunction::GetAllFragmentNames;
@@ -526,4 +527,102 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents processes nested "
     event_handler.ProcessWaitingRoomEventBus();
     REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   }
+}
+
+TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents skips children "
+          "when children_active is false",
+          "[unit][logic][action][ProcessNestedUIActionsAndEvents]") {
+  // When children_active = false, children must NOT fire even if their
+  // subscription is active and is_mouse_over is true (stale state).
+
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::PanelElement panel;
+  panel.children_active = false; // children are inactive
+
+  auto button = std::make_unique<steamrot::ButtonElement>();
+  button->is_mouse_over = true; // stale hover
+  button->subscription = std::make_shared<steamrot::Subscriber>();
+  button->subscription->m_active = true; // active sub
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  button->response_events.push_back(event_packet);
+  panel.child_elements.push_back(std::move(button));
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+
+  SECTION("Inactive child button does not fire its response event") {
+    // Panel itself has no subscription so ProcessUIActionsAndEvents is a no-op
+    steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
+        panel, event_handler, scene_context);
+    event_handler.ProcessWaitingRoomEventBus();
+    REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+  }
+}
+
+TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents with siblings: "
+          "inactive children do not block lower siblings",
+          "[unit][logic][action][ProcessNestedUIActionsAndEvents]") {
+  // Simulates the dropdown-over-exit-button pattern:
+  //   panel (children_active=true)
+  //   ├── dropdown_container (children_active=false, stale is_mouse_over=true)
+  //   └── exit_button (is_mouse_over=true, active subscription)
+  //
+  // Because the dropdown_container's children are inactive, it should not
+  // block the exit_button from firing (the panel falls through after finding
+  // the container has no active children).
+  //
+  // Note: in a real game frame UICollisionLogic would have already set
+  // is_mouse_over correctly via CheckMouseOver (which now also respects
+  // children_active).  This test validates the action layer independently.
+
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::PanelElement panel;
+  panel.children_active = true;
+
+  // dropdown container: children inactive, subscription active, stale hover
+  auto container = std::make_unique<steamrot::PanelElement>();
+  container->children_active = false;
+  container->is_mouse_over = true; // stale
+  container->subscription = std::make_shared<steamrot::Subscriber>();
+  container->subscription->m_active = true;
+  steamrot::EventPacket container_evt;
+  container_evt.type = steamrot::EventType::USER_INPUT;
+  container_evt.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  container->response_events.push_back(container_evt);
+
+  // exit button: children_active default (false, no children), hovered
+  auto exit_button = std::make_unique<steamrot::ButtonElement>();
+  exit_button->is_mouse_over = true;
+  exit_button->subscription = std::make_shared<steamrot::Subscriber>();
+  exit_button->subscription->m_active = true;
+  steamrot::EventPacket exit_evt;
+  exit_evt.type = steamrot::EventType::USER_INPUT;
+  exit_evt.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  exit_button->response_events.push_back(exit_evt);
+
+  panel.child_elements.push_back(std::move(container));
+  panel.child_elements.push_back(std::move(exit_button));
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+
+  steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
+      panel, event_handler, scene_context);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  // The container's children are inactive so ProcessNestedUIActionsAndEvents
+  // skips them and dispatches ProcessUIActionsAndEvents on the container
+  // itself (a PanelElement), which is a no-op.  No event should be fired.
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
 }

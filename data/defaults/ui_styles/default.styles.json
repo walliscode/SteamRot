@@ -152,9 +152,9 @@
   "drop_down_item_style": {
     "style": {
       "background_color": {
-        "r": 150,
-        "g": 197,
-        "b": 176,
+        "r": 0,
+        "g": 0,
+        "b": 200,
         "a": 255
       },
       "border_color": {

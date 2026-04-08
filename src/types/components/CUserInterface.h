@@ -29,7 +29,7 @@ struct CUserInterface : public Component {
       : Component(other), m_name(other.m_name),
         m_root_element(other.m_root_element ? other.m_root_element->Clone()
                                             : nullptr),
-        m_visible(other.m_visible) {}
+        m_visible(other.m_visible), m_priority(other.m_priority) {}
 
   /////////////////////////////////////////////////
   /// @brief Copy assignment operator for deep copying
@@ -44,6 +44,7 @@ struct CUserInterface : public Component {
       m_root_element =
           other.m_root_element ? other.m_root_element->Clone() : nullptr;
       m_visible = other.m_visible;
+      m_priority = other.m_priority;
     }
     return *this;
   }
@@ -64,5 +65,12 @@ struct CUserInterface : public Component {
   /// @brief Is the this element of the user interface visible to Users.
   /////////////////////////////////////////////////
   bool m_visible{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Rendering and collision priority (z-order). Higher values are
+  /// drawn on top and receive collision events first. Entities with higher
+  /// priority block collision from reaching lower-priority entities.
+  /////////////////////////////////////////////////
+  int m_priority{0};
 };
 } // namespace steamrot

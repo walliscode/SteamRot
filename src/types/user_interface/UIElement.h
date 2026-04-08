@@ -67,6 +67,13 @@ struct UIElement {
   std::vector<std::unique_ptr<UIElement>> child_elements;
 
   /////////////////////////////////////////////////
+  /// @brief Priority for rendering and collision ordering among sibling
+  /// elements. Higher values are rendered on top and receive input first.
+  /////////////////////////////////////////////////
+  int priority{0};
+
+  /////////////////////////////////////////////////
+
   /// @brief Create a deep copy of this UI element and its children
   ///
   /// @return A new unique_ptr to a cloned UIElement
@@ -85,6 +92,8 @@ struct UIElement {
     target.response_events = response_events;
     target.is_mouse_over = is_mouse_over;
     target.children_active = children_active;
+    target.priority = priority;
+
 
     // Deep copy children
     target.child_elements.clear();

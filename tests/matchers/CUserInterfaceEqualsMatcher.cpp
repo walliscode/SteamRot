@@ -66,6 +66,17 @@ bool CUserInterfaceEqualsMatcher::match(const CUserInterface &actual) const {
         << conmat::Colorize(m_expected.m_visible, conmat::Color::Blue) << "\n";
   }
 
+  if (actual.m_priority != m_expected.m_priority) {
+    oss << conmat::Indent(1) << conmat::TestFailed() << "m_priority:"
+        << "\n";
+
+    oss << conmat::Indent(2)
+        << "actual: "
+        << conmat::Colorize(actual.m_priority, conmat::Color::Red) << "\n";
+    oss << conmat::Indent(2) << "expected: "
+        << conmat::Colorize(m_expected.m_priority, conmat::Color::Blue) << "\n";
+  }
+
   // Check root element pointers - both null or both non-null
   bool both_null = (actual.m_root_element == nullptr &&
                     m_expected.m_root_element == nullptr);

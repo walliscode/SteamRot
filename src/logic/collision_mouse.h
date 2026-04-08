@@ -33,12 +33,36 @@ bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
 /// @brief Checks if the mouse is over a UIElement or any of its nested
 /// children, and sets each element's is_mouse_over accordingly.
 ///
-/// If a child is hovered the parent's is_mouse_over is set to false.
+/// Children are evaluated in descending priority order only when
+/// element.children_active is true. When children are inactive, their stale
+/// hover state is cleared and the element itself is tested against the mouse
+/// bounds. If a descendant is hovered the parent's is_mouse_over is set to
+/// false.
 ///
 /// @param mouse_position The current global mouse position.
 /// @param element UIElement to check against (recurses into children).
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element);
+
+/////////////////////////////////////////////////
+/// @brief Recursively clears is_mouse_over on an element and all its children.
+///
+/// Used to ensure that lower-priority UI entities do not retain hover state
+/// when a higher-priority entity has claimed the mouse input.
+///
+/// @param element UIElement whose is_mouse_over is cleared (recurses into
+/// children).
+/////////////////////////////////////////////////
+void ClearMouseOver(UIElement &element);
+
+/////////////////////////////////////////////////
+/// @brief Returns true if any element in the tree (element or any descendant)
+/// has is_mouse_over set to true.
+///
+/// @param element Root UIElement to check recursively.
+/// @return True if any element in the tree is hovered.
+/////////////////////////////////////////////////
+bool AnyMouseOver(const UIElement &element);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over the growth point and sets

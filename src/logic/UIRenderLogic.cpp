@@ -2,6 +2,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "UIRenderLogic.h"
+#include "CUserInterface.h"
 #include "Logic.h"
 #include "archetypes.h"
 #include "entity_memory.h"
@@ -31,11 +32,12 @@ void UIRenderLogic::DrawUIElements() {
   for (const auto &[archetype_id, entity_indices] :
        m_scene_context.archetypes) {
   }
-  // Generate entity indexes for entities with only CUserInterface component
+  // Generate entity indexes sorted by priority ascending so that
+  // higher-priority entities are drawn last (on top)
   auto entity_indexes =
-      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
-
-          m_scene_context.archetypes, true);
+      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
+          m_scene_context.archetypes, m_scene_context.scene_entities,
+          /*ascending=*/true);
 
   // cycle through all the entity indexs in the archetype
   for (size_t entity_id : entity_indexes) {
