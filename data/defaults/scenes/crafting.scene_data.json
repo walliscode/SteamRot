@@ -200,6 +200,70 @@
                   }
                 },
                 {
+                  "element_type": "DropDownContainerDataFbs",
+                  "element": {
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "priority": 1,
+
+                      "children_active": true,
+                      "children": [
+                        {
+                          "element_type": "DropDownListDataFbs",
+                          "element": {
+                            "unexpanded_label": "Select Joint...",
+                            "expanded_label": "Joint List",
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": []
+                            },
+                            "data_population_function": "GetAllJointNames"
+                          }
+                        },
+                        {
+                          "element_type": "DropDownButtonDataFbs",
+                          "element": {
+                            "base_data": {
+                              "position": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "size": {
+                                "x": 0,
+                                "y": 0
+                              },
+                              "children_active": false,
+                              "children": [],
+                              "subscriber_data": {
+                                "event_type": "USER_INPUT",
+                                "filter_payload_type": "InputPayloadFbs",
+                                "filter_payload": {
+                                  "action": "SELECT"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
                   "element_type": "ButtonDataFbs",
                   "element": {
                     "label": "Exit Construct Creation",

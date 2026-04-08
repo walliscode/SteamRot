@@ -3,5 +3,6 @@ namespace steamrot;
 
 enum DataPopulationFunctionFbs: byte {
     None = 0,
-    GetAllFragmentNames
+    GetAllFragmentNames,
+    GetAllJointNames
   }

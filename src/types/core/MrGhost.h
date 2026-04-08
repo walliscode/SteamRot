@@ -25,13 +25,21 @@ struct FragmentTag {
 };
 
 /////////////////////////////////////////////////
+/// @struct JointTag
+/// @brief Tag identifying a selected Joint type by key.
+/////////////////////////////////////////////////
+struct JointTag {
+  std::string key{};
+};
+
+/////////////////////////////////////////////////
 /// @brief Variant representing the currently selected item in MrGhost.
 ///
 /// std::monostate indicates no active selection. Additional tag types
 /// can be appended to this variant as new selectable categories are
 /// introduced without changing any existing code.
 /////////////////////////////////////////////////
-using GhostSelection = std::variant<std::monostate, FragmentTag>;
+using GhostSelection = std::variant<std::monostate, FragmentTag, JointTag>;
 
 /////////////////////////////////////////////////
 /// @struct MrGhost

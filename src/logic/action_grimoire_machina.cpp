@@ -81,4 +81,17 @@ GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
   }
   return fragment_names;
 }
+
+/////////////////////////////////////////////////
+std::vector<std::string>
+GetAllJointNames(GrimoireMachina &grimoire_machina) {
+
+  std::vector<std::string> joint_names;
+  // cycle through all joints in the GrimoireMachina and add their names to
+  // the vector
+  for (const auto &[name, joint] : grimoire_machina.m_all_joints) {
+    joint_names.push_back(name);
+  }
+  return joint_names;
+}
 } // namespace steamrot::logic::action::grimoire_machina

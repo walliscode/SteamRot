@@ -76,4 +76,12 @@ void SetColor(JointInstance &joint_instance);
 /////////////////////////////////////////////////
 std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
 
+/////////////////////////////////////////////////
+/// @brief Return the string names of all joints in the GrimoireMachina.
+///
+/// @param grimoire_machina Instance of GrimoireMachina to get the joint
+/// names from.
+/////////////////////////////////////////////////
+std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
+
 } // namespace steamrot::logic::action::grimoire_machina

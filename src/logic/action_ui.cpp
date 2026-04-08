@@ -179,12 +179,19 @@ void ProcessDropDownListElementActions(
 
   // set up any variables needed
   std::vector<std::string> fragment_names;
+  std::vector<std::string> joint_names;
 
   // switch on the DataPopulationFunction enum
   switch (dropdown_list_element.data_population_function) {
 
   case DataPopulationFunction::GetAllFragmentNames:
     fragment_names = grimoire_machina::GetAllFragmentNames(
+        *scene_context.asset_manager.GetGrimoireMachina().value());
+
+    break;
+
+  case DataPopulationFunction::GetAllJointNames:
+    joint_names = grimoire_machina::GetAllJointNames(
         *scene_context.asset_manager.GetGrimoireMachina().value());
 
     break;
@@ -201,6 +208,14 @@ void ProcessDropDownListElementActions(
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->label = fragment_name;
+    dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
+  }
+
+  for (const auto &joint_name : joint_names) {
+    // create a new DropDownItemElement for each joint name and add to the
+    // child elements of the list
+    auto dropdown_item = std::make_unique<DropDownItemElement>();
+    dropdown_item->label = joint_name;
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
   }
 

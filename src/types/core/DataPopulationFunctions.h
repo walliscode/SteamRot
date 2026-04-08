@@ -15,5 +15,9 @@
 #include <cstdint>
 
 namespace steamrot {
-enum class DataPopulationFunction : uint8_t { None = 0, GetAllFragmentNames };
+enum class DataPopulationFunction : uint8_t {
+  None = 0,
+  GetAllFragmentNames,
+  GetAllJointNames
+};
 }
