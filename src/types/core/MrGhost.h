@@ -25,21 +25,13 @@ struct FragmentTag {
 };
 
 /////////////////////////////////////////////////
-/// @struct EntityTypeTag
-/// @brief Tag identifying a selected entity type by key.
-/////////////////////////////////////////////////
-struct EntityTypeTag {
-  std::string key{};
-};
-
-/////////////////////////////////////////////////
 /// @brief Variant representing the currently selected item in MrGhost.
 ///
 /// std::monostate indicates no active selection. Additional tag types
 /// can be appended to this variant as new selectable categories are
 /// introduced without changing any existing code.
 /////////////////////////////////////////////////
-using GhostSelection = std::variant<std::monostate, FragmentTag, EntityTypeTag>;
+using GhostSelection = std::variant<std::monostate, FragmentTag>;
 
 /////////////////////////////////////////////////
 /// @struct MrGhost
