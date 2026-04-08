@@ -37,8 +37,8 @@ void UICollisionLogic::ProcessLogic() {
       // entity does not respond to collision or actions
       collision::mouse::ClearMouseOver(*ui_component.m_root_element);
     } else {
-      collision::mouse::CheckMouseOver(
-          m_scene_context.mouse_position, *ui_component.m_root_element);
+      collision::mouse::CheckMouseOver(m_scene_context.mouse_position,
+                                       *ui_component.m_root_element);
 
       // if this entity is now hovered, block all lower-priority entities
       if (collision::mouse::AnyMouseOver(*ui_component.m_root_element)) {

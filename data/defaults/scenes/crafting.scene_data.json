@@ -151,6 +151,7 @@
                         "x": 0,
                         "y": 0
                       },
+                      "priority": 1,
 
                       "children_active": true,
                       "children": [
