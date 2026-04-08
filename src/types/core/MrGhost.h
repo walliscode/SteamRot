@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include <SFML/System/Vector2.hpp>
 #include <string>
 #include <variant>
 
@@ -58,6 +59,12 @@ struct MrGhost {
   /// selected.
   /////////////////////////////////////////////////
   GhostSelection m_selection{std::monostate{}};
+
+  /////////////////////////////////////////////////
+  /// @brief The current position of the ghost item, updated each tick to track
+  /// the mouse cursor position.
+  /////////////////////////////////////////////////
+  sf::Vector2f m_position{};
 };
 
 } // namespace steamrot
