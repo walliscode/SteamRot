@@ -65,7 +65,11 @@ void GhostActionLogic::ProcessLogic() {
     const GhostPayload &ghost_payload =
         std::get<GhostPayload>(subscriber->captured_payload.value());
 
-    action::ghost::AttachGhostPayload(m_scene_context.mr_ghost, ghost_payload);
+    auto attach_result =
+        action::ghost::AttachGhostPayload(m_scene_context.mr_ghost, ghost_payload);
+    if (!attach_result.has_value()) {
+      continue;
+    }
   }
 }
 

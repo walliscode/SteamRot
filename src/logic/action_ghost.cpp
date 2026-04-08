@@ -23,6 +23,9 @@ AttachGhostPayload(MrGhost &mr_ghost, const GhostPayload &payload) {
   case GhostPayload::GhostAction::NONE:
     mr_ghost.m_selection = std::monostate{};
     break;
+  default:
+    return std::unexpected(FailInfo{FailMode::EnumValueNotHandled,
+                                    "AttachGhostPayload: unknown GhostAction"});
   }
 
   return std::monostate{};
