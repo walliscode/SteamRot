@@ -13,6 +13,7 @@
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "EventHandler.h"
+#include "MrGhost.h"
 #include "containers.h"
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
@@ -43,7 +44,7 @@ struct SceneContext {
   /////////////////////////////////////////////////
   SceneContext(sf::RenderTexture &scene_texture,
                EngineResources &engine_resources, EntityManager &entity_manager,
-               DataAccessFactory &data_access_factory);
+               DataAccessFactory &data_access_factory, MrGhost &mr_ghost);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -86,6 +87,15 @@ struct SceneContext {
   /// @brief Reference to the DataAccessFactory for the game.
   /////////////////////////////////////////////////
   DataAccessFactory &data_access_factory;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the MrGhost state for the scene.
+  ///
+  /// Provides all Logic classes with read/write access to the current
+  /// ghost selection (type + key of the item selected from menus,
+  /// dropdowns, blueprint lists, etc.).
+  /////////////////////////////////////////////////
+  MrGhost &mr_ghost;
 };
 
 } // namespace steamrot

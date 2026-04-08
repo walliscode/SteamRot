@@ -72,6 +72,18 @@ bool MatchPayload(const SystemPayload &filter_payload,
 /////////////////////////////////////////////////
 /// @brief Returns true if the filter payload matches the event payload.
 ///
+/// Compares GhostAction and the GhostSelection variant (type + key).
+///
+/// @param filter_payload GhostPayload from Subscriber filter
+/// @param event_payload  GhostPayload from EventBus
+/// @return True if they match
+/////////////////////////////////////////////////
+bool MatchPayload(const GhostPayload &filter_payload,
+                  const GhostPayload &event_payload);
+
+/////////////////////////////////////////////////
+/// @brief Returns true if the filter payload matches the event payload.
+///
 /// Wraps std::visit to dispatch to the correct MatchPayload overload based on
 /// the active variant type. Returns false if the variant types do not match.
 ///

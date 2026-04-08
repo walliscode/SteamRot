@@ -77,6 +77,17 @@ CreateSystemEventPacket(const uint8_t lifetime,
 }
 
 /////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateGhostEventPacket(const uint8_t lifetime,
+                       const GhostPayload::GhostAction action,
+                       const GhostSelection &selection) {
+  EventContext context{lifetime};
+  GhostPayload payload(action, selection);
+  EventPacket packet{context, EventType::GHOST, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   // Initialize random number generator
   std::random_device rd;
@@ -198,6 +209,13 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
                                                        valid_actions.size() - 1);
     const auto random_action = valid_actions[action_dist(gen)];
     return CreateSystemEventPacket(lifetime, random_action);
+  }
+
+  case EventType::GHOST: {
+    const std::string random_key = "key_" + std::to_string(lifetime_dist(gen));
+    GhostSelection selection{FragmentTag{random_key}};
+    return CreateGhostEventPacket(lifetime, GhostPayload::GhostAction::SELECT,
+                                  selection);
   }
 
   default:

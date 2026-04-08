@@ -14,6 +14,7 @@
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "GameContext.h"
+#include "MrGhost.h"
 #include "SceneContext.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <memory>
@@ -121,6 +122,11 @@ private:
   /// @brief GameContext created from engine resources
   /////////////////////////////////////////////////
   std::unique_ptr<GameContext> m_game_context;
+
+  /////////////////////////////////////////////////
+  /// @brief MrGhost state owned by this fixture (stand-in for SceneResources)
+  /////////////////////////////////////////////////
+  MrGhost m_mr_ghost{};
 
   /////////////////////////////////////////////////
   /// @brief SceneContext created from cores and entity manager
