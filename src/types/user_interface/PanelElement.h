@@ -11,11 +11,23 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "Layout.h"
+#include "SpacingAndSizing.h"
 #include "UIElement.h"
 
 namespace steamrot {
 
 struct PanelElement : public UIElement {
+
+  /////////////////////////////////////////////////
+  /// @brief Layout type for this panel's child elements
+  /////////////////////////////////////////////////
+  Layout layout{Layout::Vertical};
+
+  /////////////////////////////////////////////////
+  /// @brief Spacing and sizing strategy for this panel's child elements
+  /////////////////////////////////////////////////
+  SpacingAndSizing spacing_strategy{SpacingAndSizing::Even};
 
 /////////////////////////////////////////////////
   /// @brief Create a deep copy of this PanelElement
@@ -25,6 +37,8 @@ struct PanelElement : public UIElement {
   std::unique_ptr<UIElement> Clone() const override {
     auto cloned = std::make_unique<PanelElement>();
     CloneBaseUIElementData(*cloned);
+    cloned->layout = layout;
+    cloned->spacing_strategy = spacing_strategy;
     return cloned;
   }
 };

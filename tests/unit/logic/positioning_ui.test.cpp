@@ -289,14 +289,12 @@ TEST_CASE("PositionVerticalLayoutChildren", "[unit][positioning_ui]") {
   SECTION("does not position DropDownContainerElement children") {
     // DropDownContainerElement has a specialist positioning function
     // (PositionDropDownContainerChildren); the generic layout functions should
-    // not be dispatched for it. UpdateSizeAndPositionOfChildElements guards
-    // this via the Layout::DropDown case (no-op). Verify that a
-    // DropDownContainerElement with Layout::DropDown passed through
-    // UpdateSizeAndPositionOfChildElements leaves children unchanged.
+    // not be dispatched for it. UpdateSizeAndPositionOfChildElements only
+    // processes PanelElement types, so DropDownContainerElement children are
+    // untouched.
     steamrot::DropDownContainerElement container;
     container.position = {0.0f, 0.0f};
     container.size = {200.0f, 50.0f};
-    container.layout = steamrot::Layout::DropDown;
     container.child_elements.push_back(
         std::make_unique<steamrot::DropDownListElement>());
     container.child_elements.push_back(
@@ -399,14 +397,12 @@ TEST_CASE("PositionHorizontalLayoutChildren", "[unit][positioning_ui]") {
   SECTION("does not position DropDownContainerElement children") {
     // DropDownContainerElement has a specialist positioning function
     // (PositionDropDownContainerChildren); the generic layout functions should
-    // not be dispatched for it. UpdateSizeAndPositionOfChildElements guards
-    // this via the Layout::DropDown case (no-op). Verify that a
-    // DropDownContainerElement with Layout::DropDown passed through
-    // UpdateSizeAndPositionOfChildElements leaves children unchanged.
+    // not be dispatched for it. UpdateSizeAndPositionOfChildElements only
+    // processes PanelElement types, so DropDownContainerElement children are
+    // untouched.
     steamrot::DropDownContainerElement container;
     container.position = {0.0f, 0.0f};
     container.size = {300.0f, 100.0f};
-    container.layout = steamrot::Layout::DropDown;
     container.child_elements.push_back(
         std::make_unique<steamrot::DropDownListElement>());
     container.child_elements.push_back(
@@ -420,8 +416,8 @@ TEST_CASE("PositionHorizontalLayoutChildren", "[unit][positioning_ui]") {
         container, style);
 
     // Children should remain at their default zero position/size — the generic
-    // horizontal layout was not applied because Layout::DropDown is a no-op in
-    // UpdateSizeAndPositionOfChildElements.
+    // layout was not applied because DropDownContainerElement is not a
+    // PanelElement.
     REQUIRE_THAT(container.child_elements[0]->size,
                  steamrot::tests::EqualsVector2f({0.0f, 0.0f}));
     REQUIRE_THAT(container.child_elements[0]->position,
@@ -589,13 +585,11 @@ TEST_CASE("UpdateSizeAndPositionOfChildElements", "[unit][positioning_ui]") {
   SECTION("does not position DropDownContainerElement children (specialist "
           "approach)") {
     // DropDownContainerElement uses PositionDropDownContainerChildren as its
-    // specialist approach. When its layout is Layout::DropDown,
-    // UpdateSizeAndPositionOfChildElements must not dispatch to the generic
-    // Vertical or Horizontal layout functions — the DropDown case is a no-op.
+    // specialist approach. UpdateSizeAndPositionOfChildElements only processes
+    // PanelElement types, so DropDownContainerElement children are untouched.
     steamrot::DropDownContainerElement container;
     container.position = {0.0f, 0.0f};
     container.size = {200.0f, 50.0f};
-    container.layout = steamrot::Layout::DropDown;
     container.child_elements.push_back(
         std::make_unique<steamrot::DropDownListElement>());
     container.child_elements.push_back(

@@ -23,8 +23,6 @@
                 "x": 250,
                 "y": 300
               },
-              "spacing_strategy": "Even",
-              "layout": "Vertical",
               "children_active": true,
               "children": [
                 {
@@ -40,9 +38,7 @@
                         "y": 0
                       },
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "label": "Start Game"
                   }
@@ -80,9 +76,7 @@
                         }
                       ],
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "label": "Crafting Table"
                   }
@@ -119,15 +113,15 @@
                         }
                       ],
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "label": "Quit Game"
                   }
                 }
               ]
-            }
+            },
+            "spacing_strategy": "Even",
+            "layout": "Vertical"
           }
         }
       }

@@ -58,9 +58,7 @@
                         }
                       ],
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     },
                     "label": "Return"
                   }
@@ -81,8 +79,6 @@
                       },
                       "children_active": false,
                       "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None",
                       "subscriber_data": {
                         "event_type": "USER_INPUT",
                         "filter_payload_type": "InputPayloadFbs",
@@ -116,10 +112,10 @@
                     }
                   }
                 }
-              ],
-              "layout": "Vertical",
-              "spacing_strategy": "None"
-            }
+              ]
+            },
+            "layout": "Vertical",
+            "spacing_strategy": "None"
           }
         }
       },
@@ -167,9 +163,7 @@
                                 "y": 0
                               },
                               "children_active": false,
-                              "children": [],
-                              "layout": "DropDown",
-                              "spacing_strategy": "DropDownList"
+                              "children": []
                             },
                             "data_population_function": "GetAllFragmentNames"
                           }
@@ -198,9 +192,7 @@
                             }
                           }
                         }
-                      ],
-                      "layout": "DropDown",
-                      "spacing_strategy": "Ratioed"
+                      ]
                     }
                   }
                 },
@@ -248,16 +240,14 @@
                         }
                       ],
                       "children_active": false,
-                      "children": [],
-                      "layout": "Horizontal",
-                      "spacing_strategy": "None"
+                      "children": []
                     }
                   }
                 }
-              ],
-              "layout": "Vertical",
-              "spacing_strategy": "None"
-            }
+              ]
+            },
+            "layout": "Vertical",
+            "spacing_strategy": "None"
           }
         }
       },

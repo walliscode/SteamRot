@@ -12,6 +12,7 @@
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
+#include "PanelElement.h"
 #include "conmat.h"
 #include <cmath>
 #include <typeinfo>
@@ -225,17 +226,23 @@ bool UIElementEqualsMatcher::CompareUIElements(const UIElement &actual,
         << ", expected=" << expected.children_active << "; ";
   }
 
-  // Compare spacing_strategy
-  if (actual.spacing_strategy != expected.spacing_strategy) {
-    oss << prefix << "spacing_strategy: actual="
-        << static_cast<int>(actual.spacing_strategy)
-        << ", expected=" << static_cast<int>(expected.spacing_strategy) << "; ";
-  }
-
-  // Compare layout
-  if (actual.layout != expected.layout) {
-    oss << prefix << "layout: actual=" << static_cast<int>(actual.layout)
-        << ", expected=" << static_cast<int>(expected.layout) << "; ";
+  // Compare spacing_strategy and layout only for PanelElement
+  if (const auto *actual_panel = dynamic_cast<const PanelElement *>(&actual)) {
+    if (const auto *expected_panel =
+            dynamic_cast<const PanelElement *>(&expected)) {
+      if (actual_panel->spacing_strategy != expected_panel->spacing_strategy) {
+        oss << prefix << "spacing_strategy: actual="
+            << static_cast<int>(actual_panel->spacing_strategy)
+            << ", expected="
+            << static_cast<int>(expected_panel->spacing_strategy) << "; ";
+      }
+      if (actual_panel->layout != expected_panel->layout) {
+        oss << prefix
+            << "layout: actual=" << static_cast<int>(actual_panel->layout)
+            << ", expected=" << static_cast<int>(expected_panel->layout)
+            << "; ";
+      }
+    }
   }
 
   // Compare subscription

@@ -44,10 +44,12 @@ table UIElementDataFbs{
     children_active: bool ;
     children: [ChildDataFbs] (required);
     is_mouse_over: bool;
-    layout: LayoutFbs;
-    spacing_strategy: SpacingAndSizingFbs;
   }
-table PanelDataFbs{  base_data: UIElementDataFbs(required);}
+table PanelDataFbs{
+  base_data: UIElementDataFbs(required);
+  layout: LayoutFbs;
+  spacing_strategy: SpacingAndSizingFbs;
+}
 
 table ButtonDataFbs {
   base_data: UIElementDataFbs(required);

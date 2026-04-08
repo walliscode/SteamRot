@@ -19,8 +19,6 @@ TEST_CASE("DropDownContainerElement: Default Constructor", "[types]") {
   REQUIRE(container.response_events.empty());
   REQUIRE(container.children_active == false);
   REQUIRE(container.child_elements.empty());
-  REQUIRE(container.layout == steamrot::Layout::Vertical);
-  REQUIRE(container.spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(container.is_expanded == false);
 }
 
@@ -30,8 +28,6 @@ TEST_CASE("DropDownContainerElement: Clone Method", "[types]") {
   original.size = sf::Vector2f{100.f, 50.f};
   original.is_mouse_over = true;
   original.children_active = true;
-  original.layout = steamrot::Layout::Horizontal;
-  original.spacing_strategy = steamrot::SpacingAndSizing::Even;
   original.is_expanded = true;
 
   auto cloned_ptr = original.Clone();
@@ -42,7 +38,5 @@ TEST_CASE("DropDownContainerElement: Clone Method", "[types]") {
   REQUIRE(cloned->size == sf::Vector2f{100.f, 50.f});
   REQUIRE(cloned->is_mouse_over == true);
   REQUIRE(cloned->children_active == true);
-  REQUIRE(cloned->layout == steamrot::Layout::Horizontal);
-  REQUIRE(cloned->spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(cloned->is_expanded == true);
 }

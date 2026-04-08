@@ -20,8 +20,6 @@ TEST_CASE("ButtonElement: Default Constructor", "[types]") {
   REQUIRE(button.response_events.empty());
   REQUIRE(button.children_active == false);
   REQUIRE(button.child_elements.empty());
-  REQUIRE(button.layout == steamrot::Layout::Vertical);
-  REQUIRE(button.spacing_strategy == steamrot::SpacingAndSizing::Even);
 }
 
 TEST_CASE("ButtonElement: Clone Method", "[types]") {
@@ -31,8 +29,6 @@ TEST_CASE("ButtonElement: Clone Method", "[types]") {
   original.size = sf::Vector2f{100.f, 50.f};
   original.is_mouse_over = true;
   original.children_active = true;
-  original.layout = steamrot::Layout::Horizontal;
-  original.spacing_strategy = steamrot::SpacingAndSizing::Even;
   auto cloned_ptr = original.Clone();
   auto *cloned = dynamic_cast<steamrot::ButtonElement *>(cloned_ptr.get());
   REQUIRE(cloned != nullptr);
@@ -41,6 +37,4 @@ TEST_CASE("ButtonElement: Clone Method", "[types]") {
   REQUIRE(cloned->size == sf::Vector2f{100.f, 50.f});
   REQUIRE(cloned->is_mouse_over == true);
   REQUIRE(cloned->children_active == true);
-  REQUIRE(cloned->layout == steamrot::Layout::Horizontal);
-  REQUIRE(cloned->spacing_strategy == steamrot::SpacingAndSizing::Even);
 }

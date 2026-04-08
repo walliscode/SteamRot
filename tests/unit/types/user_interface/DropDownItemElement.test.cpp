@@ -19,8 +19,6 @@ TEST_CASE("DropDownItemElement: Default Constructor", "[types]") {
   REQUIRE(item.response_events.empty());
   REQUIRE(item.children_active == false);
   REQUIRE(item.child_elements.empty());
-  REQUIRE(item.layout == steamrot::Layout::Vertical);
-  REQUIRE(item.spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(item.label == "item...");
   REQUIRE(item.value == "value...");
 }
@@ -31,8 +29,6 @@ TEST_CASE("DropDownItemElement: Clone Method", "[types]") {
   original.size = sf::Vector2f{100.f, 50.f};
   original.is_mouse_over = true;
   original.children_active = true;
-  original.layout = steamrot::Layout::Horizontal;
-  original.spacing_strategy = steamrot::SpacingAndSizing::Even;
   original.label = "Option 1";
   original.value = "opt_1";
 
@@ -44,8 +40,6 @@ TEST_CASE("DropDownItemElement: Clone Method", "[types]") {
   REQUIRE(cloned->size == sf::Vector2f{100.f, 50.f});
   REQUIRE(cloned->is_mouse_over == true);
   REQUIRE(cloned->children_active == true);
-  REQUIRE(cloned->layout == steamrot::Layout::Horizontal);
-  REQUIRE(cloned->spacing_strategy == steamrot::SpacingAndSizing::Even);
   REQUIRE(cloned->label == "Option 1");
   REQUIRE(cloned->value == "opt_1");
 }

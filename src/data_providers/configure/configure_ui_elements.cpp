@@ -121,8 +121,6 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
     }
   }
 
-  element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
-  element.layout = ConvertLayout(data.layout());
   element.children_active = data.children_active();
 
   // Recursively create and attach children
@@ -147,7 +145,8 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
-  // No extra fields for panel
+  panel_element.layout = ConvertLayout(data.layout());
+  panel_element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
   return std::monostate{};
 }
 

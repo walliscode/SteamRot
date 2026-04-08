@@ -50,17 +50,15 @@
                       }
                     ],
                     "children_active": false,
-                    "children": [],
-                    "layout": "Horizontal",
-                    "spacing_strategy": "None"
+                    "children": []
                   },
                   "label": "Crafting Table"
                 }
               }
-            ],
-            "layout": "Horizontal",
-            "spacing_strategy": "None"
-          }
+            ]
+          },
+          "layout": "Horizontal",
+          "spacing_strategy": "None"
         }
       }
     },
@@ -79,10 +77,10 @@
               "y": 50.0
             },
             "children_active": false,
-            "children": [],
-            "layout": "Vertical",
-            "spacing_strategy": "Even"
-          }
+            "children": []
+          },
+          "layout": "Vertical",
+          "spacing_strategy": "Even"
         }
       }
     },
@@ -101,10 +99,10 @@
               "y": 100.0
             },
             "children_active": false,
-            "children": [],
-            "layout": "Vertical",
-            "spacing_strategy": "None"
-          }
+            "children": []
+          },
+          "layout": "Vertical",
+          "spacing_strategy": "None"
         }
       }
     },
@@ -123,10 +121,10 @@
               "y": 150.0
             },
             "children_active": false,
-            "children": [],
-            "layout": "Vertical",
-            "spacing_strategy": "None"
-          }
+            "children": []
+          },
+          "layout": "Vertical",
+          "spacing_strategy": "None"
         }
       }
     },
