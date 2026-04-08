@@ -9,6 +9,7 @@ add_library(logic
 
 
   GrimoireMachinaPositioningLogic.cpp
+  GhostPositioningLogic.cpp
   GrimoireMachinaActionLogic.cpp
   GrimoireMachinaRenderLogic.cpp
   GrimoireMachinaCollisionLogic.cpp
