@@ -1,8 +1,8 @@
 #include "UICollisionLogic.h"
 #include "CUserInterface.h"
 #include "archetypes.h"
-#include "entity_memory.h"
 #include "collision_mouse.h"
+#include "entity_memory.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot::logic {
@@ -13,14 +13,17 @@ UICollisionLogic::UICollisionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UICollisionLogic::ProcessLogic() {
 
-  // get all entity indexes with CUserInterface component
-  std::set<size_t> entity_indexes =
-      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
-          m_scene_context.archetypes, true);
+  // get entity indexes sorted by priority, highest first, so that
+  // higher-priority entities claim the mouse before lower-priority ones
+  std::vector<size_t> entity_indexes =
+      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
+          m_scene_context.archetypes, m_scene_context.scene_entities,
+          /*ascending=*/false);
 
-  // cycle through all the entity indexs in the archetype
+  // track whether any higher-priority entity has already claimed the mouse
+  bool higher_priority_claimed_mouse = false;
+
   for (size_t entity_id : entity_indexes) {
-    // get the CUserInterface component
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_scene_context.scene_entities);
 
@@ -28,9 +31,21 @@ void UICollisionLogic::ProcessLogic() {
     if (!ui_component.m_visible) {
       continue;
     }
-    collision::mouse::CheckMouseOver(
-        m_scene_context.mouse_position, *ui_component.m_root_element);
-  };
+
+    if (higher_priority_claimed_mouse) {
+      // a higher-priority entity owns the mouse: clear hover state so this
+      // entity does not respond to collision or actions
+      collision::mouse::ClearMouseOver(*ui_component.m_root_element);
+    } else {
+      collision::mouse::CheckMouseOver(
+          m_scene_context.mouse_position, *ui_component.m_root_element);
+
+      // if this entity is now hovered, block all lower-priority entities
+      if (collision::mouse::AnyMouseOver(*ui_component.m_root_element)) {
+        higher_priority_claimed_mouse = true;
+      }
+    }
+  }
 }
 
 } // namespace steamrot::logic

@@ -19,6 +19,27 @@ bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
 }
 
 /////////////////////////////////////////////////
+void ClearMouseOver(UIElement &element) {
+  element.is_mouse_over = false;
+  for (auto &child : element.child_elements) {
+    ClearMouseOver(*child);
+  }
+}
+
+/////////////////////////////////////////////////
+bool AnyMouseOver(const UIElement &element) {
+  if (element.is_mouse_over) {
+    return true;
+  }
+  for (const auto &child : element.child_elements) {
+    if (AnyMouseOver(*child)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   // bool to keep track if any child is hovered over
   bool child_hovered = false;

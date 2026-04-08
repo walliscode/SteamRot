@@ -131,3 +131,62 @@ TEST_CASE("CheckMouseOver UIElement toggles nested Panel Elements",
   REQUIRE(child_element.is_mouse_over == false);
   REQUIRE(parent_element.is_mouse_over == true);
 }
+
+TEST_CASE("ClearMouseOver clears is_mouse_over on element and all children",
+          "[unit][collision]") {
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+  parent.is_mouse_over = true;
+
+  auto child = std::make_unique<steamrot::PanelElement>();
+  child->position = {50, 50};
+  child->size = {100, 100};
+  child->is_mouse_over = true;
+
+  auto grandchild = std::make_unique<steamrot::PanelElement>();
+  grandchild->position = {60, 60};
+  grandchild->size = {20, 20};
+  grandchild->is_mouse_over = true;
+
+  child->child_elements.push_back(std::move(grandchild));
+  parent.child_elements.push_back(std::move(child));
+
+  // all hovered before clear
+  REQUIRE(parent.is_mouse_over == true);
+  REQUIRE(parent.child_elements[0]->is_mouse_over == true);
+  REQUIRE(parent.child_elements[0]->child_elements[0]->is_mouse_over == true);
+
+  steamrot::logic::collision::mouse::ClearMouseOver(parent);
+
+  REQUIRE(parent.is_mouse_over == false);
+  REQUIRE(parent.child_elements[0]->is_mouse_over == false);
+  REQUIRE(parent.child_elements[0]->child_elements[0]->is_mouse_over == false);
+}
+
+TEST_CASE("AnyMouseOver returns true when any element in tree is hovered",
+          "[unit][collision]") {
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+
+  auto child = std::make_unique<steamrot::PanelElement>();
+  child->position = {50, 50};
+  child->size = {100, 100};
+
+  parent.child_elements.push_back(std::move(child));
+
+  SECTION("No elements hovered returns false") {
+    REQUIRE(steamrot::logic::collision::mouse::AnyMouseOver(parent) == false);
+  }
+
+  SECTION("Root element hovered returns true") {
+    parent.is_mouse_over = true;
+    REQUIRE(steamrot::logic::collision::mouse::AnyMouseOver(parent) == true);
+  }
+
+  SECTION("Child element hovered returns true") {
+    parent.child_elements[0]->is_mouse_over = true;
+    REQUIRE(steamrot::logic::collision::mouse::AnyMouseOver(parent) == true);
+  }
+}

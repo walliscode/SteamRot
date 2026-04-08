@@ -86,6 +86,7 @@ table UserInterfaceFbs{
     root_ui_element: PanelDataFbs (required); 
     ui_name: string; 
     is_visible: bool;
+    priority: int;
   }
 
 root_type UserInterfaceFbs;

@@ -3,8 +3,10 @@
 /// @brief Implementation of the UIEventLogic class.
 /////////////////////////////////////////////////
 #include "UIActionLogic.h"
+#include "CUserInterface.h"
 #include "Logic.h"
 #include "archetypes.h"
+#include "collision_mouse.h"
 #include "entity_memory.h"
 #include "action_ui.h"
 #include <SFML/Window/Mouse.hpp>
@@ -19,12 +21,15 @@ UIActionLogic::UIActionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {
 
-  // get all entity indexes with CUserInterface component
-  std::set<size_t> entity_indexes =
-      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
-          m_scene_context.archetypes, true);
+  // get entity indexes sorted by priority, highest first, so that the
+  // highest-priority entity processes actions before lower-priority ones.
+  // collision::UICollisionLogic already clears is_mouse_over on lower-priority
+  // entities, so this early-exit is a defensive measure only.
+  std::vector<size_t> entity_indexes =
+      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
+          m_scene_context.archetypes, m_scene_context.scene_entities,
+          /*ascending=*/false);
 
-  // cycle through all the entity indexs in the archetype
   for (size_t entity_id : entity_indexes) {
 
     // get the CUserInterface component
@@ -36,10 +41,19 @@ void UIActionLogic::ProcessLogic() {
       continue;
     }
 
-    // Perform any aciton logic here, processing nested elements recursively
+    // check hover state before processing (used for early-exit below)
+    bool entity_has_hover =
+        collision::mouse::AnyMouseOver(*ui_component.m_root_element);
+
+    // Perform any action logic here, processing nested elements recursively
     action::ui::ProcessNestedUIActionsAndEvents(
         *ui_component.m_root_element, m_scene_context.event_handler,
         m_scene_context);
+
+    // if this entity had a hovered element, stop processing further entities
+    if (entity_has_hover) {
+      break;
+    }
   }
 }
 

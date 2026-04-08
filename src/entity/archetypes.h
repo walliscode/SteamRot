@@ -1,10 +1,14 @@
 #pragma once
 
 #include "containers.h"
+#include "entity_memory.h"
 #include "entity_types.h"
+#include <algorithm>
 #include <bitset>
 #include <cstddef>
 #include <set>
+#include <unordered_map>
+#include <vector>
 
 namespace steamrot::archetypes {
 
@@ -87,6 +91,48 @@ std::set<size_t> GenerateEntityIndexesFromComponents(
       }
     }
   }
+  return entity_indexes;
+}
+
+/////////////////////////////////////////////////
+/// @brief Returns entity indexes sorted by m_priority of the given Component.
+///
+/// The Component type must have an integer m_priority member field.
+/// Entities with equal priority retain their original index order.
+///
+/// @tparam Component Component type with an m_priority field.
+/// @param archetypes Archetype map to search.
+/// @param entity_memory_pool Pool used to read component priority values.
+/// @param ascending When true, returns lowest priority first (for rendering).
+///                  When false, returns highest priority first (for collision).
+/// @return Sorted vector of entity indexes.
+/////////////////////////////////////////////////
+template <typename Component>
+std::vector<size_t> GetEntitiesSortedByPriority(
+    const std::unordered_map<ArchetypeID, Archetype> &archetypes,
+    const EntityMemoryPool &entity_memory_pool, bool ascending = true) {
+
+  // collect all matching entity indexes (exact match)
+  std::set<size_t> entity_index_set =
+      GenerateEntityIndexesFromComponents<Component>(archetypes, true);
+
+  std::vector<size_t> entity_indexes(entity_index_set.begin(),
+                                     entity_index_set.end());
+
+  // sort by m_priority, using entity index as tie-breaker for stability
+  std::stable_sort(
+      entity_indexes.begin(), entity_indexes.end(),
+      [&](size_t a, size_t b) {
+        const Component &comp_a =
+            entity::memory::GetComponent<Component>(a, entity_memory_pool);
+        const Component &comp_b =
+            entity::memory::GetComponent<Component>(b, entity_memory_pool);
+        if (ascending) {
+          return comp_a.m_priority < comp_b.m_priority;
+        }
+        return comp_a.m_priority > comp_b.m_priority;
+      });
+
   return entity_indexes;
 }
 } // namespace steamrot::archetypes
