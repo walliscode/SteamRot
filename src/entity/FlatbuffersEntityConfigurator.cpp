@@ -207,67 +207,105 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     // pull out state key
     std::string state_key = ui_state_data->state_key()->str();
 
-    //
-    // check that data for mapping ui visi
-    if (!ui_state_data->state_to_ui_visibility()) {
-      FailInfo fail_info{
-          FailMode::FlatbuffersDataNotFound,
-          "No mappings found in UIStateDataFbs for ui visibility."};
-      return std::unexpected(fail_info);
-    }
-
     // get all UI components from the entity memory pool
     const auto &ui_components =
         entity::memory::GetComponentVector<CUserInterface>(emp);
 
-    UIVisibilityState visibility_state;
+    // ------------------------------------------------------------------
+    // Visibility state (optional)
+    // ------------------------------------------------------------------
+    if (ui_state_data->state_to_ui_visibility()) {
 
-    // check that there are ui names to map
-    if (ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+      UIVisibilityState visibility_state;
 
-      std::vector<std::string> ui_names_vec;
-      // create a vector of ui names for easier interaction
-      for (const auto &ui_name :
-           *ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+      // check that there are ui names to map
+      if (ui_state_data->state_to_ui_visibility()->ui_names_on()) {
 
-        ui_names_vec.push_back(ui_name->str());
-      }
+        std::vector<std::string> ui_names_vec;
+        // create a vector of ui names for easier interaction
+        for (const auto &ui_name :
+             *ui_state_data->state_to_ui_visibility()->ui_names_on()) {
 
-      for (size_t i = 0; i < ui_components.size(); ++i) {
-        const auto &ui_component = ui_components[i];
+          ui_names_vec.push_back(ui_name->str());
+        }
 
-        // check if name exists in the ui names vector
-        if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
-                      ui_component.m_name) != ui_names_vec.end()) {
+        for (size_t i = 0; i < ui_components.size(); ++i) {
+          const auto &ui_component = ui_components[i];
 
-          // if it does, add the index to the on list
-          visibility_state.m_ui_indices_on.push_back(i);
+          // check if name exists in the ui names vector
+          if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                        ui_component.m_name) != ui_names_vec.end()) {
+
+            // if it does, add the index to the on list
+            visibility_state.m_ui_indices_on.push_back(i);
+          }
         }
       }
-    }
 
-    // repeat for ui names off
-    if (ui_state_data->state_to_ui_visibility()->ui_names_off()) {
-      std::vector<std::string> ui_names_vec;
+      // repeat for ui names off
+      if (ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+        std::vector<std::string> ui_names_vec;
 
-      // create a vector of ui names for easier interaction
-      for (const auto &ui_name :
-           *ui_state_data->state_to_ui_visibility()->ui_names_off()) {
-        ui_names_vec.push_back(ui_name->str());
-      }
-      for (size_t i = 0; i < ui_components.size(); ++i) {
-        const auto &ui_component = ui_components[i];
-        // check if name exists in the ui names vector
-        if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
-                      ui_component.m_name) != ui_names_vec.end()) {
-          // if it does, add the index to the off list
-          visibility_state.m_ui_indices_off.push_back(i);
+        // create a vector of ui names for easier interaction
+        for (const auto &ui_name :
+             *ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+          ui_names_vec.push_back(ui_name->str());
+        }
+        for (size_t i = 0; i < ui_components.size(); ++i) {
+          const auto &ui_component = ui_components[i];
+          // check if name exists in the ui names vector
+          if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                        ui_component.m_name) != ui_names_vec.end()) {
+            // if it does, add the index to the off list
+            visibility_state.m_ui_indices_off.push_back(i);
+          }
         }
       }
+
+      // Store the visibility state for this state key
+      ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
     }
 
-    // Store the visibility state for this state key
-    ui_state_component.m_state_to_ui_visibility[state_key] = visibility_state;
+    // ------------------------------------------------------------------
+    // Disabled state (optional)
+    // ------------------------------------------------------------------
+    if (ui_state_data->state_to_ui_visibility()) {
+
+      UIDisabledState disabled_state;
+
+      if (ui_state_data->state_to_ui_visibility()->ui_names_disabled()) {
+        std::vector<std::string> ui_names_vec;
+        for (const auto &ui_name :
+             *ui_state_data->state_to_ui_visibility()->ui_names_disabled()) {
+          ui_names_vec.push_back(ui_name->str());
+        }
+        for (size_t i = 0; i < ui_components.size(); ++i) {
+          const auto &ui_component = ui_components[i];
+          if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                        ui_component.m_name) != ui_names_vec.end()) {
+            disabled_state.m_ui_indices_disabled.push_back(i);
+          }
+        }
+      }
+
+      if (ui_state_data->state_to_ui_visibility()->ui_names_enabled()) {
+        std::vector<std::string> ui_names_vec;
+        for (const auto &ui_name :
+             *ui_state_data->state_to_ui_visibility()->ui_names_enabled()) {
+          ui_names_vec.push_back(ui_name->str());
+        }
+        for (size_t i = 0; i < ui_components.size(); ++i) {
+          const auto &ui_component = ui_components[i];
+          if (std::find(ui_names_vec.begin(), ui_names_vec.end(),
+                        ui_component.m_name) != ui_names_vec.end()) {
+            disabled_state.m_ui_indices_enabled.push_back(i);
+          }
+        }
+      }
+
+      // Store the disabled state for this state key (even if empty lists)
+      ui_state_component.m_state_to_ui_disabled[state_key] = disabled_state;
+    }
 
     // Create and register subscribers if provided
     if (ui_state_data->subscribers()) {

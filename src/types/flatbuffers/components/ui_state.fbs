@@ -6,7 +6,9 @@ namespace steamrot;
 table UIStateMappingFbs {
 
   ui_names_on: [string];
-  ui_names_off: [string];  
+  ui_names_off: [string];
+  ui_names_disabled: [string];
+  ui_names_enabled: [string];
 
 }
 

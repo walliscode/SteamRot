@@ -39,6 +39,26 @@ struct UIVisibilityState {
 };
 
 /////////////////////////////////////////////////
+/// @brief Holds UI disabled state for a particular state key
+///
+/// Specifies which CUserInterface root elements should have is_disabled set to
+/// true (disabled) or false (enabled) for a given state.
+/////////////////////////////////////////////////
+struct UIDisabledState {
+  /////////////////////////////////////////////////
+  /// @brief Entity indices of UI components whose root element should be
+  /// disabled (greyed out and non-interactive)
+  /////////////////////////////////////////////////
+  std::vector<size_t> m_ui_indices_disabled;
+
+  /////////////////////////////////////////////////
+  /// @brief Entity indices of UI components whose root element should be
+  /// enabled (restored to interactive)
+  /////////////////////////////////////////////////
+  std::vector<size_t> m_ui_indices_enabled;
+};
+
+/////////////////////////////////////////////////
 /// @brief Component for managing UI visibility based on scene state
 ///
 /// This component maps state keys to UI visibility states,
@@ -59,6 +79,15 @@ struct CUIState : public Component {
   /// be hidden (off).
   /////////////////////////////////////////////////
   std::unordered_map<std::string, UIVisibilityState> m_state_to_ui_visibility;
+
+  /////////////////////////////////////////////////
+  /// @brief Mapping of state keys to UI disabled states
+  ///
+  /// Each state key maps to a UIDisabledState that specifies
+  /// which UI component root elements should be disabled (greyed out) and which
+  /// should be enabled when the associated subscribers all fire.
+  /////////////////////////////////////////////////
+  std::unordered_map<std::string, UIDisabledState> m_state_to_ui_disabled;
 
   /////////////////////////////////////////////////
   /// @brief Mapping of state keys to their associated subscribers
