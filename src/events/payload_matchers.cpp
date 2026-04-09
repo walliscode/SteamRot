@@ -95,6 +95,13 @@ bool MatchPayload(const GhostPayload &filter_payload,
     return false;
   }
 
+  // A monostate filter selection acts as a wildcard: it matches any selection
+  // type carried by the event. This allows subscribers to listen for all
+  // SELECT (or CLEAR) events without specifying a particular selection key.
+  if (std::holds_alternative<std::monostate>(filter_payload.m_selection)) {
+    return true;
+  }
+
   // Compare the selection variant (type + key must both match)
   if (filter_payload.m_selection.index() != event_payload.m_selection.index()) {
     return false;

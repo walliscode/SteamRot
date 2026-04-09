@@ -1,0 +1,24 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of free functions for processing actions related to
+/// MrGhost.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "action_ghost.h"
+
+namespace steamrot::logic::action::ghost {
+
+/////////////////////////////////////////////////
+void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection) {
+  mr_ghost.m_selection = selection;
+}
+
+/////////////////////////////////////////////////
+void ClearGhostSelection(MrGhost &mr_ghost) {
+  mr_ghost.m_selection = std::monostate{};
+}
+
+} // namespace steamrot::logic::action::ghost
