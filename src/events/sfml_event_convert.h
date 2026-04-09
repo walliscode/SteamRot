@@ -15,7 +15,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "EventPacket.h"
 #include "EventPayload.h"
 #include "InputActionRegistry.h"
 #include "UserInputBitset.h"
@@ -34,8 +33,7 @@ namespace steamrot::events::convert {
 /// @param sfml_events Vector of SFML events gathered this tick.
 /// @return UserInputBitset encoding all input state from the events.
 /////////////////////////////////////////////////
-UserInputBitset
-CollectInputEvents(const std::vector<sf::Event> &sfml_events);
+UserInputBitset CollectInputEvents(const std::vector<sf::Event> &sfml_events);
 
 /////////////////////////////////////////////////
 /// @brief Resolve an InputAction from a bitset using the registry.

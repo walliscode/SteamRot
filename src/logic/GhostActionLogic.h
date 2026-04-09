@@ -48,6 +48,13 @@ public:
   /////////////////////////////////////////////////
   LogicType GetLogicType() const override { return LogicType::GhostAction; }
 
+  /////////////////////////////////////////////////
+  /// @brief Deal with active GHOST event subscribers.
+  ///
+  /// @param subscriber Subscriber to process and take info from
+  /////////////////////////////////////////////////
+  void ProcessGhostEvents(Subscriber &subscriber);
+
 private:
   /////////////////////////////////////////////////
   /// @brief Dispatches GHOST event subscribers to the correct free function.
