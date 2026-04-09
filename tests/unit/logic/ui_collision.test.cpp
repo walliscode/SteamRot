@@ -546,3 +546,96 @@ TEST_CASE("CheckMouseOver UIElement with inactive high-priority sibling does "
     REQUIRE(low_ref.is_mouse_over == true);
   }
 }
+
+// ---------------------------------------------------------------------------
+// is_disabled gating tests
+// ---------------------------------------------------------------------------
+
+TEST_CASE("CheckMouseOver disabled UIElement never becomes hovered",
+          "[unit][collision][disabled]") {
+  steamrot::PanelElement panel;
+  panel.position = {0, 0};
+  panel.size = {100, 100};
+  panel.is_disabled = true;
+
+  // Mouse is clearly inside the element bounds
+  sf::Vector2i mouse_position(50, 50);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, panel);
+
+  REQUIRE(panel.is_mouse_over == false);
+}
+
+TEST_CASE("CheckMouseOver disabled UIElement clears stale hover state",
+          "[unit][collision][disabled]") {
+  steamrot::PanelElement panel;
+  panel.position = {0, 0};
+  panel.size = {100, 100};
+  // Simulate stale hover from a previous frame
+  panel.is_mouse_over = true;
+  panel.is_disabled = true;
+
+  sf::Vector2i mouse_position(50, 50);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, panel);
+
+  REQUIRE(panel.is_mouse_over == false);
+}
+
+TEST_CASE("CheckMouseOver disabled UIElement clears stale hover on children",
+          "[unit][collision][disabled]") {
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+  parent.children_active = true;
+  parent.is_disabled = true;
+
+  auto child = std::make_unique<steamrot::PanelElement>();
+  child->position = {50, 50};
+  child->size = {100, 100};
+  // Simulate stale hover on the child from a previous frame
+  child->is_mouse_over = true;
+  parent.child_elements.push_back(std::move(child));
+
+  auto &child_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("Parent is not hovered") {
+    REQUIRE(parent.is_mouse_over == false);
+  }
+
+  SECTION("Child stale hover is cleared") {
+    REQUIRE(child_ref.is_mouse_over == false);
+  }
+}
+
+TEST_CASE("CheckMouseOver disabled child does not receive hover even when "
+          "parent is enabled",
+          "[unit][collision][disabled]") {
+  steamrot::PanelElement parent;
+  parent.position = {0, 0};
+  parent.size = {200, 200};
+  parent.children_active = true;
+
+  auto disabled_child = std::make_unique<steamrot::PanelElement>();
+  disabled_child->position = {50, 50};
+  disabled_child->size = {100, 100};
+  disabled_child->is_disabled = true;
+  parent.child_elements.push_back(std::move(disabled_child));
+
+  auto &child_ref =
+      *static_cast<steamrot::PanelElement *>(parent.child_elements[0].get());
+
+  // Mouse directly over the disabled child's bounds
+  sf::Vector2i mouse_position(75, 75);
+  steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
+
+  SECTION("Disabled child does not receive hover") {
+    REQUIRE(child_ref.is_mouse_over == false);
+  }
+
+  SECTION("Parent receives hover because disabled child did not claim it") {
+    REQUIRE(parent.is_mouse_over == true);
+  }
+}

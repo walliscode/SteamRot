@@ -704,3 +704,90 @@ TEST_CASE("logic::ui::action::ProcessNestedUIActionsAndEvents with siblings: "
   // itself (a PanelElement), which is a no-op.  No event should be fired.
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
 }
+
+// ---------------------------------------------------------------------------
+// is_disabled tests for ProcessUIActionsAndEvents /
+// ProcessNestedUIActionsAndEvents
+// ---------------------------------------------------------------------------
+
+TEST_CASE(
+    "ProcessUIActionsAndEvents does not fire events for a disabled button",
+    "[unit][action][disabled]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::ButtonElement button;
+  button.is_mouse_over = true;
+  button.is_disabled = true;
+  button.subscription = std::make_shared<steamrot::Subscriber>();
+  button.subscription->m_active = true;
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  button.response_events.push_back(event_packet);
+
+  steamrot::tests::TestFixture fixture2;
+  steamrot::logic::action::ui::ProcessUIActionsAndEvents(
+      button, event_handler, fixture2.GetSceneContext());
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+TEST_CASE("ProcessNestedUIActionsAndEvents does not fire events for a "
+          "disabled root element",
+          "[unit][action][disabled]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::ButtonElement button;
+  button.is_mouse_over = true;
+  button.is_disabled = true;
+  button.subscription = std::make_shared<steamrot::Subscriber>();
+  button.subscription->m_active = true;
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  button.response_events.push_back(event_packet);
+
+  steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
+      button, event_handler, scene_context);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+TEST_CASE("ProcessNestedUIActionsAndEvents does not fire events for a "
+          "disabled child button",
+          "[unit][action][disabled]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::PanelElement panel;
+  panel.children_active = true;
+
+  auto button = std::make_unique<steamrot::ButtonElement>();
+  button->is_mouse_over = true;
+  button->is_disabled = true;
+  button->subscription = std::make_shared<steamrot::Subscriber>();
+  button->subscription->m_active = true;
+  steamrot::EventPacket event_packet;
+  event_packet.type = steamrot::EventType::USER_INPUT;
+  event_packet.payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+  button->response_events.push_back(event_packet);
+  panel.child_elements.push_back(std::move(button));
+
+  steamrot::logic::action::ui::ProcessNestedUIActionsAndEvents(
+      panel, event_handler, scene_context);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}

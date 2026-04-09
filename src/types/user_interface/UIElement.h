@@ -73,6 +73,12 @@ struct UIElement {
   int priority{0};
 
   /////////////////////////////////////////////////
+  /// @brief When true the element is greyed out: it cannot be interacted with
+  /// and a semi-transparent overlay is drawn on top of it (and its children).
+  /////////////////////////////////////////////////
+  bool is_disabled{false};
+
+  /////////////////////////////////////////////////
 
   /// @brief Create a deep copy of this UI element and its children
   ///
@@ -93,6 +99,7 @@ struct UIElement {
     target.is_mouse_over = is_mouse_over;
     target.children_active = children_active;
     target.priority = priority;
+    target.is_disabled = is_disabled;
 
 
     // Deep copy children

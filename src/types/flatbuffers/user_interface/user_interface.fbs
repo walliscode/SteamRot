@@ -45,6 +45,7 @@ table UIElementDataFbs{
     children: [ChildDataFbs] (required);
     is_mouse_over: bool;
     priority: int;
+    is_disabled: bool;
 
   }
 table PanelDataFbs{

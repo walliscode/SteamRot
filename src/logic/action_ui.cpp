@@ -19,6 +19,11 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
                                EventHandler &event_handler,
                                const SceneContext &scene_context) {
 
+  // disabled elements cannot be interacted with
+  if (ui_element.is_disabled) {
+    return;
+  }
+
   // check the subscription first
   if (!ui_element.subscription) {
     return;
@@ -48,6 +53,11 @@ void ProcessUIActionsAndEvents(UIElement &ui_element,
 void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
                                      EventHandler &event_handler,
                                      const SceneContext &scene_context) {
+
+  // disabled elements cannot be interacted with; skip the entire subtree
+  if (ui_element.is_disabled) {
+    return;
+  }
 
   // add specific processing for certain element types before generic recursion
   // intercept DropDownContainerElement before generic recursion
