@@ -54,4 +54,16 @@ bool CollectSystemEvents(const std::vector<sf::Event> &sfml_events) {
   return false;
 }
 
+/////////////////////////////////////////////////
+bool CollectGhostClearEvents(const std::vector<sf::Event> &sfml_events) {
+  for (const auto &event : sfml_events) {
+    if (const auto *key_pressed = event.getIf<sf::Event::KeyPressed>()) {
+      if (key_pressed->code == sf::Keyboard::Key::Q) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 } // namespace steamrot::events::convert

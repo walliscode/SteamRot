@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
 #include "FailInfo.h"
+#include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
@@ -151,6 +152,9 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
     logic_ptr =
         std::make_unique<logic::GrimoireMachinaCollisionLogic>(m_scene_context);
     break;
+  case LogicType::GhostAction:
+    logic_ptr = std::make_unique<logic::GhostActionLogic>(m_scene_context);
+    break;
   case LogicType::GhostPositioning:
     logic_ptr =
         std::make_unique<logic::GhostPositioningLogic>(m_scene_context);
@@ -284,7 +288,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 
   static constexpr std::array action_logic_types = {
       LogicType::UIAction, LogicType::UIState,
-      LogicType::GrimoireMachinaAction};
+      LogicType::GrimoireMachinaAction, LogicType::GhostAction};
 
   static constexpr std::array render_logic_types = {
       LogicType::UIRender, LogicType::GrimoireMachinaRender};

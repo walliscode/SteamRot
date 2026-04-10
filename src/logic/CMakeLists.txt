@@ -14,6 +14,8 @@ add_library(logic
   GrimoireMachinaRenderLogic.cpp
   GrimoireMachinaCollisionLogic.cpp
 
+  GhostActionLogic.cpp
+
   action_ui.cpp
   ui_helpers.cpp
   render_ui.cpp
@@ -22,6 +24,8 @@ add_library(logic
   render_grimoire_machina.cpp
 
   action_grimoire_machina.cpp
+
+  action_ghost.cpp
 
   positioning_grimoire_machina.cpp
 

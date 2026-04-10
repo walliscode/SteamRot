@@ -55,6 +55,18 @@ SFMLEventConverter::ConvertSFMLEvents(const std::vector<sf::Event> &sfml_events)
     }
   }
 
+  // Step 7: Collect ghost-clear events (Q key press).
+  bool should_clear_ghost = events::convert::CollectGhostClearEvents(sfml_events);
+
+  // Step 8: Emit a GHOST CLEAR EventPacket if a ghost-clear event was detected.
+  if (should_clear_ghost) {
+    auto ghost_clear_packet = events::CreateGhostEventPacket(
+        1, GhostPayload::GhostAction::CLEAR, std::monostate{});
+    if (ghost_clear_packet.has_value()) {
+      result.push_back(ghost_clear_packet.value());
+    }
+  }
+
   return result;
 }
 

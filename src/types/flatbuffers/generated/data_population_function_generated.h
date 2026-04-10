@@ -18,29 +18,32 @@ namespace steamrot {
 enum DataPopulationFunctionFbs : int8_t {
   DataPopulationFunctionFbs_None = 0,
   DataPopulationFunctionFbs_GetAllFragmentNames = 1,
+  DataPopulationFunctionFbs_GetAllJointNames = 2,
   DataPopulationFunctionFbs_MIN = DataPopulationFunctionFbs_None,
-  DataPopulationFunctionFbs_MAX = DataPopulationFunctionFbs_GetAllFragmentNames
+  DataPopulationFunctionFbs_MAX = DataPopulationFunctionFbs_GetAllJointNames
 };
 
-inline const DataPopulationFunctionFbs (&EnumValuesDataPopulationFunctionFbs())[2] {
+inline const DataPopulationFunctionFbs (&EnumValuesDataPopulationFunctionFbs())[3] {
   static const DataPopulationFunctionFbs values[] = {
     DataPopulationFunctionFbs_None,
-    DataPopulationFunctionFbs_GetAllFragmentNames
+    DataPopulationFunctionFbs_GetAllFragmentNames,
+    DataPopulationFunctionFbs_GetAllJointNames
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataPopulationFunctionFbs() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "None",
     "GetAllFragmentNames",
+    "GetAllJointNames",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataPopulationFunctionFbs(DataPopulationFunctionFbs e) {
-  if (::flatbuffers::IsOutRange(e, DataPopulationFunctionFbs_None, DataPopulationFunctionFbs_GetAllFragmentNames)) return "";
+  if (::flatbuffers::IsOutRange(e, DataPopulationFunctionFbs_None, DataPopulationFunctionFbs_GetAllJointNames)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataPopulationFunctionFbs()[index];
 }
