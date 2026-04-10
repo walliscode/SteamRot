@@ -17,7 +17,7 @@ add_library(logic
   GhostActionLogic.cpp
 
   action_ui.cpp
-  ui_helpers.cpp
+  state_ui.cpp
   render_ui.cpp
 
 
