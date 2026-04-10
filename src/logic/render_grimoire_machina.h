@@ -19,6 +19,7 @@
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
@@ -124,6 +125,22 @@ void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
                       ViewDirection view_direction);
 
 /////////////////////////////////////////////////
+/// @brief Draw the view of a Fragment with custom render states.
+///
+/// Like the three-argument overload but applies @p states (e.g. a
+/// translation transform) when drawing, so the geometry can be positioned
+/// at an arbitrary location such as the cursor.
+///
+/// @param texture        RenderTexture to draw on.
+/// @param fragment       Fragment whose movement view is drawn.
+/// @param view_direction ViewDirection selecting which view to draw.
+/// @param states         RenderStates applied when drawing (transform, etc.).
+/////////////////////////////////////////////////
+void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
+                      ViewDirection view_direction,
+                      const sf::RenderStates &states);
+
+/////////////////////////////////////////////////
 /// @brief Draw the view of a Joint for the given direction.
 ///
 /// Draws the vertex array stored in @p joint's movement_views for
@@ -136,5 +153,21 @@ void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
 /////////////////////////////////////////////////
 void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
                    ViewDirection view_direction);
+
+/////////////////////////////////////////////////
+/// @brief Draw the view of a Joint with custom render states.
+///
+/// Like the three-argument overload but applies @p states (e.g. a
+/// translation transform) when drawing, so the geometry can be positioned
+/// at an arbitrary location such as the cursor.
+///
+/// @param texture        RenderTexture to draw on.
+/// @param joint          Joint whose movement view is drawn.
+/// @param view_direction ViewDirection selecting which view to draw.
+/// @param states         RenderStates applied when drawing (transform, etc.).
+/////////////////////////////////////////////////
+void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
+                   ViewDirection view_direction,
+                   const sf::RenderStates &states);
 
 } // namespace steamrot::logic::render::grimoire_machina

@@ -7,45 +7,46 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_ghost.h"
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include "ViewDirection.h"
+#include "render_grimoire_machina.h"
+#include <SFML/Graphics/RenderStates.hpp>
 #include <variant>
 
 namespace steamrot::logic::render::ghost {
 
 /////////////////////////////////////////////////
 void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
-                   GrimoireMachina & /*grimoire_machina*/) {
+                   GrimoireMachina &grimoire_machina) {
 
-  // Nothing to draw when no item is selected
-  if (std::holds_alternative<std::monostate>(mr_ghost.m_selection)) {
-    return;
-  }
+  // Build a render state that translates fragment/joint geometry to the cursor
+  sf::RenderStates states;
+  states.transform.translate(mr_ghost.m_position);
 
-  // Choose a color that indicates whether a fragment or joint is selected:
-  // cyan for fragments, yellow for joints
-  sf::Color ghost_color = std::visit(
-      [](const auto &tag) -> sf::Color {
+  std::visit(
+      [&](const auto &tag) {
         using T = std::decay_t<decltype(tag)>;
-        if constexpr (std::is_same_v<T, FragmentTag>) {
-          return sf::Color(0, 200, 200, 180);
+
+        if constexpr (std::is_same_v<T, std::monostate>) {
+          return; // nothing selected — draw nothing
+
+        } else if constexpr (std::is_same_v<T, FragmentTag>) {
+          auto it = grimoire_machina.m_all_fragments.find(tag.key);
+          if (it == grimoire_machina.m_all_fragments.end()) {
+            return;
+          }
+          grimoire_machina::DrawFragmentView(texture, it->second,
+                                             ViewDirection::Front, states);
+
         } else if constexpr (std::is_same_v<T, JointTag>) {
-          return sf::Color(200, 200, 0, 180);
-        } else {
-          return sf::Color::Transparent;
+          auto it = grimoire_machina.m_all_joints.find(tag.key);
+          if (it == grimoire_machina.m_all_joints.end()) {
+            return;
+          }
+          grimoire_machina::DrawJointView(texture, it->second,
+                                          ViewDirection::Front, states);
         }
       },
       mr_ghost.m_selection);
-
-  // Draw a semi-transparent circle centred on the cursor as a placeholder.
-  // This will be replaced with proper geometry once ghost-space vertex arrays
-  // are available.
-  sf::CircleShape circle(20.f);
-  circle.setFillColor(ghost_color);
-  circle.setOrigin(circle.getLocalBounds().getCenter());
-  circle.setPosition(mr_ghost.m_position);
-
-  texture.draw(circle);
 }
 
 } // namespace steamrot::logic::render::ghost
