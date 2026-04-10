@@ -12,7 +12,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "Fragment.h"
 #include "GrimoireMachina.h"
+#include "Joint.h"
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
@@ -105,6 +107,34 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
 /// Views object.
 /////////////////////////////////////////////////
 void DrawView(sf::RenderTexture &texture, const Views &views,
-              const ViewDirection view_direction);
+              ViewDirection view_direction);
+
+/////////////////////////////////////////////////
+/// @brief Draw the view of a Fragment for the given direction.
+///
+/// Draws the vertex array stored in @p fragment's movement_views for
+/// @p view_direction onto @p texture. The geometry is drawn at its stored
+/// positions (no transform is applied).
+///
+/// @param texture        RenderTexture to draw on.
+/// @param fragment       Fragment whose movement view is drawn.
+/// @param view_direction ViewDirection selecting which view to draw.
+/////////////////////////////////////////////////
+void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
+                      ViewDirection view_direction);
+
+/////////////////////////////////////////////////
+/// @brief Draw the view of a Joint for the given direction.
+///
+/// Draws the vertex array stored in @p joint's movement_views for
+/// @p view_direction onto @p texture. The geometry is drawn at its stored
+/// positions (no transform is applied).
+///
+/// @param texture        RenderTexture to draw on.
+/// @param joint          Joint whose movement view is drawn.
+/// @param view_direction ViewDirection selecting which view to draw.
+/////////////////////////////////////////////////
+void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
+                   ViewDirection view_direction);
 
 } // namespace steamrot::logic::render::grimoire_machina
