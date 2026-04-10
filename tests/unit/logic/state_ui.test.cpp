@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the free functions in logic_ui.cpp
+/// @brief Unit tests for the free functions in state_ui.cpp
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_helpers.h"
+#include "state_ui.h"
 #include "CUserInterface.h"
 #include "PanelElement.h"
 #include "entity_memory.h"
@@ -41,7 +41,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState does nothing if "
   ui_entity.m_visible = true;
 
   // Act
-  steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+  steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
       ui_state, scene_entities);
   // Assert
   REQUIRE(ui_entity.m_visible == true); // Visibility should remain unchanged
@@ -115,7 +115,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState updates UI "
     // Activate subscriber for State_One
     subscriber_one->m_active = true;
     // Act
-    steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, scene_entities);
     // Assert
     REQUIRE(ui_one.m_visible == true);  // UI_One should be visible
@@ -126,7 +126,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState updates UI "
     // Activate subscriber for State_Two
     subscriber_two->m_active = true;
     // Act
-    steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, scene_entities);
     // Assert
     REQUIRE(ui_one.m_visible == false); // UI_One should be hidden
@@ -140,7 +140,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState updates UI "
     subscriber_three->m_active = true;
     subscriber_four->m_active = true;
     // Act
-    steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, scene_entities);
     // Assert
     REQUIRE(ui_one.m_visible == true); // UI_One should be visible
@@ -153,7 +153,7 @@ TEST_CASE("UpdateCUserInterfaceVisibilityFromCUIState updates UI "
     subscriber_three->m_active = true;
     subscriber_four->m_active = false;
     // Act
-    steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, scene_entities);
     // Assert
     REQUIRE(ui_one.m_visible == false); // UI_One should remain hidden
@@ -216,8 +216,8 @@ TEST_CASE("UpdateUIDisabledStateFromCUIState disables and enables root "
 
   SECTION("Disabled state applies when subscriber is active") {
     subscriber_disable->m_active = true;
-    steamrot::logic::ui::UpdateUIDisabledStateFromCUIState(ui_state,
-                                                           scene_entities);
+    steamrot::logic::state::ui::UpdateUIDisabledStateFromCUIState(ui_state,
+                                                                   scene_entities);
     REQUIRE(ui_one.m_root_element->is_disabled == true);
     REQUIRE(ui_two.m_root_element->is_disabled == false);
   }
@@ -227,15 +227,15 @@ TEST_CASE("UpdateUIDisabledStateFromCUIState disables and enables root "
     ui_one.m_root_element->is_disabled = true;
 
     subscriber_enable->m_active = true;
-    steamrot::logic::ui::UpdateUIDisabledStateFromCUIState(ui_state,
-                                                           scene_entities);
+    steamrot::logic::state::ui::UpdateUIDisabledStateFromCUIState(ui_state,
+                                                                   scene_entities);
     REQUIRE(ui_one.m_root_element->is_disabled == false);
   }
 
   SECTION("Nothing changes when subscriber is inactive") {
     // subscriber_disable remains inactive (default)
-    steamrot::logic::ui::UpdateUIDisabledStateFromCUIState(ui_state,
-                                                           scene_entities);
+    steamrot::logic::state::ui::UpdateUIDisabledStateFromCUIState(ui_state,
+                                                                   scene_entities);
     REQUIRE(ui_one.m_root_element->is_disabled == false);
     REQUIRE(ui_two.m_root_element->is_disabled == false);
   }
@@ -270,13 +270,13 @@ TEST_CASE("UpdateUIDisabledStateFromCUIState does not reset subscribers "
   ui_state.m_state_to_ui_visibility["State_A"] = steamrot::UIVisibilityState{};
 
   // Call disabled helper: should apply change but NOT reset subscriber
-  steamrot::logic::ui::UpdateUIDisabledStateFromCUIState(ui_state,
-                                                         scene_entities);
+  steamrot::logic::state::ui::UpdateUIDisabledStateFromCUIState(ui_state,
+                                                                 scene_entities);
   REQUIRE(ui_one.m_root_element->is_disabled == true);
   REQUIRE(subscriber->m_active == true); // subscriber still active
 
   // Now call visibility helper: should reset subscriber
-  steamrot::logic::ui::UpdateCUserInterfaceVisibilityFromCUIState(
+  steamrot::logic::state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
       ui_state, scene_entities);
   REQUIRE(subscriber->m_active == false); // subscriber now reset
 }
