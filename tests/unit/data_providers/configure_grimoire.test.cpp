@@ -33,9 +33,11 @@ CreateTestTriangle(flatbuffers::FlatBufferBuilder &builder) {
   auto vertex1 = steamrot::CreateVertexFbs(
       builder, steamrot::CreateVector2fDataFbs(builder, 0.0f, 0.0f), red_color);
   auto vertex2 = steamrot::CreateVertexFbs(
-      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f), green_color);
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f),
+      green_color);
   auto vertex3 = steamrot::CreateVertexFbs(
-      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 10.0f), blue_color);
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 10.0f),
+      blue_color);
 
   return steamrot::CreateTriangleFbs(
       builder, builder.CreateVector<flatbuffers::Offset<steamrot::VertexFbs>>(
@@ -59,7 +61,8 @@ CreateTestView(flatbuffers::FlatBufferBuilder &builder,
   }
 
   auto triangles_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::TriangleFbs>>(triangles);
+      builder.CreateVector<flatbuffers::Offset<steamrot::TriangleFbs>>(
+          triangles);
   return steamrot::CreateViewFbs(builder, direction, triangles_vector);
 }
 
@@ -316,7 +319,8 @@ TEST_CASE(
   auto vertex1 = steamrot::CreateVertexFbs(
       builder, steamrot::CreateVector2fDataFbs(builder, 0.0f, 0.0f), red_color);
   auto vertex2 = steamrot::CreateVertexFbs(
-      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f), red_color);
+      builder, steamrot::CreateVector2fDataFbs(builder, 10.0f, 0.0f),
+      red_color);
 
   auto bad_triangle = steamrot::CreateTriangleFbs(
       builder, builder.CreateVector<flatbuffers::Offset<steamrot::VertexFbs>>(

@@ -15,6 +15,7 @@
 #include "GrimoireMachina.h"
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
+#include "ViewDirection.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -94,5 +95,16 @@ void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
 /////////////////////////////////////////////////
 void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
                                GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Draw the given view of a Views object
+///
+/// @param texture sf::RenderTexture to draw on.
+/// @param views Views object containing the vertex arrays to draw.
+/// @param view_direction ViewDirection specifying which view to draw from the
+/// Views object.
+/////////////////////////////////////////////////
+void DrawView(sf::RenderTexture &texture, const Views &views,
+              const ViewDirection view_direction);
 
 } // namespace steamrot::logic::render::grimoire_machina
