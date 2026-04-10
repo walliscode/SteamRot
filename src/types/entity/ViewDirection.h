@@ -24,6 +24,8 @@ enum class ViewDirection : uint8_t {
   Back = 1,
 };
 
-using Views = std::map<ViewDirection, std::array<sf::VertexArray, 8>>;
+using Views = std::map<ViewDirection, sf::VertexArray>;
+
+using CompositeViews = std::map<ViewDirection, std::array<sf::VertexArray, 8>>;
 
 } // namespace steamrot
