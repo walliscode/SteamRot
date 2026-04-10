@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of UI helper functions
+/// @brief Declaration of UI state helper functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "containers.h"
 
-namespace steamrot::logic::ui {
+namespace steamrot::logic::state::ui {
 
 /////////////////////////////////////////////////
 /// @brief Update CUserInterface component visibility based on CUIState data
@@ -39,4 +39,4 @@ void UpdateCUserInterfaceVisibilityFromCUIState(
 void UpdateUIDisabledStateFromCUIState(CUIState &ui_state,
                                        EntityMemoryPool &scene_entities);
 
-} // namespace steamrot::logic::ui
+} // namespace steamrot::logic::state::ui
