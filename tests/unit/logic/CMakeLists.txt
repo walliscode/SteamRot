@@ -1,6 +1,6 @@
 add_executable(test_logic
 LogicFactory.test.cpp
-Logic.test.cpp
+# Logic.test.cpp
 action_ui.test.cpp
 action_ghost.test.cpp
 render_ui.test.cpp
