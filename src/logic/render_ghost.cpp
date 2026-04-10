@@ -22,7 +22,7 @@ void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
     return;
   }
 
-  // Choose a colour that indicates whether a fragment or joint is selected:
+  // Choose a color that indicates whether a fragment or joint is selected:
   // cyan for fragments, yellow for joints
   sf::Color ghost_color = std::visit(
       [](const auto &tag) -> sf::Color {
