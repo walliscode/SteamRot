@@ -167,7 +167,7 @@ struct MachinaFormScaffold {
   /// @brief Final "baked" vertex arrays for each view direction and 8
   /// progressions for movement
   /////////////////////////////////////////////////
-  Views baked_views;
+  CompositeViews baked_views;
 
   /////////////////////////////////////////////////
   /// @brief Growth point of the MachinaFormScaffold

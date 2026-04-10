@@ -27,8 +27,7 @@ struct Joint {
   std::vector<sf::Vector2f> sockets;
 
   /////////////////////////////////////////////////
-  /// @brief All vertex arrays for each view direction and 8 progressions for
-  /// movement
+  /// @brief Vertex array per view direction for this Joint's static shape
   /////////////////////////////////////////////////
   Views movement_views;
 };

@@ -269,15 +269,10 @@ TEST_CASE("ConfigureFragment configures movement_views successfully",
   REQUIRE(fragment.movement_views.size() == 1);
   REQUIRE(fragment.movement_views.count(steamrot::ViewDirection::Front) == 1);
 
-  const auto &vertex_arrays =
+  const auto &vertex_array =
       fragment.movement_views[steamrot::ViewDirection::Front];
-  REQUIRE(vertex_arrays.size() == 8);
-
-  // Check that all 8 progressions have the same vertex count
-  // (2 triangles * 3 vertices = 6 vertices)
-  for (const auto &va : vertex_arrays) {
-    REQUIRE(va.getVertexCount() == 6);
-  }
+  // 2 triangles * 3 vertices = 6 vertices
+  REQUIRE(vertex_array.getVertexCount() == 6);
 }
 
 TEST_CASE(
@@ -470,15 +465,10 @@ TEST_CASE("ConfigureJoint configures movement_views successfully",
   REQUIRE(joint.movement_views.size() == 1);
   REQUIRE(joint.movement_views.count(steamrot::ViewDirection::Front) == 1);
 
-  const auto &vertex_arrays =
+  const auto &vertex_array =
       joint.movement_views[steamrot::ViewDirection::Front];
-  REQUIRE(vertex_arrays.size() == 8);
-
-  // Check that all 8 progressions have the same vertex count
-  // (2 triangles * 3 vertices = 6 vertices)
-  for (const auto &va : vertex_arrays) {
-    REQUIRE(va.getVertexCount() == 6);
-  }
+  // 2 triangles * 3 vertices = 6 vertices
+  REQUIRE(vertex_array.getVertexCount() == 6);
 }
 
 TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
