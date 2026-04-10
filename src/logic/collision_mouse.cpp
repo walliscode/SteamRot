@@ -134,4 +134,56 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
   }
 }
 
+/////////////////////////////////////////////////
+void ProcessUIEntityCollisions(
+    const std::vector<size_t> &entity_indexes,
+    EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position) {
+
+  // Pass 1: clear all hover state to remove stale state from the previous tick
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+    ClearMouseOver(*ui_component.m_root_element);
+  }
+
+  // Pass 2: check collision in descending priority order; the first visible
+  // entity that reports a hover claims the mouse and blocks all lower-priority
+  // entities
+  bool higher_priority_claimed_mouse = false;
+
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+
+    if (!ui_component.m_visible) {
+      continue;
+    }
+
+    if (higher_priority_claimed_mouse) {
+      ClearMouseOver(*ui_component.m_root_element);
+    } else {
+      CheckMouseOver(mouse_position, *ui_component.m_root_element);
+
+      if (AnyMouseOver(*ui_component.m_root_element)) {
+        higher_priority_claimed_mouse = true;
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
+                                const sf::Vector2i &mouse_position) {
+  CheckMouseOver(mouse_position, scaffold.growth_point);
+
+  for (auto &joint : scaffold.joints) {
+    CheckMouseOver(mouse_position, joint);
+  }
+
+  for (auto &fragment : scaffold.fragments) {
+    CheckMouseOver(mouse_position, fragment);
+  }
+}
+
 } // namespace steamrot::logic::collision::mouse

@@ -21,14 +21,14 @@ GrimoireMachinaPositioningLogic::GrimoireMachinaPositioningLogic(
 /////////////////////////////////////////////////
 void GrimoireMachinaPositioningLogic::ProcessLogic() {
 
-  // get THE grimoire machina from the AssetManager
+  // --- Asset section ---
   auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
   if (!grimoire_result.has_value()) {
     return;
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
-  // set up the positioning of the crafting canvas
+  // --- Canvas size and position calculation ---
   sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
   grimoire_machina.m_crafting_helpers.crafting_canvas =
       positioning::grimoire_machina::CalculateCraftingCanvasSizeAndPosition(
@@ -37,28 +37,9 @@ void GrimoireMachinaPositioningLogic::ProcessLogic() {
               m_scene_context.scene_entities));
 
   if (grimoire_machina.m_scaffold_form) {
-
-    // position the growth point on the crafting canvas
     positioning::grimoire_machina::PositionGrowthPoint(
         grimoire_machina.m_scaffold_form->growth_point,
         grimoire_machina.m_crafting_helpers.crafting_canvas);
-  }
-  // call one time only logic here
-  if (run_set_up_logic) {
-
-    // pull out the render texture size as a Vector2f for use in the positioning
-    // calculations
-    sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
-
-    // set up the positioning of the crafting canvas
-    grimoire_machina.m_crafting_helpers.crafting_canvas =
-        positioning::grimoire_machina::CalculateCraftingCanvasSizeAndPosition(
-            sf::FloatRect{{0.0f, 0.0f}, render_texture_size},
-            entity::memory::GetComponentVector<CUserInterface>(
-                m_scene_context.scene_entities));
-
-    // shut latch
-    run_set_up_logic = false;
   }
 }
 } // namespace steamrot::logic

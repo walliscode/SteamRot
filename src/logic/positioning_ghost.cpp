@@ -1,0 +1,18 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Implementation of free functions for positioning MrGhost.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "positioning_ghost.h"
+
+namespace steamrot::logic::positioning::ghost {
+
+/////////////////////////////////////////////////
+void UpdatePosition(MrGhost &mr_ghost, const sf::Vector2i &mouse_position) {
+  mr_ghost.m_position = sf::Vector2f(mouse_position);
+}
+
+} // namespace steamrot::logic::positioning::ghost

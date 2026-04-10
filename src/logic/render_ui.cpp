@@ -8,11 +8,13 @@
 /////////////////////////////////////////////////
 #include "render_ui.h"
 #include "ButtonElement.h"
+#include "CUserInterface.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include "entity_memory.h"
 #include <algorithm>
 #include <cstdint>
 #include <vector>
@@ -239,6 +241,23 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
   text_object.setPosition(container_center);
 
   texture.draw(text_object);
+}
+
+/////////////////////////////////////////////////
+void DrawAllUIEntities(const std::vector<size_t> &entity_indexes,
+                       EntityMemoryPool &scene_entities,
+                       sf::RenderTexture &scene_texture,
+                       const UIStyle &ui_style) {
+
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+
+    if (ui_component.m_visible) {
+      DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
+                           ui_style);
+    }
+  }
 }
 
 } // namespace steamrot::logic::render::ui

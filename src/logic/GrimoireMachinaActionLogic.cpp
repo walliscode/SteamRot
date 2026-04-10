@@ -7,8 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaActionLogic.h"
-#include "EventPayload.h"
-#include "EventType.h"
 #include "action_grimoire_machina.h"
 
 namespace steamrot::logic {
@@ -20,58 +18,23 @@ GrimoireMachinaActionLogic::GrimoireMachinaActionLogic(
 /////////////////////////////////////////////////
 void GrimoireMachinaActionLogic::ProcessLogic() {
 
-  // get THE grimoire machina from the AssetManager
+  // --- Asset section ---
   auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
   if (!grimoire_result.has_value()) {
     return;
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
-  MachinaFormScaffold *active_scaffold_form =
-      grimoire_machina.m_scaffold_form.get();
 
-  // cycle through the subscribers. If active, process
+  // --- Event section ---
   for (auto &subscriber : m_subscribers) {
-
-    // set up empty variables for event type and data. If the subscriber is
-    // active, these will be populated
-    EventType event_type = EventType::NONE;
-
-    // check if the subscriber is active.
-    if (subscriber->m_active) {
-
-      // set the event data and type for processing
-      event_type = subscriber->event_type;
-
-    } else {
+    if (!subscriber->m_active)
       continue;
-    }
-
-    // add logic for processing the event type and data here.
-    if (event_type == EventType::LOGIC &&
-        std::holds_alternative<LogicPayload>(
-            subscriber->captured_payload.value())) {
-
-      LogicPayload &logic_payload =
-          std::get<LogicPayload>(subscriber->captured_payload.value());
-
-      if (logic_payload.toggle_name ==
-          LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
-        auto initialise_result =
-            action::grimoire_machina::InitialiseActiveMachinaFormScaffold(
-                grimoire_machina);
-      }
-
-      if (logic_payload.toggle_name ==
-          LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
-
-        auto clear_result =
-            action::grimoire_machina::ClearActiveMachinaFormScaffold(
-                grimoire_machina);
-      }
-    }
+    action::grimoire_machina::ProcessSubscriber(*subscriber, grimoire_machina);
   }
 
-  // run action logic based on their being an active MachinFormScaffold
+  // --- Asset section: color update ---
+  MachinaFormScaffold *active_scaffold_form =
+      grimoire_machina.m_scaffold_form.get();
   if (active_scaffold_form)
     action::grimoire_machina::SetColor(active_scaffold_form->growth_point);
 }

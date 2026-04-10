@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
+#include "GrimoireMachina.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -86,4 +87,21 @@ void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
     Draw(texture, socket);
   }
 }
+
+/////////////////////////////////////////////////
+void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
+                               GrimoireMachina &grimoire_machina) {
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+
+  DrawCraftingCanvasBorder(texture,
+                           grimoire_machina.m_crafting_helpers.crafting_canvas);
+
+  if (!scaffold) {
+    DrawNoMachinaFormBox(texture,
+                         grimoire_machina.m_crafting_helpers.crafting_canvas);
+  } else if (scaffold->joints.empty()) {
+    Draw(texture, grimoire_machina.m_scaffold_form->growth_point);
+  }
+}
+
 } // namespace steamrot::logic::render::grimoire_machina
