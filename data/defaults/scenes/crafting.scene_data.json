@@ -323,7 +323,7 @@
           "ui_states": [
             {
               "state_key": "new_construct_menu_on",
-              "state_to_ui_visibility": {
+              "ui_state_changes": {
                 "ui_names_on": [
                   "new_construct_menu",
                   "fragment_selection_menu"
@@ -343,7 +343,7 @@
             },
             {
               "state_key": "new_construct_menu_off",
-              "state_to_ui_visibility": {
+              "ui_state_changes": {
                 "ui_names_on": ["initial_crafting_menu"],
                 "ui_names_off": [
                   "new_construct_menu",

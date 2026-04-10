@@ -133,7 +133,7 @@
         "ui_states": [
           {
             "state_key": "main_menu",
-            "state_to_ui_visibility": {
+            "ui_state_changes": {
               "ui_names_on": ["simple_ui", "menu_ui"],
               "ui_names_off": ["hidden_ui"]
             }
@@ -146,7 +146,7 @@
         "ui_states": [
           {
             "state_key": "settings_screen",
-            "state_to_ui_visibility": {
+            "ui_state_changes": {
               "ui_names_on": ["settings_ui"],
               "ui_names_off": ["simple_ui", "menu_ui"]
             }
@@ -159,7 +159,7 @@
         "ui_states": [
           {
             "state_key": "game_running",
-            "state_to_ui_visibility": {
+            "ui_state_changes": {
               "ui_names_on": ["simple_ui"],
               "ui_names_off": []
             },
@@ -181,14 +181,14 @@
         "ui_states": [
           {
             "state_key": "multiple_states_a",
-            "state_to_ui_visibility": {
+            "ui_state_changes": {
               "ui_names_on": ["simple_ui"],
               "ui_names_off": ["menu_ui"]
             }
           },
           {
             "state_key": "multiple_states_b",
-            "state_to_ui_visibility": {
+            "ui_state_changes": {
               "ui_names_on": ["menu_ui", "settings_ui"],
               "ui_names_off": ["simple_ui", "hidden_ui"]
             }

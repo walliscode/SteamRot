@@ -2,8 +2,8 @@ include "../events/subscriber.fbs";
 
 namespace steamrot;
 
-// Maps a state key to lists of UI components that should be on/off
-table UIStateMappingFbs {
+// Maps a state key to lists of UI components to show/hide and enable/disable
+table UIStateChangesFbs {
 
   ui_names_on: [string];
   ui_names_off: [string];
@@ -13,9 +13,9 @@ table UIStateMappingFbs {
 }
 
 table UIStateDataFbs {
-  // Collection of state key to UI visibility mappings
+  // Collection of state key to UI change mappings
   state_key: string (required);
-  state_to_ui_visibility: UIStateMappingFbs;
+  ui_state_changes: UIStateChangesFbs;
   subscribers: [SubscriberFbs];
 }
 

@@ -214,17 +214,17 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     // ------------------------------------------------------------------
     // Visibility state (optional)
     // ------------------------------------------------------------------
-    if (ui_state_data->state_to_ui_visibility()) {
+    if (ui_state_data->ui_state_changes()) {
 
       UIVisibilityState visibility_state;
 
       // check that there are ui names to map
-      if (ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+      if (ui_state_data->ui_state_changes()->ui_names_on()) {
 
         std::vector<std::string> ui_names_vec;
         // create a vector of ui names for easier interaction
         for (const auto &ui_name :
-             *ui_state_data->state_to_ui_visibility()->ui_names_on()) {
+             *ui_state_data->ui_state_changes()->ui_names_on()) {
 
           ui_names_vec.push_back(ui_name->str());
         }
@@ -243,12 +243,12 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
       }
 
       // repeat for ui names off
-      if (ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+      if (ui_state_data->ui_state_changes()->ui_names_off()) {
         std::vector<std::string> ui_names_vec;
 
         // create a vector of ui names for easier interaction
         for (const auto &ui_name :
-             *ui_state_data->state_to_ui_visibility()->ui_names_off()) {
+             *ui_state_data->ui_state_changes()->ui_names_off()) {
           ui_names_vec.push_back(ui_name->str());
         }
         for (size_t i = 0; i < ui_components.size(); ++i) {
@@ -269,14 +269,14 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
     // ------------------------------------------------------------------
     // Disabled state (optional)
     // ------------------------------------------------------------------
-    if (ui_state_data->state_to_ui_visibility()) {
+    if (ui_state_data->ui_state_changes()) {
 
       UIDisabledState disabled_state;
 
-      if (ui_state_data->state_to_ui_visibility()->ui_names_disabled()) {
+      if (ui_state_data->ui_state_changes()->ui_names_disabled()) {
         std::vector<std::string> ui_names_vec;
         for (const auto &ui_name :
-             *ui_state_data->state_to_ui_visibility()->ui_names_disabled()) {
+             *ui_state_data->ui_state_changes()->ui_names_disabled()) {
           ui_names_vec.push_back(ui_name->str());
         }
         for (size_t i = 0; i < ui_components.size(); ++i) {
@@ -288,10 +288,10 @@ FlatbuffersEntityConfigurator::ConfigureCUIState(CUIState &ui_state_component,
         }
       }
 
-      if (ui_state_data->state_to_ui_visibility()->ui_names_enabled()) {
+      if (ui_state_data->ui_state_changes()->ui_names_enabled()) {
         std::vector<std::string> ui_names_vec;
         for (const auto &ui_name :
-             *ui_state_data->state_to_ui_visibility()->ui_names_enabled()) {
+             *ui_state_data->ui_state_changes()->ui_names_enabled()) {
           ui_names_vec.push_back(ui_name->str());
         }
         for (size_t i = 0; i < ui_components.size(); ++i) {
