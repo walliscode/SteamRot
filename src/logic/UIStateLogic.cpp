@@ -29,7 +29,11 @@ void UIStateLogic::ProcessLogic() {
     CUIState &ui_state = entity::memory::GetComponent<CUIState>(
         entity_id, m_scene_context.scene_entities);
 
-    // update the UI state
+    // update disabled state first (before visibility resets subscribers)
+    ui::UpdateUIDisabledStateFromCUIState(
+        ui_state, m_scene_context.scene_entities);
+
+    // update visibility and reset subscribers
     ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, m_scene_context.scene_entities);
   }

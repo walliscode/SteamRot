@@ -138,6 +138,17 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
                              const UIElement &element,
                              const ButtonStyle &style);
 
+/////////////////////////////////////////////////
+/// @brief Draw a semi-transparent grey overlay on a disabled UI element
+///
+/// Called after all child elements have been drawn so the overlay covers
+/// the entire element hierarchy.
+///
+/// @param texture Render texture to draw to
+/// @param element The disabled element whose bounds are used for the overlay
+/////////////////////////////////////////////////
+void DrawDisabledOverlay(sf::RenderTexture &texture, const UIElement &element);
+
 void DrawText(sf::RenderTexture &texture, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,

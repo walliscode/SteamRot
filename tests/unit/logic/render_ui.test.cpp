@@ -478,3 +478,79 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
 //   // clear the RenderTexture
 //   render_texture.clear(sf::Color::Black);
 // }
+
+// ---------------------------------------------------------------------------
+// is_disabled rendering tests
+// ---------------------------------------------------------------------------
+
+TEST_CASE(
+    "DrawDisabledOverlay paints a semi-transparent grey rectangle over the "
+    "element bounds",
+    "[unit][logic_render][disabled]") {
+  const size_t width = 100;
+  const size_t height = 100;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+
+  // Fill with a known background colour (red) so we can confirm the overlay
+  // blends on top
+  render_texture.clear(sf::Color::Red);
+  render_texture.display();
+
+  // Create a panel that covers the entire texture
+  steamrot::PanelElement panel;
+  panel.position = {0.f, 0.f};
+  panel.size = {static_cast<float>(width), static_cast<float>(height)};
+
+  steamrot::logic::render::ui::DrawDisabledOverlay(render_texture, panel);
+  render_texture.display();
+
+  sf::Image image = render_texture.getTexture().copyToImage();
+  sf::Color centre_pixel = image.getPixel({width / 2, height / 2});
+
+  // The overlay is drawn over the red background. The result must not be pure
+  // red (the overlay changed the pixels) and must not be pure black (the
+  // background still contributes through alpha blending).
+  REQUIRE(centre_pixel != sf::Color::Red);
+  REQUIRE(centre_pixel != sf::Color::Black);
+  // The grey overlay colour has R==G==B so the red channel should equal green
+  // after blending over red (approximately).  For an exact check: the overlay
+  // is Color(128,128,128,160) blended over Color(255,0,0,255).
+  // Result R ≈ 128 + (255-128)*95/255 ≈ 175, G ≈ 128*(160/255) ≈ 80,
+  // so R > G which we can verify.
+  REQUIRE(centre_pixel.r > centre_pixel.g);
+}
+
+TEST_CASE(
+    "DrawNestedUIElements draws a grey overlay on top of a disabled element",
+    "[unit][logic_render][disabled]") {
+  const size_t width = 100;
+  const size_t height = 100;
+  sf::RenderTexture render_texture{sf::Vector2u(
+      {static_cast<unsigned int>(width), static_cast<unsigned int>(height)})};
+  render_texture.clear(sf::Color::Black);
+
+  // A panel that fills the whole texture, with a white background style and
+  // is_disabled = true
+  steamrot::PanelElement panel;
+  panel.position = {0.f, 0.f};
+  panel.size = {static_cast<float>(width), static_cast<float>(height)};
+  panel.is_disabled = true;
+
+  // Use a minimal UIStyle with a white panel background
+  steamrot::UIStyle style;
+  style.panel_style.background_color = sf::Color::White;
+
+  steamrot::logic::render::ui::DrawNestedUIElements(render_texture, panel,
+                                                    style);
+  render_texture.display();
+
+  sf::Image image = render_texture.getTexture().copyToImage();
+  sf::Color centre_pixel = image.getPixel({width / 2, height / 2});
+
+  // The white background should be visible beneath the semi-transparent overlay
+  REQUIRE(centre_pixel != sf::Color::Black);
+  // The overlay should have dimmed the white, so the pixel must not be pure
+  // white either
+  REQUIRE(centre_pixel != sf::Color::White);
+}

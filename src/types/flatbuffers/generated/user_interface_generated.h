@@ -304,7 +304,8 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CHILDREN_ACTIVE = 12,
     VT_CHILDREN = 14,
     VT_IS_MOUSE_OVER = 16,
-    VT_PRIORITY = 18
+    VT_PRIORITY = 18,
+    VT_IS_DISABLED = 20
   };
   const steamrot::Vector2fDataFbs *position() const {
     return GetPointer<const steamrot::Vector2fDataFbs *>(VT_POSITION);
@@ -330,6 +331,9 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t priority() const {
     return GetField<int32_t>(VT_PRIORITY, 0);
   }
+  bool is_disabled() const {
+    return GetField<uint8_t>(VT_IS_DISABLED, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_POSITION) &&
@@ -347,6 +351,7 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVectorOfTables(children()) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOUSE_OVER, 1) &&
            VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
+           VerifyField<uint8_t>(verifier, VT_IS_DISABLED, 1) &&
            verifier.EndTable();
   }
 };
@@ -379,6 +384,9 @@ struct UIElementDataFbsBuilder {
   void add_priority(int32_t priority) {
     fbb_.AddElement<int32_t>(UIElementDataFbs::VT_PRIORITY, priority, 0);
   }
+  void add_is_disabled(bool is_disabled) {
+    fbb_.AddElement<uint8_t>(UIElementDataFbs::VT_IS_DISABLED, static_cast<uint8_t>(is_disabled), 0);
+  }
   explicit UIElementDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -402,7 +410,8 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbs(
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ChildDataFbs>>> children = 0,
     bool is_mouse_over = false,
-    int32_t priority = 0) {
+    int32_t priority = 0,
+    bool is_disabled = false) {
   UIElementDataFbsBuilder builder_(_fbb);
   builder_.add_priority(priority);
   builder_.add_children(children);
@@ -410,6 +419,7 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbs(
   builder_.add_subscriber_data(subscriber_data);
   builder_.add_size(size);
   builder_.add_position(position);
+  builder_.add_is_disabled(is_disabled);
   builder_.add_is_mouse_over(is_mouse_over);
   builder_.add_children_active(children_active);
   return builder_.Finish();
@@ -424,7 +434,8 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::ChildDataFbs>> *children = nullptr,
     bool is_mouse_over = false,
-    int32_t priority = 0) {
+    int32_t priority = 0,
+    bool is_disabled = false) {
   auto response_event_data__ = response_event_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*response_event_data) : 0;
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ChildDataFbs>>(*children) : 0;
   return steamrot::CreateUIElementDataFbs(
@@ -436,7 +447,8 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
       children_active,
       children__,
       is_mouse_over,
-      priority);
+      priority,
+      is_disabled);
 }
 
 struct PanelDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

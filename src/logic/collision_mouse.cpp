@@ -44,6 +44,12 @@ bool AnyMouseOver(const UIElement &element) {
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
 
+  // disabled elements cannot be hovered; clear any stale hover state and skip
+  if (element.is_disabled) {
+    ClearMouseOver(element);
+    return;
+  }
+
   // bool to keep track if any child is hovered over
   bool child_hovered = false;
 

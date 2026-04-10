@@ -66,6 +66,11 @@ void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
       DrawNestedUIElements(texture, *child, style);
     }
   }
+
+  // Draw disabled overlay last so it covers the element and all its children
+  if (element.is_disabled) {
+    DrawDisabledOverlay(texture, element);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -205,6 +210,15 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   // Draw the rectangle on the texture
   texture.draw(rectangle);
 }
+/////////////////////////////////////////////////
+void DrawDisabledOverlay(sf::RenderTexture &texture,
+                         const UIElement &element) {
+  sf::RectangleShape overlay(element.size);
+  overlay.setPosition(element.position);
+  overlay.setFillColor(sf::Color(128, 128, 128, 160));
+  texture.draw(overlay);
+}
+
 /////////////////////////////////////////////////
 void DrawText(sf::RenderTexture &texture, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
