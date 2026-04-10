@@ -13,6 +13,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MrGhost.h"
+#include "Subscriber.h"
 
 namespace steamrot::logic::action::ghost {
 
@@ -38,5 +39,19 @@ void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection);
 /// @param mr_ghost MrGhost instance whose selection will be cleared.
 /////////////////////////////////////////////////
 void ClearGhostSelection(MrGhost &mr_ghost);
+
+/////////////////////////////////////////////////
+/// @brief Dispatch a single active GHOST subscriber to the correct action
+/// free function.
+///
+/// Guards against a missing or mis-typed captured payload, then switches on
+/// GhostPayload::GhostAction to call SelectGhostItem (SELECT) or
+/// ClearGhostSelection (CLEAR / NONE). Callers are responsible for checking
+/// that @p subscriber is active before passing it in.
+///
+/// @param subscriber Active subscriber whose captured_payload holds the action.
+/// @param mr_ghost   MrGhost instance to mutate.
+/////////////////////////////////////////////////
+void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost);
 
 } // namespace steamrot::logic::action::ghost

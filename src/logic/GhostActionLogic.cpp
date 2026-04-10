@@ -41,75 +41,10 @@ GhostActionLogic::GhostActionLogic(const SceneContext scene_context)
 
 /////////////////////////////////////////////////
 void GhostActionLogic::ProcessLogic() {
-
-  // Iterate active GHOST subscribers and dispatch to the correct free function
-  // based on the GhostPayload::GhostAction enum value.
   for (auto &subscriber : m_subscribers) {
-    if (!subscriber->m_active) {
+    if (!subscriber->m_active)
       continue;
-    }
-
-    // deal with EventType::GHOST events.
-    if (subscriber->event_type == EventType::GHOST) {
-    }
-
-    if (!std::holds_alternative<GhostPayload>(
-            subscriber->captured_payload.value())) {
-      continue;
-    }
-
-    const GhostPayload &ghost_payload =
-        std::get<GhostPayload>(subscriber->captured_payload.value());
-
-    switch (ghost_payload.action) {
-    case GhostPayload::GhostAction::SELECT:
-      action::ghost::SelectGhostItem(m_scene_context.mr_ghost,
-                                     ghost_payload.m_selection);
-      break;
-    case GhostPayload::GhostAction::CLEAR:
-    case GhostPayload::GhostAction::NONE:
-      action::ghost::ClearGhostSelection(m_scene_context.mr_ghost);
-      break;
-    default:
-      break;
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void GhostActionLogic::ProcessGhostEvents(Subscriber &subscriber) {
-  // guard statement  to ensure we're only processing GHOST eventsa
-  if (subscriber.event_type != EventType::GHOST) {
-    return;
-  }
-
-  if (!std::holds_alternative<GhostPayload>(subscriber.filter_payload)) {
-    return;
-  }
-  // extract the GhostAction from the GhostPayload for switching
-  GhostPayload::GhostAction &action =
-      std::get<GhostPayload>(subscriber.filter_payload).action;
-
-  // switch on the GhostAction to call the correct free function.
-  switch (action) {
-  case GhostPayload::GhostAction::SELECT:
-
-    // check that the captured payload (if any) is a GhostPayload before trying
-    // to extract
-    if (!std::holds_alternative<GhostPayload>(
-            subscriber.captured_payload.value())) {
-      return;
-    }
-    action::ghost::SelectGhostItem(
-        m_scene_context.mr_ghost,
-        std::get<GhostPayload>(subscriber.filter_payload).m_selection);
-    break;
-
-  case GhostPayload::GhostAction::CLEAR:
-    action::ghost::ClearGhostSelection(m_scene_context.mr_ghost);
-    break;
-  default:
-    break;
+    action::ghost::ProcessSubscriber(*subscriber, m_scene_context.mr_ghost);
   }
 }
 

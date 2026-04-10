@@ -22,9 +22,10 @@ namespace steamrot::logic {
 ///
 /// GhostActionLogic subscribes to GHOST events on the event bus and applies
 /// incoming GhostPayloads to the scene's MrGhost instance. On each tick,
-/// ProcessLogic iterates active subscribers, extracts the GhostPayload, and
-/// switches on GhostPayload::GhostAction to call the appropriate action_ghost
-/// free function (SelectGhostItem or ClearGhostSelection).
+/// ProcessLogic iterates active subscribers and delegates each one to the
+/// action::ghost::ProcessSubscriber free function, which extracts the
+/// GhostPayload and calls the appropriate action_ghost free function
+/// (SelectGhostItem or ClearGhostSelection).
 /////////////////////////////////////////////////
 class GhostActionLogic : public Logic {
 
@@ -48,20 +49,10 @@ public:
   /////////////////////////////////////////////////
   LogicType GetLogicType() const override { return LogicType::GhostAction; }
 
-  /////////////////////////////////////////////////
-  /// @brief Deal with active GHOST event subscribers.
-  ///
-  /// @param subscriber Subscriber to process and take info from
-  /////////////////////////////////////////////////
-  void ProcessGhostEvents(Subscriber &subscriber);
-
 private:
   /////////////////////////////////////////////////
-  /// @brief Dispatches GHOST event subscribers to the correct free function.
-  ///
-  /// Iterates active subscribers, extracts each GhostPayload, and switches on
-  /// GhostPayload::GhostAction to call SelectGhostItem (SELECT) or
-  /// ClearGhostSelection (CLEAR / NONE).
+  /// @brief Iterates active subscribers and delegates each to
+  /// action::ghost::ProcessSubscriber.
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 };
