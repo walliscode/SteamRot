@@ -1,16 +1,16 @@
-
+/////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of UI helper functions
+/// @brief Implementation of UI state helper functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ui_helpers.h"
+#include "state_ui.h"
 #include "CUserInterface.h"
 #include "entity_memory.h"
 
-namespace steamrot::logic::ui {
+namespace steamrot::logic::state::ui {
 
 /////////////////////////////////////////////////
 void UpdateCUserInterfaceVisibilityFromCUIState(
@@ -115,4 +115,4 @@ void UpdateUIDisabledStateFromCUIState(CUIState &ui_state,
   }
 }
 
-} // namespace steamrot::logic::ui
+} // namespace steamrot::logic::state::ui

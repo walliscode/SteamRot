@@ -7,7 +7,7 @@
 #include "CUIState.h"
 #include "archetypes.h"
 #include "entity_memory.h"
-#include "ui_helpers.h"
+#include "state_ui.h"
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
@@ -30,11 +30,11 @@ void UIStateLogic::ProcessLogic() {
         entity_id, m_scene_context.scene_entities);
 
     // update disabled state first (before visibility resets subscribers)
-    ui::UpdateUIDisabledStateFromCUIState(
+    state::ui::UpdateUIDisabledStateFromCUIState(
         ui_state, m_scene_context.scene_entities);
 
     // update visibility and reset subscribers
-    ui::UpdateCUserInterfaceVisibilityFromCUIState(
+    state::ui::UpdateCUserInterfaceVisibilityFromCUIState(
         ui_state, m_scene_context.scene_entities);
   }
 }
