@@ -137,7 +137,8 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
         }
       }
 
-      fragment.movement_views[direction] = std::move(vertex_array);
+      fragment.movement_views.insert_or_assign(direction,
+                                               std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -271,7 +272,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
         }
       }
 
-      joint.movement_views[direction] = std::move(vertex_array);
+      joint.movement_views.insert_or_assign(direction, std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,

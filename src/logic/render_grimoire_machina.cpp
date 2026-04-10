@@ -104,4 +104,22 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
   }
 }
 
+/////////////////////////////////////////////////
+void DrawView(sf::RenderTexture &texture, const Views &views,
+              ViewDirection view_direction) {
+  texture.draw(views[view_direction]);
+}
+
+/////////////////////////////////////////////////
+void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
+                      ViewDirection view_direction) {
+  DrawView(texture, fragment.movement_views, view_direction);
+}
+
+/////////////////////////////////////////////////
+void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
+                   ViewDirection view_direction) {
+  DrawView(texture, joint.movement_views, view_direction);
+}
+
 } // namespace steamrot::logic::render::grimoire_machina
