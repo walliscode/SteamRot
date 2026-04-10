@@ -87,63 +87,57 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
 
       const auto *triangles_fbs = view_fbs->triangles();
 
-      // Create array of 8 VertexArrays for this direction
-      std::array<sf::VertexArray, 8> vertex_arrays;
-      for (auto &va : vertex_arrays) {
-        va.setPrimitiveType(sf::PrimitiveType::Triangles);
-      }
+      // Create a single VertexArray for this direction
+      sf::VertexArray vertex_array;
+      vertex_array.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-      // For now, populate all 8 progressions with the same data
-      // (in the future, this might be different for animation frames)
-      for (size_t progression = 0; progression < 8; ++progression) {
-        for (const auto *triangle_fbs : *triangles_fbs) {
-          if (!triangle_fbs) {
+      for (const auto *triangle_fbs : *triangles_fbs) {
+        if (!triangle_fbs) {
+          return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                          "Triangle data is null"});
+        }
+
+        if (!triangle_fbs->vertices()) {
+          return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                          "Triangle vertices are missing"});
+        }
+
+        const auto *vertices_fbs = triangle_fbs->vertices();
+        if (vertices_fbs->size() != 3) {
+          return std::unexpected(
+              FailInfo{FailMode::FlatbuffersDataNotFound,
+                       "Triangle must have exactly 3 vertices"});
+        }
+
+        for (const auto *vertex_fbs : *vertices_fbs) {
+          if (!vertex_fbs) {
             return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                            "Triangle data is null"});
+                                            "Vertex data is null"});
           }
 
-          if (!triangle_fbs->vertices()) {
+          if (!vertex_fbs->position()) {
             return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                            "Triangle vertices are missing"});
+                                            "Vertex position is missing"});
           }
 
-          const auto *vertices_fbs = triangle_fbs->vertices();
-          if (vertices_fbs->size() != 3) {
-            return std::unexpected(
-                FailInfo{FailMode::FlatbuffersDataNotFound,
-                         "Triangle must have exactly 3 vertices"});
+          if (!vertex_fbs->color()) {
+            return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                            "Vertex color is missing"});
           }
 
-          for (const auto *vertex_fbs : *vertices_fbs) {
-            if (!vertex_fbs) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex data is null"});
-            }
+          const auto *pos = vertex_fbs->position();
+          const auto *col = vertex_fbs->color();
 
-            if (!vertex_fbs->position()) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex position is missing"});
-            }
+          sf::Vertex sfml_vertex;
+          sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
+          sfml_vertex.color =
+              sf::Color(col->r(), col->g(), col->b(), col->a());
 
-            if (!vertex_fbs->color()) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex color is missing"});
-            }
-
-            const auto *pos = vertex_fbs->position();
-            const auto *col = vertex_fbs->color();
-
-            sf::Vertex sfml_vertex;
-            sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
-            sfml_vertex.color =
-                sf::Color(col->r(), col->g(), col->b(), col->a());
-
-            vertex_arrays[progression].append(sfml_vertex);
-          }
+          vertex_array.append(sfml_vertex);
         }
       }
 
-      fragment.movement_views[direction] = std::move(vertex_arrays);
+      fragment.movement_views[direction] = std::move(vertex_array);
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -227,63 +221,57 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
       const auto *triangles_fbs = view_fbs->triangles();
 
-      // Create array of 8 VertexArrays for this direction
-      std::array<sf::VertexArray, 8> vertex_arrays;
-      for (auto &va : vertex_arrays) {
-        va.setPrimitiveType(sf::PrimitiveType::Triangles);
-      }
+      // Create a single VertexArray for this direction
+      sf::VertexArray vertex_array;
+      vertex_array.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-      // For now, populate all 8 progressions with the same data
-      // (in the future, this might be different for animation frames)
-      for (size_t progression = 0; progression < 8; ++progression) {
-        for (const auto *triangle_fbs : *triangles_fbs) {
-          if (!triangle_fbs) {
+      for (const auto *triangle_fbs : *triangles_fbs) {
+        if (!triangle_fbs) {
+          return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                          "Triangle data is null"});
+        }
+
+        if (!triangle_fbs->vertices()) {
+          return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                          "Triangle vertices are missing"});
+        }
+
+        const auto *vertices_fbs = triangle_fbs->vertices();
+        if (vertices_fbs->size() != 3) {
+          return std::unexpected(
+              FailInfo{FailMode::FlatbuffersDataNotFound,
+                       "Triangle must have exactly 3 vertices"});
+        }
+
+        for (const auto *vertex_fbs : *vertices_fbs) {
+          if (!vertex_fbs) {
             return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                            "Triangle data is null"});
+                                            "Vertex data is null"});
           }
 
-          if (!triangle_fbs->vertices()) {
+          if (!vertex_fbs->position()) {
             return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                            "Triangle vertices are missing"});
+                                            "Vertex position is missing"});
           }
 
-          const auto *vertices_fbs = triangle_fbs->vertices();
-          if (vertices_fbs->size() != 3) {
-            return std::unexpected(
-                FailInfo{FailMode::FlatbuffersDataNotFound,
-                         "Triangle must have exactly 3 vertices"});
+          if (!vertex_fbs->color()) {
+            return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
+                                            "Vertex color is missing"});
           }
 
-          for (const auto *vertex_fbs : *vertices_fbs) {
-            if (!vertex_fbs) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex data is null"});
-            }
+          const auto *pos = vertex_fbs->position();
+          const auto *col = vertex_fbs->color();
 
-            if (!vertex_fbs->position()) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex position is missing"});
-            }
+          sf::Vertex sfml_vertex;
+          sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
+          sfml_vertex.color =
+              sf::Color(col->r(), col->g(), col->b(), col->a());
 
-            if (!vertex_fbs->color()) {
-              return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                              "Vertex color is missing"});
-            }
-
-            const auto *pos = vertex_fbs->position();
-            const auto *col = vertex_fbs->color();
-
-            sf::Vertex sfml_vertex;
-            sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
-            sfml_vertex.color =
-                sf::Color(col->r(), col->g(), col->b(), col->a());
-
-            vertex_arrays[progression].append(sfml_vertex);
-          }
+          vertex_array.append(sfml_vertex);
         }
       }
 
-      joint.movement_views[direction] = std::move(vertex_arrays);
+      joint.movement_views[direction] = std::move(vertex_array);
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
