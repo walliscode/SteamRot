@@ -24,6 +24,9 @@ void UIRenderLogic::ProcessLogic() {
           m_scene_context.archetypes, m_scene_context.scene_entities,
           /*ascending=*/true);
 
+  if (entity_indexes.empty())
+    return;
+
   render::ui::DrawAllUIEntities(
       entity_indexes, m_scene_context.scene_entities,
       m_scene_context.scene_texture,

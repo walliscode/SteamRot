@@ -21,6 +21,9 @@ void UIPositioningLogic::ProcessLogic() {
       archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
           m_scene_context.archetypes, true);
 
+  if (entity_indexes.empty())
+    return;
+
   positioning::ui::PositionAllUIEntities(
       entity_indexes, m_scene_context.scene_entities,
       m_scene_context.asset_manager.GetDefaultUIStyle());
