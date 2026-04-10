@@ -11,6 +11,7 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -35,8 +36,8 @@ steamrot::Views MakeViewsWithFrontTriangle(sf::Color colour = sf::Color::Red) {
 /////////////////////////////////////////////////
 /// @brief Helper: build a Fragment with a coloured triangle in the Front slot.
 /////////////////////////////////////////////////
-steamrot::Fragment MakeFragmentWithFrontView(
-    sf::Color colour = sf::Color::Green) {
+steamrot::Fragment
+MakeFragmentWithFrontView(sf::Color colour = sf::Color::Green) {
   sf::VertexArray va(sf::PrimitiveType::Triangles);
   va.append(sf::Vertex{sf::Vector2f{5.f, 5.f}, colour});
   va.append(sf::Vertex{sf::Vector2f{25.f, 5.f}, colour});
@@ -74,9 +75,8 @@ TEST_CASE("DrawView draws a populated view without throwing",
   sf::RenderTexture texture{{100, 100}};
   auto views = MakeViewsWithFrontTriangle();
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawView(
-          texture, views, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawView(
+      texture, views, steamrot::ViewDirection::Front));
 }
 
 TEST_CASE("DrawView draws an empty VertexArray without throwing",
@@ -84,9 +84,8 @@ TEST_CASE("DrawView draws an empty VertexArray without throwing",
   sf::RenderTexture texture{{100, 100}};
   steamrot::Views views; // no entries populated
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawView(
-          texture, views, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawView(
+      texture, views, steamrot::ViewDirection::Front));
 }
 
 TEST_CASE("DrawView produces pixels for a Front-direction triangle",
@@ -146,9 +145,8 @@ TEST_CASE("DrawFragmentView draws a Fragment view without throwing",
   sf::RenderTexture texture{{100, 100}};
   auto fragment = MakeFragmentWithFrontView();
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawFragmentView(
-          texture, fragment, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawFragmentView(
+      texture, fragment, steamrot::ViewDirection::Front));
 }
 
 TEST_CASE("DrawFragmentView produces pixels for a populated Front view",
@@ -162,7 +160,8 @@ TEST_CASE("DrawFragmentView produces pixels for a populated Front view",
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  // Centroid of the triangle at (5,5),(25,5),(15,25) = (15, 11.67) → pixel (15,12)
+  // Centroid of the triangle at (5,5),(25,5),(15,25) = (15, 11.67) → pixel
+  // (15,12)
   sf::Color centroid_pixel = image.getPixel({15, 12});
   REQUIRE(centroid_pixel == sf::Color::Green);
 }
@@ -172,9 +171,8 @@ TEST_CASE("DrawFragmentView draws an empty Fragment view without throwing",
   sf::RenderTexture texture{{100, 100}};
   steamrot::Fragment fragment; // no views populated
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawFragmentView(
-          texture, fragment, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawFragmentView(
+      texture, fragment, steamrot::ViewDirection::Front));
 }
 
 /////////////////////////////////////////////////
@@ -186,9 +184,8 @@ TEST_CASE("DrawJointView draws a Joint view without throwing",
   sf::RenderTexture texture{{100, 100}};
   auto joint = MakeJointWithFrontView();
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawJointView(
-          texture, joint, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointView(
+      texture, joint, steamrot::ViewDirection::Front));
 }
 
 TEST_CASE("DrawJointView produces pixels for a populated Front view",
@@ -202,7 +199,8 @@ TEST_CASE("DrawJointView produces pixels for a populated Front view",
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  // Centroid of the triangle at (10,10),(30,10),(20,30) = (20, 16.67) → pixel (20,17)
+  // Centroid of the triangle at (10,10),(30,10),(20,30) = (20, 16.67) → pixel
+  // (20,17)
   sf::Color centroid_pixel = image.getPixel({20, 17});
   REQUIRE(centroid_pixel == sf::Color::Blue);
 }
@@ -212,8 +210,6 @@ TEST_CASE("DrawJointView draws an empty Joint view without throwing",
   sf::RenderTexture texture{{100, 100}};
   steamrot::Joint joint; // no views populated
 
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawJointView(
-          texture, joint, steamrot::ViewDirection::Front));
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointView(
+      texture, joint, steamrot::ViewDirection::Front));
 }
-
