@@ -14,6 +14,7 @@
 
 #include "ButtonElement.h"
 #include "ButtonStyle.h"
+#include "CUserInterface.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
@@ -21,11 +22,13 @@
 #include "PanelElement.h"
 #include "UIElement.h"
 #include "UIStyle.h"
+#include "entity_memory.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 #include <memory>
 #include <sys/types.h>
+#include <vector>
 
 namespace steamrot::logic::render::ui {
 
@@ -153,5 +156,23 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
               const sf::Vector2f &position, const sf::Vector2f size,
               std::shared_ptr<const sf::Font> font, uint8_t font_size,
               const sf::Color &color);
+
+/////////////////////////////////////////////////
+/// @brief Draw all visible UI entities to a render texture.
+///
+/// Iterates the provided entity indices (in ascending priority order so that
+/// higher-priority entities are drawn on top), retrieves each entity's
+/// CUserInterface component, and calls DrawNestedUIElements for every visible
+/// entity.
+///
+/// @param entity_indexes Entity indices in ascending priority order.
+/// @param scene_entities EntityMemoryPool containing CUserInterface components.
+/// @param scene_texture  Render texture to draw to.
+/// @param ui_style       Style used for all drawing calls.
+/////////////////////////////////////////////////
+void DrawAllUIEntities(const std::vector<size_t> &entity_indexes,
+                       EntityMemoryPool &scene_entities,
+                       sf::RenderTexture &scene_texture,
+                       const UIStyle &ui_style);
 
 } // namespace steamrot::logic::render::ui

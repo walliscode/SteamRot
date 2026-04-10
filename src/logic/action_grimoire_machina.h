@@ -15,6 +15,7 @@
 #include "FailInfo.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
+#include "Subscriber.h"
 #include <expected>
 #include <variant>
 
@@ -83,5 +84,20 @@ std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
 /// names from.
 /////////////////////////////////////////////////
 std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Dispatch a single active LOGIC subscriber to the correct
+/// GrimoireMachina action free function.
+///
+/// Checks that the subscriber carries a LogicPayload, then switches on
+/// LogicPayload::LogicToggle to call InitialiseActiveMachinaFormScaffold or
+/// ClearActiveMachinaFormScaffold. Callers are responsible for checking that
+/// @p subscriber is active before passing it in.
+///
+/// @param subscriber Active subscriber whose captured_payload holds the action.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void ProcessSubscriber(Subscriber &subscriber,
+                       GrimoireMachina &grimoire_machina);
 
 } // namespace steamrot::logic::action::grimoire_machina

@@ -12,10 +12,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CUserInterface.h"
 #include "MachinaFormScaffold.h"
 #include "UIElement.h"
+#include "entity_memory.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <vector>
 
 namespace steamrot::logic::collision::mouse {
 
@@ -102,5 +105,36 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     JointInstance &joint_instance);
+
+/////////////////////////////////////////////////
+/// @brief Run the two-pass mouse-collision check for all UI entities.
+///
+/// Pass 1: clears is_mouse_over on every entity's root element to remove stale
+/// hover state from the previous tick.
+/// Pass 2: iterates entities in descending priority order. The first visible
+/// entity whose element tree reports a hover claims the mouse; all
+/// lower-priority entities have their hover state cleared.
+///
+/// @param entity_indexes UI entity indices in descending priority order.
+/// @param scene_entities EntityMemoryPool containing CUserInterface components.
+/// @param mouse_position Current mouse cursor position in window coordinates.
+/////////////////////////////////////////////////
+void ProcessUIEntityCollisions(
+    const std::vector<size_t> &entity_indexes,
+    EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position);
+
+/////////////////////////////////////////////////
+/// @brief Run mouse-collision checks for all parts of an active
+/// MachinaFormScaffold.
+///
+/// Calls CheckMouseOver for the growth point, all joints, and all fragments
+/// in the scaffold, setting is_mouse_over on each part as appropriate.
+///
+/// @param scaffold      MachinaFormScaffold whose parts will be checked.
+/// @param mouse_position Current mouse position in window coordinates.
+/////////////////////////////////////////////////
+void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
+                                const sf::Vector2i &mouse_position);
 
 } // namespace steamrot::logic::collision::mouse

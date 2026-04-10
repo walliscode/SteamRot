@@ -12,6 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "GrimoireMachina.h"
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include <SFML/Graphics/Rect.hpp>
@@ -78,5 +79,20 @@ void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
 /// @param joint_instance JointInstance whose sockets are drawn.
 /////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
+
+/////////////////////////////////////////////////
+/// @brief Draw the scaffold state or a placeholder when no scaffold is active.
+///
+/// Draws the crafting canvas border unconditionally. When @p grimoire_machina
+/// has no active scaffold, draws the no-machina-form placeholder box. When a
+/// scaffold is present but has no joints yet, draws the growth point. Other
+/// scaffold states are handled by downstream render functions.
+///
+/// @param texture          RenderTexture to draw to.
+/// @param grimoire_machina GrimoireMachina whose scaffold state drives the
+///                         rendering decision.
+/////////////////////////////////////////////////
+void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
+                               GrimoireMachina &grimoire_machina);
 
 } // namespace steamrot::logic::render::grimoire_machina

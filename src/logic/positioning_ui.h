@@ -11,11 +11,14 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CUserInterface.h"
 #include "DropDownContainerElement.h"
 #include "Style.h"
 #include "UIElement.h"
 #include "UIStyle.h"
+#include "entity_memory.h"
 #include <SFML/System/Vector2.hpp>
+#include <set>
 
 namespace steamrot::logic::positioning::ui {
 
@@ -149,5 +152,20 @@ const Style &GetStyleForElement(const UIElement &element,
 /// @param element_style Style whose minimum_size and maximum_size are used
 /////////////////////////////////////////////////
 void ApplyMinMaxSizing(sf::Vector2f &size, const Style &element_style);
+
+/////////////////////////////////////////////////
+/// @brief Position all visible UI entities in the entity memory pool.
+///
+/// Iterates the provided entity indices, retrieves each entity's CUserInterface
+/// component, and calls PositionNestedUIElements for every visible entity that
+/// has a root element.
+///
+/// @param entity_indexes Indices of entities with a CUserInterface component.
+/// @param scene_entities EntityMemoryPool containing CUserInterface components.
+/// @param ui_style       Style used for all layout calculations.
+/////////////////////////////////////////////////
+void PositionAllUIEntities(const std::set<size_t> &entity_indexes,
+                           EntityMemoryPool &scene_entities,
+                           const UIStyle &ui_style);
 
 } // namespace steamrot::logic::positioning::ui

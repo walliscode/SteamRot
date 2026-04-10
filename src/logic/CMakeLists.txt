@@ -31,6 +31,8 @@ add_library(logic
 
   positioning_ui.cpp
 
+  positioning_ghost.cpp
+
   collision_mouse.cpp
 )
 

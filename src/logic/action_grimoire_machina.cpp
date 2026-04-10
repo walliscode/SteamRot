@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_grimoire_machina.h"
+#include "EventPayload.h"
 #include "MachinaFormScaffold.h"
 #include <string>
 #include <vector>
@@ -94,4 +95,25 @@ GetAllJointNames(GrimoireMachina &grimoire_machina) {
   }
   return joint_names;
 }
+
+/////////////////////////////////////////////////
+void ProcessSubscriber(Subscriber &subscriber,
+                       GrimoireMachina &grimoire_machina) {
+  if (!subscriber.captured_payload.has_value())
+    return;
+
+  const LogicPayload *logic_payload =
+      std::get_if<LogicPayload>(&subscriber.captured_payload.value());
+  if (!logic_payload)
+    return;
+
+  if (logic_payload->toggle_name ==
+      LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
+    InitialiseActiveMachinaFormScaffold(grimoire_machina);
+  } else if (logic_payload->toggle_name ==
+             LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
+    ClearActiveMachinaFormScaffold(grimoire_machina);
+  }
+}
+
 } // namespace steamrot::logic::action::grimoire_machina

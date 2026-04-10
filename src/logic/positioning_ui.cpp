@@ -8,11 +8,13 @@
 /////////////////////////////////////////////////
 #include "positioning_ui.h"
 #include "ButtonElement.h"
+#include "CUserInterface.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include "entity_memory.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::ui {
@@ -232,6 +234,21 @@ void PositionNestedUIElements(const UIElement &element, const UIStyle &style) {
   if (element.children_active) {
     for (const auto &child : element.child_elements) {
       PositionNestedUIElements(*child, style);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PositionAllUIEntities(const std::set<size_t> &entity_indexes,
+                           EntityMemoryPool &scene_entities,
+                           const UIStyle &ui_style) {
+
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+
+    if (ui_component.m_visible && ui_component.m_root_element) {
+      PositionNestedUIElements(*ui_component.m_root_element, ui_style);
     }
   }
 }
