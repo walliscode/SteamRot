@@ -13,6 +13,9 @@
 #include "EventPacket.h"
 #include "EventPayload.h"
 #include "EventType.h"
+#include "Fragment.h"
+#include "GrimoireMachina.h"
+#include "Joint.h"
 #include "PanelElement.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
@@ -790,4 +793,335 @@ TEST_CASE("ProcessNestedUIActionsAndEvents does not fire events for a "
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+/////////////////////////////////////////////////
+/// ProcessDropDownItemElementActions tests
+/////////////////////////////////////////////////
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits a GHOST "
+          "SELECT event when item is hovered and subscription is active",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = true;
+  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.subscription = std::make_shared<steamrot::Subscriber>();
+  item.subscription->m_active = true;
+
+  REQUIRE(event_handler.GetWaitingRoomEventBus().size() == 0);
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
+  const auto &evt = event_handler.GetGlobalEventBus()[0];
+  REQUIRE(evt.type == steamrot::EventType::GHOST);
+  const auto *ghost_payload = std::get_if<steamrot::GhostPayload>(&evt.payload);
+  REQUIRE(ghost_payload != nullptr);
+  REQUIRE(ghost_payload->action == steamrot::GhostPayload::GhostAction::SELECT);
+  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(
+      ghost_payload->m_selection));
+  REQUIRE(std::get<steamrot::FragmentTag>(ghost_payload->m_selection).key ==
+          "stone");
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits GHOST "
+          "SELECT with JointTag",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = true;
+  item.ghost_selection_tag = steamrot::JointTag{"hinge"};
+  item.subscription = std::make_shared<steamrot::Subscriber>();
+  item.subscription->m_active = true;
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
+  const auto &evt = event_handler.GetGlobalEventBus()[0];
+  const auto *ghost_payload = std::get_if<steamrot::GhostPayload>(&evt.payload);
+  REQUIRE(ghost_payload != nullptr);
+  REQUIRE(std::holds_alternative<steamrot::JointTag>(ghost_payload->m_selection));
+  REQUIRE(std::get<steamrot::JointTag>(ghost_payload->m_selection).key ==
+          "hinge");
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
+          "event when not hovered",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = false;
+  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.subscription = std::make_shared<steamrot::Subscriber>();
+  item.subscription->m_active = true;
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
+          "event when subscription is inactive",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = true;
+  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.subscription = std::make_shared<steamrot::Subscriber>();
+  item.subscription->m_active = false;
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
+          "event when subscription is null",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = true;
+  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.subscription = nullptr;
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+  event_handler.ProcessWaitingRoomEventBus();
+
+  REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions deactivates "
+          "the subscription after firing",
+          "[unit][action_ui][ProcessDropDownItemElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::EventHandler &event_handler =
+      fixture.GetGameContext().event_handler;
+
+  steamrot::DropDownItemElement item;
+  item.is_mouse_over = true;
+  item.ghost_selection_tag = steamrot::FragmentTag{"granite"};
+  item.subscription = std::make_shared<steamrot::Subscriber>();
+  item.subscription->m_active = true;
+
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
+      item, event_handler);
+
+  REQUIRE_FALSE(item.subscription->m_active);
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions "
+          "collapses the dropdown and emits GHOST SELECT when an item is "
+          "clicked",
+          "[unit][action_ui][ProcessDropDownContainerElementActions]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up GrimoireMachina: " + set_up_result.error().message);
+  }
+  auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+  if (!get_grimoire_result.has_value()) {
+    FAIL("Failed to get GrimoireMachina: " +
+         get_grimoire_result.error().message);
+  }
+  steamrot::GrimoireMachina &grimoire = *get_grimoire_result.value();
+  grimoire.m_all_fragments.clear();
+  grimoire.m_all_fragments.insert({"rock", steamrot::Fragment{}});
+
+  steamrot::DropDownContainerElement dropdown_container;
+  dropdown_container.subscription = std::make_shared<steamrot::Subscriber>();
+
+  auto dropdown_list = std::make_unique<steamrot::DropDownListElement>();
+  dropdown_list->data_population_function =
+      steamrot::DataPopulationFunction::GetAllFragmentNames;
+
+  auto dropdown_button = std::make_unique<steamrot::DropDownButtonElement>();
+  dropdown_button->subscription = std::make_shared<steamrot::Subscriber>();
+
+  dropdown_container.child_elements.push_back(std::move(dropdown_list));
+  dropdown_container.child_elements.push_back(std::move(dropdown_button));
+
+  auto *list_ptr = dynamic_cast<steamrot::DropDownListElement *>(
+      dropdown_container.child_elements[0].get());
+  auto *button_ptr = dynamic_cast<steamrot::DropDownButtonElement *>(
+      dropdown_container.child_elements[1].get());
+  REQUIRE(list_ptr != nullptr);
+  REQUIRE(button_ptr != nullptr);
+
+  // Expand the list first
+  button_ptr->is_expanded = true;
+  steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+      dropdown_container, scene_context);
+  REQUIRE(list_ptr->is_expanded);
+  REQUIRE(list_ptr->child_elements.size() == 1);
+
+  // Simulate a click on the first item
+  auto *item_ptr = dynamic_cast<steamrot::DropDownItemElement *>(
+      list_ptr->child_elements[0].get());
+  REQUIRE(item_ptr != nullptr);
+  item_ptr->is_mouse_over = true;
+  item_ptr->subscription->m_active = true;
+
+  steamrot::logic::action::ui::ProcessDropDownContainerElementActions(
+      dropdown_container, scene_context);
+
+  // Dropdown must have collapsed
+  REQUIRE_FALSE(button_ptr->is_expanded);
+  REQUIRE_FALSE(list_ptr->is_expanded);
+  REQUIRE(list_ptr->child_elements.empty());
+  REQUIRE_FALSE(dropdown_container.is_expanded);
+
+  // GHOST SELECT event must be on the event bus
+  fixture.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
+  const auto &bus =
+      fixture.GetGameContext().event_handler.GetGlobalEventBus();
+  bool found_ghost = false;
+  for (const auto &evt : bus) {
+    if (evt.type == steamrot::EventType::GHOST) {
+      const auto *gp = std::get_if<steamrot::GhostPayload>(&evt.payload);
+      if (gp &&
+          gp->action == steamrot::GhostPayload::GhostAction::SELECT &&
+          std::holds_alternative<steamrot::FragmentTag>(gp->m_selection) &&
+          std::get<steamrot::FragmentTag>(gp->m_selection).key == "rock") {
+        found_ghost = true;
+      }
+    }
+  }
+  REQUIRE(found_ghost);
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
+          "ghost_selection_tag on created DropDownItemElements (fragment)",
+          "[unit][action_ui][ghost_selection_tag]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up GrimoireMachina: " + set_up_result.error().message);
+  }
+  auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+  if (!get_grimoire_result.has_value()) {
+    FAIL("Failed to get GrimoireMachina: " +
+         get_grimoire_result.error().message);
+  }
+  steamrot::GrimoireMachina &grimoire = *get_grimoire_result.value();
+  grimoire.m_all_fragments.clear();
+  grimoire.m_all_fragments.insert({"arm", steamrot::Fragment{}});
+
+  steamrot::DropDownListElement dropdown;
+  dropdown.data_population_function =
+      steamrot::DataPopulationFunction::GetAllFragmentNames;
+  dropdown.is_expanded = true;
+
+  steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
+                                                                  scene_context);
+
+  REQUIRE(dropdown.child_elements.size() == 1);
+  auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
+      dropdown.child_elements[0].get());
+  REQUIRE(item != nullptr);
+  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(
+      item->ghost_selection_tag));
+  REQUIRE(std::get<steamrot::FragmentTag>(item->ghost_selection_tag).key ==
+          "arm");
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
+          "ghost_selection_tag on created DropDownItemElements (joint)",
+          "[unit][action_ui][ghost_selection_tag]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up GrimoireMachina: " + set_up_result.error().message);
+  }
+  auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+  if (!get_grimoire_result.has_value()) {
+    FAIL("Failed to get GrimoireMachina: " +
+         get_grimoire_result.error().message);
+  }
+  steamrot::GrimoireMachina &grimoire = *get_grimoire_result.value();
+  grimoire.m_all_joints.clear();
+  grimoire.m_all_joints.insert({"pivot", steamrot::Joint{}});
+
+  steamrot::DropDownListElement dropdown;
+  dropdown.data_population_function =
+      steamrot::DataPopulationFunction::GetAllJointNames;
+  dropdown.is_expanded = true;
+
+  steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
+                                                                  scene_context);
+
+  REQUIRE(dropdown.child_elements.size() == 1);
+  auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
+      dropdown.child_elements[0].get());
+  REQUIRE(item != nullptr);
+  REQUIRE(
+      std::holds_alternative<steamrot::JointTag>(item->ghost_selection_tag));
+  REQUIRE(std::get<steamrot::JointTag>(item->ghost_selection_tag).key ==
+          "pivot");
+}
+
+TEST_CASE("logic::ui::action::ProcessDropDownListElementActions creates a "
+          "subscription on each DropDownItemElement (fragment)",
+          "[unit][action_ui][item_subscription]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+  auto set_up_result = scene_context.asset_manager.SetUpEmptyGrimoireMachina();
+  if (!set_up_result.has_value()) {
+    FAIL("Failed to set up GrimoireMachina: " + set_up_result.error().message);
+  }
+  auto get_grimoire_result = scene_context.asset_manager.GetGrimoireMachina();
+  if (!get_grimoire_result.has_value()) {
+    FAIL("Failed to get GrimoireMachina: " +
+         get_grimoire_result.error().message);
+  }
+  steamrot::GrimoireMachina &grimoire = *get_grimoire_result.value();
+  grimoire.m_all_fragments.clear();
+  grimoire.m_all_fragments.insert({"leg", steamrot::Fragment{}});
+
+  steamrot::DropDownListElement dropdown;
+  dropdown.data_population_function =
+      steamrot::DataPopulationFunction::GetAllFragmentNames;
+  dropdown.is_expanded = true;
+
+  steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
+                                                                  scene_context);
+
+  REQUIRE(dropdown.child_elements.size() == 1);
+  auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
+      dropdown.child_elements[0].get());
+  REQUIRE(item != nullptr);
+  REQUIRE(item->subscription != nullptr);
+  REQUIRE(item->subscription->event_type == steamrot::EventType::USER_INPUT);
+  const auto *input_payload =
+      std::get_if<steamrot::InputPayload>(&item->subscription->filter_payload);
+  REQUIRE(input_payload != nullptr);
+  REQUIRE(input_payload->action ==
+          steamrot::InputPayload::InputAction::SELECT);
 }

@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "MrGhost.h"
 #include "UIElement.h"
 
 namespace steamrot {
@@ -27,6 +28,14 @@ struct DropDownItemElement : public UIElement {
   std::string value{"value..."};
 
 /////////////////////////////////////////////////
+  /// @brief The GhostSelection tag to emit when this item is clicked.
+  ///
+  /// Set by ProcessDropDownListElementActions when the item is created.
+  /// std::monostate indicates no ghost selection is associated.
+/////////////////////////////////////////////////
+  GhostSelection ghost_selection_tag{std::monostate{}};
+
+/////////////////////////////////////////////////
   /// @brief Create a deep copy of this DropDownItemElement
   ///
   /// @return A new unique_ptr to a cloned DropDownItemElement
@@ -36,6 +45,7 @@ struct DropDownItemElement : public UIElement {
     CloneBaseUIElementData(*cloned);
     cloned->label = label;
     cloned->value = value;
+    cloned->ghost_selection_tag = ghost_selection_tag;
     return cloned;
   }
 };

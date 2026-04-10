@@ -155,6 +155,29 @@ void ProcessDropDownContainerElementActions(
         ProcessDropDownListElementActions(*dropdown_list_element,
                                           scene_context);
       }
+
+      // Process DropDownItemElement clicks when the list is expanded
+      bool item_selected = false;
+      if (dropdown_list_element->is_expanded) {
+        for (auto &child : dropdown_list_element->child_elements) {
+          if (auto *item = dynamic_cast<DropDownItemElement *>(child.get())) {
+            if (item->is_mouse_over && item->subscription &&
+                item->subscription->m_active) {
+              ProcessDropDownItemElementActions(*item,
+                                               scene_context.event_handler);
+              item_selected = true;
+              break;
+            }
+          }
+        }
+      }
+
+      // Collapse the dropdown after a selection so the list closes
+      if (item_selected) {
+        dropdown_button_element->is_expanded = false;
+        dropdown_list_element->is_expanded = false;
+        ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
+      }
     }
 
     // deal with parent container
@@ -218,6 +241,16 @@ void ProcessDropDownListElementActions(
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->label = fragment_name;
+    dropdown_item->ghost_selection_tag = FragmentTag{fragment_name};
+
+    // create a subscriber so the item reacts to USER_INPUT SELECT events
+    auto subscriber = std::make_shared<Subscriber>();
+    subscriber->event_type = EventType::USER_INPUT;
+    subscriber->filter_payload =
+        InputPayload{InputPayload::InputAction::SELECT};
+    scene_context.event_handler.RegisterSubscriber(subscriber);
+    dropdown_item->subscription = subscriber;
+
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
   }
 
@@ -226,11 +259,41 @@ void ProcessDropDownListElementActions(
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->label = joint_name;
+    dropdown_item->ghost_selection_tag = JointTag{joint_name};
+
+    // create a subscriber so the item reacts to USER_INPUT SELECT events
+    auto subscriber = std::make_shared<Subscriber>();
+    subscriber->event_type = EventType::USER_INPUT;
+    subscriber->filter_payload =
+        InputPayload{InputPayload::InputAction::SELECT};
+    scene_context.event_handler.RegisterSubscriber(subscriber);
+    dropdown_item->subscription = subscriber;
+
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
   }
 
   // activate children so they are rendered
   dropdown_list_element.children_active = true;
+}
+
+/////////////////////////////////////////////////
+void ProcessDropDownItemElementActions(DropDownItemElement &item,
+                                       EventHandler &event_handler) {
+
+  if (!item.is_mouse_over)
+    return;
+
+  if (!item.subscription || !item.subscription->m_active)
+    return;
+
+  // Emit a GHOST SELECT event carrying the item's ghost_selection_tag
+  EventPacket packet;
+  packet.type = EventType::GHOST;
+  packet.payload =
+      GhostPayload{GhostPayload::GhostAction::SELECT, item.ghost_selection_tag};
+  event_handler.AddEvent(packet);
+
+  item.subscription->m_active = false;
 }
 
 } // namespace steamrot::logic::action::ui

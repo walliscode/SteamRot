@@ -28,6 +28,7 @@ enum class LogicType {
   GrimoireMachinaCollision,
   GhostAction,
   GhostPositioning,
+  GhostRender,
 };
 
 inline std::string EnumNameLogicType(LogicType logic_type) {
@@ -60,6 +61,8 @@ inline std::string EnumNameLogicType(LogicType logic_type) {
     return "GhostAction";
   case LogicType::GhostPositioning:
     return "GhostPositioning";
+  case LogicType::GhostRender:
+    return "GhostRender";
   default:
     return "INVALID_LOGIC_TYPE";
   }
