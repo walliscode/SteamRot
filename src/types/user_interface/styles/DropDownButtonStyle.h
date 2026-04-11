@@ -24,9 +24,4 @@ struct DropDownButtonStyle : public Style {
   /// @brief Coloer of the triangle in the dropdown button
 /////////////////////////////////////////////////
   sf::Color triangle_color;
-
-/////////////////////////////////////////////////
-  /// @brief Background color of the dropdown button on hover
-/////////////////////////////////////////////////
-  sf::Color hover_color;
 };

@@ -50,7 +50,8 @@ struct StyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_RADIUS_RESOLUTION = 10,
     VT_INNER_MARGIN = 12,
     VT_MINIMUM_SIZE = 14,
-    VT_MAXIMUM_SIZE = 16
+    VT_MAXIMUM_SIZE = 16,
+    VT_HOVER_COLOR = 18
   };
   const steamrot::ColorDataFbs *background_color() const {
     return GetPointer<const steamrot::ColorDataFbs *>(VT_BACKGROUND_COLOR);
@@ -73,6 +74,9 @@ struct StyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::Vector2fDataFbs *maximum_size() const {
     return GetPointer<const steamrot::Vector2fDataFbs *>(VT_MAXIMUM_SIZE);
   }
+  const steamrot::ColorDataFbs *hover_color() const {
+    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_BACKGROUND_COLOR) &&
@@ -87,6 +91,8 @@ struct StyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(minimum_size()) &&
            VerifyOffsetRequired(verifier, VT_MAXIMUM_SIZE) &&
            verifier.VerifyTable(maximum_size()) &&
+           VerifyOffset(verifier, VT_HOVER_COLOR) &&
+           verifier.VerifyTable(hover_color()) &&
            verifier.EndTable();
   }
 };
@@ -116,6 +122,9 @@ struct StyleDataFbsBuilder {
   void add_maximum_size(::flatbuffers::Offset<steamrot::Vector2fDataFbs> maximum_size) {
     fbb_.AddOffset(StyleDataFbs::VT_MAXIMUM_SIZE, maximum_size);
   }
+  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
+    fbb_.AddOffset(StyleDataFbs::VT_HOVER_COLOR, hover_color);
+  }
   explicit StyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -140,8 +149,10 @@ inline ::flatbuffers::Offset<StyleDataFbs> CreateStyleDataFbs(
     int32_t radius_resolution = 0,
     ::flatbuffers::Offset<steamrot::Vector2fDataFbs> inner_margin = 0,
     ::flatbuffers::Offset<steamrot::Vector2fDataFbs> minimum_size = 0,
-    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> maximum_size = 0) {
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> maximum_size = 0,
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0) {
   StyleDataFbsBuilder builder_(_fbb);
+  builder_.add_hover_color(hover_color);
   builder_.add_maximum_size(maximum_size);
   builder_.add_minimum_size(minimum_size);
   builder_.add_inner_margin(inner_margin);
@@ -200,18 +211,14 @@ struct ButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
-    VT_HOVER_COLOR = 8,
-    VT_FONT = 10,
-    VT_FONT_SIZE = 12
+    VT_FONT = 8,
+    VT_FONT_SIZE = 10
   };
   const steamrot::StyleDataFbs *style() const {
     return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
   const steamrot::ColorDataFbs *text_color() const {
     return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
-  }
-  const steamrot::ColorDataFbs *hover_color() const {
-    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -225,8 +232,6 @@ struct ButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
            verifier.VerifyTable(style()) &&
            VerifyOffsetRequired(verifier, VT_TEXT_COLOR) &&
            verifier.VerifyTable(text_color()) &&
-           VerifyOffsetRequired(verifier, VT_HOVER_COLOR) &&
-           verifier.VerifyTable(hover_color()) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -244,9 +249,6 @@ struct ButtonStyleDataFbsBuilder {
   void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
     fbb_.AddOffset(ButtonStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
-    fbb_.AddOffset(ButtonStyleDataFbs::VT_HOVER_COLOR, hover_color);
-  }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(ButtonStyleDataFbs::VT_FONT, font);
   }
@@ -262,7 +264,6 @@ struct ButtonStyleDataFbsBuilder {
     auto o = ::flatbuffers::Offset<ButtonStyleDataFbs>(end);
     fbb_.Required(o, ButtonStyleDataFbs::VT_STYLE);
     fbb_.Required(o, ButtonStyleDataFbs::VT_TEXT_COLOR);
-    fbb_.Required(o, ButtonStyleDataFbs::VT_HOVER_COLOR);
     fbb_.Required(o, ButtonStyleDataFbs::VT_FONT);
     return o;
   }
@@ -272,13 +273,11 @@ inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   ButtonStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
-  builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
   builder_.add_style(style);
   return builder_.Finish();
@@ -288,7 +287,6 @@ inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -296,7 +294,6 @@ inline ::flatbuffers::Offset<ButtonStyleDataFbs> CreateButtonStyleDataFbsDirect(
       _fbb,
       style,
       text_color,
-      hover_color,
       font__,
       font_size);
 }
@@ -359,18 +356,14 @@ struct DropDownListStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
-    VT_HOVER_COLOR = 8,
-    VT_FONT = 10,
-    VT_FONT_SIZE = 12
+    VT_FONT = 8,
+    VT_FONT_SIZE = 10
   };
   const steamrot::StyleDataFbs *style() const {
     return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
   const steamrot::ColorDataFbs *text_color() const {
     return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
-  }
-  const steamrot::ColorDataFbs *hover_color() const {
-    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -384,8 +377,6 @@ struct DropDownListStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
            verifier.VerifyTable(style()) &&
            VerifyOffsetRequired(verifier, VT_TEXT_COLOR) &&
            verifier.VerifyTable(text_color()) &&
-           VerifyOffsetRequired(verifier, VT_HOVER_COLOR) &&
-           verifier.VerifyTable(hover_color()) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -403,9 +394,6 @@ struct DropDownListStyleDataFbsBuilder {
   void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
     fbb_.AddOffset(DropDownListStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
-    fbb_.AddOffset(DropDownListStyleDataFbs::VT_HOVER_COLOR, hover_color);
-  }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(DropDownListStyleDataFbs::VT_FONT, font);
   }
@@ -421,7 +409,6 @@ struct DropDownListStyleDataFbsBuilder {
     auto o = ::flatbuffers::Offset<DropDownListStyleDataFbs>(end);
     fbb_.Required(o, DropDownListStyleDataFbs::VT_STYLE);
     fbb_.Required(o, DropDownListStyleDataFbs::VT_TEXT_COLOR);
-    fbb_.Required(o, DropDownListStyleDataFbs::VT_HOVER_COLOR);
     fbb_.Required(o, DropDownListStyleDataFbs::VT_FONT);
     return o;
   }
@@ -431,13 +418,11 @@ inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDa
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   DropDownListStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
-  builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
   builder_.add_style(style);
   return builder_.Finish();
@@ -447,7 +432,6 @@ inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDa
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -455,7 +439,6 @@ inline ::flatbuffers::Offset<DropDownListStyleDataFbs> CreateDropDownListStyleDa
       _fbb,
       style,
       text_color,
-      hover_color,
       font__,
       font_size);
 }
@@ -465,18 +448,14 @@ struct DropDownItemStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
     VT_TEXT_COLOR = 6,
-    VT_HOVER_COLOR = 8,
-    VT_FONT = 10,
-    VT_FONT_SIZE = 12
+    VT_FONT = 8,
+    VT_FONT_SIZE = 10
   };
   const steamrot::StyleDataFbs *style() const {
     return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
   }
   const steamrot::ColorDataFbs *text_color() const {
     return GetPointer<const steamrot::ColorDataFbs *>(VT_TEXT_COLOR);
-  }
-  const steamrot::ColorDataFbs *hover_color() const {
-    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
   }
   const ::flatbuffers::String *font() const {
     return GetPointer<const ::flatbuffers::String *>(VT_FONT);
@@ -490,8 +469,6 @@ struct DropDownItemStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
            verifier.VerifyTable(style()) &&
            VerifyOffsetRequired(verifier, VT_TEXT_COLOR) &&
            verifier.VerifyTable(text_color()) &&
-           VerifyOffsetRequired(verifier, VT_HOVER_COLOR) &&
-           verifier.VerifyTable(hover_color()) &&
            VerifyOffsetRequired(verifier, VT_FONT) &&
            verifier.VerifyString(font()) &&
            VerifyField<int32_t>(verifier, VT_FONT_SIZE, 4) &&
@@ -509,9 +486,6 @@ struct DropDownItemStyleDataFbsBuilder {
   void add_text_color(::flatbuffers::Offset<steamrot::ColorDataFbs> text_color) {
     fbb_.AddOffset(DropDownItemStyleDataFbs::VT_TEXT_COLOR, text_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
-    fbb_.AddOffset(DropDownItemStyleDataFbs::VT_HOVER_COLOR, hover_color);
-  }
   void add_font(::flatbuffers::Offset<::flatbuffers::String> font) {
     fbb_.AddOffset(DropDownItemStyleDataFbs::VT_FONT, font);
   }
@@ -527,7 +501,6 @@ struct DropDownItemStyleDataFbsBuilder {
     auto o = ::flatbuffers::Offset<DropDownItemStyleDataFbs>(end);
     fbb_.Required(o, DropDownItemStyleDataFbs::VT_STYLE);
     fbb_.Required(o, DropDownItemStyleDataFbs::VT_TEXT_COLOR);
-    fbb_.Required(o, DropDownItemStyleDataFbs::VT_HOVER_COLOR);
     fbb_.Required(o, DropDownItemStyleDataFbs::VT_FONT);
     return o;
   }
@@ -537,13 +510,11 @@ inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDa
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     ::flatbuffers::Offset<::flatbuffers::String> font = 0,
     int32_t font_size = 0) {
   DropDownItemStyleDataFbsBuilder builder_(_fbb);
   builder_.add_font_size(font_size);
   builder_.add_font(font);
-  builder_.add_hover_color(hover_color);
   builder_.add_text_color(text_color);
   builder_.add_style(style);
   return builder_.Finish();
@@ -553,7 +524,6 @@ inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDa
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
     ::flatbuffers::Offset<steamrot::ColorDataFbs> text_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0,
     const char *font = nullptr,
     int32_t font_size = 0) {
   auto font__ = font ? _fbb.CreateString(font) : 0;
@@ -561,7 +531,6 @@ inline ::flatbuffers::Offset<DropDownItemStyleDataFbs> CreateDropDownItemStyleDa
       _fbb,
       style,
       text_color,
-      hover_color,
       font__,
       font_size);
 }
@@ -570,8 +539,7 @@ struct DropDownButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffer
   typedef DropDownButtonStyleDataFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_STYLE = 4,
-    VT_TRIANGLE_COLOR = 6,
-    VT_HOVER_COLOR = 8
+    VT_TRIANGLE_COLOR = 6
   };
   const steamrot::StyleDataFbs *style() const {
     return GetPointer<const steamrot::StyleDataFbs *>(VT_STYLE);
@@ -579,17 +547,12 @@ struct DropDownButtonStyleDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffer
   const steamrot::ColorDataFbs *triangle_color() const {
     return GetPointer<const steamrot::ColorDataFbs *>(VT_TRIANGLE_COLOR);
   }
-  const steamrot::ColorDataFbs *hover_color() const {
-    return GetPointer<const steamrot::ColorDataFbs *>(VT_HOVER_COLOR);
-  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_STYLE) &&
            verifier.VerifyTable(style()) &&
            VerifyOffsetRequired(verifier, VT_TRIANGLE_COLOR) &&
            verifier.VerifyTable(triangle_color()) &&
-           VerifyOffsetRequired(verifier, VT_HOVER_COLOR) &&
-           verifier.VerifyTable(hover_color()) &&
            verifier.EndTable();
   }
 };
@@ -604,9 +567,6 @@ struct DropDownButtonStyleDataFbsBuilder {
   void add_triangle_color(::flatbuffers::Offset<steamrot::ColorDataFbs> triangle_color) {
     fbb_.AddOffset(DropDownButtonStyleDataFbs::VT_TRIANGLE_COLOR, triangle_color);
   }
-  void add_hover_color(::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color) {
-    fbb_.AddOffset(DropDownButtonStyleDataFbs::VT_HOVER_COLOR, hover_color);
-  }
   explicit DropDownButtonStyleDataFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -616,7 +576,6 @@ struct DropDownButtonStyleDataFbsBuilder {
     auto o = ::flatbuffers::Offset<DropDownButtonStyleDataFbs>(end);
     fbb_.Required(o, DropDownButtonStyleDataFbs::VT_STYLE);
     fbb_.Required(o, DropDownButtonStyleDataFbs::VT_TRIANGLE_COLOR);
-    fbb_.Required(o, DropDownButtonStyleDataFbs::VT_HOVER_COLOR);
     return o;
   }
 };
@@ -624,10 +583,8 @@ struct DropDownButtonStyleDataFbsBuilder {
 inline ::flatbuffers::Offset<DropDownButtonStyleDataFbs> CreateDropDownButtonStyleDataFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<steamrot::StyleDataFbs> style = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> triangle_color = 0,
-    ::flatbuffers::Offset<steamrot::ColorDataFbs> hover_color = 0) {
+    ::flatbuffers::Offset<steamrot::ColorDataFbs> triangle_color = 0) {
   DropDownButtonStyleDataFbsBuilder builder_(_fbb);
-  builder_.add_hover_color(hover_color);
   builder_.add_triangle_color(triangle_color);
   builder_.add_style(style);
   return builder_.Finish();

@@ -47,4 +47,12 @@ struct Style {
   /// @brief Maximum size of the element
   /////////////////////////////////////////////////
   sf::Vector2f maximum_size;
+
+  /////////////////////////////////////////////////
+  /// @brief Fill color of the background when the mouse is over the element.
+  ///
+  /// Defaults to the background_color so elements that do not need a hover
+  /// effect can leave this unset.
+  /////////////////////////////////////////////////
+  sf::Color hover_color;
 };

@@ -12,6 +12,7 @@ table StyleDataFbs{
   inner_margin: Vector2fDataFbs (required);
   minimum_size: Vector2fDataFbs (required);
   maximum_size: Vector2fDataFbs (required);
+  hover_color: ColorDataFbs;
 }
 
 table PanelStyleDataFbs{
@@ -21,7 +22,6 @@ table PanelStyleDataFbs{
 table ButtonStyleDataFbs {
   style: StyleDataFbs (required);
   text_color: ColorDataFbs (required);
-  hover_color: ColorDataFbs (required);
   font: string (required);
   font_size: int;
   }
@@ -34,7 +34,6 @@ table DropDownContainerStyleDataFbs {
 table DropDownListStyleDataFbs {
   style: StyleDataFbs (required);
   text_color: ColorDataFbs(required);
-  hover_color: ColorDataFbs (required);
   font: string (required);
   font_size: int;
   }
@@ -42,15 +41,13 @@ table DropDownListStyleDataFbs {
 table DropDownItemStyleDataFbs {
   style: StyleDataFbs (required);
   text_color: ColorDataFbs (required);
-  hover_color: ColorDataFbs (required);
   font: string (required);
   font_size: int;
   }
 
 table DropDownButtonStyleDataFbs {
   style: StyleDataFbs (required);
-triangle_color: ColorDataFbs (required);
-  hover_color: ColorDataFbs (required);
+  triangle_color: ColorDataFbs (required);
 }
 
 table UIStyleDataFbs{

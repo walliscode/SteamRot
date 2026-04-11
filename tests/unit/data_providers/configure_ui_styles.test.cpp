@@ -42,10 +42,12 @@ TEST_CASE("ConfigureBaseStyle configures from valid data",
   auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 15.0f, 20.0f);
   auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 60.0f, 40.0f);
   auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 250.0f);
+  auto hover_color = steamrot::CreateColorDataFbs(fbb, 50, 100, 150, 255);
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 3.5f, 12,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   fbb.Finish(style_offset);
   const steamrot::StyleDataFbs *style_fb =
@@ -72,6 +74,40 @@ TEST_CASE("ConfigureBaseStyle configures from valid data",
   REQUIRE(style.minimum_size.y == 40.0f);
   REQUIRE(style.maximum_size.x == 300.0f);
   REQUIRE(style.maximum_size.y == 250.0f);
+  REQUIRE(style.hover_color.r == 50);
+  REQUIRE(style.hover_color.g == 100);
+  REQUIRE(style.hover_color.b == 150);
+  REQUIRE(style.hover_color.a == 255);
+}
+
+TEST_CASE("ConfigureBaseStyle defaults hover_color to background_color when not set",
+          "[unit][configure_ui_styles]") {
+  flatbuffers::FlatBufferBuilder fbb;
+
+  auto background_color = steamrot::CreateColorDataFbs(fbb, 100, 150, 200, 255);
+  auto border_color = steamrot::CreateColorDataFbs(fbb, 255, 128, 0, 255);
+  auto inner_margin = steamrot::CreateVector2fDataFbs(fbb, 15.0f, 20.0f);
+  auto minimum_size = steamrot::CreateVector2fDataFbs(fbb, 60.0f, 40.0f);
+  auto maximum_size = steamrot::CreateVector2fDataFbs(fbb, 300.0f, 250.0f);
+
+  // No hover_color provided - should default to background_color
+  auto style_offset =
+      steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 3.5f, 12,
+                                inner_margin, minimum_size, maximum_size);
+
+  fbb.Finish(style_offset);
+  const steamrot::StyleDataFbs *style_fb =
+      flatbuffers::GetRoot<steamrot::StyleDataFbs>(fbb.GetBufferPointer());
+
+  Style style;
+  auto result = steamrot::data::configure::ConfigureBaseStyle(
+      style_fb, style, "test_style");
+
+  REQUIRE(result.has_value());
+  REQUIRE(style.hover_color.r == style.background_color.r);
+  REQUIRE(style.hover_color.g == style.background_color.g);
+  REQUIRE(style.hover_color.b == style.background_color.b);
+  REQUIRE(style.hover_color.a == style.background_color.a);
 }
 
 /////////////////////////////////////////////////
@@ -157,10 +193,11 @@ TEST_CASE("ConfigureButtonStyle fails with non-existent font",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 2.0f, 10,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto button_offset = steamrot::CreateButtonStyleDataFbs(
-      fbb, style_offset, text_color, hover_color, font_name, 16);
+      fbb, style_offset, text_color, font_name, 16);
 
   fbb.Finish(button_offset);
 
@@ -196,10 +233,11 @@ TEST_CASE("ConfigureButtonStyle configures from valid data",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 2.0f, 10,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto button_offset = steamrot::CreateButtonStyleDataFbs(
-      fbb, style_offset, text_color, hover_color, font_name, 18);
+      fbb, style_offset, text_color, font_name, 18);
 
   fbb.Finish(button_offset);
 
@@ -304,10 +342,11 @@ TEST_CASE("ConfigureDropDownListStyle fails with missing font",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 8,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto dd_list_offset = steamrot::CreateDropDownListStyleDataFbs(
-      fbb, style_offset, text_color, hover_color, font_name, 14);
+      fbb, style_offset, text_color, font_name, 14);
 
   fbb.Finish(dd_list_offset);
 
@@ -345,10 +384,11 @@ TEST_CASE("ConfigureDropDownListStyle configures from valid data",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 8,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto dd_list_offset = steamrot::CreateDropDownListStyleDataFbs(
-      fbb, style_offset, text_color, hover_color, font_name, 14);
+      fbb, style_offset, text_color, font_name, 14);
 
   fbb.Finish(dd_list_offset);
 
@@ -404,10 +444,11 @@ TEST_CASE("ConfigureDropDownItemStyle configures from valid data",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 0.5f, 6,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto dd_item_offset = steamrot::CreateDropDownItemStyleDataFbs(
-      fbb, style_offset, text_color, hover_color, font_name, 12);
+      fbb, style_offset, text_color, font_name, 12);
 
   fbb.Finish(dd_item_offset);
 
@@ -457,10 +498,11 @@ TEST_CASE("ConfigureDropDownButtonStyle configures from valid data",
 
   auto style_offset =
       steamrot::CreateStyleDataFbs(fbb, background_color, border_color, 1.0f, 5,
-                                inner_margin, minimum_size, maximum_size);
+                                inner_margin, minimum_size, maximum_size,
+                                hover_color);
 
   auto dd_button_offset = steamrot::CreateDropDownButtonStyleDataFbs(
-      fbb, style_offset, triangle_color, hover_color);
+      fbb, style_offset, triangle_color);
 
   fbb.Finish(dd_button_offset);
 
