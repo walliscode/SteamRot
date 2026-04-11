@@ -164,7 +164,7 @@ void ProcessDropDownContainerElementActions(
             if (item->is_mouse_over && item->subscription &&
                 item->subscription->m_active) {
               ProcessDropDownItemElementActions(*item,
-                                               scene_context.event_handler);
+                                                scene_context.event_handler);
               item_selected = true;
               break;
             }
@@ -176,7 +176,8 @@ void ProcessDropDownContainerElementActions(
       if (item_selected) {
         dropdown_button_element->is_expanded = false;
         dropdown_list_element->is_expanded = false;
-        ProcessDropDownListElementActions(*dropdown_list_element, scene_context);
+        ProcessDropDownListElementActions(*dropdown_list_element,
+                                          scene_context);
       }
     }
 
@@ -240,6 +241,7 @@ void ProcessDropDownListElementActions(
     // create a new DropDownItemElement for each fragment name and add to the
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
+    dropdown_item->priority = 2;
     dropdown_item->label = fragment_name;
     dropdown_item->ghost_selection_tag = FragmentTag{fragment_name};
 
@@ -248,7 +250,9 @@ void ProcessDropDownListElementActions(
     subscriber->event_type = EventType::USER_INPUT;
     subscriber->filter_payload =
         InputPayload{InputPayload::InputAction::SELECT};
-    scene_context.event_handler.RegisterSubscriber(subscriber);
+    // [TODO:] Sort out a way of passing the reg result
+    auto reg_select_result =
+        scene_context.event_handler.RegisterSubscriber(subscriber);
     dropdown_item->subscription = subscriber;
 
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
@@ -258,6 +262,7 @@ void ProcessDropDownListElementActions(
     // create a new DropDownItemElement for each joint name and add to the
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
+    dropdown_item->priority = 2;
     dropdown_item->label = joint_name;
     dropdown_item->ghost_selection_tag = JointTag{joint_name};
 
@@ -266,7 +271,9 @@ void ProcessDropDownListElementActions(
     subscriber->event_type = EventType::USER_INPUT;
     subscriber->filter_payload =
         InputPayload{InputPayload::InputAction::SELECT};
-    scene_context.event_handler.RegisterSubscriber(subscriber);
+    // [TODO:] Sort out a way of passing the reg result
+    auto reg_select_result =
+        scene_context.event_handler.RegisterSubscriber(subscriber);
     dropdown_item->subscription = subscriber;
 
     dropdown_list_element.child_elements.push_back(std::move(dropdown_item));
