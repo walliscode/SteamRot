@@ -20,9 +20,9 @@ namespace steamrot::logic::render::ghost {
 /////////////////////////////////////////////////
 /// @brief Draw the ghost item at the cursor position.
 ///
-/// Renders a placeholder shape at mr_ghost.m_position when a fragment or joint
-/// has been selected. Draws nothing when the selection is empty (monostate).
-/// Fragment selections are drawn in cyan; joint selections in yellow.
+/// Renders the fragment or joint geometry at mr_ghost.m_position when a
+/// selection is active, along with pale blue socket indicator circles at each
+/// socket position. Draws nothing when the selection is empty (monostate).
 ///
 /// @param texture          RenderTexture to draw on.
 /// @param mr_ghost         MrGhost carrying the current selection and position.
