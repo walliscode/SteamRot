@@ -189,7 +189,9 @@ TEST_CASE("Socket constructor positions the circle at the local position",
   sf::Vector2f local_pos{30.f, 50.f};
   steamrot::Socket socket{local_pos};
 
-  REQUIRE(socket.circle.getPosition() == local_pos);
+  // The circle position is set to world space by the owning instance
+  // constructor; a standalone Socket circle starts at the origin.
+  REQUIRE(socket.circle.getPosition() == sf::Vector2f{0.f, 0.f});
 }
 
 TEST_CASE("Socket constructor uses default state and colors",

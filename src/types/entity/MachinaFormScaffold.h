@@ -40,13 +40,15 @@ struct Socket {
   /// @brief Construct a Socket at the given local position on the
   /// Fragment or Joint.
   ///
+  /// Stores the local position for data reference. The socket circle is
+  /// positioned in world space by the owning FragmentInstance or
+  /// JointInstance constructor.
+  ///
   /// @param local_position Local position of the socket on its parent
   /// Fragment or Joint.
   /////////////////////////////////////////////////
   explicit Socket(sf::Vector2f local_position)
-      : position{local_position} {
-    circle.setPosition(local_position);
-  }
+      : position{local_position} {}
 
   State state{State::Available};
 
