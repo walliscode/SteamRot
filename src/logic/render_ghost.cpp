@@ -36,7 +36,7 @@ void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
               it->second.movement_views[ViewDirection::Front].getBounds();
           sf::RenderStates states;
           states.transform.translate(mr_ghost.m_position - bounds.position -
-                                     bounds.size +
+                                     bounds.size -
                                      sf::Vector2f(k_corner_offset,
                                                   k_corner_offset));
           grimoire_machina::DrawFragmentView(texture, it->second,
@@ -51,7 +51,7 @@ void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
               it->second.movement_views[ViewDirection::Front].getBounds();
           sf::RenderStates states;
           states.transform.translate(mr_ghost.m_position - bounds.position -
-                                     bounds.size +
+                                     bounds.size -
                                      sf::Vector2f(k_corner_offset,
                                                   k_corner_offset));
           grimoire_machina::DrawJointView(texture, it->second,
