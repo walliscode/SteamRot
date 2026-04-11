@@ -37,10 +37,11 @@ void DrawGhostSockets(sf::RenderTexture &texture,
   static constexpr float k_socket_radius = 1.5f;
   static const sf::Color k_socket_color{173, 216, 230, 200};
 
+  sf::CircleShape circle(k_socket_radius);
+  circle.setFillColor(k_socket_color);
+  circle.setOrigin({k_socket_radius, k_socket_radius});
+
   for (const sf::Vector2f &socket_pos : sockets) {
-    sf::CircleShape circle(k_socket_radius);
-    circle.setFillColor(k_socket_color);
-    circle.setOrigin({k_socket_radius, k_socket_radius});
     circle.setPosition(socket_pos);
     texture.draw(circle, states);
   }
