@@ -93,7 +93,6 @@ GrimoireMachina &gm = *result.value();
 
 // All actual work is in a free function:
 action::grimoire_machina::ProcessLogicSubscribers(m_subscribers, gm);
-action::grimoire_machina::SetColor(gm.m_scaffold_form->growth_point);
 ```
 
 ---

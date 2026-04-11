@@ -36,28 +36,6 @@ TEST_CASE("ClearActiveMachinaForm clears the active MachinaForm in the "
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
 
-TEST_CASE("SetColor GrowthPoint sets origin color to hover_color "
-          "when is_mouse_over is true",
-          "[unit][actions][grimoire_machina]") {
-  steamrot::GrowthPoint growth_point;
-  growth_point.is_mouse_over = true;
-  growth_point.hover_color = sf::Color::Red;
-  growth_point.base_color = sf::Color::Blue;
-  steamrot::logic::action::grimoire_machina::SetColor(growth_point);
-  REQUIRE(growth_point.origin.getFillColor() == growth_point.hover_color);
-}
-
-TEST_CASE("SetColor GrowthPoint sets origin color to base_color "
-          "when is_mouse_over is false",
-          "[unit][actions][grimoire_machina]") {
-  steamrot::GrowthPoint growth_point;
-  growth_point.is_mouse_over = false;
-  growth_point.hover_color = sf::Color::Red;
-  growth_point.base_color = sf::Color::Blue;
-  steamrot::logic::action::grimoire_machina::SetColor(growth_point);
-  REQUIRE(growth_point.origin.getFillColor() == growth_point.base_color);
-}
-
 TEST_CASE("SetColor Socket sets circle color to hover_color "
           "when is_mouse_over is true",
           "[unit][actions][grimoire_machina]") {

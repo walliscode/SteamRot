@@ -62,13 +62,6 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
   texture.draw(box);
 }
 
-/////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, GrowthPoint &growth_point) {
-  // draw the growth point on the texture
-  texture.draw(growth_point.origin);
-}
-
-/////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, Socket &socket) {
   // draw the socket circle on the texture
   texture.draw(socket.circle);
@@ -99,8 +92,6 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
   if (!scaffold) {
     DrawNoMachinaFormBox(texture,
                          grimoire_machina.m_crafting_helpers.crafting_canvas);
-  } else if (scaffold->joints.empty()) {
-    Draw(texture, grimoire_machina.m_scaffold_form->growth_point);
   }
 }
 

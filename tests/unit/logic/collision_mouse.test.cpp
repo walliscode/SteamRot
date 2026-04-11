@@ -15,28 +15,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("CheckMouseOver GrowthPoint sets is_mouse_over correctly",
-          "[unit][collision][mouse]") {
-
-  SECTION("Mouse is over growth point") {
-    steamrot::GrowthPoint growth_point;
-    growth_point.origin.setPosition({100.f, 100.f});
-    sf::Vector2i mouse_position(105, 105);
-    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
-                                                      growth_point);
-    REQUIRE(growth_point.is_mouse_over == true);
-  }
-
-  SECTION("Mouse is not over growth point") {
-    steamrot::GrowthPoint growth_point;
-    growth_point.origin.setPosition({100.f, 100.f});
-    sf::Vector2i mouse_position(200, 200);
-    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
-                                                      growth_point);
-    REQUIRE(growth_point.is_mouse_over == false);
-  }
-}
-
 TEST_CASE("CheckMouseOver Socket sets is_mouse_over correctly",
           "[unit][collision][mouse]") {
 
