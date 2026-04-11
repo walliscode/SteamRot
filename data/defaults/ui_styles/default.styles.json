@@ -57,18 +57,18 @@
       "maximum_size": {
         "x": 300,
         "y": 100
+      },
+      "hover_color": {
+        "r": 173,
+        "g": 241,
+        "b": 210,
+        "a": 255
       }
     },
     "text_color": {
       "r": 255,
       "g": 255,
       "b": 255,
-      "a": 255
-    },
-    "hover_color": {
-      "r": 173,
-      "g": 241,
-      "b": 210,
       "a": 255
     },
     "font": "Roboto-Regular",
@@ -132,18 +132,18 @@
       "maximum_size": {
         "x": 400,
         "y": 300
+      },
+      "hover_color": {
+        "r": 0,
+        "g": 200,
+        "b": 0,
+        "a": 255
       }
     },
     "text_color": {
       "r": 255,
       "g": 255,
       "b": 255,
-      "a": 255
-    },
-    "hover_color": {
-      "r": 0,
-      "g": 200,
-      "b": 0,
       "a": 255
     },
     "font": "Roboto-Regular",
@@ -157,7 +157,6 @@
         "b": 176,
         "a": 255
       },
-
       "border_color": {
         "r": 117,
         "g": 91,
@@ -177,18 +176,18 @@
       "maximum_size": {
         "x": 400,
         "y": 30
+      },
+      "hover_color": {
+        "r": 173,
+        "g": 241,
+        "b": 210,
+        "a": 255
       }
     },
     "text_color": {
       "r": 255,
       "g": 255,
       "b": 255,
-      "a": 255
-    },
-    "hover_color": {
-      "r": 173,
-      "g": 241,
-      "b": 210,
       "a": 255
     },
     "font": "Roboto-Regular",
@@ -221,18 +220,18 @@
       "maximum_size": {
         "x": 30,
         "y": 30
+      },
+      "hover_color": {
+        "r": 112,
+        "g": 128,
+        "b": 114,
+        "a": 255
       }
     },
     "triangle_color": {
       "r": 0,
       "g": 0,
       "b": 0,
-      "a": 255
-    },
-    "hover_color": {
-      "r": 112,
-      "g": 128,
-      "b": 114,
       "a": 255
     }
   }

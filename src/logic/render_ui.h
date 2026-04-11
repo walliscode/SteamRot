@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 
 #include "ButtonElement.h"
-#include "ButtonStyle.h"
 #include "CUserInterface.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
@@ -129,17 +128,6 @@ void DrawDropDownContainerElement(sf::RenderTexture &texture,
 /////////////////////////////////////////////////
 void DrawBorderAndBackground(sf::RenderTexture &texture,
                              const UIElement &element, const Style &style);
-
-/////////////////////////////////////////////////
-/// @brief Draw the border and background of a button UI element
-///
-/// @param texture Render texture to draw to
-/// @param element Element to draw
-/// @param style ButtonStyle to use for drawing
-/////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
-                             const UIElement &element,
-                             const ButtonStyle &style);
 
 /////////////////////////////////////////////////
 /// @brief Draw a semi-transparent grey overlay on a disabled UI element

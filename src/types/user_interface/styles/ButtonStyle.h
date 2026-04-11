@@ -22,11 +22,6 @@ struct ButtonStyle : public Style {
   sf::Color text_color;
 
   /////////////////////////////////////////////////
-  /// @brief Fill color of the background when hovered
-  /////////////////////////////////////////////////
-  sf::Color hover_color;
-
-  /////////////////////////////////////////////////
   /// @brief Shared pointer to the font used for the button text
   /////////////////////////////////////////////////
   std::shared_ptr<const sf::Font> font{nullptr};

@@ -187,28 +187,13 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   // Create the rectangle using the element's position and size
   sf::RectangleShape rectangle(element.size);
   rectangle.setPosition(element.position);
-  rectangle.setFillColor(style.background_color);
-  rectangle.setOutlineColor(style.border_color);
-  // Border thickness is negative to draw inwards
-  rectangle.setOutlineThickness(-style.border_thickness);
-
-  // Draw the rectangle on the texture
-  texture.draw(rectangle);
-}
-
-/////////////////////////////////////////////////
-void DrawBorderAndBackground(sf::RenderTexture &texture,
-                             const UIElement &element,
-                             const ButtonStyle &style) {
-  // Create the rectangle using the element's position and size
-  sf::RectangleShape rectangle(element.size);
-  rectangle.setPosition(element.position);
   // Change color if hovered
   element.is_mouse_over ? rectangle.setFillColor(style.hover_color)
                         : rectangle.setFillColor(style.background_color);
   rectangle.setOutlineColor(style.border_color);
   // Border thickness is negative to draw inwards
   rectangle.setOutlineThickness(-style.border_thickness);
+
   // Draw the rectangle on the texture
   texture.draw(rectangle);
 }
