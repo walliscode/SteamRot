@@ -61,7 +61,7 @@ TEST_CASE("SetColor GrowthPoint sets origin color to base_color "
 TEST_CASE("SetColor Socket sets circle color to hover_color "
           "when is_mouse_over is true",
           "[unit][actions][grimoire_machina]") {
-  steamrot::Socket socket;
+  steamrot::Socket socket{sf::Vector2f{0.f, 0.f}};
   socket.is_mouse_over = true;
   socket.hover_color = sf::Color::Cyan;
   socket.base_color = sf::Color::White;
@@ -72,7 +72,7 @@ TEST_CASE("SetColor Socket sets circle color to hover_color "
 TEST_CASE("SetColor Socket sets circle color to base_color "
           "when is_mouse_over is false",
           "[unit][actions][grimoire_machina]") {
-  steamrot::Socket socket;
+  steamrot::Socket socket{sf::Vector2f{0.f, 0.f}};
   socket.is_mouse_over = false;
   socket.hover_color = sf::Color::Cyan;
   socket.base_color = sf::Color::White;
