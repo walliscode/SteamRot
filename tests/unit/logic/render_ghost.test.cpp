@@ -252,8 +252,9 @@ TEST_CASE("DrawGhostItem uses DrawFragmentView to draw at the cursor position",
   mr_ghost.m_selection = steamrot::FragmentTag{"arm"};
   mr_ghost.m_position = {50.f, 50.f};
 
-  // fragment has a 20x20 white square starting at origin; with translate(50,50)
-  // the square maps to [50..70, 50..70] on the texture
+  // fragment has a 20x20 white square at local origin.
+  // translate = m_position(50,50) - bounds.position(0,0) - bounds.size(20,20)
+  //             - corner_offset(5,5) = (25,25).  Square lands at [25..45, 25..45].
   steamrot::GrimoireMachina grimoire =
       MakeGrimoireWithPopulatedFragment("arm");
 
@@ -263,8 +264,8 @@ TEST_CASE("DrawGhostItem uses DrawFragmentView to draw at the cursor position",
   const sf::Image image = texture.getTexture().copyToImage();
 
   // Centre of the translated square should be white
-  REQUIRE(image.getPixel({60, 60}) == sf::Color::White);
-  // A point before the translation should be black
+  REQUIRE(image.getPixel({35, 35}) == sf::Color::White);
+  // A point well outside the translated square should be black
   REQUIRE(image.getPixel({5, 5}) == sf::Color::Black);
 }
 
@@ -327,7 +328,8 @@ TEST_CASE("DrawGhostItem uses DrawJointView to draw at the cursor position",
   mr_ghost.m_selection = steamrot::JointTag{"pivot"};
   mr_ghost.m_position = {50.f, 50.f};
 
-  // joint has a 20x20 white square at origin; translate(50,50) → [50..70, 50..70]
+  // joint has a 20x20 white square at local origin; same translate as fragment:
+  // (50,50) - (0,0) - (20,20) - (5,5) = (25,25) → square at [25..45, 25..45]
   steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedJoint("pivot");
 
   steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
@@ -335,7 +337,7 @@ TEST_CASE("DrawGhostItem uses DrawJointView to draw at the cursor position",
 
   const sf::Image image = texture.getTexture().copyToImage();
 
-  REQUIRE(image.getPixel({60, 60}) == sf::Color::White);
+  REQUIRE(image.getPixel({35, 35}) == sf::Color::White);
   REQUIRE(image.getPixel({5, 5}) == sf::Color::Black);
 }
 
@@ -359,8 +361,9 @@ TEST_CASE("DrawGhostItem renders fragment geometry at the stored cursor position
 
   const sf::Image image = texture.getTexture().copyToImage();
 
-  // Centre of the translated square [200..220, 200..220]
-  REQUIRE(image.getPixel({210, 210}) == sf::Color::White);
+  // translate = (200,200) - (0,0) - (20,20) - (5,5) = (175,175)
+  // Centre of the translated square [175..195, 175..195]
+  REQUIRE(image.getPixel({185, 185}) == sf::Color::White);
   // Near origin — nothing
   REQUIRE(image.getPixel({5, 5}) == sf::Color::Black);
 }
