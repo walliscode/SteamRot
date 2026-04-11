@@ -23,10 +23,6 @@ struct DropDownItemStyle : public Style {
   /// @brief Text color of the dropdown item
   /////////////////////////////////////////////////
   sf::Color text_color;
-  /////////////////////////////////////////////////
-  /// @brief Background color of the dropdown item on hover
-  /////////////////////////////////////////////////
-  sf::Color hover_color;
 
   /////////////////////////////////////////////////
   /// @brief Shared pointer to the font used for the dropdown item
