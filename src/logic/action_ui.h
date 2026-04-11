@@ -14,6 +14,7 @@
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "EventHandler.h"
 #include "SceneContext.h"
