@@ -36,7 +36,26 @@ struct Socket {
     Blocked    // Socket exists but can't be used (e.g., edge of canvas)
   };
 
+  /////////////////////////////////////////////////
+  /// @brief Construct a Socket at the given local position on the
+  /// Fragment or Joint.
+  ///
+  /// Stores the local position for data reference. The socket circle is
+  /// positioned in world space by the owning FragmentInstance or
+  /// JointInstance constructor.
+  ///
+  /// @param local_position Local position of the socket on its parent
+  /// Fragment or Joint.
+  /////////////////////////////////////////////////
+  explicit Socket(sf::Vector2f local_position)
+      : position{local_position} {}
+
   State state{State::Available};
+
+  /////////////////////////////////////////////////
+  /// @brief Local position of this socket on its parent Fragment or Joint.
+  /////////////////////////////////////////////////
+  sf::Vector2f position{};
 
   /////////////////////////////////////////////////
   /// @brief For visual and collision purposes.
@@ -60,6 +79,27 @@ struct Socket {
 };
 
 struct JointInstance {
+  /////////////////////////////////////////////////
+  /// @brief Construct a JointInstance from a Joint and an initial transform.
+  ///
+  /// Populates the sockets vector from the Joint's local socket positions.
+  /// Each socket's circle is positioned in world space by applying
+  /// @p initial_transform to the local socket position.
+  ///
+  /// @param joint_ref      Joint to reference for this instance.
+  /// @param initial_transform  Transform placing this instance in space.
+  /////////////////////////////////////////////////
+  JointInstance(Joint &joint_ref,
+                sf::Transform initial_transform = sf::Transform::Identity)
+      : joint{joint_ref}, transform{initial_transform} {
+    sockets.reserve(joint_ref.sockets.size());
+    for (const sf::Vector2f &local_pos : joint_ref.sockets) {
+      Socket socket{local_pos};
+      socket.circle.setPosition(initial_transform.transformPoint(local_pos));
+      sockets.push_back(std::move(socket));
+    }
+  }
+
   ////////////////////////////////////////////////
   /// @brief Joint being referenced for this instance
   /// //////////////////////////////////////////////
@@ -80,6 +120,29 @@ struct JointInstance {
   std::vector<Socket> sockets;
 };
 struct FragmentInstance {
+  /////////////////////////////////////////////////
+  /// @brief Construct a FragmentInstance from a Fragment and an initial
+  /// transform.
+  ///
+  /// Populates the sockets vector from the Fragment's local socket positions.
+  /// Each socket's circle is positioned in world space by applying
+  /// @p initial_transform to the local socket position.
+  ///
+  /// @param fragment_ref     Fragment to reference for this instance.
+  /// @param initial_transform  Transform placing this instance in space.
+  /////////////////////////////////////////////////
+  FragmentInstance(
+      Fragment &fragment_ref,
+      sf::Transform initial_transform = sf::Transform::Identity)
+      : fragment{fragment_ref}, transform{initial_transform} {
+    sockets.reserve(fragment_ref.sockets.size());
+    for (const sf::Vector2f &local_pos : fragment_ref.sockets) {
+      Socket socket{local_pos};
+      socket.circle.setPosition(initial_transform.transformPoint(local_pos));
+      sockets.push_back(std::move(socket));
+    }
+  }
+
   /////////////////////////////////////////////////
   /// @brief Fragment being referenced for this instance
   /////////////////////////////////////////////////
