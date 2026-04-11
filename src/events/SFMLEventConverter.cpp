@@ -10,7 +10,6 @@
 #include "EventPayload.h"
 #include "event_factory.h"
 #include "sfml_event_convert.h"
-
 namespace steamrot {
 
 /////////////////////////////////////////////////
@@ -64,6 +63,17 @@ SFMLEventConverter::ConvertSFMLEvents(const std::vector<sf::Event> &sfml_events)
         1, GhostPayload::GhostAction::CLEAR, std::monostate{});
     if (ghost_clear_packet.has_value()) {
       result.push_back(ghost_clear_packet.value());
+    }
+  }
+
+  // Step 9: Collect mouse-scroll events and accumulate delta.
+  auto scroll_delta = events::convert::CollectScrollDelta(sfml_events);
+
+  // Step 10: Emit a CAMERA EventPacket if scroll input was detected.
+  if (scroll_delta.has_value()) {
+    auto camera_packet = events::CreateCameraEventPacket(1, scroll_delta.value());
+    if (camera_packet.has_value()) {
+      result.push_back(camera_packet.value());
     }
   }
 

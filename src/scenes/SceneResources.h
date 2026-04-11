@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CameraState.h"
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
@@ -62,6 +63,14 @@ struct SceneResources {
   /// all Logic classes via SceneContext::mr_ghost.
   /////////////////////////////////////////////////
   MrGhost mr_ghost{};
+
+  /////////////////////////////////////////////////
+  /// @brief Camera/view state for the scene.
+  ///
+  /// Holds the current zoom level applied to world-space rendering.
+  /// Exposed to all Logic classes via SceneContext::camera_state.
+  /////////////////////////////////////////////////
+  CameraState camera_state{};
 };
 
 } // namespace steamrot

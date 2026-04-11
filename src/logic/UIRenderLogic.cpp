@@ -17,6 +17,11 @@ UIRenderLogic::UIRenderLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UIRenderLogic::ProcessLogic() {
 
+  // Reset to the default (unzoomed) view so UI elements are always drawn
+  // at their fixed screen-space positions, unaffected by world zoom.
+  m_scene_context.scene_texture.setView(
+      m_scene_context.scene_texture.getDefaultView());
+
   // Generate entity indexes sorted by priority ascending so that
   // higher-priority entities are drawn last (on top)
   auto entity_indexes =

@@ -29,6 +29,7 @@ enum class LogicType {
   GhostAction,
   GhostPositioning,
   GhostRender,
+  CameraZoom,
 };
 
 inline std::string EnumNameLogicType(LogicType logic_type) {
@@ -63,6 +64,8 @@ inline std::string EnumNameLogicType(LogicType logic_type) {
     return "GhostPositioning";
   case LogicType::GhostRender:
     return "GhostRender";
+  case LogicType::CameraZoom:
+    return "CameraZoom";
   default:
     return "INVALID_LOGIC_TYPE";
   }

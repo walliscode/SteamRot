@@ -71,4 +71,16 @@ bool CollectSystemEvents(const std::vector<sf::Event> &sfml_events);
 /////////////////////////////////////////////////
 bool CollectGhostClearEvents(const std::vector<sf::Event> &sfml_events);
 
+/////////////////////////////////////////////////
+/// @brief Accumulate mouse-wheel scroll delta from SFML events.
+///
+/// Sums the delta of all sf::Event::MouseWheelScrolled events in
+/// @p sfml_events.  Returns std::nullopt when no scroll events occurred.
+///
+/// @param sfml_events Vector of SFML events gathered this tick.
+/// @return Total scroll delta, or std::nullopt if no scroll events occurred.
+/////////////////////////////////////////////////
+std::optional<float>
+CollectScrollDelta(const std::vector<sf::Event> &sfml_events);
+
 } // namespace steamrot::events::convert

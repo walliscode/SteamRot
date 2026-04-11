@@ -84,6 +84,20 @@ bool MatchPayload(const GhostPayload &filter_payload,
 /////////////////////////////////////////////////
 /// @brief Returns true if the filter payload matches the event payload.
 ///
+/// Any CameraPayload matches any other CameraPayload — the subscriber
+/// receives the scroll delta from the captured_payload rather than
+/// selecting on a specific delta value.
+///
+/// @param filter_payload CameraPayload from Subscriber filter
+/// @param event_payload  CameraPayload from EventBus
+/// @return Always true when both payloads are CameraPayload.
+/////////////////////////////////////////////////
+bool MatchPayload(const CameraPayload &filter_payload,
+                  const CameraPayload &event_payload);
+
+/////////////////////////////////////////////////
+/// @brief Returns true if the filter payload matches the event payload.
+///
 /// Wraps std::visit to dispatch to the correct MatchPayload overload based on
 /// the active variant type. Returns false if the variant types do not match.
 ///

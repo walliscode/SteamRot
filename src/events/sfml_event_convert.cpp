@@ -66,4 +66,24 @@ bool CollectGhostClearEvents(const std::vector<sf::Event> &sfml_events) {
   return false;
 }
 
+/////////////////////////////////////////////////
+std::optional<float>
+CollectScrollDelta(const std::vector<sf::Event> &sfml_events) {
+  float total_delta = 0.0f;
+  bool found = false;
+
+  for (const auto &event : sfml_events) {
+    if (const auto *scroll =
+            event.getIf<sf::Event::MouseWheelScrolled>()) {
+      total_delta += scroll->delta;
+      found = true;
+    }
+  }
+
+  if (!found)
+    return std::nullopt;
+
+  return total_delta;
+}
+
 } // namespace steamrot::events::convert

@@ -248,8 +248,38 @@ struct GhostPayload {
   GhostSelection m_selection{std::monostate{}};
 };
 
+/////////////////////////////////////////////////
+/// @class CameraPayload
+/// @brief Event payload carrying a mouse-scroll delta for camera zoom.
+///
+/// Emitted each tick that a mouse-wheel event is detected by
+/// SFMLEventConverter and consumed by CameraZoomActionLogic to update the
+/// scene CameraState.
+/////////////////////////////////////////////////
+struct CameraPayload {
+
+  /////////////////////////////////////////////////
+  /// @brief Raw scroll delta from SFML this tick.
+  ///
+  /// Positive = scroll up (zoom in); negative = scroll down (zoom out).
+  /////////////////////////////////////////////////
+  float scroll_delta{0.0f};
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor.
+  /////////////////////////////////////////////////
+  CameraPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking a scroll delta.
+  ///
+  /// @param delta Raw scroll delta from the SFML mouse-wheel event.
+  /////////////////////////////////////////////////
+  explicit CameraPayload(float delta) : scroll_delta(delta) {}
+};
+
 using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
                                   LogicPayload, ScenePayload, SystemPayload,
-                                  GhostPayload>;
+                                  GhostPayload, CameraPayload>;
 
 } // namespace steamrot

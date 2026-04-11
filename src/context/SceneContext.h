@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "CameraState.h"
 #include "DataAccessFactory.h"
 #include "EngineResources.h"
 #include "EntityManager.h"
@@ -44,7 +45,8 @@ struct SceneContext {
   /////////////////////////////////////////////////
   SceneContext(sf::RenderTexture &scene_texture,
                EngineResources &engine_resources, EntityManager &entity_manager,
-               DataAccessFactory &data_access_factory, MrGhost &mr_ghost);
+               DataAccessFactory &data_access_factory, MrGhost &mr_ghost,
+               CameraState &camera_state);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -96,6 +98,14 @@ struct SceneContext {
   /// dropdowns, blueprint lists, etc.).
   /////////////////////////////////////////////////
   MrGhost &mr_ghost;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the camera/view state for the scene.
+  ///
+  /// Provides all Logic classes with read/write access to the current
+  /// zoom level and the world view derived from it.
+  /////////////////////////////////////////////////
+  CameraState &camera_state;
 };
 
 } // namespace steamrot
