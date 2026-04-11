@@ -32,10 +32,5 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     action::grimoire_machina::ProcessSubscriber(*subscriber, grimoire_machina);
   }
 
-  // --- Asset section: color update ---
-  MachinaFormScaffold *active_scaffold_form =
-      grimoire_machina.m_scaffold_form.get();
-  if (active_scaffold_form)
-    action::grimoire_machina::SetColor(active_scaffold_form->growth_point);
 }
 } // namespace steamrot::logic

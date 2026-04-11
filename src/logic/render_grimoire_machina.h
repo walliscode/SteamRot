@@ -52,20 +52,6 @@ void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
 void DrawNoMachinaFormBox(sf::RenderTexture &texture,
                           sf::FloatRect &crafting_canvas);
 
-/////////////////////////////////////////////////
-/// @brief Draw a GrowthPoint on the crafting canvas.
-///
-/// @param texture RenderTexture to draw on.
-/// @param growth_point GrowthPoint to draw.
-/////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, GrowthPoint &growth_point);
-
-/////////////////////////////////////////////////
-/// @brief Draw a Socket on the crafting canvas.
-///
-/// @param texture RenderTexture to draw on.
-/// @param socket Socket to draw.
-/////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, Socket &socket);
 
 /////////////////////////////////////////////////

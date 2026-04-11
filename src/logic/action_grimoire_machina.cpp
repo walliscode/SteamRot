@@ -37,17 +37,6 @@ ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
   return std::monostate{};
 }
 
-/////////////////////////////////////////////////
-void SetColor(GrowthPoint &growth_point) {
-  if (growth_point.is_mouse_over) {
-
-    growth_point.origin.setFillColor(growth_point.hover_color);
-  } else {
-    growth_point.origin.setFillColor(growth_point.base_color);
-  }
-}
-
-/////////////////////////////////////////////////
 void SetColor(Socket &socket) {
   if (socket.is_mouse_over) {
     socket.circle.setFillColor(socket.hover_color);

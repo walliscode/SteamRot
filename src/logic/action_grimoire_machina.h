@@ -39,18 +39,6 @@ InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 std::expected<std::monostate, FailInfo>
 ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 
-/////////////////////////////////////////////////
-/// @brief Change color of a GrowthPoint based on is_mouse_over
-///
-/// @param growth_point GrowthPoint reference
-/////////////////////////////////////////////////
-void SetColor(GrowthPoint &growth_point);
-
-/////////////////////////////////////////////////
-/// @brief Change color of a Socket based on is_mouse_over
-///
-/// @param socket Socket reference
-/////////////////////////////////////////////////
 void SetColor(Socket &socket);
 
 /////////////////////////////////////////////////

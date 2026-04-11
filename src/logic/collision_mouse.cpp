@@ -98,18 +98,6 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   }
 }
 
-/////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
-                    GrowthPoint &growth_point) {
-  if (growth_point.origin.getGlobalBounds().contains(
-          sf::Vector2f{mouse_position})) {
-    growth_point.is_mouse_over = true;
-  } else {
-    growth_point.is_mouse_over = false;
-  }
-}
-
-/////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, Socket &socket) {
   if (socket.circle.getGlobalBounds().contains(sf::Vector2f{mouse_position})) {
     socket.is_mouse_over = true;
@@ -175,8 +163,6 @@ void ProcessUIEntityCollisions(
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
                                 const sf::Vector2i &mouse_position) {
-  CheckMouseOver(mouse_position, scaffold.growth_point);
-
   for (auto &joint : scaffold.joints) {
     CheckMouseOver(mouse_position, joint);
   }
