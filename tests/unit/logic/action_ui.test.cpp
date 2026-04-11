@@ -814,8 +814,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits a GHOST "
 
   REQUIRE(event_handler.GetWaitingRoomEventBus().size() == 0);
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
@@ -843,15 +843,16 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits GHOST "
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 1);
   const auto &evt = event_handler.GetGlobalEventBus()[0];
   const auto *ghost_payload = std::get_if<steamrot::GhostPayload>(&evt.payload);
   REQUIRE(ghost_payload != nullptr);
-  REQUIRE(std::holds_alternative<steamrot::JointTag>(ghost_payload->m_selection));
+  REQUIRE(
+      std::holds_alternative<steamrot::JointTag>(ghost_payload->m_selection));
   REQUIRE(std::get<steamrot::JointTag>(ghost_payload->m_selection).key ==
           "hinge");
 }
@@ -869,8 +870,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -889,8 +890,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = false;
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -908,8 +909,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
   item.subscription = nullptr;
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
   event_handler.ProcessWaitingRoomEventBus();
 
   REQUIRE(event_handler.GetGlobalEventBus().size() == 0);
@@ -928,8 +929,8 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions deactivates "
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
-  steamrot::logic::action::ui::ProcessDropDownItemElementActions(
-      item, event_handler);
+  steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
+                                                                 event_handler);
 
   REQUIRE_FALSE(item.subscription->m_active);
 }
@@ -998,14 +999,12 @@ TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions "
 
   // GHOST SELECT event must be on the event bus
   fixture.GetGameContext().event_handler.ProcessWaitingRoomEventBus();
-  const auto &bus =
-      fixture.GetGameContext().event_handler.GetGlobalEventBus();
+  const auto &bus = fixture.GetGameContext().event_handler.GetGlobalEventBus();
   bool found_ghost = false;
   for (const auto &evt : bus) {
     if (evt.type == steamrot::EventType::GHOST) {
       const auto *gp = std::get_if<steamrot::GhostPayload>(&evt.payload);
-      if (gp &&
-          gp->action == steamrot::GhostPayload::GhostAction::SELECT &&
+      if (gp && gp->action == steamrot::GhostPayload::GhostAction::SELECT &&
           std::holds_alternative<steamrot::FragmentTag>(gp->m_selection) &&
           std::get<steamrot::FragmentTag>(gp->m_selection).key == "rock") {
         found_ghost = true;
@@ -1039,14 +1038,16 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   dropdown.is_expanded = true;
 
   steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
-                                                                  scene_context);
+                                                                 scene_context);
 
   REQUIRE(dropdown.child_elements.size() == 1);
   auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
       dropdown.child_elements[0].get());
   REQUIRE(item != nullptr);
-  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(
-      item->ghost_selection_tag));
+  REQUIRE(item->priority ==
+          2); // priority should be set to 2 for any dropdown list item
+  REQUIRE(
+      std::holds_alternative<steamrot::FragmentTag>(item->ghost_selection_tag));
   REQUIRE(std::get<steamrot::FragmentTag>(item->ghost_selection_tag).key ==
           "arm");
 }
@@ -1075,12 +1076,14 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   dropdown.is_expanded = true;
 
   steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
-                                                                  scene_context);
+                                                                 scene_context);
 
   REQUIRE(dropdown.child_elements.size() == 1);
   auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
       dropdown.child_elements[0].get());
   REQUIRE(item != nullptr);
+  REQUIRE(item->priority ==
+          2); // priority should be set to 2 for any dropdown list item
   REQUIRE(
       std::holds_alternative<steamrot::JointTag>(item->ghost_selection_tag));
   REQUIRE(std::get<steamrot::JointTag>(item->ghost_selection_tag).key ==
@@ -1111,7 +1114,7 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions creates a "
   dropdown.is_expanded = true;
 
   steamrot::logic::action::ui::ProcessDropDownListElementActions(dropdown,
-                                                                  scene_context);
+                                                                 scene_context);
 
   REQUIRE(dropdown.child_elements.size() == 1);
   auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
@@ -1122,6 +1125,5 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions creates a "
   const auto *input_payload =
       std::get_if<steamrot::InputPayload>(&item->subscription->filter_payload);
   REQUIRE(input_payload != nullptr);
-  REQUIRE(input_payload->action ==
-          steamrot::InputPayload::InputAction::SELECT);
+  REQUIRE(input_payload->action == steamrot::InputPayload::InputAction::SELECT);
 }
