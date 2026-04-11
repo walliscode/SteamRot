@@ -18,9 +18,7 @@ namespace steamrot::logic::render::ghost {
 void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
                    GrimoireMachina &grimoire_machina) {
 
-  // Build a render state that translates fragment/joint geometry to the cursor
-  sf::RenderStates states;
-  states.transform.translate(mr_ghost.m_position);
+  static constexpr float k_corner_offset = 5.f;
 
   std::visit(
       [&](const auto &tag) {
@@ -34,6 +32,13 @@ void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
           if (it == grimoire_machina.m_all_fragments.end()) {
             return;
           }
+          const sf::FloatRect bounds =
+              it->second.movement_views[ViewDirection::Front].getBounds();
+          sf::RenderStates states;
+          states.transform.translate(mr_ghost.m_position - bounds.position -
+                                     bounds.size +
+                                     sf::Vector2f(k_corner_offset,
+                                                  k_corner_offset));
           grimoire_machina::DrawFragmentView(texture, it->second,
                                              ViewDirection::Front, states);
 
@@ -42,6 +47,13 @@ void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
           if (it == grimoire_machina.m_all_joints.end()) {
             return;
           }
+          const sf::FloatRect bounds =
+              it->second.movement_views[ViewDirection::Front].getBounds();
+          sf::RenderStates states;
+          states.transform.translate(mr_ghost.m_position - bounds.position -
+                                     bounds.size +
+                                     sf::Vector2f(k_corner_offset,
+                                                  k_corner_offset));
           grimoire_machina::DrawJointView(texture, it->second,
                                           ViewDirection::Front, states);
         }
