@@ -14,6 +14,7 @@
 #include "ButtonElement.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
+#include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "EventHandler.h"
 #include "SceneContext.h"
@@ -90,4 +91,17 @@ void ProcessDropDownButtonElementActions(
 void ProcessDropDownListElementActions(
     DropDownListElement &dropdown_list_element,
     const SceneContext &scene_context);
+
+/////////////////////////////////////////////////
+/// @brief Process actions for a DropDownItemElement.
+///
+/// When the item is hovered and its subscriber is active, emits a
+/// GHOST SELECT EventPacket onto the event bus carrying the item's
+/// ghost_selection_tag, then deactivates the subscriber.
+///
+/// @param item          DropDownItemElement to process.
+/// @param event_handler EventHandler used to post the GHOST event.
+/////////////////////////////////////////////////
+void ProcessDropDownItemElementActions(DropDownItemElement &item,
+                                       EventHandler &event_handler);
 } // namespace steamrot::logic::action::ui

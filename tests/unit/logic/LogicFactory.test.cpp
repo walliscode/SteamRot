@@ -10,6 +10,7 @@
 #include "EventPayload.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
+#include "GhostRenderLogic.h"
 #include "GrimoireMachinaActionLogic.h"
 #include "GrimoireMachinaCollisionLogic.h"
 #include "GrimoireMachinaPositioningLogic.h"
@@ -165,11 +166,13 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Render LogicType");
   }
   const auto &render_logics = render_it->second;
-  REQUIRE(render_logics.size() == 2);
+  REQUIRE(render_logics.size() == 3);
   REQUIRE(
       dynamic_cast<steamrot::logic::UIRenderLogic *>(render_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaRenderLogic *>(
       render_logics[1].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GhostRenderLogic *>(
+      render_logics[2].get()));
 
   ///// CHECKING MOVEMENT LOGICS /////
   auto movement_it = logic_collection.find(steamrot::LogicGrouping::Movement);

@@ -10,6 +10,8 @@ TestLogic.cpp
 action_grimoire_machina.test.cpp
 
 render_grimoire_machina.test.cpp
+render_ghost.test.cpp
+GhostRenderLogic.test.cpp
 positioning_grimoire_machina.test.cpp
 positioning_ui.test.cpp
 collision_mouse.test.cpp
