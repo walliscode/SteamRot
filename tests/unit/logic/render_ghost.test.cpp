@@ -18,6 +18,7 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <vector>
 
 namespace {
 
@@ -91,6 +92,81 @@ steamrot::GrimoireMachina MakeGrimoireWithPopulatedJoint(
 }
 
 } // anonymous namespace
+
+// ---------------------------------------------------------------------------
+// Coordinate reference used by socket tests
+//
+// MakeFilledSquare(0, 0, White) produces a 20×20 square with:
+//   bounds.position = (0, 0)   bounds.size = (20, 20)
+//
+// DrawGhostItem computes:
+//   translate = mr_ghost.m_position - bounds.position - bounds.size - (5, 5)
+//
+// With mr_ghost.m_position = (100, 100):
+//   translate = (100-0-20-5, 100-0-20-5) = (75, 75)
+//
+// A socket at local position (25, 10) therefore lands at texture (100, 85),
+// which is outside the white square [75..95, 75..95] so the background there
+// is pure black before the socket circle is painted.
+// ---------------------------------------------------------------------------
+
+namespace {
+
+/////////////////////////////////////////////////
+/// @brief Build a GrimoireMachina with one named fragment (20×20 white Front
+///        view) and a single socket at the given local position.
+/////////////////////////////////////////////////
+steamrot::GrimoireMachina
+MakeGrimoireWithFragmentAndSocket(const std::string &name,
+                                  sf::Vector2f socket_local_pos) {
+  steamrot::GrimoireMachina grimoire;
+  steamrot::Fragment fragment;
+  fragment.name = name;
+  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                           MakeFilledSquare(0.f, 0.f,
+                                                            sf::Color::White));
+  fragment.sockets.push_back(socket_local_pos);
+  grimoire.m_all_fragments.insert({name, std::move(fragment)});
+  return grimoire;
+}
+
+/////////////////////////////////////////////////
+/// @brief Build a GrimoireMachina with one named fragment (20×20 white Front
+///        view) and multiple sockets at the given local positions.
+/////////////////////////////////////////////////
+steamrot::GrimoireMachina
+MakeGrimoireWithFragmentAndSockets(const std::string &name,
+                                   std::vector<sf::Vector2f> socket_positions) {
+  steamrot::GrimoireMachina grimoire;
+  steamrot::Fragment fragment;
+  fragment.name = name;
+  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                           MakeFilledSquare(0.f, 0.f,
+                                                            sf::Color::White));
+  fragment.sockets = std::move(socket_positions);
+  grimoire.m_all_fragments.insert({name, std::move(fragment)});
+  return grimoire;
+}
+
+/////////////////////////////////////////////////
+/// @brief Build a GrimoireMachina with one named joint (20×20 white Front
+///        view) and a single socket at the given local position.
+/////////////////////////////////////////////////
+steamrot::GrimoireMachina
+MakeGrimoireWithJointAndSocket(const std::string &name,
+                               sf::Vector2f socket_local_pos) {
+  steamrot::GrimoireMachina grimoire;
+  steamrot::Joint joint;
+  joint.name = name;
+  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                        MakeFilledSquare(0.f, 0.f,
+                                                         sf::Color::White));
+  joint.sockets.push_back(socket_local_pos);
+  grimoire.m_all_joints.insert({name, std::move(joint)});
+  return grimoire;
+}
+
+} // anonymous namespace (second block — socket helpers)
 
 /////////////////////////////////////////////////
 /// DrawGhostItem — monostate (nothing selected)
@@ -287,4 +363,144 @@ TEST_CASE("DrawGhostItem renders fragment geometry at the stored cursor position
   REQUIRE(image.getPixel({210, 210}) == sf::Color::White);
   // Near origin — nothing
   REQUIRE(image.getPixel({5, 5}) == sf::Color::Black);
+}
+
+/////////////////////////////////////////////////
+/// DrawGhostItem — sockets: FragmentTag, socket drawn outside geometry
+/////////////////////////////////////////////////
+
+TEST_CASE("DrawGhostItem draws socket circle for a FragmentTag selection",
+          "[unit][render_ghost]") {
+  // Texture large enough to contain geometry + socket
+  sf::RenderTexture texture{{200, 200}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"leaf"};
+  mr_ghost.m_position = {100.f, 100.f};
+
+  // Socket at local (25, 10) → texture (100, 85): outside the white square
+  // [75..95, 75..95] so the background there is black before the socket is drawn.
+  steamrot::GrimoireMachina grimoire =
+      MakeGrimoireWithFragmentAndSocket("leaf", {25.f, 10.f});
+
+  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  // The socket circle centre must have been painted (not black)
+  REQUIRE(image.getPixel({100, 85}) != sf::Color::Black);
+  // A point well away from both geometry and socket must remain black
+  REQUIRE(image.getPixel({10, 10}) == sf::Color::Black);
+}
+
+/////////////////////////////////////////////////
+/// DrawGhostItem — sockets: FragmentTag, no sockets → socket area stays black
+/////////////////////////////////////////////////
+
+TEST_CASE("DrawGhostItem draws no socket pixels when fragment sockets list is empty",
+          "[unit][render_ghost]") {
+  sf::RenderTexture texture{{200, 200}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"bare"};
+  mr_ghost.m_position = {100.f, 100.f};
+
+  // Fragment with geometry but NO sockets
+  steamrot::GrimoireMachina grimoire =
+      MakeGrimoireWithPopulatedFragment("bare");
+
+  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  // Position (100, 85) is where a socket at local (25, 10) would have been
+  // painted — with no sockets it must remain black.
+  REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
+}
+
+/////////////////////////////////////////////////
+/// DrawGhostItem — sockets: JointTag, socket drawn outside geometry
+/////////////////////////////////////////////////
+
+TEST_CASE("DrawGhostItem draws socket circle for a JointTag selection",
+          "[unit][render_ghost]") {
+  sf::RenderTexture texture{{200, 200}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"knuckle"};
+  mr_ghost.m_position = {100.f, 100.f};
+
+  // Same local position and coordinate logic as the fragment socket test
+  steamrot::GrimoireMachina grimoire =
+      MakeGrimoireWithJointAndSocket("knuckle", {25.f, 10.f});
+
+  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  REQUIRE(image.getPixel({100, 85}) != sf::Color::Black);
+  REQUIRE(image.getPixel({10, 10}) == sf::Color::Black);
+}
+
+/////////////////////////////////////////////////
+/// DrawGhostItem — sockets: JointTag, no sockets → socket area stays black
+/////////////////////////////////////////////////
+
+TEST_CASE("DrawGhostItem draws no socket pixels when joint sockets list is empty",
+          "[unit][render_ghost]") {
+  sf::RenderTexture texture{{200, 200}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"bare"};
+  mr_ghost.m_position = {100.f, 100.f};
+
+  // Joint with geometry but NO sockets
+  steamrot::GrimoireMachina grimoire =
+      MakeGrimoireWithPopulatedJoint("bare");
+
+  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
+}
+
+/////////////////////////////////////////////////
+/// DrawGhostItem — sockets: multiple sockets are all drawn
+/////////////////////////////////////////////////
+
+TEST_CASE("DrawGhostItem draws all socket circles when fragment has multiple sockets",
+          "[unit][render_ghost]") {
+  sf::RenderTexture texture{{200, 200}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"multi"};
+  mr_ghost.m_position = {100.f, 100.f};
+
+  // Two sockets at distinct local positions that both fall outside the white
+  // square [75..95, 75..95] once the transform (75, 75) is applied:
+  //   local (25, 10)  → texture (100, 85)
+  //   local (30, 25)  → texture (105, 100)
+  steamrot::GrimoireMachina grimoire = MakeGrimoireWithFragmentAndSockets(
+      "multi", {{25.f, 10.f}, {30.f, 25.f}});
+
+  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  // Both socket centres must have been painted
+  REQUIRE(image.getPixel({100, 85}) != sf::Color::Black);
+  REQUIRE(image.getPixel({105, 100}) != sf::Color::Black);
+  // Control: an unrelated pixel must remain black
+  REQUIRE(image.getPixel({10, 10}) == sf::Color::Black);
 }
