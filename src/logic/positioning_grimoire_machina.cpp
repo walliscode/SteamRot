@@ -54,12 +54,4 @@ sf::FloatRect CalculateCraftingCanvasSizeAndPosition(
   return crafting_canvas;
 }
 
-/////////////////////////////////////////////////
-void PositionGrowthPoint(GrowthPoint &growth_point,
-                         const sf::FloatRect &crafting_canvas) {
-  // position the growth point in the center of the crafting canvas
-  growth_point.origin.setPosition(
-      {crafting_canvas.position.x + crafting_canvas.size.x / 2.f,
-       crafting_canvas.position.y + crafting_canvas.size.y / 2.f});
-}
 } // namespace steamrot::logic::positioning::grimoire_machina

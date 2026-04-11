@@ -36,10 +36,5 @@ void GrimoireMachinaPositioningLogic::ProcessLogic() {
           entity::memory::GetComponentVector<CUserInterface>(
               m_scene_context.scene_entities));
 
-  if (grimoire_machina.m_scaffold_form) {
-    positioning::grimoire_machina::PositionGrowthPoint(
-        grimoire_machina.m_scaffold_form->growth_point,
-        grimoire_machina.m_crafting_helpers.crafting_canvas);
-  }
 }
 } // namespace steamrot::logic

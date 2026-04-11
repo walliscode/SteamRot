@@ -67,23 +67,6 @@ void ClearMouseOver(UIElement &element);
 /////////////////////////////////////////////////
 bool AnyMouseOver(const UIElement &element);
 
-/////////////////////////////////////////////////
-/// @brief Checks whether the mouse is over the growth point and sets
-/// is_mouse_over accordingly.
-///
-/// @param mouse_position Mouse position in world coordinates.
-/// @param growth_point GrowthPoint to check against.
-/////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
-                    GrowthPoint &growth_point);
-
-/////////////////////////////////////////////////
-/// @brief Checks whether the mouse is over the socket and sets
-/// is_mouse_over accordingly.
-///
-/// @param mouse_position Mouse position in world coordinates.
-/// @param socket Socket to check against.
-/////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position, Socket &socket);
 
 /////////////////////////////////////////////////

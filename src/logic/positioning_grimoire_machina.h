@@ -32,12 +32,4 @@ sf::FloatRect CalculateCraftingCanvasSizeAndPosition(
     const sf::FloatRect &texture_coordinates,
     const std::vector<CUserInterface> &crafting_ui_elements);
 
-/////////////////////////////////////////////////
-/// @brief Positions the growth point on the crafting canvas
-///
-/// @param growth_point GrowthPoint to position
-/// @param crafting_canvas FloatRect representing the crafting canvas
-/////////////////////////////////////////////////
-void PositionGrowthPoint(GrowthPoint &growth_point,
-                         const sf::FloatRect &crafting_canvas);
 } // namespace steamrot::logic::positioning::grimoire_machina
