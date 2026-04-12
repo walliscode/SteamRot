@@ -733,10 +733,90 @@ m_logic_context.event_handler.AddEvent(event_packet);
 - **Always** update test helpers when changing LogicFactory
 - **Never** add logic to component classes (keep them pure data)
 - **Never** modify entities outside their archetype's Logic
+- **Never** register subscribers in a Logic constructor — use `logic_config.json` instead (see below)
+- **Always** keep `ProcessLogic()` as a clean list of named free-function calls (see below)
 - Use `m_logic_context` members (don't store duplicates)
 - Use visual dividers (`/////////////////////////////////////////////////`)
 - Use Doxygen documentation (`///`)
 - Use 2-space indentation
+
+#### Logic Subscriber Registration Pattern
+
+Subscribers must **always** be registered through `data/defaults/logic_config/logic_config.json`, never manually in a Logic constructor. The `LogicFactory` reads this file and wires all subscribers automatically via `Logic::AddSubscriber` and `EventHandler::RegisterSubscriber`.
+
+**DO NOT:**
+```cpp
+// ❌ Wrong — manual subscriber in constructor
+MyLogic::MyLogic(const SceneContext scene_context)
+    : Logic(scene_context) {
+  m_my_subscriber = std::make_shared<Subscriber>();
+  m_my_subscriber->event_type = EventType::USER_INPUT;
+  m_my_subscriber->filter_payload = InputPayload{InputPayload::InputAction::SELECT};
+  m_scene_context.event_handler.RegisterSubscriber(m_my_subscriber);
+}
+```
+
+**DO:**
+```json
+// ✅ Correct — declare in logic_config.json
+"my_action_logic": {
+  "subscriptions": [
+    {
+      "event_type": "USER_INPUT",
+      "filter_payload_type": "InputPayloadFbs",
+      "filter_payload": { "action": "SELECT" }
+    }
+  ]
+}
+```
+The subscriber(s) become available in `m_subscribers` automatically.
+
+#### ProcessLogic Pattern: Clean List of Free Functions
+
+`ProcessLogic()` must **not** contain inline logic or subscriber loops. Instead:
+1. Obtain any required assets/resources at the top.
+2. Call named free functions (from the matching `action_*.h` file) in a clean, readable list.
+
+Each free function handles its own subscriber iteration and all qualifying guards internally. This keeps `ProcessLogic` readable at a glance and makes the free functions independently testable.
+
+```cpp
+// ✅ Correct — ProcessLogic is a clean list of named free-function calls
+void MyActionLogic::ProcessLogic() {
+  auto result = m_scene_context.asset_manager.GetSomething();
+  if (!result.has_value())
+    return;
+  Something &resource = *result.value();
+
+  action::my_system::ProcessEventSubscribers(m_subscribers, resource);
+  action::my_system::ProcessUserInputSubscribers(m_subscribers, m_scene_context, resource);
+}
+```
+
+Free functions that consume subscribers check the subscriber's `event_type` (and, if needed, cast `captured_payload`) internally to determine whether a given subscriber is relevant to them:
+
+```cpp
+// ✅ Correct — free function checks event_type and guards internally
+void ProcessUserInputSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context,
+    Something &resource) {
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+    if (subscriber->event_type != EventType::USER_INPUT)
+      continue;
+
+    // Qualifying guards (e.g. selection state, UI collision, canvas bounds)
+    if (!QualifyingCondition(scene_context))
+      continue;
+
+    // Perform the action
+    DoAction(resource, scene_context);
+  }
+}
+```
+
+**DO NOT** add `std::shared_ptr<Subscriber>` member variables to Logic classes. All subscribers live in the base-class `m_subscribers` vector and are distinguished by `event_type` at processing time.
 
 ### Adding Actions
 

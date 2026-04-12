@@ -8,9 +8,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_grimoire_machina.h"
+#include "CUserInterface.h"
 #include "EventPayload.h"
+#include "EventType.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
+#include "archetypes.h"
+#include "collision_mouse.h"
+#include "entity_memory.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <string>
 #include <vector>
@@ -167,6 +172,90 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
   return std::unexpected(
       FailInfo{FailMode::InvalidInput,
                "PlaceGhostOnScaffold: no valid socket connection"});
+}
+
+/////////////////////////////////////////////////
+void ProcessScaffoldSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    GrimoireMachina &grimoire_machina) {
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+    ProcessSubscriber(*subscriber, grimoire_machina);
+  }
+}
+
+/////////////////////////////////////////////////
+void ProcessPlacementSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+    if (subscriber->event_type != EventType::USER_INPUT)
+      continue;
+
+    // Guard 1: a ghost item must be selected (not monostate).
+    if (std::holds_alternative<std::monostate>(
+            scene_context.mr_ghost.m_selection))
+      continue;
+
+    // Guard 2: the click must not land on any visible UI element.
+    bool can_place = true;
+    const std::vector<size_t> ui_ids =
+        archetypes::GetEntitiesSortedByPriority<CUserInterface>(
+            scene_context.archetypes, scene_context.scene_entities,
+            /*ascending=*/false);
+    for (size_t id : ui_ids) {
+      const CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
+          id, scene_context.scene_entities);
+      if (ui.m_visible &&
+          collision::mouse::AnyMouseOver(*ui.m_root_element)) {
+        can_place = false;
+        break;
+      }
+    }
+    if (!can_place)
+      continue;
+
+    // Guard 3: the active scaffold must exist.
+    if (!grimoire_machina.m_scaffold_form)
+      continue;
+
+    // Guard 4: the click must be inside the crafting canvas.
+    if (!collision::mouse::IsMouseOverBounds(
+            scene_context.mouse_position,
+            grimoire_machina.m_crafting_helpers.crafting_canvas))
+      continue;
+
+    // Convert screen-space mouse position to world-space coordinates so
+    // the placed instance is correctly positioned regardless of zoom level.
+    const sf::View world_view = scene_context.camera_state.GetWorldView(
+        scene_context.scene_texture);
+    const sf::Vector2f mouse_world_pos =
+        scene_context.scene_texture.mapPixelToCoords(
+            scene_context.mouse_position, world_view);
+
+    // First piece: snap to canvas centre; subsequent pieces: use cursor.
+    MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+    const bool is_first_piece =
+        scaffold->fragments.empty() && scaffold->joints.empty();
+
+    sf::Vector2f place_pos = mouse_world_pos;
+    if (is_first_piece) {
+      const sf::FloatRect &canvas =
+          grimoire_machina.m_crafting_helpers.crafting_canvas;
+      const sf::Vector2i canvas_center_pixel{
+          static_cast<int>(canvas.position.x + canvas.size.x / 2.f),
+          static_cast<int>(canvas.position.y + canvas.size.y / 2.f)};
+      place_pos = scene_context.scene_texture.mapPixelToCoords(
+          canvas_center_pixel, world_view);
+    }
+
+    // [TODO:] handle the result and report failure if it fails.
+    auto place_result =
+        PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost, place_pos);
+  }
 }
 
 } // namespace steamrot::logic::action::grimoire_machina

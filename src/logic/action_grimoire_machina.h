@@ -15,10 +15,13 @@
 #include "FailInfo.h"
 #include "GrimoireMachina.h"
 #include "MrGhost.h"
+#include "SceneContext.h"
 #include "Subscriber.h"
 #include <SFML/System/Vector2.hpp>
 #include <expected>
+#include <memory>
 #include <variant>
+#include <vector>
 
 namespace steamrot::logic::action::grimoire_machina {
 
@@ -71,6 +74,38 @@ std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
 void ProcessSubscriber(Subscriber &subscriber,
                        GrimoireMachina &grimoire_machina);
 
+/////////////////////////////////////////////////
+/// @brief Process all active LOGIC-type subscribers for scaffold init/clear
+/// events.
+///
+/// Iterates the subscriber list, skips inactive entries, and dispatches each
+/// active subscriber to @ref ProcessSubscriber.
+///
+/// @param subscribers Subscribers owned by the Logic instance.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void ProcessScaffoldSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Process all active USER_INPUT SELECT-type subscribers and, when all
+/// placement guards pass, place the ghost item on the active scaffold.
+///
+/// Guards checked in order:
+///  1. Ghost selection must not be monostate (an item must be selected).
+///  2. The click must not land on any visible UI element.
+///  3. An active scaffold must exist on the GrimoireMachina.
+///  4. The mouse position must be inside the crafting canvas.
+///
+/// @param subscribers Subscribers owned by the Logic instance.
+/// @param scene_context SceneContext providing archetypes, entities, ghost
+/// state, camera, and mouse position.
+/// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
+/////////////////////////////////////////////////
+void ProcessPlacementSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item as the very first piece on

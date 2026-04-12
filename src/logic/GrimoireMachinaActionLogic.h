@@ -13,8 +13,6 @@
 /////////////////////////////////////////////////
 #include "Logic.h"
 #include "LogicType.h"
-#include "Subscriber.h"
-#include <memory>
 
 namespace steamrot::logic {
 
@@ -23,12 +21,6 @@ namespace steamrot::logic {
 /// @brief Deals with flow control for the Grimoire Machina action sequence
 /////////////////////////////////////////////////
 class GrimoireMachinaActionLogic : public Logic {
-
-  /////////////////////////////////////////////////
-  /// @brief Subscriber for USER_INPUT SELECT events, used to detect
-  /// pick-and-place clicks on the crafting canvas.
-  /////////////////////////////////////////////////
-  std::shared_ptr<Subscriber> m_place_subscriber;
 
 public:
   /////////////////////////////////////////////////
