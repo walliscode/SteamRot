@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
+#include "CameraZoomActionLogic.h"
 #include "FailInfo.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
@@ -163,6 +164,10 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
   case LogicType::GhostRender:
     logic_ptr = std::make_unique<logic::GhostRenderLogic>(m_scene_context);
     break;
+  case LogicType::CameraZoom:
+    logic_ptr =
+        std::make_unique<logic::CameraZoomActionLogic>(m_scene_context);
+    break;
   default:
     return std::unexpected(
         FailInfo(FailMode::EnumValueNotHandled,
@@ -291,7 +296,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::UICollision, LogicType::GrimoireMachinaCollision};
 
   static constexpr std::array action_logic_types = {
-      LogicType::UIAction, LogicType::UIState,
+      LogicType::CameraZoom, LogicType::UIAction, LogicType::UIState,
       LogicType::GrimoireMachinaAction, LogicType::GhostAction};
 
   static constexpr std::array render_logic_types = {

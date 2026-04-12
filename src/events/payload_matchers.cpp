@@ -123,6 +123,14 @@ bool MatchPayload(const GhostPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
+bool MatchPayload(const CameraPayload & /*filter_payload*/,
+                  const CameraPayload & /*event_payload*/) {
+  // Any camera scroll event matches — the subscriber reads the delta
+  // from captured_payload rather than filtering on a specific value.
+  return true;
+}
+
+/////////////////////////////////////////////////
 bool MatchPayload(const EventPayload &filter_payload,
                   const EventPayload &event_payload) {
 

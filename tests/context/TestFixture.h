@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "CameraState.h"
 #include "EngineResources.h"
 #include "EntityManager.h"
 #include "GameContext.h"
@@ -127,6 +128,11 @@ private:
   /// @brief MrGhost state owned by this fixture (stand-in for SceneResources)
   /////////////////////////////////////////////////
   MrGhost m_mr_ghost{};
+
+  /////////////////////////////////////////////////
+  /// @brief CameraState owned by this fixture (stand-in for SceneResources)
+  /////////////////////////////////////////////////
+  CameraState m_camera_state{};
 
   /////////////////////////////////////////////////
   /// @brief SceneContext created from cores and entity manager

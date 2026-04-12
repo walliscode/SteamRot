@@ -56,7 +56,8 @@ SceneContext Scene::GetSceneContext() {
       m_scene_resources.game_context.engine_resources,
       m_scene_resources.entity_manager,
       m_scene_resources.game_context.data_access_factory,
-      m_scene_resources.mr_ghost};
+      m_scene_resources.mr_ghost,
+      m_scene_resources.camera_state};
 
   return scene_context;
 }

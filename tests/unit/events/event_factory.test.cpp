@@ -428,6 +428,11 @@ TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
       break;
     }
 
+    case steamrot::EventType::CAMERA: {
+      REQUIRE(std::holds_alternative<steamrot::CameraPayload>(packet.payload));
+      break;
+    }
+
     default:
       FAIL("Unexpected event type encountered");
     }

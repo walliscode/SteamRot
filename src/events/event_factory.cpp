@@ -88,6 +88,15 @@ CreateGhostEventPacket(const uint8_t lifetime,
 }
 
 /////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime, float scroll_delta) {
+  EventContext context{lifetime};
+  CameraPayload payload(scroll_delta);
+  EventPacket packet{context, EventType::CAMERA, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   // Initialize random number generator
   std::random_device rd;
@@ -216,6 +225,11 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
     GhostSelection selection{FragmentTag{random_key}};
     return CreateGhostEventPacket(lifetime, GhostPayload::GhostAction::SELECT,
                                   selection);
+  }
+
+  case EventType::CAMERA: {
+    std::uniform_real_distribution<float> delta_dist(-3.0f, 3.0f);
+    return CreateCameraEventPacket(lifetime, delta_dist(gen));
   }
 
   default:

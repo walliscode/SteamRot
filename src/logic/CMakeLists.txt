@@ -17,6 +17,8 @@ add_library(logic
   GhostActionLogic.cpp
   GhostRenderLogic.cpp
 
+  CameraZoomActionLogic.cpp
+
   action_ui.cpp
   state_ui.cpp
   render_ui.cpp

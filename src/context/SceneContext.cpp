@@ -15,13 +15,14 @@ SceneContext::SceneContext(sf::RenderTexture &scene_texture,
                            EngineResources &engine_resources,
                            EntityManager &entity_manager,
                            DataAccessFactory &data_access_factory,
-                           MrGhost &mr_ghost)
+                           MrGhost &mr_ghost, CameraState &camera_state)
     : scene_entities(entity_manager.GetEntityMemoryPool()),
       archetypes(entity_manager.GetArchetypeManager().GetArchetypes()),
       scene_texture(scene_texture), game_window(engine_resources.game_window),
       asset_manager(engine_resources.asset_manager),
       event_handler(engine_resources.event_handler),
       mouse_position(engine_resources.mouse_position),
-      data_access_factory(data_access_factory), mr_ghost(mr_ghost) {}
+      data_access_factory(data_access_factory), mr_ghost(mr_ghost),
+      camera_state(camera_state) {}
 
 } // namespace steamrot

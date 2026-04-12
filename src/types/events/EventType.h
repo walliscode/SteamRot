@@ -24,7 +24,8 @@ enum class EventType : uint64_t {
   SCENE,
   LOGIC,
   SYSTEM,
-  GHOST
+  GHOST,
+  CAMERA
 
 };
 

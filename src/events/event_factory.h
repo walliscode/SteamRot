@@ -104,6 +104,16 @@ CreateGhostEventPacket(const uint8_t lifetime,
                        const GhostSelection &selection);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a CameraPayload carrying a scroll delta.
+///
+/// @param lifetime     The lifetime of the event in ticks.
+/// @param scroll_delta Accumulated mouse-wheel delta for this tick.
+/// @return EventPacket with CameraPayload or FailInfo on error.
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime, float scroll_delta);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket();
