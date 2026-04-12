@@ -39,24 +39,6 @@ InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 std::expected<std::monostate, FailInfo>
 ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 
-void SetColor(Socket &socket);
-
-/////////////////////////////////////////////////
-/// @brief Change color of all sockets on a FragmentInstance based on
-/// is_mouse_over
-///
-/// @param fragment_instance FragmentInstance reference
-/////////////////////////////////////////////////
-void SetColor(FragmentInstance &fragment_instance);
-
-/////////////////////////////////////////////////
-/// @brief Change color of all sockets on a JointInstance based on
-/// is_mouse_over
-///
-/// @param joint_instance JointInstance reference
-/////////////////////////////////////////////////
-void SetColor(JointInstance &joint_instance);
-
 /////////////////////////////////////////////////
 /// @brief Return the string names of all fragments in the GrimoireMachina.
 ///

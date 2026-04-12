@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
+#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -62,22 +63,37 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
   texture.draw(box);
 }
 
-void Draw(sf::RenderTexture &texture, Socket &socket) {
-  // draw the socket circle on the texture
-  texture.draw(socket.circle);
+void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
+                const SocketState &socket_state) {
+  static constexpr float k_radius = 5.f;
+  static constexpr int k_point_count = 30;
+  static const sf::Color k_base_color{sf::Color::White};
+  static const sf::Color k_hover_color{sf::Color::Yellow};
+
+  sf::CircleShape circle(k_radius, k_point_count);
+  circle.setOrigin({k_radius, k_radius});
+  circle.setPosition(world_pos);
+  circle.setFillColor(socket_state.is_mouse_over ? k_hover_color : k_base_color);
+  texture.draw(circle);
 }
 
 /////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance) {
-  for (auto &socket : fragment_instance.sockets) {
-    Draw(texture, socket);
+  for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(
+            fragment_instance.fragment.sockets[i]);
+    DrawSocket(texture, world_pos, fragment_instance.socket_states[i]);
   }
 }
 
 /////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
-  for (auto &socket : joint_instance.sockets) {
-    Draw(texture, socket);
+  for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(
+            joint_instance.joint.sockets[i]);
+    DrawSocket(texture, world_pos, joint_instance.socket_states[i]);
   }
 }
 

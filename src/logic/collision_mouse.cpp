@@ -98,27 +98,37 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   }
 }
 
-void CheckMouseOver(const sf::Vector2i &mouse_position, Socket &socket) {
-  if (socket.circle.getGlobalBounds().contains(sf::Vector2f{mouse_position})) {
-    socket.is_mouse_over = true;
-  } else {
-    socket.is_mouse_over = false;
-  }
+void CheckMouseOver(const sf::Vector2i &mouse_position,
+                    sf::Vector2f world_pos,
+                    SocketState &socket_state) {
+  static constexpr float k_radius = 5.f;
+  const sf::Vector2f mouse_f{static_cast<float>(mouse_position.x),
+                              static_cast<float>(mouse_position.y)};
+  const sf::Vector2f delta = mouse_f - world_pos;
+  socket_state.is_mouse_over =
+      (delta.x * delta.x + delta.y * delta.y) <= (k_radius * k_radius);
 }
 
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     FragmentInstance &fragment_instance) {
-  for (auto &socket : fragment_instance.sockets) {
-    CheckMouseOver(mouse_position, socket);
+  for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(
+            fragment_instance.fragment.sockets[i]);
+    CheckMouseOver(mouse_position, world_pos,
+                   fragment_instance.socket_states[i]);
   }
 }
 
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     JointInstance &joint_instance) {
-  for (auto &socket : joint_instance.sockets) {
-    CheckMouseOver(mouse_position, socket);
+  for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(
+            joint_instance.joint.sockets[i]);
+    CheckMouseOver(mouse_position, world_pos, joint_instance.socket_states[i]);
   }
 }
 

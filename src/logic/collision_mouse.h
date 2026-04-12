@@ -67,7 +67,20 @@ void ClearMouseOver(UIElement &element);
 /////////////////////////////////////////////////
 bool AnyMouseOver(const UIElement &element);
 
-void CheckMouseOver(const sf::Vector2i &mouse_position, Socket &socket);
+/////////////////////////////////////////////////
+/// @brief Sets is_mouse_over on a SocketState based on whether the mouse is
+/// within the socket's hit radius of the given world position.
+///
+/// The hit radius matches the visual radius used when drawing sockets so that
+/// click/hover detection is pixel-accurate relative to what the user sees.
+///
+/// @param mouse_position Mouse position in world coordinates.
+/// @param world_pos      World-space centre of the socket.
+/// @param socket_state   SocketState whose is_mouse_over flag is updated.
+/////////////////////////////////////////////////
+void CheckMouseOver(const sf::Vector2i &mouse_position,
+                    sf::Vector2f world_pos,
+                    SocketState &socket_state);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over any socket on a FragmentInstance
