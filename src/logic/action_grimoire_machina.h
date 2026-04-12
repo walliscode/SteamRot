@@ -85,9 +85,12 @@ void ProcessSubscriber(Subscriber &subscriber,
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /// @param world_pos        World-space position at which to place the part.
+/// @param is_first_piece   When true the part is centered on @p world_pos;
+///                         when false the ghost anchor (bottom-right corner)
+///                         is used so the piece visually snaps to the cursor.
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                     sf::Vector2f world_pos);
+                     sf::Vector2f world_pos, bool is_first_piece = false);
 
 } // namespace steamrot::logic::action::grimoire_machina

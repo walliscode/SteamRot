@@ -86,15 +86,35 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     if (can_place) {
       // Convert screen-space mouse position to world-space coordinates so
       // the placed instance is correctly positioned regardless of zoom level.
-      const sf::Vector2f world_pos =
+      const sf::View world_view = m_scene_context.camera_state.GetWorldView(
+          m_scene_context.scene_texture);
+      const sf::Vector2f mouse_world_pos =
           m_scene_context.scene_texture.mapPixelToCoords(
-              m_scene_context.mouse_position,
-              m_scene_context.camera_state.GetWorldView(
-                  m_scene_context.scene_texture));
+              m_scene_context.mouse_position, world_view);
+
+      // First piece: snap to canvas center; subsequent pieces: use cursor.
+      MachinaFormScaffold *scaffold =
+          grimoire_machina.m_scaffold_form.get();
+      const bool is_first_piece =
+          scaffold->fragments.empty() && scaffold->joints.empty();
+
+      sf::Vector2f place_pos = mouse_world_pos;
+      if (is_first_piece) {
+        // Ignore the click position and place the piece centered on the
+        // crafting canvas.
+        const sf::FloatRect &canvas =
+            grimoire_machina.m_crafting_helpers.crafting_canvas;
+        const sf::Vector2i canvas_center_pixel{
+            static_cast<int>(canvas.position.x + canvas.size.x / 2.f),
+            static_cast<int>(canvas.position.y + canvas.size.y / 2.f)};
+        place_pos = m_scene_context.scene_texture.mapPixelToCoords(
+            canvas_center_pixel, world_view);
+      }
 
       // [TODO:] handle the result and report failure if it fails.
       auto place_result = action::grimoire_machina::PlaceGhostOnScaffold(
-          grimoire_machina, m_scene_context.mr_ghost, world_pos);
+          grimoire_machina, m_scene_context.mr_ghost, place_pos,
+          is_first_piece);
     }
   }
 

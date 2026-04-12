@@ -90,7 +90,7 @@ void ProcessSubscriber(Subscriber &subscriber,
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                     sf::Vector2f world_pos) {
+                     sf::Vector2f world_pos, bool is_first_piece) {
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
@@ -98,8 +98,7 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
         FailInfo{FailMode::NullPointer,
                  "PlaceGhostOnScaffold: no active scaffold"});
 
-  // Matches the anchor used by the ghost renderer so the placed piece
-  // visually snaps to where the ghost preview was hovering.
+  // Small corner offset that matches the ghost renderer's bottom-right anchor.
   static constexpr float k_corner_offset = 5.f;
 
   if (std::holds_alternative<FragmentTag>(mr_ghost.m_selection)) {
@@ -114,11 +113,19 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     const sf::FloatRect bounds =
         fragment.movement_views[ViewDirection::Front].getBounds();
 
-    // Translate so the placed piece appears at the same position the ghost
-    // was rendered (matching the ghost anchor: bottom-right corner of bounds).
     sf::Transform transform;
-    transform.translate(world_pos - bounds.position - bounds.size -
-                        sf::Vector2f{k_corner_offset, k_corner_offset});
+    if (is_first_piece) {
+      // Center the piece on world_pos (the canvas center).
+      transform.translate(world_pos - bounds.position - bounds.size / 2.f);
+    } else {
+      // [TODO:] Socket-proximity collision detection will determine the
+      // target socket and compute the correct transform for snapping the
+      // new piece to the nearest compatible open socket on the scaffold.
+
+      // Ghost anchor: bottom-right corner of bounds snaps to cursor.
+      transform.translate(world_pos - bounds.position - bounds.size -
+                          sf::Vector2f{k_corner_offset, k_corner_offset});
+    }
 
     FragmentInstance instance{fragment, transform};
     instance.id = scaffold->next_id++;
@@ -137,8 +144,18 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
         joint.movement_views[ViewDirection::Front].getBounds();
 
     sf::Transform transform;
-    transform.translate(world_pos - bounds.position - bounds.size -
-                        sf::Vector2f{k_corner_offset, k_corner_offset});
+    if (is_first_piece) {
+      // Center the piece on world_pos (the canvas center).
+      transform.translate(world_pos - bounds.position - bounds.size / 2.f);
+    } else {
+      // [TODO:] Socket-proximity collision detection will determine the
+      // target socket and compute the correct transform for snapping the
+      // new piece to the nearest compatible open socket on the scaffold.
+
+      // Ghost anchor: bottom-right corner of bounds snaps to cursor.
+      transform.translate(world_pos - bounds.position - bounds.size -
+                          sf::Vector2f{k_corner_offset, k_corner_offset});
+    }
 
     JointInstance instance{joint, transform};
     instance.id = scaffold->next_id++;
