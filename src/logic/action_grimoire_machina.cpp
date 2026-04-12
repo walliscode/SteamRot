@@ -51,8 +51,7 @@ GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string>
-GetAllJointNames(GrimoireMachina &grimoire_machina) {
+std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina) {
 
   std::vector<std::string> joint_names;
   // cycle through all joints in the GrimoireMachina and add their names to
@@ -76,10 +75,13 @@ void ProcessSubscriber(Subscriber &subscriber,
 
   if (logic_payload->toggle_name ==
       LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
-    InitialiseActiveMachinaFormScaffold(grimoire_machina);
+    // [TODO:] handle the result of this action and report failure if it fails.
+    auto initialise_result =
+        InitialiseActiveMachinaFormScaffold(grimoire_machina);
   } else if (logic_payload->toggle_name ==
              LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
-    ClearActiveMachinaFormScaffold(grimoire_machina);
+    // [TODO:] handle the result of this action and report failure if it fails.
+    auto clear_result = ClearActiveMachinaFormScaffold(grimoire_machina);
   }
 }
 

@@ -98,12 +98,15 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   }
 }
 
-void CheckMouseOver(const sf::Vector2i &mouse_position,
-                    sf::Vector2f world_pos,
+void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
                     SocketState &socket_state) {
+
+  // give the socket a circular hitbox with a fixed radius;
   static constexpr float k_radius = 5.f;
+
+  // cast mouse position to float for distance checking
   const sf::Vector2f mouse_f{static_cast<float>(mouse_position.x),
-                              static_cast<float>(mouse_position.y)};
+                             static_cast<float>(mouse_position.y)};
   const sf::Vector2f delta = mouse_f - world_pos;
   socket_state.is_mouse_over =
       (delta.x * delta.x + delta.y * delta.y) <= (k_radius * k_radius);
@@ -113,9 +116,8 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     FragmentInstance &fragment_instance) {
   for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
-    const sf::Vector2f world_pos =
-        fragment_instance.transform.transformPoint(
-            fragment_instance.fragment.sockets[i]);
+    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
+        fragment_instance.fragment.sockets[i]);
     CheckMouseOver(mouse_position, world_pos,
                    fragment_instance.socket_states[i]);
   }
@@ -125,18 +127,16 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     JointInstance &joint_instance) {
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
-    const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(
-            joint_instance.joint.sockets[i]);
+    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
+        joint_instance.joint.sockets[i]);
     CheckMouseOver(mouse_position, world_pos, joint_instance.socket_states[i]);
   }
 }
 
 /////////////////////////////////////////////////
-void ProcessUIEntityCollisions(
-    const std::vector<size_t> &entity_indexes,
-    EntityMemoryPool &scene_entities,
-    const sf::Vector2i &mouse_position) {
+void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
+                               EntityMemoryPool &scene_entities,
+                               const sf::Vector2i &mouse_position) {
 
   // Pass 1: clear all hover state to remove stale state from the previous tick
   for (size_t entity_id : entity_indexes) {
@@ -172,7 +172,7 @@ void ProcessUIEntityCollisions(
 
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
-                                const sf::Vector2i &mouse_position) {
+                               const sf::Vector2i &mouse_position) {
   for (auto &joint : scaffold.joints) {
     CheckMouseOver(mouse_position, joint);
   }
