@@ -87,6 +87,12 @@ public:
   SceneContext &GetSceneContext();
 
   /////////////////////////////////////////////////
+  /// @brief Get reference to MrGhost
+  ///
+  /// @return Reference to the MrGhost state for testing
+  /////////////////////////////////////////////////
+  MrGhost &GetMrGhost();
+  /////////////////////////////////////////////////
   /// @brief Get the current scene type
   ///
   /// @return The SceneType this fixture was created with
