@@ -76,4 +76,7 @@ SceneContext &TestFixture::GetSceneContext() { return *m_scene_context; }
 /////////////////////////////////////////////////
 SceneType TestFixture::GetSceneType() const { return m_scene_type; }
 
+/////////////////////////////////////////////////
+MrGhost &TestFixture::GetMrGhost() { return m_mr_ghost; }
+
 } // namespace steamrot::tests
