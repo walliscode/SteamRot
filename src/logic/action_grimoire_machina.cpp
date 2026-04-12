@@ -37,28 +37,6 @@ ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
   return std::monostate{};
 }
 
-void SetColor(Socket &socket) {
-  if (socket.is_mouse_over) {
-    socket.circle.setFillColor(socket.hover_color);
-  } else {
-    socket.circle.setFillColor(socket.base_color);
-  }
-}
-
-/////////////////////////////////////////////////
-void SetColor(FragmentInstance &fragment_instance) {
-  for (auto &socket : fragment_instance.sockets) {
-    SetColor(socket);
-  }
-}
-
-/////////////////////////////////////////////////
-void SetColor(JointInstance &joint_instance) {
-  for (auto &socket : joint_instance.sockets) {
-    SetColor(socket);
-  }
-}
-
 /////////////////////////////////////////////////
 std::vector<std::string>
 GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
@@ -73,8 +51,7 @@ GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string>
-GetAllJointNames(GrimoireMachina &grimoire_machina) {
+std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina) {
 
   std::vector<std::string> joint_names;
   // cycle through all joints in the GrimoireMachina and add their names to
@@ -98,10 +75,13 @@ void ProcessSubscriber(Subscriber &subscriber,
 
   if (logic_payload->toggle_name ==
       LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
-    InitialiseActiveMachinaFormScaffold(grimoire_machina);
+    // [TODO:] handle the result of this action and report failure if it fails.
+    auto initialise_result =
+        InitialiseActiveMachinaFormScaffold(grimoire_machina);
   } else if (logic_payload->toggle_name ==
              LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
-    ClearActiveMachinaFormScaffold(grimoire_machina);
+    // [TODO:] handle the result of this action and report failure if it fails.
+    auto clear_result = ClearActiveMachinaFormScaffold(grimoire_machina);
   }
 }
 

@@ -36,70 +36,6 @@ TEST_CASE("ClearActiveMachinaForm clears the active MachinaForm in the "
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
 
-TEST_CASE("SetColor Socket sets circle color to hover_color "
-          "when is_mouse_over is true",
-          "[unit][actions][grimoire_machina]") {
-  steamrot::Socket socket{sf::Vector2f{0.f, 0.f}};
-  socket.is_mouse_over = true;
-  socket.hover_color = sf::Color::Cyan;
-  socket.base_color = sf::Color::White;
-  steamrot::logic::action::grimoire_machina::SetColor(socket);
-  REQUIRE(socket.circle.getFillColor() == socket.hover_color);
-}
-
-TEST_CASE("SetColor Socket sets circle color to base_color "
-          "when is_mouse_over is false",
-          "[unit][actions][grimoire_machina]") {
-  steamrot::Socket socket{sf::Vector2f{0.f, 0.f}};
-  socket.is_mouse_over = false;
-  socket.hover_color = sf::Color::Cyan;
-  socket.base_color = sf::Color::White;
-  steamrot::logic::action::grimoire_machina::SetColor(socket);
-  REQUIRE(socket.circle.getFillColor() == socket.base_color);
-}
-
-TEST_CASE("SetColor FragmentInstance sets all socket colors based on "
-          "is_mouse_over",
-          "[unit][actions][grimoire_machina]") {
-  steamrot::Fragment fragment;
-  fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}};
-
-  steamrot::FragmentInstance fragment_instance{fragment};
-  fragment_instance.sockets[0].is_mouse_over = true;
-  fragment_instance.sockets[0].hover_color = sf::Color::Cyan;
-  fragment_instance.sockets[0].base_color = sf::Color::White;
-  fragment_instance.sockets[1].is_mouse_over = false;
-  fragment_instance.sockets[1].hover_color = sf::Color::Cyan;
-  fragment_instance.sockets[1].base_color = sf::Color::White;
-
-  steamrot::logic::action::grimoire_machina::SetColor(fragment_instance);
-
-  REQUIRE(fragment_instance.sockets[0].circle.getFillColor() ==
-          sf::Color::Cyan);
-  REQUIRE(fragment_instance.sockets[1].circle.getFillColor() ==
-          sf::Color::White);
-}
-
-TEST_CASE(
-    "SetColor JointInstance sets all socket colors based on is_mouse_over",
-    "[unit][actions][grimoire_machina]") {
-  steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
-
-  steamrot::JointInstance joint_instance{joint};
-  joint_instance.sockets[0].is_mouse_over = true;
-  joint_instance.sockets[0].hover_color = sf::Color::Cyan;
-  joint_instance.sockets[0].base_color = sf::Color::White;
-  joint_instance.sockets[1].is_mouse_over = false;
-  joint_instance.sockets[1].hover_color = sf::Color::Cyan;
-  joint_instance.sockets[1].base_color = sf::Color::White;
-
-  steamrot::logic::action::grimoire_machina::SetColor(joint_instance);
-
-  REQUIRE(joint_instance.sockets[0].circle.getFillColor() == sf::Color::Cyan);
-  REQUIRE(joint_instance.sockets[1].circle.getFillColor() == sf::Color::White);
-}
-
 TEST_CASE("GetAllFragmentNames returns the string names of all fragments in "
           "the GrimoireMachina",
           "[unit][actions][grimoire_machina]") {
@@ -151,49 +87,33 @@ TEST_CASE("GetAllJointNames returns the string names of all joints in "
 }
 
 /////////////////////////////////////////////////
-/// Socket constructor tests
+/// SocketState default-state tests
 /////////////////////////////////////////////////
 
-TEST_CASE("Socket constructor stores the local position",
-          "[unit][Socket][MachinaFormScaffold]") {
-  sf::Vector2f local_pos{15.f, 25.f};
-  steamrot::Socket socket{local_pos};
-
-  REQUIRE(socket.position == local_pos);
+TEST_CASE("SocketState has Available state by default",
+          "[unit][SocketState][MachinaFormScaffold]") {
+  steamrot::SocketState socket_state;
+  REQUIRE(socket_state.state == steamrot::SocketState::State::Available);
 }
 
-TEST_CASE("Socket constructor positions the circle at the local position",
-          "[unit][Socket][MachinaFormScaffold]") {
-  sf::Vector2f local_pos{30.f, 50.f};
-  steamrot::Socket socket{local_pos};
-
-  // The circle position is set to world space by the owning instance
-  // constructor; a standalone Socket circle starts at the origin.
-  REQUIRE(socket.circle.getPosition() == sf::Vector2f{0.f, 0.f});
-}
-
-TEST_CASE("Socket constructor uses default state and colors",
-          "[unit][Socket][MachinaFormScaffold]") {
-  steamrot::Socket socket{{0.f, 0.f}};
-
-  REQUIRE(socket.state == steamrot::Socket::State::Available);
-  REQUIRE(socket.is_mouse_over == false);
-  REQUIRE(socket.base_color == sf::Color::White);
-  REQUIRE(socket.hover_color == sf::Color::Yellow);
+TEST_CASE("SocketState has is_mouse_over false by default",
+          "[unit][SocketState][MachinaFormScaffold]") {
+  steamrot::SocketState socket_state;
+  REQUIRE(socket_state.is_mouse_over == false);
 }
 
 /////////////////////////////////////////////////
 /// FragmentInstance constructor tests
 /////////////////////////////////////////////////
 
-TEST_CASE("FragmentInstance constructor creates one socket per Fragment socket",
+TEST_CASE("FragmentInstance constructor creates one socket state per Fragment socket",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
   fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}, {50.f, 60.f}};
 
   steamrot::FragmentInstance instance{fragment};
 
-  REQUIRE(instance.sockets.size() == 3);
+  REQUIRE(instance.socket_states.size() == 3);
 }
 
 TEST_CASE("FragmentInstance constructor stores the Fragment reference",
@@ -205,44 +125,6 @@ TEST_CASE("FragmentInstance constructor stores the Fragment reference",
   steamrot::FragmentInstance instance{fragment};
 
   REQUIRE(&instance.fragment == &fragment);
-}
-
-TEST_CASE("FragmentInstance constructor stores socket local positions",
-          "[unit][FragmentInstance][MachinaFormScaffold]") {
-  steamrot::Fragment fragment;
-  fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}};
-
-  steamrot::FragmentInstance instance{fragment};
-
-  REQUIRE(instance.sockets[0].position == sf::Vector2f{10.f, 20.f});
-  REQUIRE(instance.sockets[1].position == sf::Vector2f{30.f, 40.f});
-}
-
-TEST_CASE("FragmentInstance constructor with identity transform positions "
-          "circles at local positions",
-          "[unit][FragmentInstance][MachinaFormScaffold]") {
-  steamrot::Fragment fragment;
-  fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}};
-
-  steamrot::FragmentInstance instance{fragment};
-
-  REQUIRE(instance.sockets[0].circle.getPosition() == sf::Vector2f{10.f, 20.f});
-  REQUIRE(instance.sockets[1].circle.getPosition() == sf::Vector2f{30.f, 40.f});
-}
-
-TEST_CASE("FragmentInstance constructor applies initial transform to circle "
-          "positions",
-          "[unit][FragmentInstance][MachinaFormScaffold]") {
-  steamrot::Fragment fragment;
-  fragment.sockets = {{10.f, 20.f}};
-
-  sf::Transform transform;
-  transform.translate({100.f, 200.f});
-
-  steamrot::FragmentInstance instance{fragment, transform};
-
-  REQUIRE(instance.sockets[0].circle.getPosition() ==
-          sf::Vector2f{110.f, 220.f});
 }
 
 TEST_CASE("FragmentInstance constructor stores the initial transform",
@@ -258,29 +140,52 @@ TEST_CASE("FragmentInstance constructor stores the initial transform",
   REQUIRE(instance.transform == transform);
 }
 
-TEST_CASE("FragmentInstance constructor with no sockets creates empty sockets "
-          "vector",
+TEST_CASE("FragmentInstance constructor with no sockets creates empty "
+          "socket_states vector",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
   fragment.sockets = {};
 
   steamrot::FragmentInstance instance{fragment};
 
-  REQUIRE(instance.sockets.empty());
+  REQUIRE(instance.socket_states.empty());
+}
+
+TEST_CASE("FragmentInstance constructor initialises socket states to Available",
+          "[unit][FragmentInstance][MachinaFormScaffold]") {
+  steamrot::Fragment fragment;
+  fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}};
+
+  steamrot::FragmentInstance instance{fragment};
+
+  REQUIRE(instance.socket_states[0].state ==
+          steamrot::SocketState::State::Available);
+  REQUIRE(instance.socket_states[1].state ==
+          steamrot::SocketState::State::Available);
+}
+
+TEST_CASE("FragmentInstance id defaults to zero",
+          "[unit][FragmentInstance][MachinaFormScaffold]") {
+  steamrot::Fragment fragment;
+  fragment.sockets = {{0.f, 0.f}};
+
+  steamrot::FragmentInstance instance{fragment};
+
+  REQUIRE(instance.id == 0u);
 }
 
 /////////////////////////////////////////////////
 /// JointInstance constructor tests
 /////////////////////////////////////////////////
 
-TEST_CASE("JointInstance constructor creates one socket per Joint socket",
+TEST_CASE("JointInstance constructor creates one socket state per Joint socket",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
   joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
 
   steamrot::JointInstance instance{joint};
 
-  REQUIRE(instance.sockets.size() == 2);
+  REQUIRE(instance.socket_states.size() == 2);
 }
 
 TEST_CASE("JointInstance constructor stores the Joint reference",
@@ -292,44 +197,6 @@ TEST_CASE("JointInstance constructor stores the Joint reference",
   steamrot::JointInstance instance{joint};
 
   REQUIRE(&instance.joint == &joint);
-}
-
-TEST_CASE("JointInstance constructor stores socket local positions",
-          "[unit][JointInstance][MachinaFormScaffold]") {
-  steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
-
-  steamrot::JointInstance instance{joint};
-
-  REQUIRE(instance.sockets[0].position == sf::Vector2f{5.f, 10.f});
-  REQUIRE(instance.sockets[1].position == sf::Vector2f{15.f, 25.f});
-}
-
-TEST_CASE("JointInstance constructor with identity transform positions circles "
-          "at local positions",
-          "[unit][JointInstance][MachinaFormScaffold]") {
-  steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
-
-  steamrot::JointInstance instance{joint};
-
-  REQUIRE(instance.sockets[0].circle.getPosition() == sf::Vector2f{5.f, 10.f});
-  REQUIRE(instance.sockets[1].circle.getPosition() == sf::Vector2f{15.f, 25.f});
-}
-
-TEST_CASE("JointInstance constructor applies initial transform to circle "
-          "positions",
-          "[unit][JointInstance][MachinaFormScaffold]") {
-  steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}};
-
-  sf::Transform transform;
-  transform.translate({100.f, 200.f});
-
-  steamrot::JointInstance instance{joint, transform};
-
-  REQUIRE(instance.sockets[0].circle.getPosition() ==
-          sf::Vector2f{105.f, 210.f});
 }
 
 TEST_CASE("JointInstance constructor stores the initial transform",
@@ -345,13 +212,36 @@ TEST_CASE("JointInstance constructor stores the initial transform",
   REQUIRE(instance.transform == transform);
 }
 
-TEST_CASE("JointInstance constructor with no sockets creates empty sockets "
-          "vector",
+TEST_CASE("JointInstance constructor with no sockets creates empty "
+          "socket_states vector",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
   joint.sockets = {};
 
   steamrot::JointInstance instance{joint};
 
-  REQUIRE(instance.sockets.empty());
+  REQUIRE(instance.socket_states.empty());
+}
+
+TEST_CASE("JointInstance constructor initialises socket states to Available",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
+
+  steamrot::JointInstance instance{joint};
+
+  REQUIRE(instance.socket_states[0].state ==
+          steamrot::SocketState::State::Available);
+  REQUIRE(instance.socket_states[1].state ==
+          steamrot::SocketState::State::Available);
+}
+
+TEST_CASE("JointInstance id defaults to zero",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.sockets = {{0.f, 0.f}};
+
+  steamrot::JointInstance instance{joint};
+
+  REQUIRE(instance.id == 0u);
 }

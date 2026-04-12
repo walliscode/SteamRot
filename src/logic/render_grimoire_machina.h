@@ -52,10 +52,25 @@ void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
 void DrawNoMachinaFormBox(sf::RenderTexture &texture,
                           sf::FloatRect &crafting_canvas);
 
-void Draw(sf::RenderTexture &texture, Socket &socket);
+/////////////////////////////////////////////////
+/// @brief Draw a single socket circle at the given world position.
+///
+/// Creates a circle shape on the fly, coloured based on the socket's hover
+/// state (hover_color when hovered, base_color otherwise), and draws it onto
+/// @p texture. Keeping the circle transient avoids stale cached positions.
+///
+/// @param texture      RenderTexture to draw on.
+/// @param world_pos    World-space centre of the socket circle.
+/// @param socket_state Runtime state of the socket (hover, connection status).
+/////////////////////////////////////////////////
+void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
+                const SocketState &socket_state);
 
 /////////////////////////////////////////////////
 /// @brief Draw all sockets of a FragmentInstance on the crafting canvas.
+///
+/// World position of each socket is derived from the instance's transform
+/// applied to the Fragment definition's local socket positions.
 ///
 /// @param texture RenderTexture to draw on.
 /// @param fragment_instance FragmentInstance whose sockets are drawn.
@@ -64,6 +79,9 @@ void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
 
 /////////////////////////////////////////////////
 /// @brief Draw all sockets of a JointInstance on the crafting canvas.
+///
+/// World position of each socket is derived from the instance's transform
+/// applied to the Joint definition's local socket positions.
 ///
 /// @param texture RenderTexture to draw on.
 /// @param joint_instance JointInstance whose sockets are drawn.

@@ -15,23 +15,25 @@
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("CheckMouseOver Socket sets is_mouse_over correctly",
+TEST_CASE("CheckMouseOver SocketState sets is_mouse_over correctly",
           "[unit][collision][mouse]") {
 
   SECTION("Mouse is over socket") {
-    steamrot::Socket socket{sf::Vector2f{100.f, 100.f}};
-    socket.circle.setPosition({100.f, 100.f});
+    steamrot::SocketState socket_state;
+    sf::Vector2f world_pos{100.f, 100.f};
     sf::Vector2i mouse_position(103, 103);
-    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, socket);
-    REQUIRE(socket.is_mouse_over == true);
+    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, world_pos,
+                                                      socket_state);
+    REQUIRE(socket_state.is_mouse_over == true);
   }
 
   SECTION("Mouse is not over socket") {
-    steamrot::Socket socket{sf::Vector2f{100.f, 100.f}};
-    socket.circle.setPosition({100.f, 100.f});
+    steamrot::SocketState socket_state;
+    sf::Vector2f world_pos{100.f, 100.f};
     sf::Vector2i mouse_position(200, 200);
-    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, socket);
-    REQUIRE(socket.is_mouse_over == false);
+    steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, world_pos,
+                                                      socket_state);
+    REQUIRE(socket_state.is_mouse_over == false);
   }
 }
 
@@ -45,7 +47,7 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
     sf::Vector2i mouse_position(103, 103);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
                                                       fragment_instance);
-    REQUIRE(fragment_instance.sockets[0].is_mouse_over == true);
+    REQUIRE(fragment_instance.socket_states[0].is_mouse_over == true);
   }
 
   SECTION("Mouse is not over any socket on the fragment") {
@@ -55,7 +57,7 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
     sf::Vector2i mouse_position(200, 200);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
                                                       fragment_instance);
-    REQUIRE(fragment_instance.sockets[0].is_mouse_over == false);
+    REQUIRE(fragment_instance.socket_states[0].is_mouse_over == false);
   }
 
   SECTION("Fragment with no sockets does not crash") {
@@ -77,7 +79,7 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
     sf::Vector2i mouse_position(103, 103);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
                                                       joint_instance);
-    REQUIRE(joint_instance.sockets[0].is_mouse_over == true);
+    REQUIRE(joint_instance.socket_states[0].is_mouse_over == true);
   }
 
   SECTION("Mouse is not over any socket on the joint") {
@@ -87,7 +89,7 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
     sf::Vector2i mouse_position(200, 200);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
                                                       joint_instance);
-    REQUIRE(joint_instance.sockets[0].is_mouse_over == false);
+    REQUIRE(joint_instance.socket_states[0].is_mouse_over == false);
   }
 
   SECTION("Joint with no sockets does not crash") {
