@@ -283,7 +283,7 @@ TEST_CASE(
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::InvalidInput);
   REQUIRE(result.error().message ==
-          "PlaceGhostOnScaffold: no ghost item selected");
+          "PlaceFirstPiece: no ghost item selected");
 }
 
 TEST_CASE("PlaceGhostOnScaffold returns error when fragment key not found",
@@ -301,7 +301,7 @@ TEST_CASE("PlaceGhostOnScaffold returns error when fragment key not found",
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::MissingData);
   REQUIRE(result.error().message ==
-          "PlaceGhostOnScaffold: fragment key not found");
+          "PlaceFirstPiece: fragment key not found");
 }
 
 TEST_CASE("PlaceGhostOnScaffold returns error when joint key not found",
@@ -319,7 +319,7 @@ TEST_CASE("PlaceGhostOnScaffold returns error when joint key not found",
   REQUIRE_FALSE(result.has_value());
   REQUIRE(result.error().mode == steamrot::FailMode::MissingData);
   REQUIRE(result.error().message ==
-          "PlaceGhostOnScaffold: joint key not found");
+          "PlaceFirstPiece: joint key not found");
 }
 
 /////////////////////////////////////////////////
@@ -337,7 +337,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends fragment to scaffold",
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
 
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {100.f, 80.f}, /*is_first_piece=*/true);
+      grimoire_machina, mr_ghost, {100.f, 80.f});
 
   REQUIRE(result.has_value());
   REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
@@ -356,7 +356,7 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
 
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {100.f, 80.f}, true);
+      grimoire_machina, mr_ghost, {100.f, 80.f});
 
   if (!result.has_value()) {
     FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
@@ -386,7 +386,7 @@ TEST_CASE(
 
   const sf::Vector2f world_pos{60.f, 40.f};
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, world_pos, true);
+      grimoire_machina, mr_ghost, world_pos);
   if (!result.has_value()) {
     FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
   }
@@ -412,7 +412,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends joint to scaffold",
   mr_ghost.m_selection = steamrot::JointTag{"joint"};
 
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {50.f, 50.f}, true);
+      grimoire_machina, mr_ghost, {50.f, 50.f});
 
   REQUIRE(result.has_value());
   REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
@@ -430,7 +430,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: joint id and next_id are assigned",
   mr_ghost.m_selection = steamrot::JointTag{"joint"};
 
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {50.f, 50.f}, true);
+      grimoire_machina, mr_ghost, {50.f, 50.f});
 
   if (!result.has_value()) {
     FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
@@ -453,7 +453,7 @@ TEST_CASE(
 
   const sf::Vector2f world_pos{70.f, 30.f};
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, world_pos, true);
+      grimoire_machina, mr_ghost, world_pos);
   if (!result.has_value()) {
     FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
   }
@@ -466,17 +466,306 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
-/// PlaceGhostOnScaffold subsequent-piece placement tests
+/// PlaceGhostOnScaffold subsequent-piece tests (blocked until collision logic)
 /////////////////////////////////////////////////
 
 TEST_CASE(
-    "PlaceGhostOnScaffold subsequent piece: fragment uses ghost anchor with "
-    "empty bounds",
+    "PlaceGhostOnScaffold returns error when scaffold already has a fragment",
     "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
-  // With empty bounds, ghost anchor formula:
-  // translate(world_pos - bounds.position - bounds.size - {5,5})
-  // = translate(world_pos - {0,0} - {0,0} - {5,5}) = translate(world_pos -
-  // {5,5}). So transformPoint({0,0}) == world_pos - {5,5}.
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  // Place the first piece successfully.
+  auto first_result =
+      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+          grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first_result.has_value());
+
+  // Attempting a second placement must fail (no collision logic yet).
+  auto second_result =
+      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+          grimoire_machina, mr_ghost, {60.f, 60.f});
+
+  REQUIRE_FALSE(second_result.has_value());
+  REQUIRE(second_result.error().mode == steamrot::FailMode::InvalidInput);
+  REQUIRE(second_result.error().message ==
+          "PlaceGhostOnScaffold: no valid socket connection");
+}
+
+TEST_CASE(
+    "PlaceGhostOnScaffold returns error when scaffold already has a joint",
+    "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+
+  // Place the first piece successfully.
+  auto first_result =
+      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+          grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first_result.has_value());
+
+  // Attempting a second placement must fail (no collision logic yet).
+  auto second_result =
+      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+          grimoire_machina, mr_ghost, {60.f, 60.f});
+
+  REQUIRE_FALSE(second_result.has_value());
+  REQUIRE(second_result.error().mode == steamrot::FailMode::InvalidInput);
+  REQUIRE(second_result.error().message ==
+          "PlaceGhostOnScaffold: no valid socket connection");
+}
+
+/////////////////////////////////////////////////
+/// PlaceGhostOnScaffold single-piece-per-instance tests
+/////////////////////////////////////////////////
+
+TEST_CASE(
+    "PlaceGhostOnScaffold only places one fragment per game instance",
+    "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  auto first = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first.has_value());
+
+  auto second = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {60.f, 60.f});
+  REQUIRE_FALSE(second.has_value());
+
+  auto third = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {70.f, 70.f});
+  REQUIRE_FALSE(third.has_value());
+
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+}
+
+TEST_CASE(
+    "PlaceGhostOnScaffold only places one joint per game instance",
+    "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+
+  auto first = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first.has_value());
+
+  auto second = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {60.f, 60.f});
+  REQUIRE_FALSE(second.has_value());
+
+  auto third = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost, {70.f, 70.f});
+  REQUIRE_FALSE(third.has_value());
+
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+}
+
+/////////////////////////////////////////////////
+/// PlaceFirstPiece error-path tests
+/////////////////////////////////////////////////
+
+TEST_CASE("PlaceFirstPiece returns error when no scaffold is active",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::NullPointer);
+  REQUIRE(result.error().message == "PlaceFirstPiece: no active scaffold");
+}
+
+TEST_CASE("PlaceFirstPiece returns error when scaffold already has pieces",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  // Place the first piece via PlaceFirstPiece.
+  auto first_result =
+      steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+          grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first_result.has_value());
+
+  // A second call must be rejected.
+  auto second_result =
+      steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+          grimoire_machina, mr_ghost, {60.f, 60.f});
+
+  REQUIRE_FALSE(second_result.has_value());
+  REQUIRE(second_result.error().mode == steamrot::FailMode::InvalidInput);
+  REQUIRE(second_result.error().message ==
+          "PlaceFirstPiece: scaffold is not empty");
+}
+
+TEST_CASE(
+    "PlaceFirstPiece returns error when ghost selection is monostate",
+    "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  steamrot::MrGhost mr_ghost; // default selection = monostate
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::InvalidInput);
+  REQUIRE(result.error().message == "PlaceFirstPiece: no ghost item selected");
+}
+
+TEST_CASE("PlaceFirstPiece returns error when fragment key not found",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"nonexistent"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::MissingData);
+  REQUIRE(result.error().message ==
+          "PlaceFirstPiece: fragment key not found");
+}
+
+TEST_CASE("PlaceFirstPiece returns error when joint key not found",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"nonexistent"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  REQUIRE_FALSE(result.has_value());
+  REQUIRE(result.error().mode == steamrot::FailMode::MissingData);
+  REQUIRE(result.error().message == "PlaceFirstPiece: joint key not found");
+}
+
+/////////////////////////////////////////////////
+/// PlaceFirstPiece success tests
+/////////////////////////////////////////////////
+
+TEST_CASE("PlaceFirstPiece appends a fragment to an empty scaffold",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {100.f, 80.f});
+
+  REQUIRE(result.has_value());
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+}
+
+TEST_CASE("PlaceFirstPiece appends a joint to an empty scaffold",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  REQUIRE(result.has_value());
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+}
+
+TEST_CASE("PlaceFirstPiece assigns fragment id 0 and increments next_id",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  if (!result.has_value()) {
+    FAIL("PlaceFirstPiece failed with error: " + result.error().message);
+  }
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].id == 0u);
+  REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
+}
+
+TEST_CASE("PlaceFirstPiece assigns joint id 0 and increments next_id",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+
+  if (!result.has_value()) {
+    FAIL("PlaceFirstPiece failed with error: " + result.error().message);
+  }
+  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].id == 0u);
+  REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
+}
+
+TEST_CASE(
+    "PlaceFirstPiece: fragment transform centers on world_pos with empty "
+    "bounds",
+    "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
@@ -486,24 +775,21 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
 
   const sf::Vector2f world_pos{60.f, 40.f};
-  // is_first_piece defaults to false
-  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
       grimoire_machina, mr_ghost, world_pos);
-
   if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
+    FAIL("PlaceFirstPiece failed with error: " + result.error().message);
   }
+
   const sf::Transform &t =
       grimoire_machina.m_scaffold_form->fragments[0].transform;
-  const sf::Vector2f mapped = t.transformPoint({0.f, 0.f});
-
-  REQUIRE_THAT(mapped, steamrot::tests::EqualsVector2f(
-                           {world_pos.x - 5.f, world_pos.y - 5.f}));
+  REQUIRE_THAT(t.transformPoint({0.f, 0.f}),
+               steamrot::tests::EqualsVector2f(world_pos));
 }
 
-TEST_CASE("PlaceGhostOnScaffold subsequent piece: joint uses ghost anchor with "
-          "empty bounds",
-          "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
+TEST_CASE(
+    "PlaceFirstPiece: joint transform centers on world_pos with empty bounds",
+    "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
@@ -512,69 +798,45 @@ TEST_CASE("PlaceGhostOnScaffold subsequent piece: joint uses ghost anchor with "
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_selection = steamrot::JointTag{"joint"};
 
-  const sf::Vector2f world_pos{80.f, 60.f};
-  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  const sf::Vector2f world_pos{70.f, 30.f};
+  auto result = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
       grimoire_machina, mr_ghost, world_pos);
-
   if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed with error: " + result.error().message);
+    FAIL("PlaceFirstPiece failed with error: " + result.error().message);
   }
+
   const sf::Transform &t =
       grimoire_machina.m_scaffold_form->joints[0].transform;
-  const sf::Vector2f mapped = t.transformPoint({0.f, 0.f});
-
-  REQUIRE_THAT(mapped, steamrot::tests::EqualsVector2f(
-                           {world_pos.x - 5.f, world_pos.y - 5.f}));
+  REQUIRE_THAT(t.transformPoint({0.f, 0.f}),
+               steamrot::tests::EqualsVector2f(world_pos));
 }
 
 /////////////////////////////////////////////////
-/// PlaceGhostOnScaffold ID assignment tests
+/// PlaceFirstPiece single-piece-only tests
 /////////////////////////////////////////////////
 
-TEST_CASE(
-    "PlaceGhostOnScaffold assigns incrementing IDs across mixed placements",
-    "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
+TEST_CASE("PlaceFirstPiece only places one piece per game instance",
+          "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
-  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-
-  // First placement: fragment as first piece → id 0
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
-  auto frag_result =
-      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-          grimoire_machina, mr_ghost, {10.f, 10.f}, true);
-  if (!frag_result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed with error: " +
-         frag_result.error().message);
-  }
 
-  // Second placement: joint as subsequent piece → id 1
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
-  auto joint_result =
-      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-          grimoire_machina, mr_ghost, {20.f, 20.f});
-  if (!joint_result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed with error: " +
-         joint_result.error().message);
-  }
+  auto first = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {50.f, 50.f});
+  REQUIRE(first.has_value());
 
-  // Third placement: fragment as subsequent piece → id 2
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
-  auto third_result =
-      steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-          grimoire_machina, mr_ghost, {30.f, 30.f});
+  auto second = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {60.f, 60.f});
+  REQUIRE_FALSE(second.has_value());
 
-  if (!third_result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed with error: " +
-         third_result.error().message);
-  }
+  auto third = steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
+      grimoire_machina, mr_ghost, {70.f, 70.f});
+  REQUIRE_FALSE(third.has_value());
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].id == 0u);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].id == 1u);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[1].id == 2u);
-  REQUIRE(grimoire_machina.m_scaffold_form->next_id == 3u);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
 }
