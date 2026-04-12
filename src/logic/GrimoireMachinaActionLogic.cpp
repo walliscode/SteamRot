@@ -113,8 +113,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
       // [TODO:] handle the result and report failure if it fails.
       auto place_result = action::grimoire_machina::PlaceGhostOnScaffold(
-          grimoire_machina, m_scene_context.mr_ghost, place_pos,
-          is_first_piece);
+          grimoire_machina, m_scene_context.mr_ghost, place_pos);
     }
   }
 

@@ -73,24 +73,40 @@ void ProcessSubscriber(Subscriber &subscriber,
 
 
 /////////////////////////////////////////////////
+/// @brief Place the currently selected ghost item as the very first piece on
+/// the active scaffold.
+///
+/// Looks up the Fragment or Joint identified by @p mr_ghost's selection tag,
+/// builds an instance with a transform that centers it on @p world_pos, and
+/// appends it to the scaffold.  Returns an error if no scaffold is active,
+/// the scaffold already contains pieces (not the first piece), the selection
+/// is empty (std::monostate), or the key is not found in the GrimoireMachina's
+/// library.
+///
+/// @param grimoire_machina GrimoireMachina that owns the active scaffold.
+/// @param mr_ghost         Current ghost state providing the selection tag.
+/// @param world_pos        World-space position at which to center the piece.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
+                sf::Vector2f world_pos);
+
+/////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
 ///
-/// Looks up the Fragment or Joint identified by @p mr_ghost's selection
-/// tag, builds an instance with a transform that places it at @p world_pos,
-/// assigns it the next stable ID from the scaffold, and appends it to the
-/// appropriate instance list.  Returns an error if no scaffold is active,
-/// the selection is empty (std::monostate), or the key is not found in
-/// the GrimoireMachina's library.
+/// Routes to @ref PlaceFirstPiece when the scaffold is empty.  For subsequent
+/// pieces a positive socket-proximity collision result is required; because
+/// that logic is not yet implemented this path always returns an error.
+///
+/// Returns an error if no scaffold is active, the selection is empty
+/// (std::monostate), or the key is not found in the GrimoireMachina's library.
 ///
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /// @param world_pos        World-space position at which to place the part.
-/// @param is_first_piece   When true the part is centered on @p world_pos;
-///                         when false the ghost anchor (bottom-right corner)
-///                         is used so the piece visually snaps to the cursor.
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                     sf::Vector2f world_pos, bool is_first_piece = false);
+                     sf::Vector2f world_pos);
 
 } // namespace steamrot::logic::action::grimoire_machina

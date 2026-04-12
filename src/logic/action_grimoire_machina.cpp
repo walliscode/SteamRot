@@ -89,16 +89,18 @@ void ProcessSubscriber(Subscriber &subscriber,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
-PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                     sf::Vector2f world_pos, bool is_first_piece) {
+PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
+                sf::Vector2f world_pos) {
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
-    return std::unexpected(FailInfo{
-        FailMode::NullPointer, "PlaceGhostOnScaffold: no active scaffold"});
+    return std::unexpected(FailInfo{FailMode::NullPointer,
+                                    "PlaceFirstPiece: no active scaffold"});
 
-  // Small corner offset that matches the ghost renderer's bottom-right anchor.
-  static constexpr float k_corner_offset = 5.f;
+  if (!scaffold->fragments.empty() || !scaffold->joints.empty())
+    return std::unexpected(
+        FailInfo{FailMode::InvalidInput,
+                 "PlaceFirstPiece: scaffold is not empty"});
 
   if (std::holds_alternative<FragmentTag>(mr_ghost.m_selection)) {
     const auto &tag = std::get<FragmentTag>(mr_ghost.m_selection);
@@ -106,25 +108,14 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     if (it == grimoire_machina.m_all_fragments.end())
       return std::unexpected(
           FailInfo{FailMode::MissingData,
-                   "PlaceGhostOnScaffold: fragment key not found"});
+                   "PlaceFirstPiece: fragment key not found"});
 
     Fragment &fragment = it->second;
     const sf::FloatRect bounds =
         fragment.movement_views[ViewDirection::Front].getBounds();
 
     sf::Transform transform;
-    if (is_first_piece) {
-      // Center the piece on world_pos (the canvas center).
-      transform.translate(world_pos - bounds.position - bounds.size / 2.f);
-    } else {
-      // [TODO:] Socket-proximity collision detection will determine the
-      // target socket and compute the correct transform for snapping the
-      // new piece to the nearest compatible open socket on the scaffold.
-
-      // Ghost anchor: bottom-right corner of bounds snaps to cursor.
-      transform.translate(world_pos - bounds.position - bounds.size -
-                          sf::Vector2f{k_corner_offset, k_corner_offset});
-    }
+    transform.translate(world_pos - bounds.position - bounds.size / 2.f);
 
     FragmentInstance instance{fragment, transform};
     instance.id = scaffold->next_id++;
@@ -134,26 +125,16 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     const auto &tag = std::get<JointTag>(mr_ghost.m_selection);
     auto it = grimoire_machina.m_all_joints.find(tag.key);
     if (it == grimoire_machina.m_all_joints.end())
-      return std::unexpected(FailInfo{
-          FailMode::MissingData, "PlaceGhostOnScaffold: joint key not found"});
+      return std::unexpected(
+          FailInfo{FailMode::MissingData,
+                   "PlaceFirstPiece: joint key not found"});
 
     Joint &joint = it->second;
     const sf::FloatRect bounds =
         joint.movement_views[ViewDirection::Front].getBounds();
 
     sf::Transform transform;
-    if (is_first_piece) {
-      // Center the piece on world_pos (the canvas center).
-      transform.translate(world_pos - bounds.position - bounds.size / 2.f);
-    } else {
-      // [TODO:] Socket-proximity collision detection will determine the
-      // target socket and compute the correct transform for snapping the
-      // new piece to the nearest compatible open socket on the scaffold.
-
-      // Ghost anchor: bottom-right corner of bounds snaps to cursor.
-      transform.translate(world_pos - bounds.position - bounds.size -
-                          sf::Vector2f{k_corner_offset, k_corner_offset});
-    }
+    transform.translate(world_pos - bounds.position - bounds.size / 2.f);
 
     JointInstance instance{joint, transform};
     instance.id = scaffold->next_id++;
@@ -162,10 +143,30 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
   } else {
     return std::unexpected(
         FailInfo{FailMode::InvalidInput,
-                 "PlaceGhostOnScaffold: no ghost item selected"});
+                 "PlaceFirstPiece: no ghost item selected"});
   }
 
   return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
+                     sf::Vector2f world_pos) {
+
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+  if (!scaffold)
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer, "PlaceGhostOnScaffold: no active scaffold"});
+
+  if (scaffold->fragments.empty() && scaffold->joints.empty())
+    return PlaceFirstPiece(grimoire_machina, mr_ghost, world_pos);
+
+  // [TODO:] Socket-proximity collision detection will determine whether the
+  // new piece can connect to an existing open socket on the scaffold.
+  return std::unexpected(
+      FailInfo{FailMode::InvalidInput,
+               "PlaceGhostOnScaffold: no valid socket connection"});
 }
 
 } // namespace steamrot::logic::action::grimoire_machina
