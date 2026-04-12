@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
 #include "UIElement.h"
+#include "entity_memory.h"
 #include <algorithm>
 #include <vector>
 
@@ -107,7 +108,11 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
   // cast mouse position to float for distance checking
   const sf::Vector2f mouse_f{static_cast<float>(mouse_position.x),
                              static_cast<float>(mouse_position.y)};
+  // calculate vector distance from mouse to socket position
   const sf::Vector2f delta = mouse_f - world_pos;
+
+  // checks squared distance to avoid costly square root; if within radius, mark
+  // socket as is_mouse_over = true, else false
   socket_state.is_mouse_over =
       (delta.x * delta.x + delta.y * delta.y) <= (k_radius * k_radius);
 }
@@ -115,9 +120,17 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     FragmentInstance &fragment_instance) {
+
+  // cycle through all sockets in the fragment and check if any are hovered
   for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
+
+    // get the world position of the socket by applying the fragment's transform
+    // to the socket's local position
     const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
         fragment_instance.fragment.sockets[i]);
+
+    // check if the mouse is over this socket and update the socket state
+    // accordingly
     CheckMouseOver(mouse_position, world_pos,
                    fragment_instance.socket_states[i]);
   }
@@ -126,9 +139,17 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 /////////////////////////////////////////////////
 void CheckMouseOver(const sf::Vector2i &mouse_position,
                     JointInstance &joint_instance) {
+
+  // cycle through all sockets in the joint and check if any are hovered
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+
+    // get the world position of the socket by applying the joint's transform to
+    // the socket's local position
     const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
         joint_instance.joint.sockets[i]);
+
+    // check if the mouse is over this socket and update the socket state
+    // accordingly
     CheckMouseOver(mouse_position, world_pos, joint_instance.socket_states[i]);
   }
 }
