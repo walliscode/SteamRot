@@ -197,6 +197,53 @@ ConfigureSystemPayload(SystemPayload &system_payload,
 
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
+ConfigureGhostPayload(GhostPayload &ghost_payload,
+                      const GhostPayloadFbs *ghost_payload_data) {
+  // check for null data
+  if (!ghost_payload_data) {
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "GhostPayloadFbs data is null, cannot populate GhostPayload"});
+  }
+
+  // populate action enum
+  switch (ghost_payload_data->action()) {
+  case GhostActionFbs_NONE:
+    ghost_payload.action = GhostPayload::GhostAction::NONE;
+    break;
+  case GhostActionFbs_SELECT:
+    ghost_payload.action = GhostPayload::GhostAction::SELECT;
+    break;
+  case GhostActionFbs_CLEAR:
+    ghost_payload.action = GhostPayload::GhostAction::CLEAR;
+    break;
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "Unknown GhostActionFbs value in flatbuffers data"});
+  }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureCameraPayload(CameraPayload &camera_payload,
+                       const CameraPayloadFbs *camera_payload_data) {
+  // check for null data
+  if (!camera_payload_data) {
+    return std::unexpected(FailInfo{
+        FailMode::FlatbuffersDataNotFound,
+        "CameraPayloadFbs data is null, cannot populate CameraPayload"});
+  }
+
+  // CameraPayload filter is a wildcard — no data fields to configure
+  (void)camera_payload;
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
 ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data) {
   // Convert flatbuffers enum to native enum
   switch (event_type_data) {
@@ -217,6 +264,12 @@ ConfigureEventType(EventType &event_type, EventTypeFbs event_type_data) {
     break;
   case EventTypeFbs_SYSTEM:
     event_type = EventType::SYSTEM;
+    break;
+  case EventTypeFbs_GHOST:
+    event_type = EventType::GHOST;
+    break;
+  case EventTypeFbs_CAMERA:
+    event_type = EventType::CAMERA;
     break;
   default:
     return std::unexpected(
@@ -327,6 +380,42 @@ ConfigureEventPayload(EventPayload &event_payload,
       return std::unexpected(result.error());
     }
     event_payload = system_payload;
+    break;
+  }
+  case EventPayloadFbs_GhostPayloadFbs: {
+    auto *ghost_payload_data =
+        static_cast<const GhostPayloadFbs *>(event_payload_ptr);
+
+    if (!ghost_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "GhostPayloadFbs data pointer is null, cannot populate "
+                   "GhostPayload"});
+    }
+    GhostPayload ghost_payload;
+    auto result = ConfigureGhostPayload(ghost_payload, ghost_payload_data);
+    if (!result.has_value()) {
+      return std::unexpected(result.error());
+    }
+    event_payload = ghost_payload;
+    break;
+  }
+  case EventPayloadFbs_CameraPayloadFbs: {
+    auto *camera_payload_data =
+        static_cast<const CameraPayloadFbs *>(event_payload_ptr);
+
+    if (!camera_payload_data) {
+      return std::unexpected(
+          FailInfo{FailMode::FlatbuffersDataNotFound,
+                   "CameraPayloadFbs data pointer is null, cannot populate "
+                   "CameraPayload"});
+    }
+    CameraPayload camera_payload;
+    auto result = ConfigureCameraPayload(camera_payload, camera_payload_data);
+    if (!result.has_value()) {
+      return std::unexpected(result.error());
+    }
+    event_payload = camera_payload;
     break;
   }
   case EventPayloadFbs_NONE:

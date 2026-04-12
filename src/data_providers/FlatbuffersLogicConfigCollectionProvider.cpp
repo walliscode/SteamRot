@@ -57,6 +57,24 @@ FlatbuffersLogicConfigCollectionProvider::ConfigureLogicConfigCollection(
     logic_config_collection[steamrot::LogicType::GrimoireMachinaAction] =
         logic_config;
   }
+  if (collection->ghost_action_logic()) {
+    LogicConfig logic_config;
+    auto configure_result = data::configure::ConfigureLogicConfig(
+        logic_config, collection->ghost_action_logic());
+    if (!configure_result) {
+      return std::unexpected(configure_result.error());
+    }
+    logic_config_collection[steamrot::LogicType::GhostAction] = logic_config;
+  }
+  if (collection->camera_zoom_action_logic()) {
+    LogicConfig logic_config;
+    auto configure_result = data::configure::ConfigureLogicConfig(
+        logic_config, collection->camera_zoom_action_logic());
+    if (!configure_result) {
+      return std::unexpected(configure_result.error());
+    }
+    logic_config_collection[steamrot::LogicType::CameraZoom] = logic_config;
+  }
 
   return std::monostate{};
 }

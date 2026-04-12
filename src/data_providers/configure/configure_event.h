@@ -83,6 +83,26 @@ ConfigureSystemPayload(SystemPayload &system_payload,
                        const SystemPayloadFbs *system_payload_data);
 
 /////////////////////////////////////////////////
+/// @brief Logic for populating GhostPayload from flatbuffers data source.
+///
+/// @param ghost_payload Reference to GhostPayload to populate.
+/// @param ghost_payload_data Pointer to GhostPayloadFbs flatbuffers data.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureGhostPayload(GhostPayload &ghost_payload,
+                      const GhostPayloadFbs *ghost_payload_data);
+
+/////////////////////////////////////////////////
+/// @brief Logic for populating CameraPayload from flatbuffers data source.
+///
+/// @param camera_payload Reference to CameraPayload to populate.
+/// @param camera_payload_data Pointer to CameraPayloadFbs flatbuffers data.
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+ConfigureCameraPayload(CameraPayload &camera_payload,
+                       const CameraPayloadFbs *camera_payload_data);
+
+/////////////////////////////////////////////////
 /// @brief Logic for populating EventType from flatbuffers data source.
 ///
 /// @param event_type Reference to EventType to populate.

@@ -32,6 +32,12 @@ struct ScenePayloadFbsBuilder;
 struct SystemPayloadFbs;
 struct SystemPayloadFbsBuilder;
 
+struct GhostPayloadFbs;
+struct GhostPayloadFbsBuilder;
+
+struct CameraPayloadFbs;
+struct CameraPayloadFbsBuilder;
+
 ////////////////////////////////////////////////////////////
 /// Input action types
 ////////////////////////////////////////////////////////////
@@ -186,6 +192,42 @@ inline const char *EnumNameSystemActionFbs(SystemActionFbs e) {
 }
 
 ////////////////////////////////////////////////////////////
+/// Ghost action types
+////////////////////////////////////////////////////////////
+enum GhostActionFbs : int8_t {
+  GhostActionFbs_NONE = 0,
+  GhostActionFbs_SELECT = 1,
+  GhostActionFbs_CLEAR = 2,
+  GhostActionFbs_MIN = GhostActionFbs_NONE,
+  GhostActionFbs_MAX = GhostActionFbs_CLEAR
+};
+
+inline const GhostActionFbs (&EnumValuesGhostActionFbs())[3] {
+  static const GhostActionFbs values[] = {
+    GhostActionFbs_NONE,
+    GhostActionFbs_SELECT,
+    GhostActionFbs_CLEAR
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesGhostActionFbs() {
+  static const char * const names[4] = {
+    "NONE",
+    "SELECT",
+    "CLEAR",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameGhostActionFbs(GhostActionFbs e) {
+  if (::flatbuffers::IsOutRange(e, GhostActionFbs_NONE, GhostActionFbs_CLEAR)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesGhostActionFbs()[index];
+}
+
+////////////////////////////////////////////////////////////
 /// Union of all payload types
 ////////////////////////////////////////////////////////////
 enum EventPayloadFbs : uint8_t {
@@ -195,37 +237,43 @@ enum EventPayloadFbs : uint8_t {
   EventPayloadFbs_LogicPayloadFbs = 3,
   EventPayloadFbs_ScenePayloadFbs = 4,
   EventPayloadFbs_SystemPayloadFbs = 5,
+  EventPayloadFbs_GhostPayloadFbs = 6,
+  EventPayloadFbs_CameraPayloadFbs = 7,
   EventPayloadFbs_MIN = EventPayloadFbs_NONE,
-  EventPayloadFbs_MAX = EventPayloadFbs_SystemPayloadFbs
+  EventPayloadFbs_MAX = EventPayloadFbs_CameraPayloadFbs
 };
 
-inline const EventPayloadFbs (&EnumValuesEventPayloadFbs())[6] {
+inline const EventPayloadFbs (&EnumValuesEventPayloadFbs())[8] {
   static const EventPayloadFbs values[] = {
     EventPayloadFbs_NONE,
     EventPayloadFbs_InputPayloadFbs,
     EventPayloadFbs_UIPayloadFbs,
     EventPayloadFbs_LogicPayloadFbs,
     EventPayloadFbs_ScenePayloadFbs,
-    EventPayloadFbs_SystemPayloadFbs
+    EventPayloadFbs_SystemPayloadFbs,
+    EventPayloadFbs_GhostPayloadFbs,
+    EventPayloadFbs_CameraPayloadFbs
   };
   return values;
 }
 
 inline const char * const *EnumNamesEventPayloadFbs() {
-  static const char * const names[7] = {
+  static const char * const names[9] = {
     "NONE",
     "InputPayloadFbs",
     "UIPayloadFbs",
     "LogicPayloadFbs",
     "ScenePayloadFbs",
     "SystemPayloadFbs",
+    "GhostPayloadFbs",
+    "CameraPayloadFbs",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEventPayloadFbs(EventPayloadFbs e) {
-  if (::flatbuffers::IsOutRange(e, EventPayloadFbs_NONE, EventPayloadFbs_SystemPayloadFbs)) return "";
+  if (::flatbuffers::IsOutRange(e, EventPayloadFbs_NONE, EventPayloadFbs_CameraPayloadFbs)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEventPayloadFbs()[index];
 }
@@ -252,6 +300,14 @@ template<> struct EventPayloadFbsTraits<steamrot::ScenePayloadFbs> {
 
 template<> struct EventPayloadFbsTraits<steamrot::SystemPayloadFbs> {
   static const EventPayloadFbs enum_value = EventPayloadFbs_SystemPayloadFbs;
+};
+
+template<> struct EventPayloadFbsTraits<steamrot::GhostPayloadFbs> {
+  static const EventPayloadFbs enum_value = EventPayloadFbs_GhostPayloadFbs;
+};
+
+template<> struct EventPayloadFbsTraits<steamrot::CameraPayloadFbs> {
+  static const EventPayloadFbs enum_value = EventPayloadFbs_CameraPayloadFbs;
 };
 
 bool VerifyEventPayloadFbs(::flatbuffers::Verifier &verifier, const void *obj, EventPayloadFbs type);
@@ -533,6 +589,82 @@ inline ::flatbuffers::Offset<SystemPayloadFbs> CreateSystemPayloadFbs(
   return builder_.Finish();
 }
 
+////////////////////////////////////////////////////////////
+/// Ghost payload data
+////////////////////////////////////////////////////////////
+struct GhostPayloadFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GhostPayloadFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ACTION = 4
+  };
+  steamrot::GhostActionFbs action() const {
+    return static_cast<steamrot::GhostActionFbs>(GetField<int8_t>(VT_ACTION, 0));
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_ACTION, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct GhostPayloadFbsBuilder {
+  typedef GhostPayloadFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_action(steamrot::GhostActionFbs action) {
+    fbb_.AddElement<int8_t>(GhostPayloadFbs::VT_ACTION, static_cast<int8_t>(action), 0);
+  }
+  explicit GhostPayloadFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<GhostPayloadFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<GhostPayloadFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<GhostPayloadFbs> CreateGhostPayloadFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    steamrot::GhostActionFbs action = steamrot::GhostActionFbs_NONE) {
+  GhostPayloadFbsBuilder builder_(_fbb);
+  builder_.add_action(action);
+  return builder_.Finish();
+}
+
+////////////////////////////////////////////////////////////
+/// Camera payload data (wildcard filter — no fields needed)
+////////////////////////////////////////////////////////////
+struct CameraPayloadFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef CameraPayloadFbsBuilder Builder;
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct CameraPayloadFbsBuilder {
+  typedef CameraPayloadFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  explicit CameraPayloadFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<CameraPayloadFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<CameraPayloadFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<CameraPayloadFbs> CreateCameraPayloadFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb) {
+  CameraPayloadFbsBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 inline bool VerifyEventPayloadFbs(::flatbuffers::Verifier &verifier, const void *obj, EventPayloadFbs type) {
   switch (type) {
     case EventPayloadFbs_NONE: {
@@ -556,6 +688,14 @@ inline bool VerifyEventPayloadFbs(::flatbuffers::Verifier &verifier, const void 
     }
     case EventPayloadFbs_SystemPayloadFbs: {
       auto ptr = reinterpret_cast<const steamrot::SystemPayloadFbs *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventPayloadFbs_GhostPayloadFbs: {
+      auto ptr = reinterpret_cast<const steamrot::GhostPayloadFbs *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case EventPayloadFbs_CameraPayloadFbs: {
+      auto ptr = reinterpret_cast<const steamrot::CameraPayloadFbs *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
