@@ -22,7 +22,9 @@ enum EventTypeFbs: ulong {
   UI,
   LOGIC,
   SCENE,
-  SYSTEM
+  SYSTEM,
+  GHOST,
+  CAMERA
 }
 
 ////////////////////////////////////////////////////////////

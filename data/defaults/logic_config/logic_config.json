@@ -22,5 +22,30 @@
         "filter_payload": { "toggle_name": "CLEAR_MACHINA_FORM_SCAFFOLD" }
       }
     ]
+  },
+
+  "ghost_action_logic": {
+    "subscriptions": [
+      {
+        "event_type": "GHOST",
+        "filter_payload_type": "GhostPayloadFbs",
+        "filter_payload": { "action": "SELECT" }
+      },
+      {
+        "event_type": "GHOST",
+        "filter_payload_type": "GhostPayloadFbs",
+        "filter_payload": { "action": "CLEAR" }
+      }
+    ]
+  },
+
+  "camera_zoom_action_logic": {
+    "subscriptions": [
+      {
+        "event_type": "CAMERA",
+        "filter_payload_type": "CameraPayloadFbs",
+        "filter_payload": {}
+      }
+    ]
   }
 }

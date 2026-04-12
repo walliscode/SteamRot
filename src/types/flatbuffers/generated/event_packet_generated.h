@@ -31,37 +31,43 @@ enum EventTypeFbs : uint64_t {
   EventTypeFbs_LOGIC = 3ULL,
   EventTypeFbs_SCENE = 4ULL,
   EventTypeFbs_SYSTEM = 5ULL,
+  EventTypeFbs_GHOST = 6ULL,
+  EventTypeFbs_CAMERA = 7ULL,
   EventTypeFbs_MIN = EventTypeFbs_NONE,
-  EventTypeFbs_MAX = EventTypeFbs_SYSTEM
+  EventTypeFbs_MAX = EventTypeFbs_CAMERA
 };
 
-inline const EventTypeFbs (&EnumValuesEventTypeFbs())[6] {
+inline const EventTypeFbs (&EnumValuesEventTypeFbs())[8] {
   static const EventTypeFbs values[] = {
     EventTypeFbs_NONE,
     EventTypeFbs_USER_INPUT,
     EventTypeFbs_UI,
     EventTypeFbs_LOGIC,
     EventTypeFbs_SCENE,
-    EventTypeFbs_SYSTEM
+    EventTypeFbs_SYSTEM,
+    EventTypeFbs_GHOST,
+    EventTypeFbs_CAMERA
   };
   return values;
 }
 
 inline const char * const *EnumNamesEventTypeFbs() {
-  static const char * const names[7] = {
+  static const char * const names[9] = {
     "NONE",
     "USER_INPUT",
     "UI",
     "LOGIC",
     "SCENE",
     "SYSTEM",
+    "GHOST",
+    "CAMERA",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameEventTypeFbs(EventTypeFbs e) {
-  if (::flatbuffers::IsOutRange(e, EventTypeFbs_NONE, EventTypeFbs_SYSTEM)) return "";
+  if (::flatbuffers::IsOutRange(e, EventTypeFbs_NONE, EventTypeFbs_CAMERA)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesEventTypeFbs()[index];
 }
