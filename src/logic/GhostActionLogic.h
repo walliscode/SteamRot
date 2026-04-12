@@ -20,8 +20,9 @@ namespace steamrot::logic {
 /// @class GhostActionLogic
 /// @brief Processes ghost-related action events and updates MrGhost state.
 ///
-/// GhostActionLogic subscribes to GHOST events on the event bus and applies
-/// incoming GhostPayloads to the scene's MrGhost instance. On each tick,
+/// GhostActionLogic subscribes to GHOST events on the event bus via
+/// logic_config.json data-driven configuration and applies incoming
+/// GhostPayloads to the scene's MrGhost instance. On each tick,
 /// ProcessLogic iterates active subscribers and delegates each one to the
 /// action::ghost::ProcessSubscriber free function, which extracts the
 /// GhostPayload and calls the appropriate action_ghost free function
@@ -32,10 +33,6 @@ class GhostActionLogic : public Logic {
 public:
   /////////////////////////////////////////////////
   /// @brief Constructor for GhostActionLogic.
-  ///
-  /// Registers subscribers for GHOST SELECT and GHOST CLEAR events on the
-  /// scene event handler so that ProcessLogic can react to selection changes
-  /// each tick.
   ///
   /// @param scene_context SceneContext struct instance to be used by the logic
   /// class.

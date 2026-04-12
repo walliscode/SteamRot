@@ -58,6 +58,12 @@ struct SubscriberFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const steamrot::SystemPayloadFbs *filter_payload_as_SystemPayloadFbs() const {
     return filter_payload_type() == steamrot::EventPayloadFbs_SystemPayloadFbs ? static_cast<const steamrot::SystemPayloadFbs *>(filter_payload()) : nullptr;
   }
+  const steamrot::GhostPayloadFbs *filter_payload_as_GhostPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_GhostPayloadFbs ? static_cast<const steamrot::GhostPayloadFbs *>(filter_payload()) : nullptr;
+  }
+  const steamrot::CameraPayloadFbs *filter_payload_as_CameraPayloadFbs() const {
+    return filter_payload_type() == steamrot::EventPayloadFbs_CameraPayloadFbs ? static_cast<const steamrot::CameraPayloadFbs *>(filter_payload()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_EVENT_TYPE, 8) &&
@@ -86,6 +92,14 @@ template<> inline const steamrot::ScenePayloadFbs *SubscriberFbs::filter_payload
 
 template<> inline const steamrot::SystemPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::SystemPayloadFbs>() const {
   return filter_payload_as_SystemPayloadFbs();
+}
+
+template<> inline const steamrot::GhostPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::GhostPayloadFbs>() const {
+  return filter_payload_as_GhostPayloadFbs();
+}
+
+template<> inline const steamrot::CameraPayloadFbs *SubscriberFbs::filter_payload_as<steamrot::CameraPayloadFbs>() const {
+  return filter_payload_as_CameraPayloadFbs();
 }
 
 struct SubscriberFbsBuilder {
