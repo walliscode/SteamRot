@@ -16,7 +16,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class Joint
+/// @struct Joint
 /// @brief Contains the data for a Joint.
 ///
 /// Inherits common part data (name, sockets, movement_views) from Part.

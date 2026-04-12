@@ -22,7 +22,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class SocketState
+/// @struct SocketState
 /// @brief Runtime state of a single socket on a placed Fragment or Joint
 /// instance.
 ///
@@ -50,7 +50,7 @@ struct SocketState {
 };
 
 /////////////////////////////////////////////////
-/// @class JointInstance
+/// @struct JointInstance
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
 /// Holds a stable unique ID, a reference to the Joint definition, the single
@@ -101,7 +101,7 @@ struct JointInstance {
 };
 
 /////////////////////////////////////////////////
-/// @class FragmentInstance
+/// @struct FragmentInstance
 /// @brief A placed instance of a Fragment on the MachinaFormScaffold.
 ///
 /// Holds a stable unique ID, a reference to the Fragment definition, the
@@ -153,7 +153,7 @@ struct FragmentInstance {
 };
 
 /////////////////////////////////////////////////
-/// @class Connection
+/// @struct Connection
 /// @brief Represents a connection between two sockets on the scaffold.
 ///
 /// Each endpoint identifies a placed instance by its stable ID (not its
@@ -162,7 +162,7 @@ struct FragmentInstance {
 /////////////////////////////////////////////////
 struct Connection {
   /////////////////////////////////////////////////
-  /// @class Endpoint
+  /// @struct Endpoint
   /// @brief One end of a Connection.
   /////////////////////////////////////////////////
   struct Endpoint {
@@ -184,7 +184,7 @@ struct Connection {
 };
 
 /////////////////////////////////////////////////
-/// @class MachinaFormScaffold
+/// @struct MachinaFormScaffold
 /// @brief Contains all data necessary to create a MachinaForm.
 ///
 /// This is designed to be an "unbaked" editor workspace. When committed to a

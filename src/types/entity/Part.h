@@ -19,7 +19,7 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
-/// @class Part
+/// @struct Part
 /// @brief Base struct for Fragment and Joint, wrapping common data shared by
 /// both part types.
 ///
