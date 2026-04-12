@@ -237,7 +237,10 @@ ConfigureCameraPayload(CameraPayload &camera_payload,
         "CameraPayloadFbs data is null, cannot populate CameraPayload"});
   }
 
-  // CameraPayload filter is a wildcard — no data fields to configure
+  // CameraPayloadFbs has no fields: a default-constructed CameraPayload{}
+  // (scroll_delta = 0) is the correct filter value.  The EventHandler matches
+  // CAMERA subscribers by payload type only, so no field values need to be
+  // copied from the FlatBuffers data.
   (void)camera_payload;
   return std::monostate{};
 }
