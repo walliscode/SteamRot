@@ -89,6 +89,32 @@ void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
 void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
+/// @brief Draw a placed FragmentInstance onto the crafting canvas.
+///
+/// Applies the instance's stored transform as RenderStates, draws the
+/// fragment's Front view geometry at the placed position, then draws all
+/// socket indicators on top.
+///
+/// @param texture           RenderTexture to draw on.
+/// @param fragment_instance FragmentInstance to render.
+/////////////////////////////////////////////////
+void DrawFragmentInstance(sf::RenderTexture &texture,
+                          FragmentInstance &fragment_instance);
+
+/////////////////////////////////////////////////
+/// @brief Draw a placed JointInstance onto the crafting canvas.
+///
+/// Applies the instance's stored transform as RenderStates, draws the
+/// joint's Front view geometry at the placed position, then draws all
+/// socket indicators on top.
+///
+/// @param texture        RenderTexture to draw on.
+/// @param joint_instance JointInstance to render.
+/////////////////////////////////////////////////
+void DrawJointInstance(sf::RenderTexture &texture,
+                       JointInstance &joint_instance);
+
+/////////////////////////////////////////////////
 /// @brief Draw the scaffold state or a placeholder when no scaffold is active.
 ///
 /// Draws the crafting canvas border unconditionally. When @p grimoire_machina

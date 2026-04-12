@@ -98,6 +98,25 @@ void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
 }
 
 /////////////////////////////////////////////////
+void DrawFragmentInstance(sf::RenderTexture &texture,
+                          FragmentInstance &fragment_instance) {
+  sf::RenderStates states;
+  states.transform = fragment_instance.transform;
+  DrawFragmentView(texture, fragment_instance.fragment, ViewDirection::Front,
+                   states);
+  Draw(texture, fragment_instance);
+}
+
+/////////////////////////////////////////////////
+void DrawJointInstance(sf::RenderTexture &texture,
+                       JointInstance &joint_instance) {
+  sf::RenderStates states;
+  states.transform = joint_instance.transform;
+  DrawJointView(texture, joint_instance.joint, ViewDirection::Front, states);
+  Draw(texture, joint_instance);
+}
+
+/////////////////////////////////////////////////
 void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
                                GrimoireMachina &grimoire_machina) {
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
@@ -108,6 +127,15 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
   if (!scaffold) {
     DrawNoMachinaFormBox(texture,
                          grimoire_machina.m_crafting_helpers.crafting_canvas);
+    return;
+  }
+
+  // Draw all placed instances on the active scaffold.
+  for (auto &joint : scaffold->joints) {
+    DrawJointInstance(texture, joint);
+  }
+  for (auto &fragment : scaffold->fragments) {
+    DrawFragmentInstance(texture, fragment);
   }
 }
 
