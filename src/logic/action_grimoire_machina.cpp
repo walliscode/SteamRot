@@ -94,9 +94,8 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
-    return std::unexpected(
-        FailInfo{FailMode::NullPointer,
-                 "PlaceGhostOnScaffold: no active scaffold"});
+    return std::unexpected(FailInfo{
+        FailMode::NullPointer, "PlaceGhostOnScaffold: no active scaffold"});
 
   // Small corner offset that matches the ghost renderer's bottom-right anchor.
   static constexpr float k_corner_offset = 5.f;
@@ -135,9 +134,8 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     const auto &tag = std::get<JointTag>(mr_ghost.m_selection);
     auto it = grimoire_machina.m_all_joints.find(tag.key);
     if (it == grimoire_machina.m_all_joints.end())
-      return std::unexpected(
-          FailInfo{FailMode::MissingData,
-                   "PlaceGhostOnScaffold: joint key not found"});
+      return std::unexpected(FailInfo{
+          FailMode::MissingData, "PlaceGhostOnScaffold: joint key not found"});
 
     Joint &joint = it->second;
     const sf::FloatRect bounds =
@@ -171,4 +169,3 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 }
 
 } // namespace steamrot::logic::action::grimoire_machina
-
