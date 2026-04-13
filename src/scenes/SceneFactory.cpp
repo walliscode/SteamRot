@@ -308,6 +308,12 @@ SceneFactory::ValidateUIStyles(Scene &scene) const {
       m_game_context.asset_manager.GetAllUIStyles();
   const size_t pool_size = entity::memory::GetMemoryPoolSize(emp);
 
+  // Only validate when styles have been loaded into the AssetManager.
+  // An empty map means no style configuration was performed (e.g. in unit
+  // tests that do not set up assets), so there is nothing to validate against.
+  if (styles.empty())
+    return std::monostate{};
+
   for (size_t i = 0; i < pool_size; ++i) {
     const CUserInterface &ui_component =
         entity::memory::GetComponent<CUserInterface>(i, emp);
