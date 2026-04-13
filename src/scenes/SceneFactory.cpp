@@ -7,14 +7,17 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "SceneFactory.h"
+#include "CUserInterface.h"
 #include "CraftingScene.h"
 #include "IEntityConfigurator.h"
 #include "LogicFactory.h"
 #include "Scene.h"
 #include "TitleScene.h"
 #include "UIExplorerScene.h"
+#include "entity_memory.h"
 #include "uuid.h"
 #include <SFML/System/Vector2.hpp>
+#include <format>
 #include <memory>
 #include <variant>
 
@@ -125,6 +128,11 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   auto import_result = ConfigureEntities(scene, scene_data);
   if (!import_result.has_value())
     return std::unexpected(import_result.error());
+
+  // Validate that all CUserInterface style names exist in the AssetManager
+  auto validate_result = ValidateUIStyles(scene);
+  if (!validate_result.has_value())
+    return std::unexpected(validate_result.error());
 
   // Configure LogicMap
   auto logic_result = ConfigureLogicMap(scene);
@@ -289,6 +297,35 @@ SceneFactory::CreateUIExplorerScene() {
                                              logic::LogicVector{});
 
   return scene;
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ValidateUIStyles(Scene &scene) const {
+  const EntityMemoryPool &emp =
+      scene.GetEntityManager().GetEntityMemoryPool();
+  const std::unordered_map<std::string, UIStyle> &styles =
+      m_game_context.asset_manager.GetAllUIStyles();
+  const size_t pool_size = entity::memory::GetMemoryPoolSize(emp);
+
+  for (size_t i = 0; i < pool_size; ++i) {
+    const CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(i, emp);
+
+    if (!ui_component.m_active)
+      continue;
+
+    if (!styles.contains(ui_component.m_style_name)) {
+      return std::unexpected(FailInfo{
+          FailMode::FlatbuffersDataNotFound,
+          std::format("UIStyle '{}' referenced by UI entity {} not found in "
+                      "AssetManager. Available styles must be declared in the "
+                      "asset config.",
+                      ui_component.m_style_name, i)});
+    }
+  }
+
+  return std::monostate{};
 }
 
 } // namespace steamrot
