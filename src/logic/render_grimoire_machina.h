@@ -111,13 +111,15 @@ void DrawFragmentInstance(sf::RenderTexture &texture,
 ///
 /// Applies the instance's stored transform as RenderStates, draws the
 /// joint's Front view geometry at the placed position, then draws all
-/// socket indicators on top.
+/// socket indicators on top when draw_sockets is true.
 ///
 /// @param texture        RenderTexture to draw on.
 /// @param joint_instance JointInstance to render.
+/// @param draw_sockets   Whether to draw the instance's sockets.
 /////////////////////////////////////////////////
 void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance);
+                       JointInstance &joint_instance,
+                       const bool draw_sockets);
 
 /////////////////////////////////////////////////
 /// @brief Draw the scaffold state or a placeholder when no scaffold is active.

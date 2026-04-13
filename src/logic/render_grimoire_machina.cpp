@@ -110,16 +110,19 @@ void DrawFragmentInstance(sf::RenderTexture &texture,
   states.transform = fragment_instance.transform;
   DrawFragmentView(texture, fragment_instance.fragment, ViewDirection::Front,
                    states);
-  DrawFragmentInstanceSockets(texture, fragment_instance);
+  if (draw_sockets)
+    DrawFragmentInstanceSockets(texture, fragment_instance);
 }
 
 /////////////////////////////////////////////////
 void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance) {
+                       JointInstance &joint_instance,
+                       const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
   DrawJointView(texture, joint_instance.joint, ViewDirection::Front, states);
-  DrawJointInstanceSockets(texture, joint_instance);
+  if (draw_sockets)
+    DrawJointInstanceSockets(texture, joint_instance);
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +144,7 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
 
   // Draw all placed instances on the active scaffold.
   for (auto &joint : scaffold->joints) {
-    DrawJointInstance(texture, joint);
+    DrawJointInstance(texture, joint, draw_sockets);
   }
   for (auto &fragment : scaffold->fragments) {
     DrawFragmentInstance(texture, fragment, draw_sockets);

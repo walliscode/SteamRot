@@ -421,7 +421,7 @@ TEST_CASE("DrawFragmentInstance renders fragment view geometry at transformed "
   steamrot::FragmentInstance instance{fragment, t};
 
   steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
-      texture, instance, false);
+      texture, instance, true);
   texture.display();
 
   // test the Fragment View
@@ -446,7 +446,7 @@ TEST_CASE("DrawJointInstance draws joint geometry and sockets without throwing",
   steamrot::JointInstance instance{joint, t};
 
   REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointInstance(
-      texture, instance));
+      texture, instance, true));
 }
 
 TEST_CASE(
@@ -465,7 +465,7 @@ TEST_CASE(
   steamrot::JointInstance instance{joint, t};
 
   steamrot::logic::render::grimoire_machina::DrawJointInstance(texture,
-                                                               instance);
+                                                               instance, true);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
