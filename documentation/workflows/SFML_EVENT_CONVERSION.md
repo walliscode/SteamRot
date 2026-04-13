@@ -33,7 +33,7 @@ extend it with new input actions or new event types.
 ## Overview
 
 The SFML event conversion system translates raw SFML window events into the
-engine's `EventPacket` / `EventPayload` types.  The design separates two
+engine's `EventPacket` / `EventPayload` types. The design separates two
 concerns:
 
 - **Ordering** — the `SFMLEventConverter` class collects the conversion
@@ -41,9 +41,9 @@ concerns:
 - **Logic** — free-functions in `steamrot::events::convert` contain the actual
   conversion algorithms and are independently unit-testable.
 
-Input action mappings (which key/button combination maps to which
-`InputAction`) are **data-driven**: they live in a FlatBuffers JSON file and
-are loaded at startup, so new mappings can be added without touching C++ code.
+Input action mappings (which key/button combination maps to which `InputAction`)
+are **data-driven**: they live in a FlatBuffers JSON file and are loaded at
+startup, so new mappings can be added without touching C++ code.
 
 ---
 
@@ -51,18 +51,18 @@ are loaded at startup, so new mappings can be added without touching C++ code.
 
 ### Class and File Map
 
-| File | Namespace / Class | Responsibility |
-|------|--------------------|----------------|
-| `src/events/sfml_event_convert.h/.cpp` | `steamrot::events::convert` | Conversion *logic* as free functions |
-| `src/events/SFMLEventConverter.h/.cpp` | `steamrot::SFMLEventConverter` | Pipeline coordinator; holds registry |
-| `src/events/EventHandler.h/.cpp` | `steamrot::EventHandler` | Owns `SFMLEventConverter`; exposes `SetInputActionRegistry()` and `ConvertSFMLEventsToEventPackets()` |
-| `src/types/events/InputActionRegistry.h` | `steamrot` | `InputActionRegistry` type alias (`unordered_map<UserInputBitset, InputAction>`) |
-| `src/types/events/UserInputBitset.h` | `steamrot::UserInputBitset` | Bitset encoding all keyboard/mouse state |
-| `src/types/interfaces/IInputActionConfigProvider.h` | `steamrot` | Interface for building an `InputActionRegistry` |
-| `src/data_providers/FlatbuffersInputActionConfigProvider.h/.cpp` | `steamrot` | Builds registry from FlatBuffers binary data |
-| `src/data_providers/configure/configure_input_action.h/.cpp` | `steamrot::data::configure` | Configure free functions: `ConfigureInputAction`, `ConfigureInputActionMapping`, `ConfigureInputActionRegistry` |
-| `src/data_providers/FlatbuffersDataLoader` | `steamrot` | Loads the binary config file |
-| `data/defaults/input_actions/default.input_action_config.json` | — | Default input mappings (data-driven) |
+| File                                                             | Namespace / Class              | Responsibility                                                                                                  |
+| ---------------------------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `src/events/sfml_event_convert.h/.cpp`                           | `steamrot::events::convert`    | Conversion _logic_ as free functions                                                                            |
+| `src/events/SFMLEventConverter.h/.cpp`                           | `steamrot::SFMLEventConverter` | Pipeline coordinator; holds registry                                                                            |
+| `src/events/EventHandler.h/.cpp`                                 | `steamrot::EventHandler`       | Owns `SFMLEventConverter`; exposes `SetInputActionRegistry()` and `ConvertSFMLEventsToEventPackets()`           |
+| `src/types/events/InputActionRegistry.h`                         | `steamrot`                     | `InputActionRegistry` type alias (`unordered_map<UserInputBitset, InputAction>`)                                |
+| `src/types/events/UserInputBitset.h`                             | `steamrot::UserInputBitset`    | Bitset encoding all keyboard/mouse state                                                                        |
+| `src/types/interfaces/IInputActionConfigProvider.h`              | `steamrot`                     | Interface for building an `InputActionRegistry`                                                                 |
+| `src/data_providers/FlatbuffersInputActionConfigProvider.h/.cpp` | `steamrot`                     | Builds registry from FlatBuffers binary data                                                                    |
+| `src/data_providers/configure/configure_input_action.h/.cpp`     | `steamrot::data::configure`    | Configure free functions: `ConfigureInputAction`, `ConfigureInputActionMapping`, `ConfigureInputActionRegistry` |
+| `src/data_providers/FlatbuffersDataLoader`                       | `steamrot`                     | Loads the binary config file                                                                                    |
+| `data/defaults/input_actions/default.input_action_config.json`   | —                              | Default input mappings (data-driven)                                                                            |
 
 ### Data Flow
 
@@ -119,7 +119,7 @@ TickGlobalEventBus()
 
 ## Adding a New InputAction
 
-This is the most common extension point.  The C++ enum and FlatBuffers schema
+This is the most common extension point. The C++ enum and FlatBuffers schema
 need a new value, and then the JSON data file gets the new mapping.
 
 ### Step 1: Add to the InputAction Enum
@@ -150,17 +150,17 @@ enum InputActionFbs: byte {
 }
 ```
 
-**`src/types/flatbuffers/events/input_action_config.fbs`** uses
-`InputActionFbs` already, so no change is needed there.
+**`src/types/flatbuffers/events/input_action_config.fbs`** uses `InputActionFbs`
+already, so no change is needed there.
 
 ### Step 3: Update the Shared Configure Function
 
 **Location**: `src/data_providers/configure/configure_input_action.cpp`
 
-Add a case to the `ConfigureInputAction` switch.  This single function is
-shared by both `ConfigureInputPayload` (used when deserialising event packets)
-and `ConfigureInputActionMapping` (used when building the registry), so you
-only need to update it **once**:
+Add a case to the `ConfigureInputAction` switch. This single function is shared
+by both `ConfigureInputPayload` (used when deserialising event packets) and
+`ConfigureInputActionMapping` (used when building the registry), so you only
+need to update it **once**:
 
 ```cpp
 std::expected<std::monostate, FailInfo>
@@ -179,7 +179,8 @@ ConfigureInputAction(InputPayload::InputAction &action,
   return std::monostate{};
 }
 ```
-```
+
+````
 
 ### Step 4: Add the JSON Mapping
 
@@ -201,26 +202,25 @@ must all be held at the same time for the action to fire.
     }
   ]
 }
-```
+````
 
 Available bit-field keys (all optional, combine freely):
 
-| Field | Type | Values |
-|-------|------|--------|
-| `keyboard_pressed` | `[KeyboardInput]` | `A`–`Z` (see `user_input.fbs`) |
-| `keyboard_released` | `[KeyboardInput]` | same as above |
-| `mouse_pressed` | `[MouseInput]` | `LEFT_CLICK`, `RIGHT_CLICK`, `MIDDLE_CLICK`, `SCROLL_UP`, `SCROLL_DOWN` |
-| `mouse_released` | `[MouseInput]` | same as above |
+| Field               | Type              | Values                                                                  |
+| ------------------- | ----------------- | ----------------------------------------------------------------------- |
+| `keyboard_pressed`  | `[KeyboardInput]` | `A`–`Z` (see `user_input.fbs`)                                          |
+| `keyboard_released` | `[KeyboardInput]` | same as above                                                           |
+| `mouse_pressed`     | `[MouseInput]`    | `LEFT_CLICK`, `RIGHT_CLICK`, `MIDDLE_CLICK`, `SCROLL_UP`, `SCROLL_DOWN` |
+| `mouse_released`    | `[MouseInput]`    | same as above                                                           |
 
 **Matching rule**: every bit set in the pattern must also be set in the
-accumulated bitset for the same tick (subset check).  The first matching entry
-in the list wins.
+accumulated bitset for the same tick (subset check). The first matching entry in
+the list wins.
 
 ### Step 5: Write Tests
 
-Add a test case to
-`tests/unit/data_providers/configure_input_action.test.cpp` verifying the new
-enum round-trips through `ConfigureInputActionMapping`.
+Add a test case to `tests/unit/data_providers/configure_input_action.test.cpp`
+verifying the new enum round-trips through `ConfigureInputActionMapping`.
 
 ```cpp
 TEST_CASE("ConfigureInputActionMapping maps Escape key to CANCEL action",
@@ -255,7 +255,7 @@ TEST_CASE("ConfigureInputActionMapping maps Escape key to CANCEL action",
 ## Adding a New SFML Event Type
 
 `UserInputBitset` currently handles `KeyPressed`, `KeyReleased`,
-`MouseButtonPressed`, and `MouseButtonReleased`.  If you need to encode
+`MouseButtonPressed`, and `MouseButtonReleased`. If you need to encode
 additional SFML event variants (e.g. scroll wheel, joystick), follow the steps
 below.
 
@@ -263,12 +263,12 @@ below.
 
 **Location**: `src/events/sfml_event_convert.cpp`
 
-`CollectInputEvents` simply delegates to the `UserInputBitset` constructor
-which already processes a `vector<sf::Event>`.  If the `UserInputBitset` is
-extended (see Step 2) you do not need to change `CollectInputEvents` itself.
+`CollectInputEvents` simply delegates to the `UserInputBitset` constructor which
+already processes a `vector<sf::Event>`. If the `UserInputBitset` is extended
+(see Step 2) you do not need to change `CollectInputEvents` itself.
 
-If you want to produce a **different payload type** from a particular SFML
-event (e.g. a `SystemPayload::QUIT` from `sf::Event::Closed`), add a separate
+If you want to produce a **different payload type** from a particular SFML event
+(e.g. a `SystemPayload::QUIT` from `sf::Event::Closed`), add a separate
 free-function in the same file and call it from `SFMLEventConverter` (see
 [Adding a New EventPayload Type Conversion](#adding-a-new-eventpayload-type-conversion)).
 
@@ -292,14 +292,14 @@ To add scroll-wheel support you would:
 3. Populate them in the vector-of-events constructor by checking
    `event.getIf<sf::Event::MouseWheelScrolled>()`.
 
-Update `user_input.fbs` (`MouseInput` enum) and the
-`configure_input_action.cpp` mapping switch accordingly.
+Update `user_input.fbs` (`MouseInput` enum) and the `configure_input_action.cpp`
+mapping switch accordingly.
 
 ---
 
 ## Adding a New EventPayload Type Conversion
 
-The current pipeline only produces `InputPayload` events.  The framework is
+The current pipeline only produces `InputPayload` events. The framework is
 designed so additional payload types can be added without restructuring the
 class.
 
@@ -307,8 +307,8 @@ class.
 
 **Location**: `src/events/sfml_event_convert.h/.cpp`
 
-Add a new free-function that inspects the `vector<sf::Event>` for the SFML
-event variant you care about and returns the appropriate payload.
+Add a new free-function that inspects the `vector<sf::Event>` for the SFML event
+variant you care about and returns the appropriate payload.
 
 ```cpp
 // sfml_event_convert.h
@@ -339,7 +339,7 @@ Add a corresponding unit test in
 
 **Location**: `src/events/SFMLEventConverter.cpp`
 
-In `ConvertSFMLEvents()`, add a new step after step 3 and before step 4.  The
+In `ConvertSFMLEvents()`, add a new step after step 3 and before step 4. The
 numbered comments make the ordering visible:
 
 ```cpp
@@ -379,8 +379,8 @@ SFMLEventConverter::ConvertSFMLEvents(const std::vector<sf::Event> &sfml_events)
 }
 ```
 
-**Important**: Keep the numbered comments updated so the execution order
-remains visible to the reader.
+**Important**: Keep the numbered comments updated so the execution order remains
+visible to the reader.
 
 ---
 
@@ -401,8 +401,8 @@ event_handler.SetInputActionRegistry(std::move(registry.value()));  // RAII move
 ```
 
 The binary file is generated automatically from
-`data/defaults/input_actions/default.input_action_config.json` during the
-CMake build step.
+`data/defaults/input_actions/default.input_action_config.json` during the CMake
+build step.
 
 ---
 
@@ -410,17 +410,17 @@ CMake build step.
 
 1. **Keep conversion logic in free functions** — `sfml_event_convert.cpp`
    contains testable logic; `SFMLEventConverter.cpp` contains only ordering.
-2. **Keep steps numbered** — The numbered comments in `ConvertSFMLEvents()`
-   make execution order obvious.  Update them when adding new steps.
-3. **Unique patterns — unordered_map key semantics** — `InputActionRegistry` is a
-   `std::unordered_map<UserInputBitset, InputPayload::InputAction>`, so each
-   pattern is unique.  If the same bitset appears twice in the JSON the later
-   entry silently replaces the earlier one.  The same `InputAction` value can
-   be associated with many different patterns.  `UserInputBitset` provides a
+2. **Keep steps numbered** — The numbered comments in `ConvertSFMLEvents()` make
+   execution order obvious. Update them when adding new steps.
+3. **Unique patterns — unordered_map key semantics** — `InputActionRegistry` is
+   a `std::unordered_map<UserInputBitset, InputPayload::InputAction>`, so each
+   pattern is unique. If the same bitset appears twice in the JSON the later
+   entry silently replaces the earlier one. The same `InputAction` value can be
+   associated with many different patterns. `UserInputBitset` provides a
    `std::hash` specialisation that folds the bits into 64-bit words with
    boost-style mixing (no heap allocation).
 4. **One action per tick** — The current design resolves at most one
-   `InputAction` per tick from the bitset.  If you need multiple simultaneous
+   `InputAction` per tick from the bitset. If you need multiple simultaneous
    actions, change the resolve function to return a `vector`.
 5. **Null-check FlatBuffers data** — `ConfigureInputActionMapping` already
    guards against null; maintain this pattern for any new configure functions.
@@ -434,7 +434,8 @@ CMake build step.
 
 ### No InputPayload events appear on the bus
 
-- ✅ Verify `event_handler.SetInputActionRegistry(std::move(registry))` is called before the first tick.
+- ✅ Verify `event_handler.SetInputActionRegistry(std::move(registry))` is
+  called before the first tick.
 - ✅ Check `default.input_action_config.json` is correct and the binary
   (`default.input_action_config.bin`) has been regenerated by the build.
 - ✅ Confirm the SFML event being tested actually fires
@@ -451,8 +452,8 @@ CMake build step.
 
 ### New action enum value not recognised
 
-- ✅ Add the value to both `InputActionFbs` (`.fbs`) **and** `InputAction`
-  (C++ enum).
+- ✅ Add the value to both `InputActionFbs` (`.fbs`) **and** `InputAction` (C++
+  enum).
 - ✅ Add a `case` to `ConfigureInputAction` in `configure_event.cpp` (one place
   — both `ConfigureInputPayload` and `ConfigureInputActionMapping` call it).
 - ✅ Rebuild to regenerate FlatBuffers headers.
@@ -481,7 +482,7 @@ CMake build step.
 - [ ] Write unit tests for the new function (`sfml_event_convert.test.cpp`)
 - [ ] Add numbered step in `SFMLEventConverter::ConvertSFMLEvents()`
 - [ ] (If extending `UserInputBitset`) update `UserInputBitset.h`,
-  `user_input.fbs`, and `configure_input_action.cpp`
+      `user_input.fbs`, and `configure_input_action.cpp`
 
 ---
 
@@ -493,10 +494,13 @@ CMake build step.
 - **Input bitset**: `src/types/events/UserInputBitset.h`
 - **InputActionRegistry type**: `src/types/events/InputActionRegistry.h`
 - **Provider interface**: `src/types/interfaces/IInputActionConfigProvider.h`
-- **Provider implementation**: `src/data_providers/FlatbuffersInputActionConfigProvider.h`
+- **Provider implementation**:
+  `src/data_providers/FlatbuffersInputActionConfigProvider.h`
 - **FlatBuffers schema**: `src/types/flatbuffers/events/input_action_config.fbs`
-- **Configure functions**: `src/data_providers/configure/configure_input_action.h`
-- **Default mappings**: `data/defaults/input_actions/default.input_action_config.json`
+- **Configure functions**:
+  `src/data_providers/configure/configure_input_action.h`
+- **Default mappings**:
+  `data/defaults/input_actions/default.input_action_config.json`
 - **Unit tests**: `tests/unit/events/sfml_event_convert.test.cpp`,
   `tests/unit/events/SFMLEventConverter.test.cpp`,
   `tests/unit/data_providers/configure_input_action.test.cpp`,
