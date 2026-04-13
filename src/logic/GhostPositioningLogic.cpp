@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "GhostPositioningLogic.h"
 #include "positioning_ghost.h"
-#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic {
 
@@ -18,8 +17,10 @@ GhostPositioningLogic::GhostPositioningLogic(const SceneContext &scene_context)
 
 /////////////////////////////////////////////////
 void GhostPositioningLogic::ProcessLogic() {
-  positioning::ghost::UpdatePosition(m_scene_context.mr_ghost,
-                                     m_scene_context.mouse_position);
+  positioning::ghost::UpdatePosition(
+      m_scene_context.mr_ghost, m_scene_context.world_mouse_position,
+      m_scene_context.mouse_position, m_scene_context.camera_state,
+      m_scene_context.scene_texture);
 }
 
 } // namespace steamrot::logic
