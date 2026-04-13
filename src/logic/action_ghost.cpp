@@ -46,4 +46,16 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost) {
   }
 }
 
+
+/////////////////////////////////////////////////
+void ProcessSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    MrGhost &mr_ghost) {
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+    ProcessSubscriber(*subscriber, mr_ghost);
+  }
+}
+
 } // namespace steamrot::logic::action::ghost

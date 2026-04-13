@@ -3,6 +3,7 @@ LogicFactory.test.cpp
 # Logic.test.cpp
 action_ui.test.cpp
 action_ghost.test.cpp
+action_camera.test.cpp
 render_ui.test.cpp
 logic_render_test_helpers.cpp
 state_ui.test.cpp

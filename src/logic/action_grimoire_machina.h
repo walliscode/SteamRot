@@ -158,4 +158,26 @@ std::expected<std::monostate, FailInfo>
 PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
                      sf::Vector2f world_pos);
 
+/////////////////////////////////////////////////
+/// @brief Process all active subscribers in a single pass, dispatching each
+/// to the appropriate GrimoireMachina action.
+///
+/// Iterates the subscriber list once, skipping inactive entries, then routes
+/// each active subscriber by event type:
+///  - LOGIC events are forwarded to @ref ProcessSubscriber for scaffold
+///    init/clear handling.
+///  - USER_INPUT TOGGLE_SOCKET_VISIBILITY events toggle socket visibility on
+///    the active scaffold.
+///  - USER_INPUT SELECT events run the full placement guard chain and, when
+///    all guards pass, place the ghost item via @ref PlaceGhostOnScaffold.
+///
+/// @param subscribers    Subscribers owned by the Logic instance.
+/// @param scene_context  SceneContext providing ghost state, archetypes,
+///                       entities, camera, and mouse position.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void ProcessSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
+
 } // namespace steamrot::logic::action::grimoire_machina

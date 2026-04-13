@@ -23,11 +23,7 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
     return;
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
-  action::grimoire_machina::ProcessScaffoldSubscribers(m_subscribers,
-                                                       grimoire_machina);
-  action::grimoire_machina::ProcessSocketVisibilitySubscribers(m_subscribers,
-                                                               grimoire_machina);
-  action::grimoire_machina::ProcessPlacementSubscribers(
-      m_subscribers, m_scene_context, grimoire_machina);
+  action::grimoire_machina::ProcessSubscribers(m_subscribers, m_scene_context,
+                                               grimoire_machina);
 }
 } // namespace steamrot::logic
