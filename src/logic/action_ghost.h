@@ -54,4 +54,18 @@ void ClearGhostSelection(MrGhost &mr_ghost);
 /////////////////////////////////////////////////
 void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost);
 
+/////////////////////////////////////////////////
+/// @brief Process all active subscribers and apply their ghost actions to
+/// MrGhost.
+///
+/// Iterates the subscriber list, skips inactive entries, and dispatches each
+/// active subscriber to @ref ProcessSubscriber.
+///
+/// @param subscribers Subscribers owned by the Logic instance.
+/// @param mr_ghost    MrGhost instance to mutate.
+/////////////////////////////////////////////////
+void ProcessSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    MrGhost &mr_ghost);
+
 } // namespace steamrot::logic::action::ghost

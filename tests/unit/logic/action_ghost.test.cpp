@@ -176,3 +176,54 @@ TEST_CASE(
 
   REQUIRE(std::holds_alternative<steamrot::FragmentTag>(mr_ghost.m_selection));
 }
+
+/////////////////////////////////////////////////
+// ProcessSubscribers
+/////////////////////////////////////////////////
+
+TEST_CASE("ProcessSubscribers – inactive subscriber is skipped",
+          "[unit][action_ghost]") {
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"stone"};
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = false;
+  subscriber->captured_payload = steamrot::GhostPayload{
+      steamrot::GhostPayload::GhostAction::CLEAR, std::monostate{}};
+
+  steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost);
+
+  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(mr_ghost.m_selection));
+}
+
+TEST_CASE("ProcessSubscribers – active SELECT subscriber updates MrGhost",
+          "[unit][action_ghost]") {
+  steamrot::MrGhost mr_ghost;
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->captured_payload = steamrot::GhostPayload{
+      steamrot::GhostPayload::GhostAction::SELECT,
+      steamrot::FragmentTag{"granite"}};
+
+  steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost);
+
+  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(mr_ghost.m_selection));
+  REQUIRE(std::get<steamrot::FragmentTag>(mr_ghost.m_selection).key ==
+          "granite");
+}
+
+TEST_CASE("ProcessSubscribers – active CLEAR subscriber clears MrGhost",
+          "[unit][action_ghost]") {
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_selection = steamrot::FragmentTag{"stone"};
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->captured_payload = steamrot::GhostPayload{
+      steamrot::GhostPayload::GhostAction::CLEAR, std::monostate{}};
+
+  steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost);
+
+  REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_selection));
+}
