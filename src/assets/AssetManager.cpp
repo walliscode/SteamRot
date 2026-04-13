@@ -194,6 +194,14 @@ const UIStyle &AssetManager::GetDefaultUIStyle() const {
   }
 }
 /////////////////////////////////////////////////
+const UIStyle &AssetManager::GetUIStyle(const std::string &name) const {
+  auto it = m_ui_styles.find(name);
+  if (it != m_ui_styles.end()) {
+    return it->second;
+  }
+  return GetDefaultUIStyle();
+}
+/////////////////////////////////////////////////
 const std::unordered_map<std::string, UIStyle> &
 AssetManager::GetAllUIStyles() const {
   return m_ui_styles;

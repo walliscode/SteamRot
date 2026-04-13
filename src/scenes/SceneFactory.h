@@ -116,6 +116,15 @@ public:
   PassAssetConfig(Scene &scene, const SceneData &scene_data);
 
   /////////////////////////////////////////////////
+  /// @brief Validate that all CUserInterface m_style_name values exist in
+  /// the AssetManager. Called after entities are configured.
+  ///
+  /// @param scene Scene whose entity pool is checked
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ValidateUIStyles(Scene &scene) const;
+
+  /////////////////////////////////////////////////
   /// @brief Configure the logic map for the scene
   ///
   /// This should be set in stone, not configurable by data or the user.
