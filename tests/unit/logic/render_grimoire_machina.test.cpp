@@ -405,9 +405,31 @@ TEST_CASE("DrawFragmentInstance draws fragment geometry and sockets without "
           texture, instance, true));
 }
 
-TEST_CASE("DrawFragmentInstance renders fragment view geometry at transformed "
-          "position",
+TEST_CASE("DrawFragmentInstance draws fragment but no sockets when "
+          "draw_sockets is false",
           "[unit][render_grimoire_machina]") {
+  sf::RenderTexture texture{{100, 100}};
+  auto fragment = MakeFragmentWithOriginTriangle();
+  sf::Transform t;
+  t.translate({10.f, 10.f});
+  steamrot::FragmentInstance instance{fragment, t};
+  REQUIRE_NOTHROW(
+      steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+          texture, instance, false));
+
+  // test the Fragment View
+  texture.display();
+  const sf::Image image = texture.getTexture().copyToImage();
+  REQUIRE(image.getPixel({20, 17}) == sf::Color::Green);
+  // socket at local (5,5) → world (15,15) should be green when sockets not
+  // drawn due to the triangle's green fill, not white.
+  REQUIRE(image.getPixel({15, 15}) == sf::Color::Green);
+}
+
+TEST_CASE(
+    "DrawFragmentInstance renders fragment view  and socketsat transformed "
+    "position when draw_sockets is true",
+    "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
@@ -449,9 +471,27 @@ TEST_CASE("DrawJointInstance draws joint geometry and sockets without throwing",
       texture, instance, true));
 }
 
-TEST_CASE(
-    "DrawJointInstance renders joint view geometry at transformed position",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("DrawJointInstance draws joint but no sockets when draw_sockets is "
+          "false",
+          "[unit][render_grimoire_machina]") {
+  sf::RenderTexture texture{{100, 100}};
+  auto joint = MakeJointWithOriginTriangle();
+  sf::Transform t;
+  t.translate({10.f, 10.f});
+  steamrot::JointInstance instance{joint, t};
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointInstance(
+      texture, instance, false));
+  // test the Joint View
+  texture.display();
+  const sf::Image image = texture.getTexture().copyToImage();
+  REQUIRE(image.getPixel({20, 17}) == sf::Color::Blue);
+  // socket at local (5,0) → world (15,10) should be blue when sockets not drawn
+  // due to the triangle's blue fill, not white.
+  REQUIRE(image.getPixel({15, 10}) == sf::Color::Blue);
+}
+TEST_CASE("DrawJointInstance renders joint view geometry at transformed "
+          "position when draw_sockets is true",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
@@ -470,6 +510,10 @@ TEST_CASE(
 
   const sf::Image image = texture.getTexture().copyToImage();
   REQUIRE(image.getPixel({20, 17}) == sf::Color::Blue);
+
+  // test the socket rendering: socket at local (5,0) → world (15,10) should be
+  // white when drawn on top of the blue triangle.
+  REQUIRE(image.getPixel({15, 10}) == sf::Color::White);
 }
 
 /////////////////////////////////////////////////
@@ -509,7 +553,7 @@ TEST_CASE(
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost, {50.f, 50.f});
   if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed: " << result.error());
+    FAIL("PlaceGhostOnScaffold failed: " << result.error().message);
   } // These are all the boolean states that the editor needs to track for the
 
   REQUIRE_NOTHROW(
@@ -535,7 +579,7 @@ TEST_CASE(
   auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost, {50.f, 50.f});
   if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed: " << result.error());
+    FAIL("PlaceGhostOnScaffold failed: " << result.error().message);
   } // These are all the boolean states that the editor needs to track for the
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(

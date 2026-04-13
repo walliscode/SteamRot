@@ -116,8 +116,7 @@ void DrawFragmentInstance(sf::RenderTexture &texture,
 
 /////////////////////////////////////////////////
 void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance,
-                       const bool draw_sockets) {
+                       JointInstance &joint_instance, const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
   DrawJointView(texture, joint_instance.joint, ViewDirection::Front, states);
