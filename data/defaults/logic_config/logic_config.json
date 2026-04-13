@@ -25,6 +25,11 @@
         "event_type": "USER_INPUT",
         "filter_payload_type": "InputPayloadFbs",
         "filter_payload": { "action": "SELECT" }
+      },
+      {
+        "event_type": "USER_INPUT",
+        "filter_payload_type": "InputPayloadFbs",
+        "filter_payload": { "action": "TOGGLE_SOCKET_VISIBILITY" }
       }
     ]
   },

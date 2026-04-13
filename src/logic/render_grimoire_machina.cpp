@@ -67,34 +67,35 @@ void DrawNoMachinaFormBox(sf::RenderTexture &texture,
 
 void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
                 const SocketState &socket_state) {
-  static constexpr float k_radius = 5.f;
-  static constexpr int k_point_count = 30;
+  static constexpr float k_radius = 2.f;
+  static constexpr int k_point_count = 10;
   static const sf::Color k_base_color{sf::Color::White};
   static const sf::Color k_hover_color{sf::Color::Yellow};
 
   sf::CircleShape circle(k_radius, k_point_count);
   circle.setOrigin({k_radius, k_radius});
   circle.setPosition(world_pos);
-  circle.setFillColor(socket_state.is_mouse_over ? k_hover_color : k_base_color);
+  circle.setFillColor(socket_state.is_mouse_over ? k_hover_color
+                                                 : k_base_color);
   texture.draw(circle);
 }
 
 /////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance) {
+void DrawFragmentInstanceSockets(sf::RenderTexture &texture,
+                                 FragmentInstance &fragment_instance) {
   for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
-    const sf::Vector2f world_pos =
-        fragment_instance.transform.transformPoint(
-            fragment_instance.fragment.sockets[i]);
+    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
+        fragment_instance.fragment.sockets[i]);
     DrawSocket(texture, world_pos, fragment_instance.socket_states[i]);
   }
 }
 
 /////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
+void DrawJointInstanceSockets(sf::RenderTexture &texture,
+                              JointInstance &joint_instance) {
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
-    const sf::Vector2f local_pos =
-        ComputeSocketLocalPos(joint_instance.joint.socket_config, i,
-                              joint_instance.current_rotation);
+    const sf::Vector2f local_pos = ComputeSocketLocalPos(
+        joint_instance.joint.socket_config, i, joint_instance.current_rotation);
     const sf::Vector2f world_pos =
         joint_instance.transform.transformPoint(local_pos);
     DrawSocket(texture, world_pos, joint_instance.socket_states[i]);
@@ -103,21 +104,24 @@ void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
 
 /////////////////////////////////////////////////
 void DrawFragmentInstance(sf::RenderTexture &texture,
-                          FragmentInstance &fragment_instance) {
+                          FragmentInstance &fragment_instance,
+                          const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = fragment_instance.transform;
   DrawFragmentView(texture, fragment_instance.fragment, ViewDirection::Front,
                    states);
-  Draw(texture, fragment_instance);
+  if (draw_sockets)
+    DrawFragmentInstanceSockets(texture, fragment_instance);
 }
 
 /////////////////////////////////////////////////
 void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance) {
+                       JointInstance &joint_instance, const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
   DrawJointView(texture, joint_instance.joint, ViewDirection::Front, states);
-  Draw(texture, joint_instance);
+  if (draw_sockets)
+    DrawJointInstanceSockets(texture, joint_instance);
 }
 
 /////////////////////////////////////////////////
@@ -134,12 +138,15 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
     return;
   }
 
+  // pull out the bool that indicates whether to draw sockets or not
+  bool draw_sockets = scaffold->are_sockets_visible;
+
   // Draw all placed instances on the active scaffold.
   for (auto &joint : scaffold->joints) {
-    DrawJointInstance(texture, joint);
+    DrawJointInstance(texture, joint, draw_sockets);
   }
   for (auto &fragment : scaffold->fragments) {
-    DrawFragmentInstance(texture, fragment);
+    DrawFragmentInstance(texture, fragment, draw_sockets);
   }
 }
 

@@ -89,6 +89,20 @@ void ProcessScaffoldSubscribers(
     GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
+/// @brief Process all active USER_INPUT TOGGLE_SOCKET_VISIBILITY-type
+/// subscribers and toggle are_sockets_visible on the active scaffold.
+///
+/// When triggered, toggles MachinaFormScaffold::are_sockets_visible. Does
+/// nothing if no active scaffold exists.
+///
+/// @param subscribers Subscribers owned by the Logic instance.
+/// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
+/////////////////////////////////////////////////
+void ProcessSocketVisibilitySubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
 /// @brief Process all active USER_INPUT SELECT-type subscribers and, when all
 /// placement guards pass, place the ghost item on the active scaffold.
 ///

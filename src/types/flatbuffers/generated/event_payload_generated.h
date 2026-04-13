@@ -43,27 +43,30 @@ struct CameraPayloadFbsBuilder;
 ////////////////////////////////////////////////////////////
 enum InputActionFbs : int8_t {
   InputActionFbs_SELECT = 0,
+  InputActionFbs_TOGGLE_SOCKET_VISIBILITY = 1,
   InputActionFbs_MIN = InputActionFbs_SELECT,
-  InputActionFbs_MAX = InputActionFbs_SELECT
+  InputActionFbs_MAX = InputActionFbs_TOGGLE_SOCKET_VISIBILITY
 };
 
-inline const InputActionFbs (&EnumValuesInputActionFbs())[1] {
+inline const InputActionFbs (&EnumValuesInputActionFbs())[2] {
   static const InputActionFbs values[] = {
-    InputActionFbs_SELECT
+    InputActionFbs_SELECT,
+    InputActionFbs_TOGGLE_SOCKET_VISIBILITY
   };
   return values;
 }
 
 inline const char * const *EnumNamesInputActionFbs() {
-  static const char * const names[2] = {
+  static const char * const names[3] = {
     "SELECT",
+    "TOGGLE_SOCKET_VISIBILITY",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameInputActionFbs(InputActionFbs e) {
-  if (::flatbuffers::IsOutRange(e, InputActionFbs_SELECT, InputActionFbs_SELECT)) return "";
+  if (::flatbuffers::IsOutRange(e, InputActionFbs_SELECT, InputActionFbs_TOGGLE_SOCKET_VISIBILITY)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesInputActionFbs()[index];
 }

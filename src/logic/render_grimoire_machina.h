@@ -75,7 +75,8 @@ void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
 /// @param texture RenderTexture to draw on.
 /// @param fragment_instance FragmentInstance whose sockets are drawn.
 /////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
+void DrawFragmentInstanceSockets(sf::RenderTexture &texture,
+                                 FragmentInstance &fragment_instance);
 
 /////////////////////////////////////////////////
 /// @brief Draw all sockets of a JointInstance on the crafting canvas.
@@ -86,7 +87,8 @@ void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance);
 /// @param texture RenderTexture to draw on.
 /// @param joint_instance JointInstance whose sockets are drawn.
 /////////////////////////////////////////////////
-void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
+void DrawJointInstanceSockets(sf::RenderTexture &texture,
+                              JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
 /// @brief Draw a placed FragmentInstance onto the crafting canvas.
@@ -97,22 +99,27 @@ void Draw(sf::RenderTexture &texture, JointInstance &joint_instance);
 ///
 /// @param texture           RenderTexture to draw on.
 /// @param fragment_instance FragmentInstance to render.
+/// @param draw_sockets      Whether to draw the instance's sockets. May be
+/// false
 /////////////////////////////////////////////////
 void DrawFragmentInstance(sf::RenderTexture &texture,
-                          FragmentInstance &fragment_instance);
+                          FragmentInstance &fragment_instance,
+                          const bool draw_sockets);
 
 /////////////////////////////////////////////////
 /// @brief Draw a placed JointInstance onto the crafting canvas.
 ///
 /// Applies the instance's stored transform as RenderStates, draws the
 /// joint's Front view geometry at the placed position, then draws all
-/// socket indicators on top.
+/// socket indicators on top when draw_sockets is true.
 ///
 /// @param texture        RenderTexture to draw on.
 /// @param joint_instance JointInstance to render.
+/// @param draw_sockets   Whether to draw the instance's sockets.
 /////////////////////////////////////////////////
 void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance);
+                       JointInstance &joint_instance,
+                       const bool draw_sockets);
 
 /////////////////////////////////////////////////
 /// @brief Draw the scaffold state or a placeholder when no scaffold is active.

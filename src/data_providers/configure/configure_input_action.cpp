@@ -20,6 +20,9 @@ ConfigureInputAction(InputPayload::InputAction &action,
   case InputActionFbs_SELECT:
     action = InputPayload::InputAction::SELECT;
     break;
+  case InputActionFbs_TOGGLE_SOCKET_VISIBILITY:
+    action = InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,

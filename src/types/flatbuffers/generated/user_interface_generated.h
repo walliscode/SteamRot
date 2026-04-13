@@ -910,8 +910,8 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbs(
     int32_t priority = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_style_name = 0) {
   UserInterfaceFbsBuilder builder_(_fbb);
-  builder_.add_priority(priority);
   builder_.add_ui_style_name(ui_style_name);
+  builder_.add_priority(priority);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
   builder_.add_is_visible(is_visible);
