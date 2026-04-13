@@ -3,6 +3,10 @@
     {
       "mouse_pressed": ["LEFT_CLICK"],
       "action": "SELECT"
+    },
+    {
+      "keyboard_pressed": ["S"],
+      "action": "TOGGLE_SOCKET_VISIBILITY"
     }
   ]
 }

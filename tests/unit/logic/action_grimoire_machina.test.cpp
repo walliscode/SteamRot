@@ -1005,3 +1005,117 @@ TEST_CASE(
   REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
   REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
 }
+
+/////////////////////////////////////////////////
+/// ProcessSocketVisibilitySubscribers tests
+/////////////////////////////////////////////////
+
+TEST_CASE(
+    "ProcessSocketVisibilitySubscribers: active TOGGLE_SOCKET_VISIBILITY "
+    "subscriber toggles are_sockets_visible from false to true",
+    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
+
+  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+      subscribers, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == true);
+}
+
+TEST_CASE(
+    "ProcessSocketVisibilitySubscribers: toggling twice returns to original "
+    "state",
+    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
+
+  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+      subscribers, grimoire_machina);
+  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+      subscribers, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
+}
+
+TEST_CASE(
+    "ProcessSocketVisibilitySubscribers: inactive subscriber is skipped",
+    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = false;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
+
+  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+      subscribers, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
+}
+
+TEST_CASE(
+    "ProcessSocketVisibilitySubscribers: no scaffold means subscriber is "
+    "skipped without crash",
+    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  // no scaffold_form set
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
+
+  REQUIRE_NOTHROW(
+      steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+          subscribers, grimoire_machina));
+}
+
+TEST_CASE(
+    "ProcessSocketVisibilitySubscribers: SELECT subscriber does not toggle "
+    "socket visibility",
+    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
+  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
+
+  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
+      subscribers, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
+}

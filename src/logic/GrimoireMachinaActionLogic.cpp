@@ -25,6 +25,8 @@ void GrimoireMachinaActionLogic::ProcessLogic() {
 
   action::grimoire_machina::ProcessScaffoldSubscribers(m_subscribers,
                                                        grimoire_machina);
+  action::grimoire_machina::ProcessSocketVisibilitySubscribers(m_subscribers,
+                                                               grimoire_machina);
   action::grimoire_machina::ProcessPlacementSubscribers(
       m_subscribers, m_scene_context, grimoire_machina);
 }

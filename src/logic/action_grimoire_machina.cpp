@@ -252,4 +252,32 @@ void ProcessPlacementSubscribers(
   }
 }
 
+/////////////////////////////////////////////////
+void ProcessSocketVisibilitySubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    GrimoireMachina &grimoire_machina) {
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+    if (subscriber->event_type != EventType::USER_INPUT)
+      continue;
+
+    if (!subscriber->captured_payload.has_value())
+      continue;
+
+    const InputPayload *input_payload =
+        std::get_if<InputPayload>(&subscriber->captured_payload.value());
+    if (!input_payload)
+      continue;
+    if (input_payload->action != InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY)
+      continue;
+
+    MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+    if (!scaffold)
+      continue;
+
+    scaffold->are_sockets_visible = !scaffold->are_sockets_visible;
+  }
+}
+
 } // namespace steamrot::logic::action::grimoire_machina
