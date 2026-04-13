@@ -99,17 +99,14 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   }
 }
 
-void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
+void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
                     SocketState &socket_state) {
 
   // give the socket a circular hitbox with a fixed radius;
   static constexpr float k_radius = 5.f;
 
-  // cast mouse position to float for distance checking
-  const sf::Vector2f mouse_f{static_cast<float>(mouse_position.x),
-                             static_cast<float>(mouse_position.y)};
-  // calculate vector distance from mouse to socket position
-  const sf::Vector2f delta = mouse_f - world_pos;
+  // calculate vector distance from world-space mouse to world-space socket
+  const sf::Vector2f delta = world_mouse - world_pos;
 
   // checks squared distance to avoid costly square root; if within radius, mark
   // socket as is_mouse_over = true, else false
@@ -118,7 +115,7 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
 }
 
 /////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
+void CheckMouseOver(sf::Vector2f world_mouse,
                     FragmentInstance &fragment_instance) {
 
   // cycle through all sockets in the fragment and check if any are hovered
@@ -131,14 +128,12 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(mouse_position, world_pos,
-                   fragment_instance.socket_states[i]);
+    CheckMouseOver(world_mouse, world_pos, fragment_instance.socket_states[i]);
   }
 }
 
 /////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
-                    JointInstance &joint_instance) {
+void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 
   // cycle through all sockets in the joint and check if any are hovered
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
@@ -150,7 +145,7 @@ void CheckMouseOver(const sf::Vector2i &mouse_position,
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(mouse_position, world_pos, joint_instance.socket_states[i]);
+    CheckMouseOver(world_mouse, world_pos, joint_instance.socket_states[i]);
   }
 }
 
@@ -193,13 +188,13 @@ void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
 
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
-                               const sf::Vector2i &mouse_position) {
+                               sf::Vector2f world_mouse) {
   for (auto &joint : scaffold.joints) {
-    CheckMouseOver(mouse_position, joint);
+    CheckMouseOver(world_mouse, joint);
   }
 
   for (auto &fragment : scaffold.fragments) {
-    CheckMouseOver(mouse_position, fragment);
+    CheckMouseOver(world_mouse, fragment);
   }
 }
 

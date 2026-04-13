@@ -29,8 +29,8 @@ void GrimoireMachinaCollisionLogic::ProcessLogic() {
       grimoire_machina.m_scaffold_form.get();
 
   if (active_scaffold_form) {
-    collision::mouse::ProcessScaffoldCollisions(*active_scaffold_form,
-                                               m_scene_context.mouse_position);
+    collision::mouse::ProcessScaffoldCollisions(
+        *active_scaffold_form, m_scene_context.world_mouse_position);
   }
 }
 

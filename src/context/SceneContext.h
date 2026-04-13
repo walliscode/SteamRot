@@ -46,7 +46,8 @@ struct SceneContext {
   SceneContext(sf::RenderTexture &scene_texture,
                EngineResources &engine_resources, EntityManager &entity_manager,
                DataAccessFactory &data_access_factory, MrGhost &mr_ghost,
-               CameraState &camera_state);
+               CameraState &camera_state,
+               sf::Vector2f &world_mouse_position);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -106,6 +107,20 @@ struct SceneContext {
   /// zoom level and the world view derived from it.
   /////////////////////////////////////////////////
   CameraState &camera_state;
+
+  /////////////////////////////////////////////////
+  /// @brief World-space mouse position for the current tick.
+  ///
+  /// Computed once per tick by GhostPositioningLogic via
+  /// CameraState::MapToWorldCoords.  World-space systems (ghost rendering,
+  /// grimoire collision, piece placement) read this value; screen-space
+  /// systems (UI collision) use mouse_position instead.
+  ///
+  /// Coordinate contract:
+  ///   mouse_position       (sf::Vector2i) — screen pixels — UI collision only
+  ///   world_mouse_position (sf::Vector2f) — world space  — everything else
+  /////////////////////////////////////////////////
+  sf::Vector2f &world_mouse_position;
 };
 
 } // namespace steamrot

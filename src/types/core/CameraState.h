@@ -74,6 +74,23 @@ struct CameraState {
     view.zoom(m_zoom_level);
     return view;
   }
+
+  /////////////////////////////////////////////////
+  /// @brief Convert a screen-space pixel position to world-space coordinates.
+  ///
+  /// Applies the current world view (with zoom) to map the given screen-pixel
+  /// position to its corresponding world-space floating-point position.
+  /// This is the single authoritative screen-to-world conversion; callers
+  /// should use this instead of calling mapPixelToCoords directly.
+  ///
+  /// @param screen_pos Screen-space pixel position (e.g. mouse cursor).
+  /// @param texture    Render texture whose world view is used for the mapping.
+  /// @return World-space position corresponding to @p screen_pos.
+  /////////////////////////////////////////////////
+  sf::Vector2f MapToWorldCoords(sf::Vector2i screen_pos,
+                                const sf::RenderTexture &texture) const {
+    return texture.mapPixelToCoords(screen_pos, GetWorldView(texture));
+  }
 };
 
 } // namespace steamrot

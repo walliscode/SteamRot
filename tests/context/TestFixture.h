@@ -18,6 +18,7 @@
 #include "MrGhost.h"
 #include "SceneContext.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <memory>
 
 namespace steamrot::tests {
@@ -139,6 +140,12 @@ private:
   /// @brief CameraState owned by this fixture (stand-in for SceneResources)
   /////////////////////////////////////////////////
   CameraState m_camera_state{};
+
+  /////////////////////////////////////////////////
+  /// @brief World-space mouse position owned by this fixture
+  /// (stand-in for SceneResources::world_mouse_position)
+  /////////////////////////////////////////////////
+  sf::Vector2f m_world_mouse_position{0.f, 0.f};
 
   /////////////////////////////////////////////////
   /// @brief SceneContext created from cores and entity manager

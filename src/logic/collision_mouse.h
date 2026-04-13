@@ -73,32 +73,31 @@ bool AnyMouseOver(const UIElement &element);
 /// The hit radius matches the visual radius used when drawing sockets so that
 /// click/hover detection is pixel-accurate relative to what the user sees.
 ///
-/// @param mouse_position Mouse position in world coordinates.
-/// @param world_pos      World-space centre of the socket.
-/// @param socket_state   SocketState whose is_mouse_over flag is updated.
+/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
+/// @param world_pos   World-space centre of the socket.
+/// @param socket_state SocketState whose is_mouse_over flag is updated.
 /////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position, sf::Vector2f world_pos,
+void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
                     SocketState &socket_state);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over any socket on a FragmentInstance
 /// and sets each socket's is_mouse_over accordingly.
 ///
-/// @param mouse_position Mouse position in world coordinates.
+/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
 /// @param fragment_instance FragmentInstance whose sockets are checked.
 /////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
+void CheckMouseOver(sf::Vector2f world_mouse,
                     FragmentInstance &fragment_instance);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over any socket on a JointInstance
 /// and sets each socket's is_mouse_over accordingly.
 ///
-/// @param mouse_position Mouse position in world coordinates.
+/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
 /// @param joint_instance JointInstance whose sockets are checked.
 /////////////////////////////////////////////////
-void CheckMouseOver(const sf::Vector2i &mouse_position,
-                    JointInstance &joint_instance);
+void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
 /// @brief Run the two-pass mouse-collision check for all UI entities.
@@ -124,10 +123,11 @@ void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
 /// Calls CheckMouseOver for the growth point, all joints, and all fragments
 /// in the scaffold, setting is_mouse_over on each part as appropriate.
 ///
-/// @param scaffold      MachinaFormScaffold whose parts will be checked.
-/// @param mouse_position Current mouse position in window coordinates.
+/// @param scaffold        MachinaFormScaffold whose parts will be checked.
+/// @param world_mouse     World-space mouse position
+///                        (SceneContext::world_mouse_position).
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
-                               const sf::Vector2i &mouse_position);
+                               sf::Vector2f world_mouse);
 
 } // namespace steamrot::logic::collision::mouse
