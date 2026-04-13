@@ -1022,8 +1022,8 @@ TEST_CASE(
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
@@ -1044,8 +1044,8 @@ TEST_CASE(
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
@@ -1067,8 +1067,8 @@ TEST_CASE(
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = false;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
@@ -1088,14 +1088,14 @@ TEST_CASE(
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-          subscribers, grimoire_machina));
+      steamrot::logic::action::grimoire_machina::
+          ProcessSocketVisibilitySubscribers(subscribers, grimoire_machina));
 }
 
 TEST_CASE(
@@ -1135,8 +1135,8 @@ TEST_CASE("ProcessSubscribers: LOGIC INITIATE subscriber initialises scaffold "
   subscriber->captured_payload = steamrot::LogicPayload{
       steamrot::LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD};
 
-  steamrot::TestFixture fixture;
-  fixture.Initialise();
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
@@ -1159,8 +1159,8 @@ TEST_CASE("ProcessSubscribers: LOGIC CLEAR subscriber clears scaffold in a "
   subscriber->captured_payload = steamrot::LogicPayload{
       steamrot::LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD};
 
-  steamrot::TestFixture fixture;
-  fixture.Initialise();
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
@@ -1181,11 +1181,11 @@ TEST_CASE("ProcessSubscribers: TOGGLE_SOCKET_VISIBILITY subscriber toggles "
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload =
-      steamrot::InputPayload{steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  steamrot::TestFixture fixture;
-  fixture.Initialise();
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
@@ -1205,8 +1205,8 @@ TEST_CASE("ProcessSubscribers: inactive subscriber is skipped",
   subscriber->captured_payload = steamrot::LogicPayload{
       steamrot::LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD};
 
-  steamrot::TestFixture fixture;
-  fixture.Initialise();
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
@@ -1235,8 +1235,8 @@ TEST_CASE(
   toggle_subscriber->captured_payload = steamrot::InputPayload{
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  steamrot::TestFixture fixture;
-  fixture.Initialise();
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{
