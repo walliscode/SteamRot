@@ -13,8 +13,6 @@
 /////////////////////////////////////////////////
 #include "ViewDirection.h"
 #include <string>
-#include <vector>
-#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -23,21 +21,15 @@ namespace steamrot {
 /// @brief Base struct for Fragment and Joint, wrapping common data shared by
 /// both part types.
 ///
-/// Contains the name, local socket positions, and per-direction vertex arrays
-/// that every Part variant must have. Concrete subtypes (Fragment, Joint) add
-/// their own type-specific fields by inheriting from this struct.
+/// Contains the name and per-direction vertex arrays that every Part variant
+/// must have. Socket data is held by the concrete subtypes (Fragment stores
+/// explicit local positions; Joint stores a procedural SocketConfig).
 /////////////////////////////////////////////////
 struct Part {
   /////////////////////////////////////////////////
   /// @brief Human-readable name of the part.
   /////////////////////////////////////////////////
   std::string name{"unnamed"};
-
-  /////////////////////////////////////////////////
-  /// @brief Local positions of the part's sockets, in the part's own
-  /// coordinate space.
-  /////////////////////////////////////////////////
-  std::vector<sf::Vector2f> sockets;
 
   /////////////////////////////////////////////////
   /// @brief Vertex array per view direction for this part's static shape.

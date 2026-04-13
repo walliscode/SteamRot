@@ -90,8 +90,12 @@ MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green) {
 }
 
 /////////////////////////////////////////////////
-/// @brief Helper: build a Joint with a socket at (0,0) and a coloured
-/// triangle in the Front slot, placed at origin.
+/// @brief Helper: build a Joint with a single socket at local (5,0) and a
+/// coloured triangle in the Front slot, placed at origin.
+///
+/// SocketConfig: socket_count=1, radius=5, arc_min=arc_max=0 (angle 0°) so the
+/// socket lands at local (5, 0). Callers that need a specific world position
+/// can translate by (world_x - 5, world_y).
 /////////////////////////////////////////////////
 steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
   sf::VertexArray va(sf::PrimitiveType::Triangles);
@@ -102,7 +106,11 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) 
   steamrot::Joint joint;
   joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
                                         std::move(va));
-  joint.sockets = {{5.f, 5.f}};
+  joint.socket_config.socket_count = 1;
+  joint.socket_config.radius = 5.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 0.f;
+  joint.socket_config.has_fixed_socket = false;
   return joint;
 }
 
@@ -361,9 +369,9 @@ TEST_CASE(
   texture.clear(sf::Color::Black);
 
   auto joint = MakeJointWithOriginTriangle();
-  // socket at local (5,5); translate by (40,40) → world pos (45,45)
+  // Socket is at local (5, 0); translate by (40, 45) → world pos (45, 45).
   sf::Transform t;
-  t.translate({40.f, 40.f});
+  t.translate({40.f, 45.f});
   steamrot::JointInstance instance{joint, t};
 
   steamrot::logic::render::grimoire_machina::Draw(texture, instance);

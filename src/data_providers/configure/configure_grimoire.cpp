@@ -167,24 +167,27 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
         FailInfo{FailMode::FlatbuffersDataNotFound, "Joint name is missing"});
   }
 
-  // Configure sockets
-  if (!joint_fbs->sockets()->empty()) {
-    const auto *sockets_fbs = joint_fbs->sockets();
-    joint.sockets.clear();
-    joint.sockets.reserve(sockets_fbs->size());
-
-    for (const auto *socket_fbs : *sockets_fbs) {
-      if (socket_fbs) {
-        joint.sockets.emplace_back(socket_fbs->x(), socket_fbs->y());
-      } else {
-        return std::unexpected(
-            FailInfo{FailMode::FlatbuffersDataNotFound, "Socket data is null"});
-      }
-    }
-  } else {
+  // Configure socket_config
+  if (!joint_fbs->socket_config()) {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Joint sockets are missing"});
+                                    "Joint socket_config is missing"});
   }
+
+  const auto *sc = joint_fbs->socket_config();
+
+  if (sc->socket_count() <= 0) {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "Joint socket_config socket_count must be positive"});
+  }
+
+  joint.socket_config.socket_count = sc->socket_count();
+  joint.socket_config.radius = sc->radius();
+  joint.socket_config.arc_min = sc->arc_min();
+  joint.socket_config.arc_max = sc->arc_max();
+  joint.socket_config.min_gap = sc->min_gap();
+  joint.socket_config.fixed_socket_angle = sc->fixed_socket_angle();
+  joint.socket_config.has_fixed_socket = sc->has_fixed_socket();
 
   // Configure movement_views
   if (!joint_fbs->movement_views()->empty()) {
