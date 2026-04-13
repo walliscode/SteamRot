@@ -91,7 +91,7 @@ MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green) {
 
 /////////////////////////////////////////////////
 /// @brief Helper: build a Joint with a single socket at local (5,0) and a
-/// coloured triangle in the Front slot, placed at origin.
+/// colored triangle in the Front slot, placed at origin.
 ///
 /// SocketConfig: socket_count=1, radius=5, arc_min=arc_max=0 (angle 0°) so the
 /// socket lands at local (5, 0). Callers that need a specific world position

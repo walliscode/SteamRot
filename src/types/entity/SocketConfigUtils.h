@@ -19,6 +19,12 @@
 namespace steamrot {
 
 /////////////////////////////////////////////////
+/// @brief Degrees-to-radians conversion factor used by socket computations.
+/////////////////////////////////////////////////
+inline constexpr float k_socket_deg_to_rad =
+    std::numbers::pi_v<float> / 180.f;
+
+/////////////////////////////////////////////////
 /// @brief Compute the local-space position of a single socket on a Joint.
 ///
 /// Fixed anchor sockets (socket index 0 when SocketConfig::has_fixed_socket is
@@ -40,11 +46,9 @@ namespace steamrot {
 inline sf::Vector2f ComputeSocketLocalPos(const SocketConfig &config,
                                           size_t socket_index,
                                           float current_rotation) {
-  constexpr float k_deg_to_rad = std::numbers::pi_v<float> / 180.f;
-
   // Fixed anchor socket: sits at fixed_socket_angle and does not rotate
   if (config.has_fixed_socket && socket_index == 0) {
-    const float rad = config.fixed_socket_angle * k_deg_to_rad;
+    const float rad = config.fixed_socket_angle * k_socket_deg_to_rad;
     return {config.radius * std::cos(rad), config.radius * std::sin(rad)};
   }
 
@@ -72,7 +76,7 @@ inline sf::Vector2f ComputeSocketLocalPos(const SocketConfig &config,
     }
   }
 
-  const float total_rad = (base_angle_deg + current_rotation) * k_deg_to_rad;
+  const float total_rad = (base_angle_deg + current_rotation) * k_socket_deg_to_rad;
   return {config.radius * std::cos(total_rad),
           config.radius * std::sin(total_rad)};
 }
