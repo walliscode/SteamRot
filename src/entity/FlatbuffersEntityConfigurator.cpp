@@ -166,6 +166,10 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   if (ui_data->priority())
     ui_component.m_priority = ui_data->priority();
 
+  // Read the style name for per-entity style selection
+  if (ui_data->ui_style_name())
+    ui_component.m_style_name = ui_data->ui_style_name()->str();
+
   // data must contain a root element so throw unexpected if it is not set
   if (!ui_data->root_ui_element()) {
     FailInfo fail_info{FailMode::FlatbuffersDataNotFound,

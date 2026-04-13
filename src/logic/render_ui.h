@@ -26,7 +26,9 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <sys/types.h>
+#include <unordered_map>
 #include <vector>
 
 namespace steamrot::logic::render::ui {
@@ -151,16 +153,16 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 /// Iterates the provided entity indices (in ascending priority order so that
 /// higher-priority entities are drawn on top), retrieves each entity's
 /// CUserInterface component, and calls DrawNestedUIElements for every visible
-/// entity.
+/// entity using the style named by CUserInterface::m_style_name.
 ///
 /// @param entity_indexes Entity indices in ascending priority order.
 /// @param scene_entities EntityMemoryPool containing CUserInterface components.
 /// @param scene_texture  Render texture to draw to.
-/// @param ui_style       Style used for all drawing calls.
+/// @param ui_styles      Map of all available UIStyles (keyed by name).
 /////////////////////////////////////////////////
 void DrawAllUIEntities(const std::vector<size_t> &entity_indexes,
                        EntityMemoryPool &scene_entities,
                        sf::RenderTexture &scene_texture,
-                       const UIStyle &ui_style);
+                       const std::unordered_map<std::string, UIStyle> &ui_styles);
 
 } // namespace steamrot::logic::render::ui

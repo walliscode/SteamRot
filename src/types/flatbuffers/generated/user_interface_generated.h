@@ -839,7 +839,8 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ROOT_UI_ELEMENT = 4,
     VT_UI_NAME = 6,
     VT_IS_VISIBLE = 8,
-    VT_PRIORITY = 10
+    VT_PRIORITY = 10,
+    VT_UI_STYLE_NAME = 12
   };
   const steamrot::PanelDataFbs *root_ui_element() const {
     return GetPointer<const steamrot::PanelDataFbs *>(VT_ROOT_UI_ELEMENT);
@@ -853,6 +854,9 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t priority() const {
     return GetField<int32_t>(VT_PRIORITY, 0);
   }
+  const ::flatbuffers::String *ui_style_name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_UI_STYLE_NAME);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_ROOT_UI_ELEMENT) &&
@@ -861,6 +865,8 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyString(ui_name()) &&
            VerifyField<uint8_t>(verifier, VT_IS_VISIBLE, 1) &&
            VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
+           VerifyOffset(verifier, VT_UI_STYLE_NAME) &&
+           verifier.VerifyString(ui_style_name()) &&
            verifier.EndTable();
   }
 };
@@ -881,6 +887,9 @@ struct UserInterfaceFbsBuilder {
   void add_priority(int32_t priority) {
     fbb_.AddElement<int32_t>(UserInterfaceFbs::VT_PRIORITY, priority, 0);
   }
+  void add_ui_style_name(::flatbuffers::Offset<::flatbuffers::String> ui_style_name) {
+    fbb_.AddOffset(UserInterfaceFbs::VT_UI_STYLE_NAME, ui_style_name);
+  }
   explicit UserInterfaceFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -898,9 +907,11 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbs(
     ::flatbuffers::Offset<steamrot::PanelDataFbs> root_ui_element = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_name = 0,
     bool is_visible = false,
-    int32_t priority = 0) {
+    int32_t priority = 0,
+    ::flatbuffers::Offset<::flatbuffers::String> ui_style_name = 0) {
   UserInterfaceFbsBuilder builder_(_fbb);
   builder_.add_priority(priority);
+  builder_.add_ui_style_name(ui_style_name);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
   builder_.add_is_visible(is_visible);
@@ -912,14 +923,17 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbsDirect(
     ::flatbuffers::Offset<steamrot::PanelDataFbs> root_ui_element = 0,
     const char *ui_name = nullptr,
     bool is_visible = false,
-    int32_t priority = 0) {
+    int32_t priority = 0,
+    const char *ui_style_name = nullptr) {
   auto ui_name__ = ui_name ? _fbb.CreateString(ui_name) : 0;
+  auto ui_style_name__ = ui_style_name ? _fbb.CreateString(ui_style_name) : 0;
   return steamrot::CreateUserInterfaceFbs(
       _fbb,
       root_ui_element,
       ui_name__,
       is_visible,
-      priority);
+      priority,
+      ui_style_name__);
 }
 
 inline bool VerifyUIElementDataUnionFbs(::flatbuffers::Verifier &verifier, const void *obj, UIElementDataUnionFbs type) {
