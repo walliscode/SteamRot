@@ -35,7 +35,7 @@ void UIRenderLogic::ProcessLogic() {
   render::ui::DrawAllUIEntities(
       entity_indexes, m_scene_context.scene_entities,
       m_scene_context.scene_texture,
-      m_scene_context.asset_manager.GetDefaultUIStyle());
+      m_scene_context.asset_manager.GetAllUIStyles());
 }
 
 } // namespace steamrot::logic

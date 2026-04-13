@@ -111,6 +111,15 @@ public:
   /////////////////////////////////////////////////
   const UIStyle &GetDefaultUIStyle() const;
 
+  /////////////////////////////////////////////////
+  /// @brief Returns the UIStyle with the given name, falling back to "default"
+  /// if the named style is not found.
+  ///
+  /// @param name Name of the UIStyle to retrieve
+  /// @return const reference to the resolved UIStyle
+  /////////////////////////////////////////////////
+  const UIStyle &GetUIStyle(const std::string &name) const;
+
   const std::unordered_map<std::string, UIStyle> &GetAllUIStyles() const;
 
   /////////////////////////////////////////////////

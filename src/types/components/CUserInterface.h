@@ -29,7 +29,8 @@ struct CUserInterface : public Component {
       : Component(other), m_name(other.m_name),
         m_root_element(other.m_root_element ? other.m_root_element->Clone()
                                             : nullptr),
-        m_visible(other.m_visible), m_priority(other.m_priority) {}
+        m_visible(other.m_visible), m_priority(other.m_priority),
+        m_style_name(other.m_style_name) {}
 
   /////////////////////////////////////////////////
   /// @brief Copy assignment operator for deep copying
@@ -45,6 +46,7 @@ struct CUserInterface : public Component {
           other.m_root_element ? other.m_root_element->Clone() : nullptr;
       m_visible = other.m_visible;
       m_priority = other.m_priority;
+      m_style_name = other.m_style_name;
     }
     return *this;
   }
@@ -72,5 +74,13 @@ struct CUserInterface : public Component {
   /// priority block collision from reaching lower-priority entities.
   /////////////////////////////////////////////////
   int m_priority{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Name of the UIStyle to use when rendering this component.
+  ///
+  /// Must match a key in AssetManager's UI style map. Falls back to "default"
+  /// if the named style is not found.
+  /////////////////////////////////////////////////
+  std::string m_style_name{"default"};
 };
 } // namespace steamrot

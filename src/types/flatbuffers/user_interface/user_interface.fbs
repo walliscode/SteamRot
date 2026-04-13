@@ -92,6 +92,7 @@ table UserInterfaceFbs{
     ui_name: string; 
     is_visible: bool;
     priority: int;
+    ui_style_name: string;
   }
 
 root_type UserInterfaceFbs;
