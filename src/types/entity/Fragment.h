@@ -12,6 +12,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Part.h"
+#include <SFML/System/Vector2.hpp>
+#include <vector>
 
 namespace steamrot {
 
@@ -19,11 +21,15 @@ namespace steamrot {
 /// @struct Fragment
 /// @brief Contains the data for a Fragment.
 ///
-/// Inherits common part data (name, sockets, movement_views) from Part.
-/// Fragment-specific fields are added here.
+/// Inherits common part data (name, movement_views) from Part.
+/// Stores explicit local socket positions in the part's own coordinate space.
 /////////////////////////////////////////////////
 struct Fragment : Part {
-  // Fragment-specific fields will be added here as the design grows.
+  /////////////////////////////////////////////////
+  /// @brief Local positions of the fragment's sockets, in the part's own
+  /// coordinate space.
+  /////////////////////////////////////////////////
+  std::vector<sf::Vector2f> sockets;
 };
 
 } // namespace steamrot

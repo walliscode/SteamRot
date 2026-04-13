@@ -18,21 +18,125 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct SocketConfigFbs;
+struct SocketConfigFbsBuilder;
+
 struct JointFbs;
 struct JointFbsBuilder;
+
+struct SocketConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SocketConfigFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SOCKET_COUNT = 4,
+    VT_RADIUS = 6,
+    VT_ARC_MIN = 8,
+    VT_ARC_MAX = 10,
+    VT_MIN_GAP = 12,
+    VT_FIXED_SOCKET_ANGLE = 14,
+    VT_HAS_FIXED_SOCKET = 16
+  };
+  int32_t socket_count() const {
+    return GetField<int32_t>(VT_SOCKET_COUNT, 0);
+  }
+  float radius() const {
+    return GetField<float>(VT_RADIUS, 10.0f);
+  }
+  float arc_min() const {
+    return GetField<float>(VT_ARC_MIN, 0.0f);
+  }
+  float arc_max() const {
+    return GetField<float>(VT_ARC_MAX, 360.0f);
+  }
+  float min_gap() const {
+    return GetField<float>(VT_MIN_GAP, 0.0f);
+  }
+  float fixed_socket_angle() const {
+    return GetField<float>(VT_FIXED_SOCKET_ANGLE, 0.0f);
+  }
+  bool has_fixed_socket() const {
+    return GetField<uint8_t>(VT_HAS_FIXED_SOCKET, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_SOCKET_COUNT, 4) &&
+           VerifyField<float>(verifier, VT_RADIUS, 4) &&
+           VerifyField<float>(verifier, VT_ARC_MIN, 4) &&
+           VerifyField<float>(verifier, VT_ARC_MAX, 4) &&
+           VerifyField<float>(verifier, VT_MIN_GAP, 4) &&
+           VerifyField<float>(verifier, VT_FIXED_SOCKET_ANGLE, 4) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_FIXED_SOCKET, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct SocketConfigFbsBuilder {
+  typedef SocketConfigFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_socket_count(int32_t socket_count) {
+    fbb_.AddElement<int32_t>(SocketConfigFbs::VT_SOCKET_COUNT, socket_count, 0);
+  }
+  void add_radius(float radius) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_RADIUS, radius, 10.0f);
+  }
+  void add_arc_min(float arc_min) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_ARC_MIN, arc_min, 0.0f);
+  }
+  void add_arc_max(float arc_max) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_ARC_MAX, arc_max, 360.0f);
+  }
+  void add_min_gap(float min_gap) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_MIN_GAP, min_gap, 0.0f);
+  }
+  void add_fixed_socket_angle(float fixed_socket_angle) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_FIXED_SOCKET_ANGLE, fixed_socket_angle, 0.0f);
+  }
+  void add_has_fixed_socket(bool has_fixed_socket) {
+    fbb_.AddElement<uint8_t>(SocketConfigFbs::VT_HAS_FIXED_SOCKET, static_cast<uint8_t>(has_fixed_socket), 0);
+  }
+  explicit SocketConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SocketConfigFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SocketConfigFbs>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SocketConfigFbs> CreateSocketConfigFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t socket_count = 0,
+    float radius = 10.0f,
+    float arc_min = 0.0f,
+    float arc_max = 360.0f,
+    float min_gap = 0.0f,
+    float fixed_socket_angle = 0.0f,
+    bool has_fixed_socket = false) {
+  SocketConfigFbsBuilder builder_(_fbb);
+  builder_.add_fixed_socket_angle(fixed_socket_angle);
+  builder_.add_min_gap(min_gap);
+  builder_.add_arc_max(arc_max);
+  builder_.add_arc_min(arc_min);
+  builder_.add_radius(radius);
+  builder_.add_socket_count(socket_count);
+  builder_.add_has_fixed_socket(has_fixed_socket);
+  return builder_.Finish();
+}
 
 struct JointFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef JointFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_SOCKETS = 6,
+    VT_SOCKET_CONFIG = 6,
     VT_MOVEMENT_VIEWS = 8
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *sockets() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *>(VT_SOCKETS);
+  const steamrot::SocketConfigFbs *socket_config() const {
+    return GetPointer<const steamrot::SocketConfigFbs *>(VT_SOCKET_CONFIG);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>> *movement_views() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>> *>(VT_MOVEMENT_VIEWS);
@@ -41,9 +145,8 @@ struct JointFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
-           VerifyOffsetRequired(verifier, VT_SOCKETS) &&
-           verifier.VerifyVector(sockets()) &&
-           verifier.VerifyVectorOfTables(sockets()) &&
+           VerifyOffsetRequired(verifier, VT_SOCKET_CONFIG) &&
+           verifier.VerifyTable(socket_config()) &&
            VerifyOffsetRequired(verifier, VT_MOVEMENT_VIEWS) &&
            verifier.VerifyVector(movement_views()) &&
            verifier.VerifyVectorOfTables(movement_views()) &&
@@ -58,8 +161,8 @@ struct JointFbsBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(JointFbs::VT_NAME, name);
   }
-  void add_sockets(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>> sockets) {
-    fbb_.AddOffset(JointFbs::VT_SOCKETS, sockets);
+  void add_socket_config(::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config) {
+    fbb_.AddOffset(JointFbs::VT_SOCKET_CONFIG, socket_config);
   }
   void add_movement_views(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>>> movement_views) {
     fbb_.AddOffset(JointFbs::VT_MOVEMENT_VIEWS, movement_views);
@@ -72,7 +175,7 @@ struct JointFbsBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<JointFbs>(end);
     fbb_.Required(o, JointFbs::VT_NAME);
-    fbb_.Required(o, JointFbs::VT_SOCKETS);
+    fbb_.Required(o, JointFbs::VT_SOCKET_CONFIG);
     fbb_.Required(o, JointFbs::VT_MOVEMENT_VIEWS);
     return o;
   }
@@ -81,11 +184,11 @@ struct JointFbsBuilder {
 inline ::flatbuffers::Offset<JointFbs> CreateJointFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>> sockets = 0,
+    ::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>>> movement_views = 0) {
   JointFbsBuilder builder_(_fbb);
   builder_.add_movement_views(movement_views);
-  builder_.add_sockets(sockets);
+  builder_.add_socket_config(socket_config);
   builder_.add_name(name);
   return builder_.Finish();
 }
@@ -93,15 +196,14 @@ inline ::flatbuffers::Offset<JointFbs> CreateJointFbs(
 inline ::flatbuffers::Offset<JointFbs> CreateJointFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *sockets = nullptr,
+    ::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config = 0,
     const std::vector<::flatbuffers::Offset<steamrot::ViewFbs>> *movement_views = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto sockets__ = sockets ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>(*sockets) : 0;
   auto movement_views__ = movement_views ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ViewFbs>>(*movement_views) : 0;
   return steamrot::CreateJointFbs(
       _fbb,
       name__,
-      sockets__,
+      socket_config,
       movement_views__);
 }
 
