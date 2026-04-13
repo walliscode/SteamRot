@@ -74,9 +74,14 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is over a socket on the joint") {
     steamrot::Joint joint;
-    joint.sockets = {{100.f, 100.f}};
+    // Single socket at local (100, 0) via socket_config (radius=100, angle=0)
+    joint.socket_config.socket_count = 1;
+    joint.socket_config.radius = 100.f;
+    joint.socket_config.arc_min = 0.f;
+    joint.socket_config.arc_max = 0.f;
+    joint.socket_config.has_fixed_socket = false;
     steamrot::JointInstance joint_instance{joint};
-    sf::Vector2i mouse_position(103, 103);
+    sf::Vector2i mouse_position(103, 3);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,
                                                       joint_instance);
     REQUIRE(joint_instance.socket_states[0].is_mouse_over == true);
@@ -84,7 +89,11 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is not over any socket on the joint") {
     steamrot::Joint joint;
-    joint.sockets = {{100.f, 100.f}};
+    joint.socket_config.socket_count = 1;
+    joint.socket_config.radius = 100.f;
+    joint.socket_config.arc_min = 0.f;
+    joint.socket_config.arc_max = 0.f;
+    joint.socket_config.has_fixed_socket = false;
     steamrot::JointInstance joint_instance{joint};
     sf::Vector2i mouse_position(200, 200);
     steamrot::logic::collision::mouse::CheckMouseOver(mouse_position,

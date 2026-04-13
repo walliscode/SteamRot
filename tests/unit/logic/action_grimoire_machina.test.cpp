@@ -188,7 +188,7 @@ TEST_CASE("FragmentInstance id defaults to zero",
 TEST_CASE("JointInstance constructor creates one socket state per Joint socket",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
+  joint.socket_config.socket_count = 2;
 
   steamrot::JointInstance instance{joint};
 
@@ -199,7 +199,7 @@ TEST_CASE("JointInstance constructor stores the Joint reference",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
   joint.name = "test_joint";
-  joint.sockets = {{0.f, 0.f}};
+  joint.socket_config.socket_count = 1;
 
   steamrot::JointInstance instance{joint};
 
@@ -209,7 +209,7 @@ TEST_CASE("JointInstance constructor stores the Joint reference",
 TEST_CASE("JointInstance constructor stores the initial transform",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.sockets = {{0.f, 0.f}};
+  joint.socket_config.socket_count = 1;
 
   sf::Transform transform;
   transform.translate({50.f, 75.f});
@@ -219,11 +219,11 @@ TEST_CASE("JointInstance constructor stores the initial transform",
   REQUIRE(instance.transform == transform);
 }
 
-TEST_CASE("JointInstance constructor with no sockets creates empty "
+TEST_CASE("JointInstance constructor with socket_count zero creates empty "
           "socket_states vector",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.sockets = {};
+  joint.socket_config.socket_count = 0;
 
   steamrot::JointInstance instance{joint};
 
@@ -233,7 +233,7 @@ TEST_CASE("JointInstance constructor with no sockets creates empty "
 TEST_CASE("JointInstance constructor initialises socket states to Available",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.sockets = {{5.f, 10.f}, {15.f, 25.f}};
+  joint.socket_config.socket_count = 2;
 
   steamrot::JointInstance instance{joint};
 
@@ -246,11 +246,41 @@ TEST_CASE("JointInstance constructor initialises socket states to Available",
 TEST_CASE("JointInstance id defaults to zero",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.sockets = {{0.f, 0.f}};
+  joint.socket_config.socket_count = 1;
 
   steamrot::JointInstance instance{joint};
 
   REQUIRE(instance.id == 0u);
+}
+
+TEST_CASE("JointInstance constructor defaults current_rotation to zero",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 1;
+
+  steamrot::JointInstance instance{joint};
+
+  REQUIRE(instance.current_rotation == 0.f);
+}
+
+TEST_CASE("JointInstance constructor defaults rotation_min to -180",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 1;
+
+  steamrot::JointInstance instance{joint};
+
+  REQUIRE(instance.rotation_min == -180.f);
+}
+
+TEST_CASE("JointInstance constructor defaults rotation_max to 180",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 1;
+
+  steamrot::JointInstance instance{joint};
+
+  REQUIRE(instance.rotation_max == 180.f);
 }
 
 /////////////////////////////////////////////////

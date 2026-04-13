@@ -56,14 +56,15 @@ struct SocketState {
 /// Holds a stable unique ID, a reference to the Joint definition, the single
 /// transform that positions the instance on the canvas, and per-socket runtime
 /// state. World positions for sockets are derived on demand via:
-///   transform.transformPoint(joint.sockets[i])
+///   ComputeSocketLocalPos(joint.socket_config, i, current_rotation)
+///   followed by transform.transformPoint(local_pos)
 /////////////////////////////////////////////////
 struct JointInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a JointInstance from a Joint definition.
   ///
   /// Initialises socket_states with one default-constructed SocketState per
-  /// socket in the Joint definition.
+  /// socket described by the Joint's SocketConfig.
   ///
   /// @param joint_ref         Joint definition to reference.
   /// @param initial_transform Transform placing this instance in world space.
@@ -71,7 +72,8 @@ struct JointInstance {
   JointInstance(Joint &joint_ref,
                 sf::Transform initial_transform = sf::Transform::Identity)
       : joint{joint_ref}, transform{initial_transform} {
-    socket_states.resize(joint_ref.sockets.size());
+    socket_states.resize(
+        static_cast<size_t>(joint_ref.socket_config.socket_count));
   }
 
   /////////////////////////////////////////////////
@@ -88,16 +90,35 @@ struct JointInstance {
   /////////////////////////////////////////////////
   /// @brief Single transform that positions this instance on the canvas.
   ///
-  /// Apply to joint.sockets[i] to obtain each socket's world position.
+  /// Apply to a socket's local position to obtain the socket's world position.
+  /// Use ComputeSocketLocalPos(joint.socket_config, i, current_rotation) to
+  /// get the local position first.
   /////////////////////////////////////////////////
   sf::Transform transform{sf::Transform::Identity};
 
   /////////////////////////////////////////////////
   /// @brief Per-socket runtime state (connection status, hover).
   ///
-  /// socket_states[i] corresponds to joint.sockets[i].
+  /// socket_states[i] corresponds to the i-th socket as described by
+  /// joint.socket_config.
   /////////////////////////////////////////////////
   std::vector<SocketState> socket_states;
+
+  /////////////////////////////////////////////////
+  /// @brief Current rotation angle (degrees) of the socket ring around the
+  /// Joint's local origin.
+  /////////////////////////////////////////////////
+  float current_rotation{0.f};
+
+  /////////////////////////////////////////////////
+  /// @brief Minimum allowed rotation angle (degrees, hard stop).
+  /////////////////////////////////////////////////
+  float rotation_min{-180.f};
+
+  /////////////////////////////////////////////////
+  /// @brief Maximum allowed rotation angle (degrees, hard stop).
+  /////////////////////////////////////////////////
+  float rotation_max{180.f};
 };
 
 /////////////////////////////////////////////////
