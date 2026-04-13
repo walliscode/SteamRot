@@ -19,6 +19,8 @@ SteamRot is a data-driven C++ game engine built with:
 |---------|-------------|
 | [Workflows](workflows/ADDING_LOGIC.md) | Step-by-step guides for common development tasks |
 | [Design](design/LOGIC_DECOMPOSITION.md) | Architectural decisions and design notes |
+| [Coordinate Spaces](design/COORDINATE_SPACES.md) | Screen space vs world space — concepts and mechanics |
+| [Coordinate Spaces in SteamRot](design/COORDINATE_SPACES_STEAMROT.md) | How the codebase handles coordinate conversion and pitfalls |
 
 ## Getting Started
 

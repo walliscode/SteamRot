@@ -14,6 +14,7 @@
 #include "LogicFactory.h"
 #include "MrGhost.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -71,6 +72,17 @@ struct SceneResources {
   /// Exposed to all Logic classes via SceneContext::camera_state.
   /////////////////////////////////////////////////
   CameraState camera_state{};
+
+  /////////////////////////////////////////////////
+  /// @brief World-space mouse position for the current tick.
+  ///
+  /// Computed once per tick in GhostPositioningLogic from the screen-space
+  /// mouse_position via CameraState::MapToWorldCoords. All world-space
+  /// systems (ghost rendering, grimoire collision, piece placement) read from
+  /// this value rather than performing the screen-to-world conversion
+  /// themselves.
+  /////////////////////////////////////////////////
+  sf::Vector2f world_mouse_position{0.f, 0.f};
 };
 
 } // namespace steamrot
