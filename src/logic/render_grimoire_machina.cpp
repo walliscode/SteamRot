@@ -9,11 +9,13 @@
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
+#include "SocketConfigUtils.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
+
 /////////////////////////////////////////////////
 void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form) {
 }
@@ -90,9 +92,11 @@ void Draw(sf::RenderTexture &texture, FragmentInstance &fragment_instance) {
 /////////////////////////////////////////////////
 void Draw(sf::RenderTexture &texture, JointInstance &joint_instance) {
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+    const sf::Vector2f local_pos =
+        ComputeSocketLocalPos(joint_instance.joint.socket_config, i,
+                              joint_instance.current_rotation);
     const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(
-            joint_instance.joint.sockets[i]);
+        joint_instance.transform.transformPoint(local_pos);
     DrawSocket(texture, world_pos, joint_instance.socket_states[i]);
   }
 }
