@@ -86,6 +86,10 @@ using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 **Serve locally:**
 
 ```bash
+# Activate the virtual environment (once per shell session)
+source .venv/bin/activate   # macOS/Linux
+# .venv\Scripts\activate    # Windows
+
 # Install dependencies (once)
 pip install -r tools/wiki/requirements.txt
 

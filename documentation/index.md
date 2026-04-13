@@ -38,12 +38,17 @@ ctest --preset Debug
 ### Generate test dashboard
 
 ```bash
+# Activate the virtual environment first (see "Serve this wiki locally" below)
 python -m tools.test_dashboard --tests-dir tests/
 ```
 
 ### Serve this wiki locally
 
 ```bash
+# Activate the virtual environment (once per shell session)
+source .venv/bin/activate   # macOS/Linux
+# .venv\Scripts\activate    # Windows
+
 # Install dependencies (once)
 pip install -r tools/wiki/requirements.txt
 
