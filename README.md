@@ -76,6 +76,32 @@ SteamRot/
 4. **Fail Fast**: Let exceptions propagate, handle gracefully at top level
 5. **Type Safety**: Use `std::expected` for runtime errors
 
+## Wiki
+
+The SteamRot wiki is a searchable, browsable site built from the `documentation/` directory
+using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
+
+**Live wiki:** https://walliscode.github.io/SteamRot/
+
+**Serve locally:**
+
+```bash
+# Install dependencies (once)
+pip install -r tools/wiki/requirements.txt
+
+# Start live-reloading local server
+mkdocs serve
+# Open http://127.0.0.1:8000
+```
+
+**Add a new page:** drop a `.md` file into `documentation/` and add it to the `nav`
+section in `mkdocs.yml`. Mermaid diagrams render automatically in fenced ` ```mermaid ` blocks.
+
+The wiki is rebuilt and published to GitHub Pages automatically on every push to `main`
+that touches `documentation/`, `mkdocs.yml`, or `tools/wiki/requirements.txt`.
+
+---
+
 ## Documentation
 
 The `documentation/` directory contains comprehensive guides organized by topic:
