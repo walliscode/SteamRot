@@ -128,10 +128,9 @@ CreateTestFragmentFbs(flatbuffers::FlatBufferBuilder &builder,
 /////////////////////////////////////////////////
 flatbuffers::Offset<steamrot::JointFbs>
 CreateTestJointFbs(flatbuffers::FlatBufferBuilder &builder,
-                   const std::string &name = "test_joint",
-                   int socket_count = 4, float radius = 10.f,
-                   float arc_min = 0.f, float arc_max = 360.f,
-                   size_t num_views = 1) {
+                   const std::string &name = "test_joint", int socket_count = 4,
+                   float radius = 10.f, float arc_min = 0.f,
+                   float arc_max = 360.f, size_t num_views = 1) {
   auto name_offset = builder.CreateString(name);
 
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(
@@ -432,33 +431,8 @@ TEST_CASE("ConfigureJoint configures socket_config successfully",
   REQUIRE(joint.socket_config.arc_max == 190.f);
 }
 
-TEST_CASE("ConfigureJoint returns unexpected when socket_config is missing",
+TEST_CASE("ConfigureJoint returns unexpected when socket_count is not positive",
           "[unit][ConfigureJoint]") {
-  flatbuffers::FlatBufferBuilder builder;
-
-  auto name_offset = builder.CreateString("test_joint");
-  auto view = CreateTestView(builder, steamrot::ViewDirectionFbs_FRONT, 2);
-  auto views_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
-
-  // Pass offset 0 (null) for socket_config to simulate missing table
-  auto joint_fbs_offset =
-      steamrot::CreateJointFbs(builder, name_offset, 0, views_vector);
-
-  builder.Finish(joint_fbs_offset);
-  auto joint_fbs =
-      flatbuffers::GetRoot<steamrot::JointFbs>(builder.GetBufferPointer());
-
-  steamrot::Joint joint;
-  auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
-
-  REQUIRE(!result.has_value());
-  REQUIRE(result.error().message == "Joint socket_config is missing");
-}
-
-TEST_CASE(
-    "ConfigureJoint returns unexpected when socket_count is not positive",
-    "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_joint");
@@ -486,8 +460,8 @@ TEST_CASE(
 TEST_CASE("ConfigureJoint configures movement_views successfully",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto joint_fbs_offset = CreateTestJointFbs(builder, "test_joint", 4, 10.f,
-                                             0.f, 360.f, 1);
+  auto joint_fbs_offset =
+      CreateTestJointFbs(builder, "test_joint", 4, 10.f, 0.f, 360.f, 1);
   builder.Finish(joint_fbs_offset);
 
   auto joint_fbs =

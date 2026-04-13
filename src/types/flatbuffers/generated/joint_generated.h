@@ -89,15 +89,13 @@ struct SocketConfigFbsBuilder {
     fbb_.AddElement<float>(SocketConfigFbs::VT_MIN_GAP, min_gap, 0.0f);
   }
   void add_fixed_socket_angle(float fixed_socket_angle) {
-    fbb_.AddElement<float>(SocketConfigFbs::VT_FIXED_SOCKET_ANGLE,
-                           fixed_socket_angle, 0.0f);
+    fbb_.AddElement<float>(SocketConfigFbs::VT_FIXED_SOCKET_ANGLE, fixed_socket_angle, 0.0f);
   }
   void add_has_fixed_socket(bool has_fixed_socket) {
-    fbb_.AddElement<uint8_t>(SocketConfigFbs::VT_HAS_FIXED_SOCKET,
-                             static_cast<uint8_t>(has_fixed_socket), 0);
+    fbb_.AddElement<uint8_t>(SocketConfigFbs::VT_HAS_FIXED_SOCKET, static_cast<uint8_t>(has_fixed_socket), 0);
   }
   explicit SocketConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-      : fbb_(_fbb) {
+        : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
   ::flatbuffers::Offset<SocketConfigFbs> Finish() {
@@ -117,13 +115,13 @@ inline ::flatbuffers::Offset<SocketConfigFbs> CreateSocketConfigFbs(
     float fixed_socket_angle = 0.0f,
     bool has_fixed_socket = false) {
   SocketConfigFbsBuilder builder_(_fbb);
-  builder_.add_has_fixed_socket(has_fixed_socket);
   builder_.add_fixed_socket_angle(fixed_socket_angle);
   builder_.add_min_gap(min_gap);
   builder_.add_arc_max(arc_max);
   builder_.add_arc_min(arc_min);
   builder_.add_radius(radius);
   builder_.add_socket_count(socket_count);
+  builder_.add_has_fixed_socket(has_fixed_socket);
   return builder_.Finish();
 }
 
@@ -193,6 +191,20 @@ inline ::flatbuffers::Offset<JointFbs> CreateJointFbs(
   builder_.add_socket_config(socket_config);
   builder_.add_name(name);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<JointFbs> CreateJointFbsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    ::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config = 0,
+    const std::vector<::flatbuffers::Offset<steamrot::ViewFbs>> *movement_views = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto movement_views__ = movement_views ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ViewFbs>>(*movement_views) : 0;
+  return steamrot::CreateJointFbs(
+      _fbb,
+      name__,
+      socket_config,
+      movement_views__);
 }
 
 inline const steamrot::JointFbs *GetJointFbs(const void *buf) {
