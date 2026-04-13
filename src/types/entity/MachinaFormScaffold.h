@@ -140,9 +140,8 @@ struct FragmentInstance {
   /// @param fragment_ref      Fragment definition to reference.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
-  FragmentInstance(
-      Fragment &fragment_ref,
-      sf::Transform initial_transform = sf::Transform::Identity)
+  FragmentInstance(Fragment &fragment_ref,
+                   sf::Transform initial_transform = sf::Transform::Identity)
       : fragment{fragment_ref}, transform{initial_transform} {
     socket_states.resize(fragment_ref.sockets.size());
   }
@@ -239,6 +238,14 @@ struct MachinaFormScaffold {
   /// @brief All connections between sockets on the scaffold.
   /////////////////////////////////////////////////
   std::vector<Connection> connections;
+
+  // Boolean States //
+
+  /////////////////////////////////////////////////
+  /// @brief a boolean toggle used to determine whether to render sockets on the
+  /// Joint and Fragments.
+  /////////////////////////////////////////////////
+  bool are_sockets_visible{false};
 };
 
 } // namespace steamrot

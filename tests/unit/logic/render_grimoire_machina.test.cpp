@@ -97,7 +97,8 @@ MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green) {
 /// socket lands at local (5, 0). Callers that need a specific world position
 /// can translate by (world_x - 5, world_y).
 /////////////////////////////////////////////////
-steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
+steamrot::Joint
+MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
   sf::VertexArray va(sf::PrimitiveType::Triangles);
   va.append(sf::Vertex{sf::Vector2f{0.f, 0.f}, colour});
   va.append(sf::Vertex{sf::Vector2f{20.f, 0.f}, colour});
@@ -322,7 +323,8 @@ TEST_CASE("Draw(FragmentInstance) draws socket circles without throwing",
   steamrot::FragmentInstance instance{fragment, t};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::Draw(texture, instance));
+      steamrot::logic::render::grimoire_machina::DrawFragmentInstanceSockets(
+          texture, instance));
 }
 
 TEST_CASE(
@@ -337,7 +339,8 @@ TEST_CASE(
   t.translate({40.f, 40.f});
   steamrot::FragmentInstance instance{fragment, t};
 
-  steamrot::logic::render::grimoire_machina::Draw(texture, instance);
+  steamrot::logic::render::grimoire_machina::DrawFragmentInstanceSockets(
+      texture, instance);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -359,7 +362,8 @@ TEST_CASE("Draw(JointInstance) draws socket circles without throwing",
   steamrot::JointInstance instance{joint, t};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::Draw(texture, instance));
+      steamrot::logic::render::grimoire_machina::DrawJointInstanceSockets(
+          texture, instance));
 }
 
 TEST_CASE(
@@ -374,7 +378,8 @@ TEST_CASE(
   t.translate({40.f, 45.f});
   steamrot::JointInstance instance{joint, t};
 
-  steamrot::logic::render::grimoire_machina::Draw(texture, instance);
+  steamrot::logic::render::grimoire_machina::DrawJointInstanceSockets(texture,
+                                                                      instance);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -395,14 +400,14 @@ TEST_CASE("DrawFragmentInstance draws fragment geometry and sockets without "
   t.translate({10.f, 10.f});
   steamrot::FragmentInstance instance{fragment, t};
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
-      texture, instance));
+  REQUIRE_NOTHROW(
+      steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+          texture, instance, true));
 }
 
-TEST_CASE(
-    "DrawFragmentInstance renders fragment view geometry at transformed "
-    "position",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("DrawFragmentInstance renders fragment view geometry at transformed "
+          "position",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
@@ -415,12 +420,16 @@ TEST_CASE(
   t.translate({10.f, 10.f});
   steamrot::FragmentInstance instance{fragment, t};
 
-  steamrot::logic::render::grimoire_machina::DrawFragmentInstance(texture,
-                                                                  instance);
+  steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+      texture, instance, false);
   texture.display();
 
+  // test the Fragment View
   const sf::Image image = texture.getTexture().copyToImage();
   REQUIRE(image.getPixel({20, 17}) == sf::Color::Green);
+
+  // test the socket rendering
+  REQUIRE(image.getPixel({15, 15}) == sf::Color::White);
 }
 
 /////////////////////////////////////////////////
@@ -497,8 +506,11 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost, {50.f, 50.f});
+  if (!result.has_value()) {
+    FAIL("PlaceGhostOnScaffold failed: " << result.error());
+  } // These are all the boolean states that the editor needs to track for the
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
@@ -520,9 +532,11 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::JointTag{"joint"};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost, {50.f, 50.f});
-
+  if (!result.has_value()) {
+    FAIL("PlaceGhostOnScaffold failed: " << result.error());
+  } // These are all the boolean states that the editor needs to track for the
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
           texture, grimoire_machina));
