@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CameraZoomActionLogic.h"
+#include "CameraActionLogic.h"
 #include "EventPayload.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
@@ -152,7 +152,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   }
   const auto &action_logics = action_it->second;
   REQUIRE(action_logics.size() == 5);
-  REQUIRE(dynamic_cast<steamrot::logic::CameraZoomActionLogic *>(
+  REQUIRE(dynamic_cast<steamrot::logic::CameraActionLogic *>(
       action_logics[0].get()));
   REQUIRE(
       dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[1].get()));

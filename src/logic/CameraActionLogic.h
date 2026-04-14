@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the CameraZoomActionLogic class.
+/// @brief Declaration of the CameraActionLogic class.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -17,35 +17,35 @@
 namespace steamrot::logic {
 
 /////////////////////////////////////////////////
-/// @class CameraZoomActionLogic
-/// @brief Action logic that translates scroll-wheel events into camera zoom.
+/// @class CameraActionLogic
+/// @brief Action logic that handles all camera-based events.
 ///
 /// Subscribes to EventType::CAMERA via logic_config.json data-driven
 /// configuration. Each tick that a CAMERA event is active the subscriber
 /// captures the CameraPayload and applies its scroll delta to
 /// SceneContext::camera_state.
 /////////////////////////////////////////////////
-class CameraZoomActionLogic : public Logic {
+class CameraActionLogic : public Logic {
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Process camera zoom from any active CAMERA subscriber.
+  /// @brief Process all active CAMERA subscribers.
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 
 public:
   /////////////////////////////////////////////////
-  /// @brief Constructor for CameraZoomActionLogic.
+  /// @brief Constructor for CameraActionLogic.
   ///
   /// @param scene_context SceneContext providing event_handler and
   ///                      camera_state references.
   /////////////////////////////////////////////////
-  CameraZoomActionLogic(const SceneContext scene_context);
+  CameraActionLogic(const SceneContext scene_context);
 
   /////////////////////////////////////////////////
-  /// @brief Returns LogicType::CameraZoom.
+  /// @brief Returns LogicType::Camera.
   /////////////////////////////////////////////////
-  LogicType GetLogicType() const override { return LogicType::CameraZoom; }
+  LogicType GetLogicType() const override { return LogicType::Camera; }
 };
 
 } // namespace steamrot::logic

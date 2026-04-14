@@ -81,7 +81,7 @@ struct LogicConfigCollectionFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
     VT_TEST_LOGIC = 4,
     VT_GRIMOIRE_MACHINA_ACTION_LOGIC = 6,
     VT_GHOST_ACTION_LOGIC = 8,
-    VT_CAMERA_ZOOM_ACTION_LOGIC = 10
+    VT_CAMERA_ACTION_LOGIC = 10
   };
   const steamrot::LogicConfigFbs *test_logic() const {
     return GetPointer<const steamrot::LogicConfigFbs *>(VT_TEST_LOGIC);
@@ -92,8 +92,8 @@ struct LogicConfigCollectionFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
   const steamrot::LogicConfigFbs *ghost_action_logic() const {
     return GetPointer<const steamrot::LogicConfigFbs *>(VT_GHOST_ACTION_LOGIC);
   }
-  const steamrot::LogicConfigFbs *camera_zoom_action_logic() const {
-    return GetPointer<const steamrot::LogicConfigFbs *>(VT_CAMERA_ZOOM_ACTION_LOGIC);
+  const steamrot::LogicConfigFbs *camera_action_logic() const {
+    return GetPointer<const steamrot::LogicConfigFbs *>(VT_CAMERA_ACTION_LOGIC);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -103,8 +103,8 @@ struct LogicConfigCollectionFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
            verifier.VerifyTable(grimoire_machina_action_logic()) &&
            VerifyOffset(verifier, VT_GHOST_ACTION_LOGIC) &&
            verifier.VerifyTable(ghost_action_logic()) &&
-           VerifyOffset(verifier, VT_CAMERA_ZOOM_ACTION_LOGIC) &&
-           verifier.VerifyTable(camera_zoom_action_logic()) &&
+           VerifyOffset(verifier, VT_CAMERA_ACTION_LOGIC) &&
+           verifier.VerifyTable(camera_action_logic()) &&
            verifier.EndTable();
   }
 };
@@ -122,8 +122,8 @@ struct LogicConfigCollectionFbsBuilder {
   void add_ghost_action_logic(::flatbuffers::Offset<steamrot::LogicConfigFbs> ghost_action_logic) {
     fbb_.AddOffset(LogicConfigCollectionFbs::VT_GHOST_ACTION_LOGIC, ghost_action_logic);
   }
-  void add_camera_zoom_action_logic(::flatbuffers::Offset<steamrot::LogicConfigFbs> camera_zoom_action_logic) {
-    fbb_.AddOffset(LogicConfigCollectionFbs::VT_CAMERA_ZOOM_ACTION_LOGIC, camera_zoom_action_logic);
+  void add_camera_action_logic(::flatbuffers::Offset<steamrot::LogicConfigFbs> camera_action_logic) {
+    fbb_.AddOffset(LogicConfigCollectionFbs::VT_CAMERA_ACTION_LOGIC, camera_action_logic);
   }
   explicit LogicConfigCollectionFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -141,9 +141,9 @@ inline ::flatbuffers::Offset<LogicConfigCollectionFbs> CreateLogicConfigCollecti
     ::flatbuffers::Offset<steamrot::LogicConfigFbs> test_logic = 0,
     ::flatbuffers::Offset<steamrot::LogicConfigFbs> grimoire_machina_action_logic = 0,
     ::flatbuffers::Offset<steamrot::LogicConfigFbs> ghost_action_logic = 0,
-    ::flatbuffers::Offset<steamrot::LogicConfigFbs> camera_zoom_action_logic = 0) {
+    ::flatbuffers::Offset<steamrot::LogicConfigFbs> camera_action_logic = 0) {
   LogicConfigCollectionFbsBuilder builder_(_fbb);
-  builder_.add_camera_zoom_action_logic(camera_zoom_action_logic);
+  builder_.add_camera_action_logic(camera_action_logic);
   builder_.add_ghost_action_logic(ghost_action_logic);
   builder_.add_grimoire_machina_action_logic(grimoire_machina_action_logic);
   builder_.add_test_logic(test_logic);

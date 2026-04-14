@@ -66,14 +66,14 @@ FlatbuffersLogicConfigCollectionProvider::ConfigureLogicConfigCollection(
     }
     logic_config_collection[steamrot::LogicType::GhostAction] = logic_config;
   }
-  if (collection->camera_zoom_action_logic()) {
+  if (collection->camera_action_logic()) {
     LogicConfig logic_config;
     auto configure_result = data::configure::ConfigureLogicConfig(
-        logic_config, collection->camera_zoom_action_logic());
+        logic_config, collection->camera_action_logic());
     if (!configure_result) {
       return std::unexpected(configure_result.error());
     }
-    logic_config_collection[steamrot::LogicType::CameraZoom] = logic_config;
+    logic_config_collection[steamrot::LogicType::Camera] = logic_config;
   }
 
   return std::monostate{};
