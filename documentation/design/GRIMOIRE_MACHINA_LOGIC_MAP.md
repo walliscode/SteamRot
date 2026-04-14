@@ -102,10 +102,9 @@ GrimoireMachinaActionLogic::ProcessLogic()
         │     ├── InitialiseActiveMachinaFormScaffold(grimoire_machina)  // INITIATE_MACHINA_FORM_SCAFFOLD
         │     └── ClearActiveMachinaFormScaffold(grimoire_machina)       // CLEAR_MACHINA_FORM_SCAFFOLD
         └── ProcessUserInputEvents(subscriber, scene_context, grimoire_machina) // USER_INPUT events
-              ├── ProcessSocketVisibilitySubscribers(subscriber, grimoire_machina) // TOGGLE_SOCKET_VISIBILITY
-              └── ProcessPlacementSubscribers(subscriber, scene_context, grimoire_machina) // SELECT
-                    └── PlaceGhostOnScaffold(grimoire_machina, mr_ghost, world_pos)
-                          └── PlaceFirstPiece(grimoire_machina, mr_ghost, world_pos)  // when scaffold is empty
+              ├── ToggleSocketVisibility(scaffold)          // TOGGLE_SOCKET_VISIBILITY (guard: scaffold exists)
+              └── PlaceGhostOnScaffold(grimoire_machina, mr_ghost)  // SELECT (guards: ghost not monostate, not over UI)
+                    └── PlaceFirstPiece(grimoire_machina, mr_ghost)  // when scaffold is empty
 ```
 
 ---
@@ -196,11 +195,10 @@ GrimoireMachina-specific surface area is:
 | `GetAllFragmentNames` | Returns a `vector<string>` of all keys in `m_all_fragments`. Used to populate UI drop-down lists with available fragment names. |
 | `GetAllJointNames` | Returns a `vector<string>` of all keys in `m_all_joints`. Used to populate UI drop-down lists with available joint names. |
 | `ProcessLogicEvents` | Extracts a `LogicPayload` from `subscriber.captured_payload` and dispatches to `Initialise…` or `Clear…` based on the `LogicToggle` value. |
-| `ProcessSocketVisibilitySubscribers` | Toggles `MachinaFormScaffold::are_sockets_visible` when the subscriber carries `InputPayload::TOGGLE_SOCKET_VISIBILITY`. |
-| `ProcessPlacementSubscribers` | Places the currently selected ghost item onto the scaffold when a `SELECT` input arrives and all placement guards pass: (0) subscriber must carry an `InputPayload` with action `SELECT`, (1) a ghost item is selected, (2) the click does not land on a visible UI element, (3) an active scaffold exists. |
-| `ProcessUserInputEvents` | Routes a `USER_INPUT` subscriber to `ProcessSocketVisibilitySubscribers` and `ProcessPlacementSubscribers`. |
-| `PlaceFirstPiece` | Handles the first piece on an empty scaffold. Looks up the `Fragment` or `Joint` identified by the ghost selection tag, centers it on `world_pos`, and appends a new instance to the scaffold with a fresh `next_id`. |
-| `PlaceGhostOnScaffold` | Routes to `PlaceFirstPiece` when the scaffold is empty. For subsequent pieces a positive socket-proximity result is required; because that collision detection is not yet implemented this path always returns an error. |
+| `ToggleSocketVisibility` | Toggles `MachinaFormScaffold::are_sockets_visible`. Called from `ProcessUserInputEvents` when a `TOGGLE_SOCKET_VISIBILITY` input arrives and a scaffold is active. |
+| `ProcessUserInputEvents` | Handles `USER_INPUT` subscribers via a switch on `InputPayload::InputAction`. `SELECT`: places the ghost on the scaffold when all guards pass (ghost not monostate, not over UI). `TOGGLE_SOCKET_VISIBILITY`: toggles socket visibility when a scaffold is active. |
+| `PlaceFirstPiece` | Handles the first piece on an empty scaffold. Looks up the `Fragment` or `Joint` identified by the ghost selection tag and appends a new instance (identity transform) to the scaffold with a fresh `next_id`. Does nothing if no scaffold, scaffold non-empty, selection is monostate, or key not found. |
+| `PlaceGhostOnScaffold` | Routes to `PlaceFirstPiece` when the scaffold is empty. For subsequent pieces a positive socket-proximity result is required; because that collision detection is not yet implemented this path does nothing. Does nothing if no scaffold is active. |
 | `ProcessSubscribers` | Top-level dispatcher. Iterates `subscribers`, skips inactive ones, and routes each to `ProcessLogicEvents` or `ProcessUserInputEvents` based on `event_type`. |
 
 ---
@@ -293,8 +291,6 @@ within the [#1395 epic](https://github.com/walliscode/SteamRot/issues/1395).
 
 | Location | Description |
 |----------|-------------|
-| `action_grimoire_machina.cpp :: PlaceGhostOnScaffold` | Socket-proximity collision for subsequent pieces is not yet implemented. `PlaceGhostOnScaffold` always returns an error for non-first placements. Tracked by `// TODO:` comment at line 170. |
-| `action_grimoire_machina.cpp :: ProcessLogicEvents` | The `expected` results from `InitialiseActiveMachinaFormScaffold` and `ClearActiveMachinaFormScaffold` are discarded. Failures are silently ignored. Tracked by `// TODO: handle the result` comments. |
-| `action_grimoire_machina.cpp :: ProcessPlacementSubscribers` | Same — the result of `PlaceGhostOnScaffold` is discarded. |
+| `action_grimoire_machina.cpp :: PlaceGhostOnScaffold` | Socket-proximity collision for subsequent pieces is not yet implemented. `PlaceGhostOnScaffold` silently does nothing for non-first placements. Tracked by `// TODO:` comment. |
 | `render_grimoire_machina.cpp :: DrawEmptyActiveMachinaForm` | Function body is empty. Intended to draw a visual indicator for an active but empty `MachinaForm` blueprint (distinct from the scaffold-absent placeholder). |
 | `positioning_grimoire_machina.h/cpp` | Empty module. Future home for socket-snapping, layout-constraint resolution, or piece-alignment helpers. |
