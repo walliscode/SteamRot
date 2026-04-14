@@ -872,25 +872,6 @@ TEST_CASE("PlaceFirstPiece only places one piece per game instance",
 /// ProcessLogicEvents tests
 /////////////////////////////////////////////////
 
-TEST_CASE("ProcessLogicEvents: inactive subscriber is skipped",
-          "[unit][actions][grimoire_machina][ProcessLogicEvents]") {
-  steamrot::GrimoireMachina grimoire_machina;
-
-  auto subscriber = std::make_shared<steamrot::Subscriber>();
-  subscriber->m_active = false;
-  subscriber->event_type = steamrot::EventType::LOGIC;
-  subscriber->captured_payload = steamrot::LogicPayload{
-      steamrot::LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD};
-
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
-  steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
-      subscribers, grimoire_machina);
-
-  // scaffold must not have been initialised
-  REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
-}
-
 TEST_CASE("ProcessLogicEvents: active INITIATE subscriber initialises "
           "scaffold",
           "[unit][actions][grimoire_machina][ProcessLogicEvents]") {
@@ -902,10 +883,8 @@ TEST_CASE("ProcessLogicEvents: active INITIATE subscriber initialises "
   subscriber->captured_payload = steamrot::LogicPayload{
       steamrot::LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD};
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
 }
@@ -923,10 +902,8 @@ TEST_CASE("ProcessLogicEvents: active CLEAR subscriber clears existing "
   subscriber->captured_payload = steamrot::LogicPayload{
       steamrot::LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD};
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
@@ -934,53 +911,6 @@ TEST_CASE("ProcessLogicEvents: active CLEAR subscriber clears existing "
 /////////////////////////////////////////////////
 /// ProcessPlacementSubscribers tests
 /////////////////////////////////////////////////
-
-TEST_CASE("ProcessPlacementSubscribers: inactive subscriber is skipped",
-          "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
-  steamrot::tests::TestFixture fixture;
-  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
-
-  steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_scaffold_form =
-      std::make_unique<steamrot::MachinaFormScaffold>();
-  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
-  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
-
-  auto subscriber = std::make_shared<steamrot::Subscriber>();
-  subscriber->m_active = false;
-  subscriber->event_type = steamrot::EventType::USER_INPUT;
-
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
-  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
-      subscribers, scene_context, grimoire_machina);
-
-  // No placement should have occurred
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-}
-
-TEST_CASE("ProcessPlacementSubscribers: non-USER_INPUT subscriber is skipped",
-          "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
-  steamrot::tests::TestFixture fixture;
-  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
-
-  steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_scaffold_form =
-      std::make_unique<steamrot::MachinaFormScaffold>();
-  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
-  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
-
-  auto subscriber = std::make_shared<steamrot::Subscriber>();
-  subscriber->m_active = true;
-  subscriber->event_type = steamrot::EventType::LOGIC;
-
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
-  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
-      subscribers, scene_context, grimoire_machina);
-
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-}
 
 TEST_CASE(
     "ProcessPlacementSubscribers: monostate ghost selection blocks placement",
@@ -997,10 +927,8 @@ TEST_CASE(
   subscriber->m_active = true;
   subscriber->event_type = steamrot::EventType::USER_INPUT;
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
-      subscribers, scene_context, grimoire_machina);
+      *subscriber, scene_context, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
   REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
@@ -1025,10 +953,8 @@ TEST_CASE(
   subscriber->captured_payload = steamrot::InputPayload{
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == true);
 }
@@ -1047,33 +973,10 @@ TEST_CASE(
   subscriber->captured_payload = steamrot::InputPayload{
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
   steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-      subscribers, grimoire_machina);
-
-  REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
-}
-
-TEST_CASE(
-    "ProcessSocketVisibilitySubscribers: inactive subscriber is skipped",
-    "[unit][actions][grimoire_machina][ProcessSocketVisibilitySubscribers]") {
-  steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_scaffold_form =
-      std::make_unique<steamrot::MachinaFormScaffold>();
-
-  auto subscriber = std::make_shared<steamrot::Subscriber>();
-  subscriber->m_active = false;
-  subscriber->event_type = steamrot::EventType::USER_INPUT;
-  subscriber->captured_payload = steamrot::InputPayload{
-      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
-
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
-  steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
 }
@@ -1091,11 +994,9 @@ TEST_CASE(
   subscriber->captured_payload = steamrot::InputPayload{
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
-
   REQUIRE_NOTHROW(
       steamrot::logic::action::grimoire_machina::
-          ProcessSocketVisibilitySubscribers(subscribers, grimoire_machina));
+          ProcessSocketVisibilitySubscribers(*subscriber, grimoire_machina));
 }
 
 TEST_CASE(

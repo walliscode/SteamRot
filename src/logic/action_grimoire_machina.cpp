@@ -70,8 +70,8 @@ std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-void ProcessSubscriber(Subscriber &subscriber,
-                       GrimoireMachina &grimoire_machina) {
+void ProcessLogicEvents(Subscriber &subscriber,
+                        GrimoireMachina &grimoire_machina) {
   if (!subscriber.captured_payload.has_value())
     return;
 
@@ -175,113 +175,85 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 }
 
 /////////////////////////////////////////////////
-void ProcessLogicEvents(
-    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    GrimoireMachina &grimoire_machina) {
-  for (const auto &subscriber : subscribers) {
-    if (!subscriber->m_active)
-      continue;
-    if (subscriber->event_type != EventType::LOGIC)
-      continue;
-    ProcessSubscriber(*subscriber, grimoire_machina);
+void ProcessPlacementSubscribers(Subscriber &subscriber,
+                                 const SceneContext &scene_context,
+                                 GrimoireMachina &grimoire_machina) {
+  // Guard 1: a ghost item must be selected (not monostate).
+  if (std::holds_alternative<std::monostate>(scene_context.mr_ghost.m_selection))
+    return;
+
+  // Guard 2: the click must not land on any visible UI element.
+  const std::vector<size_t> ui_ids =
+      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
+          scene_context.archetypes, scene_context.scene_entities,
+          /*ascending=*/false);
+  for (size_t id : ui_ids) {
+    const CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
+        id, scene_context.scene_entities);
+    if (ui.m_visible && collision::mouse::AnyMouseOver(*ui.m_root_element))
+      return;
   }
+
+  // Guard 3: the active scaffold must exist.
+  if (!grimoire_machina.m_scaffold_form)
+    return;
+
+  // First piece: snap to world origin (0, 0); subsequent pieces: use cursor.
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+  const bool is_first_piece =
+      scaffold->fragments.empty() && scaffold->joints.empty();
+
+  sf::Vector2f place_pos = scene_context.world_mouse_position;
+  if (is_first_piece)
+    place_pos = {0.f, 0.f};
+
+  // [TODO:] handle the result and report failure if it fails.
+  auto place_result =
+      PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost, place_pos);
 }
 
 /////////////////////////////////////////////////
-void ProcessPlacementSubscribers(
-    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
-  for (const auto &subscriber : subscribers) {
-    if (!subscriber->m_active)
-      continue;
-    if (subscriber->event_type != EventType::USER_INPUT)
-      continue;
+void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
+                                        GrimoireMachina &grimoire_machina) {
+  if (!subscriber.captured_payload.has_value())
+    return;
 
-    // Guard 1: a ghost item must be selected (not monostate).
-    if (std::holds_alternative<std::monostate>(
-            scene_context.mr_ghost.m_selection))
-      continue;
+  const InputPayload *input_payload =
+      std::get_if<InputPayload>(&subscriber.captured_payload.value());
+  if (!input_payload)
+    return;
+  if (input_payload->action !=
+      InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY)
+    return;
 
-    // Guard 2: the click must not land on any visible UI element.
-    bool can_place = true;
-    const std::vector<size_t> ui_ids =
-        archetypes::GetEntitiesSortedByPriority<CUserInterface>(
-            scene_context.archetypes, scene_context.scene_entities,
-            /*ascending=*/false);
-    for (size_t id : ui_ids) {
-      const CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
-          id, scene_context.scene_entities);
-      if (ui.m_visible &&
-          collision::mouse::AnyMouseOver(*ui.m_root_element)) {
-        can_place = false;
-        break;
-      }
-    }
-    if (!can_place)
-      continue;
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+  if (!scaffold)
+    return;
 
-    // Guard 3: the active scaffold must exist.
-    if (!grimoire_machina.m_scaffold_form)
-      continue;
-
-    // First piece: snap to world origin (0, 0); subsequent pieces: use cursor.
-    MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-    const bool is_first_piece =
-        scaffold->fragments.empty() && scaffold->joints.empty();
-
-    sf::Vector2f place_pos = scene_context.world_mouse_position;
-    if (is_first_piece) {
-      place_pos = {0.f, 0.f};
-    }
-
-    // [TODO:] handle the result and report failure if it fails.
-    auto place_result =
-        PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost, place_pos);
-  }
+  scaffold->are_sockets_visible = !scaffold->are_sockets_visible;
 }
 
 /////////////////////////////////////////////////
-void ProcessSocketVisibilitySubscribers(
-    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    GrimoireMachina &grimoire_machina) {
-  for (const auto &subscriber : subscribers) {
-    if (!subscriber->m_active)
-      continue;
-    if (subscriber->event_type != EventType::USER_INPUT)
-      continue;
-
-    if (!subscriber->captured_payload.has_value())
-      continue;
-
-    const InputPayload *input_payload =
-        std::get_if<InputPayload>(&subscriber->captured_payload.value());
-    if (!input_payload)
-      continue;
-    if (input_payload->action != InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY)
-      continue;
-
-    MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-    if (!scaffold)
-      continue;
-
-    scaffold->are_sockets_visible = !scaffold->are_sockets_visible;
-  }
-}
-
-/////////////////////////////////////////////////
-void ProcessUserInputEvents(
-    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
-  ProcessSocketVisibilitySubscribers(subscribers, grimoire_machina);
-  ProcessPlacementSubscribers(subscribers, scene_context, grimoire_machina);
+void ProcessUserInputEvents(Subscriber &subscriber,
+                            const SceneContext &scene_context,
+                            GrimoireMachina &grimoire_machina) {
+  ProcessSocketVisibilitySubscribers(subscriber, grimoire_machina);
+  ProcessPlacementSubscribers(subscriber, scene_context, grimoire_machina);
 }
 
 /////////////////////////////////////////////////
 void ProcessSubscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
-  ProcessLogicEvents(subscribers, grimoire_machina);
-  ProcessUserInputEvents(subscribers, scene_context, grimoire_machina);
+  for (const auto &subscriber : subscribers) {
+    if (!subscriber->m_active)
+      continue;
+
+    if (subscriber->event_type == EventType::LOGIC)
+      ProcessLogicEvents(*subscriber, grimoire_machina);
+    else if (subscriber->event_type == EventType::USER_INPUT)
+      ProcessUserInputEvents(*subscriber, scene_context, grimoire_machina);
+  }
 }
 
 } // namespace steamrot::logic::action::grimoire_machina
