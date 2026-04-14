@@ -92,7 +92,7 @@ void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
 ///
 /// Guards checked in order:
 ///  1. Ghost selection must not be monostate (an item must be selected).
-///  2. The click must not land on any visible UI element.
+///  2. SceneState::is_mouse_over_ui_layer must be false (no UI hover).
 ///  3. An active scaffold must exist on the GrimoireMachina.
 ///
 /// @param subscriber    Subscriber to process.

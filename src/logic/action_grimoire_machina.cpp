@@ -8,14 +8,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "action_grimoire_machina.h"
-#include "CUserInterface.h"
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
-#include "archetypes.h"
-#include "collision_mouse.h"
-#include "entity_memory.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <string>
 #include <vector>
@@ -183,16 +179,8 @@ void ProcessPlacementSubscribers(Subscriber &subscriber,
     return;
 
   // Guard 2: the click must not land on any visible UI element.
-  const std::vector<size_t> ui_ids =
-      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
-          scene_context.archetypes, scene_context.scene_entities,
-          /*ascending=*/false);
-  for (size_t id : ui_ids) {
-    const CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
-        id, scene_context.scene_entities);
-    if (ui.m_visible && collision::mouse::AnyMouseOver(*ui.m_root_element))
-      return;
-  }
+  if (scene_context.scene_state.is_mouse_over_ui_layer)
+    return;
 
   // Guard 3: the active scaffold must exist.
   if (!grimoire_machina.m_scaffold_form)
