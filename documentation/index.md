@@ -21,6 +21,7 @@ SteamRot is a data-driven C++ game engine built with:
 | [Design](design/LOGIC_DECOMPOSITION.md) | Architectural decisions and design notes |
 | [Coordinate Spaces](design/COORDINATE_SPACES.md) | Screen space vs world space — concepts and mechanics |
 | [Coordinate Spaces in SteamRot](design/COORDINATE_SPACES_STEAMROT.md) | How the codebase handles coordinate conversion and pitfalls |
+| [GrimoireMachina Logic Map](design/GRIMOIRE_MACHINA_LOGIC_MAP.md) | Audit and responsibility map for all GrimoireMachina logic (Collision / Action / Positioning / Render) |
 
 ## Getting Started
 
