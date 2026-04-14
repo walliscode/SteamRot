@@ -7,10 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaPositioningLogic.h"
-#include "CUserInterface.h"
-#include "entity_memory.h"
-#include "positioning_grimoire_machina.h"
-#include <SFML/Graphics/Rect.hpp>
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
@@ -20,21 +16,8 @@ GrimoireMachinaPositioningLogic::GrimoireMachinaPositioningLogic(
 
 /////////////////////////////////////////////////
 void GrimoireMachinaPositioningLogic::ProcessLogic() {
-
-  // --- Asset section ---
-  auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
-  if (!grimoire_result.has_value()) {
-    return;
-  }
-  GrimoireMachina &grimoire_machina = *grimoire_result.value();
-
-  // --- Canvas size and position calculation ---
-  sf::Vector2f render_texture_size(m_scene_context.scene_texture.getSize());
-  grimoire_machina.m_crafting_helpers.crafting_canvas =
-      positioning::grimoire_machina::CalculateCraftingCanvasSizeAndPosition(
-          sf::FloatRect{{0.0f, 0.0f}, render_texture_size},
-          entity::memory::GetComponentVector<CUserInterface>(
-              m_scene_context.scene_entities));
-
+  // Intentionally empty: the crafting canvas has been replaced with an
+  // infinite canvas, so there is nothing to compute here.  This class is
+  // retained to preserve LogicFactory and LogicClassEnum compatibility.
 }
 } // namespace steamrot::logic

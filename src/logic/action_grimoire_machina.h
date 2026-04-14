@@ -110,7 +110,6 @@ void ProcessSocketVisibilitySubscribers(
 ///  1. Ghost selection must not be monostate (an item must be selected).
 ///  2. The click must not land on any visible UI element.
 ///  3. An active scaffold must exist on the GrimoireMachina.
-///  4. The mouse position must be inside the crafting canvas.
 ///
 /// @param subscribers Subscribers owned by the Logic instance.
 /// @param scene_context SceneContext providing archetypes, entities, ghost
