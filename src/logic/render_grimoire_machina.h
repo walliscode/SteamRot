@@ -18,7 +18,6 @@
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
-#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -34,23 +33,15 @@ namespace steamrot::logic::render::grimoire_machina {
 void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form);
 
 /////////////////////////////////////////////////
-/// @brief Draw a border around the crafting canvas.
+/// @brief Draw a small indicator box at the world origin (0, 0) to show that
+/// no machina form is currently active.
+///
+/// The box is drawn in world space, centred on (0, 0), so that the camera
+/// can use the origin as a reference point.
 ///
 /// @param texture RenderTexture to draw on.
-/// @param crafting_canvas FloatRect representing the crafting canvas.
 /////////////////////////////////////////////////
-void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
-                              sf::FloatRect &crafting_canvas);
-
-/////////////////////////////////////////////////
-/// @brief Draw a box around the crafting canvas to indicate that no machina
-/// form is active.
-///
-/// @param texture Texture to draw on.
-/// @param crafting_canvas FloatRect representing the crafting canvas.
-/////////////////////////////////////////////////
-void DrawNoMachinaFormBox(sf::RenderTexture &texture,
-                          sf::FloatRect &crafting_canvas);
+void DrawNoMachinaFormIndicator(sf::RenderTexture &texture);
 
 /////////////////////////////////////////////////
 /// @brief Draw a single socket circle at the given world position.
@@ -124,10 +115,9 @@ void DrawJointInstance(sf::RenderTexture &texture,
 /////////////////////////////////////////////////
 /// @brief Draw the scaffold state or a placeholder when no scaffold is active.
 ///
-/// Draws the crafting canvas border unconditionally. When @p grimoire_machina
-/// has no active scaffold, draws the no-machina-form placeholder box. When a
-/// scaffold is present but has no joints yet, draws the growth point. Other
-/// scaffold states are handled by downstream render functions.
+/// When @p grimoire_machina has no active scaffold, draws the no-machina-form
+/// indicator at the world origin. When a scaffold is present, draws all placed
+/// joints and fragments.
 ///
 /// @param texture          RenderTexture to draw to.
 /// @param grimoire_machina GrimoireMachina whose scaffold state drives the

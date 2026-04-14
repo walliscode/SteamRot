@@ -526,8 +526,6 @@ TEST_CASE(
     "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_crafting_helpers.crafting_canvas = {{0.f, 0.f},
-                                                         {100.f, 100.f}};
   // m_scaffold_form is null by default
 
   REQUIRE_NOTHROW(
@@ -542,8 +540,6 @@ TEST_CASE(
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_crafting_helpers.crafting_canvas = {{0.f, 0.f},
-                                                         {100.f, 100.f}};
   grimoire_machina.m_all_fragments["frag"] = MakeFragmentWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
@@ -568,8 +564,6 @@ TEST_CASE(
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_crafting_helpers.crafting_canvas = {{0.f, 0.f},
-                                                         {100.f, 100.f}};
   grimoire_machina.m_all_joints["joint"] = MakeJointWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
