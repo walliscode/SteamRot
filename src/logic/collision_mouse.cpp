@@ -153,9 +153,9 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 }
 
 /////////////////////////////////////////////////
-void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
-                               EntityMemoryPool &scene_entities,
-                               const sf::Vector2i &mouse_position) {
+void CheckMouseOverAllCUserInterfaceComponents(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, bool &is_mouse_over_ui_layer) {
 
   // Pass 1: clear all hover state to remove stale state from the previous tick
   for (size_t entity_id : entity_indexes) {
@@ -163,6 +163,8 @@ void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
         entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
     ClearMouseOver(*ui_component.m_root_element);
   }
+  // clear the scene state flag at the start of the check
+  is_mouse_over_ui_layer = false;
 
   // Pass 2: check collision in descending priority order; the first visible
   // entity that reports a hover claims the mouse and blocks all lower-priority
@@ -183,7 +185,12 @@ void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
       CheckMouseOver(mouse_position, *ui_component.m_root_element);
 
       if (AnyMouseOver(*ui_component.m_root_element)) {
+        // if this entity reports a hover, it claims the mouse and blocks all
         higher_priority_claimed_mouse = true;
+
+        // also, set the scene state flag to indicate the mouse is over a UI
+        // layer
+        is_mouse_over_ui_layer = true;
       }
     }
   }

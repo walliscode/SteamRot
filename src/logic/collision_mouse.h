@@ -73,7 +73,8 @@ bool AnyMouseOver(const UIElement &element);
 /// The hit radius matches the visual radius used when drawing sockets so that
 /// click/hover detection is pixel-accurate relative to what the user sees.
 ///
-/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
+/// @param world_mouse World-space mouse position
+/// (SceneContext::world_mouse_position).
 /// @param world_pos   World-space centre of the socket.
 /// @param socket_state SocketState whose is_mouse_over flag is updated.
 /////////////////////////////////////////////////
@@ -84,7 +85,8 @@ void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
 /// @brief Checks whether the mouse is over any socket on a FragmentInstance
 /// and sets each socket's is_mouse_over accordingly.
 ///
-/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
+/// @param world_mouse World-space mouse position
+/// (SceneContext::world_mouse_position).
 /// @param fragment_instance FragmentInstance whose sockets are checked.
 /////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse,
@@ -94,27 +96,31 @@ void CheckMouseOver(sf::Vector2f world_mouse,
 /// @brief Checks whether the mouse is over any socket on a JointInstance
 /// and sets each socket's is_mouse_over accordingly.
 ///
-/// @param world_mouse World-space mouse position (SceneContext::world_mouse_position).
+/// @param world_mouse World-space mouse position
+/// (SceneContext::world_mouse_position).
 /// @param joint_instance JointInstance whose sockets are checked.
 /////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
-/// @brief Run the two-pass mouse-collision check for all UI entities.
+/// @brief Run the two-pass mouse-collision check for all CUserInterface
+/// components in the scene and thus the UI elements they contain.
 ///
 /// Pass 1: clears is_mouse_over on every entity's root element to remove stale
 /// hover state from the previous tick.
 /// Pass 2: iterates entities in descending priority order. The first visible
 /// entity whose element tree reports a hover claims the mouse; all
 /// lower-priority entities have their hover state cleared.
+/// Also, changes SceneState::is_mouse_over_ui_layer to true if any entity
+/// reports a hover
 ///
 /// @param entity_indexes UI entity indices in descending priority order.
 /// @param scene_entities EntityMemoryPool containing CUserInterface components.
 /// @param mouse_position Current mouse cursor position in window coordinates.
 /////////////////////////////////////////////////
-void ProcessUIEntityCollisions(const std::vector<size_t> &entity_indexes,
-                               EntityMemoryPool &scene_entities,
-                               const sf::Vector2i &mouse_position);
+void CheckMouseOverAllCUserInterfaceComponents(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, bool &is_mouse_over_ui_layer);
 
 /////////////////////////////////////////////////
 /// @brief Run mouse-collision checks for all parts of an active

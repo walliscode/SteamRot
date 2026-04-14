@@ -2,7 +2,6 @@
 #include "CUserInterface.h"
 #include "archetypes.h"
 #include "collision_mouse.h"
-#include "entity_memory.h"
 #include <SFML/Window/Mouse.hpp>
 
 namespace steamrot::logic {
@@ -20,9 +19,10 @@ void UICollisionLogic::ProcessLogic() {
           m_scene_context.archetypes, m_scene_context.scene_entities,
           /*ascending=*/false);
 
-  collision::mouse::ProcessUIEntityCollisions(
+  collision::mouse::CheckMouseOverAllCUserInterfaceComponents(
       entity_indexes, m_scene_context.scene_entities,
-      m_scene_context.mouse_position);
+      m_scene_context.mouse_position,
+      m_scene_context.scene_state.is_mouse_over_ui_layer);
 }
 
 } // namespace steamrot::logic
