@@ -13,6 +13,7 @@
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <string>
 #include <vector>
 
@@ -40,6 +41,11 @@ ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
   return std::monostate{};
 }
 
+/////////////////////////////////////////////////
+void ToggleSocketVisibility(MachinaFormScaffold &scaffold) {
+
+  scaffold.are_sockets_visible = !scaffold.are_sockets_visible;
+}
 /////////////////////////////////////////////////
 std::vector<std::string>
 GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
@@ -76,18 +82,26 @@ void ProcessLogicEvents(Subscriber &subscriber,
   if (!logic_payload)
     return;
 
-  if (logic_payload->toggle_name ==
-      LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD) {
+  switch (logic_payload->toggle_name) {
+
+  case LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD: {
+
     // [TODO:] handle the result of this action and report failure if it fails.
     auto initialise_result =
         InitialiseActiveMachinaFormScaffold(grimoire_machina);
-  } else if (logic_payload->toggle_name ==
-             LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD) {
+    break;
+  }
+
+  case LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD: {
     // [TODO:] handle the result of this action and report failure if it fails.
     auto clear_result = ClearActiveMachinaFormScaffold(grimoire_machina);
+    break;
+  }
+
+  default:
+    break;
   }
 }
-
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
@@ -95,21 +109,19 @@ PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
-    return std::unexpected(FailInfo{FailMode::NullPointer,
-                                    "PlaceFirstPiece: no active scaffold"});
+    return std::unexpected(
+        FailInfo{FailMode::NullPointer, "PlaceFirstPiece: no active scaffold"});
 
   if (!scaffold->fragments.empty() || !scaffold->joints.empty())
-    return std::unexpected(
-        FailInfo{FailMode::InvalidInput,
-                 "PlaceFirstPiece: scaffold is not empty"});
+    return std::unexpected(FailInfo{FailMode::InvalidInput,
+                                    "PlaceFirstPiece: scaffold is not empty"});
 
   if (std::holds_alternative<FragmentTag>(mr_ghost.m_selection)) {
     const auto &tag = std::get<FragmentTag>(mr_ghost.m_selection);
     auto it = grimoire_machina.m_all_fragments.find(tag.key);
     if (it == grimoire_machina.m_all_fragments.end())
-      return std::unexpected(
-          FailInfo{FailMode::MissingData,
-                   "PlaceFirstPiece: fragment key not found"});
+      return std::unexpected(FailInfo{
+          FailMode::MissingData, "PlaceFirstPiece: fragment key not found"});
 
     Fragment &fragment = it->second;
     const sf::FloatRect bounds =
@@ -126,9 +138,8 @@ PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     const auto &tag = std::get<JointTag>(mr_ghost.m_selection);
     auto it = grimoire_machina.m_all_joints.find(tag.key);
     if (it == grimoire_machina.m_all_joints.end())
-      return std::unexpected(
-          FailInfo{FailMode::MissingData,
-                   "PlaceFirstPiece: joint key not found"});
+      return std::unexpected(FailInfo{FailMode::MissingData,
+                                      "PlaceFirstPiece: joint key not found"});
 
     Joint &joint = it->second;
     const sf::FloatRect bounds =
@@ -142,9 +153,8 @@ PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
     scaffold->joints.push_back(std::move(instance));
 
   } else {
-    return std::unexpected(
-        FailInfo{FailMode::InvalidInput,
-                 "PlaceFirstPiece: no ghost item selected"});
+    return std::unexpected(FailInfo{FailMode::InvalidInput,
+                                    "PlaceFirstPiece: no ghost item selected"});
   }
 
   return std::monostate{};
@@ -187,7 +197,8 @@ void ProcessPlacementSubscribers(Subscriber &subscriber,
     return;
 
   // Guard 1: a ghost item must be selected (not monostate).
-  if (std::holds_alternative<std::monostate>(scene_context.mr_ghost.m_selection))
+  if (std::holds_alternative<std::monostate>(
+          scene_context.mr_ghost.m_selection))
     return;
 
   // Guard 2: the click must not land on any visible UI element.
@@ -198,7 +209,8 @@ void ProcessPlacementSubscribers(Subscriber &subscriber,
   if (!grimoire_machina.m_scaffold_form)
     return;
 
-  // First piece: snap to world origin (0, 0); subsequent pieces: use cursor.
+  // First piece: snap to world origin (0, 0); subsequent pieces: use
+  // cursor.
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   const bool is_first_piece =
       scaffold->fragments.empty() && scaffold->joints.empty();
@@ -213,32 +225,29 @@ void ProcessPlacementSubscribers(Subscriber &subscriber,
 }
 
 /////////////////////////////////////////////////
-void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
-                                        GrimoireMachina &grimoire_machina) {
-  if (!subscriber.captured_payload.has_value())
-    return;
+void ProcessUserInputEvents(Subscriber &subscriber,
+                            const SceneContext &scene_context,
+                            GrimoireMachina &grimoire_machina) {
 
   const InputPayload *input_payload =
       std::get_if<InputPayload>(&subscriber.captured_payload.value());
   if (!input_payload)
     return;
-  if (input_payload->action !=
-      InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY)
-    return;
 
-  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-  if (!scaffold)
-    return;
+  switch (input_payload->action) {
 
-  scaffold->are_sockets_visible = !scaffold->are_sockets_visible;
-}
+  case InputPayload::InputAction::SELECT:
+    PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost,
+                         sf::Vector2f{0, 0});
+    break;
 
-/////////////////////////////////////////////////
-void ProcessUserInputEvents(Subscriber &subscriber,
-                            const SceneContext &scene_context,
-                            GrimoireMachina &grimoire_machina) {
-  ProcessSocketVisibilitySubscribers(subscriber, grimoire_machina);
-  ProcessPlacementSubscribers(subscriber, scene_context, grimoire_machina);
+  case InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY:
+    ToggleSocketVisibility(*grimoire_machina.m_scaffold_form);
+    break;
+
+  default:
+    break;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -251,6 +260,7 @@ void ProcessSubscribers(
 
     if (subscriber->event_type == EventType::LOGIC)
       ProcessLogicEvents(*subscriber, grimoire_machina);
+
     else if (subscriber->event_type == EventType::USER_INPUT)
       ProcessUserInputEvents(*subscriber, scene_context, grimoire_machina);
   }

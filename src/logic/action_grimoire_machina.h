@@ -60,6 +60,14 @@ std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
 std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
+/// @brief Toggle the are_sockets_visible boolean on the active
+/// MachinaFormScaffold in the GrimoireMachina.
+///
+/// @param scaffold MachinaFormScaffold to toggle the socket visibility on.
+/////////////////////////////////////////////////
+void ToggleSocketVisibility(MachinaFormScaffold &scaffold);
+
+/////////////////////////////////////////////////
 /// @brief Handle a single LOGIC subscriber for scaffold init/clear events.
 ///
 /// Checks that the subscriber carries a LogicPayload, then switches on
@@ -71,20 +79,6 @@ std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
 /////////////////////////////////////////////////
 void ProcessLogicEvents(Subscriber &subscriber,
                         GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
-/// @brief Handle a single USER_INPUT TOGGLE_SOCKET_VISIBILITY subscriber and
-/// toggle are_sockets_visible on the active scaffold.
-///
-/// When triggered, toggles MachinaFormScaffold::are_sockets_visible. Does
-/// nothing if the payload is not TOGGLE_SOCKET_VISIBILITY or no active
-/// scaffold exists.
-///
-/// @param subscriber    Subscriber to process.
-/// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
-/////////////////////////////////////////////////
-void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
-                                        GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Handle a single USER_INPUT SELECT subscriber and, when all placement
@@ -107,7 +101,8 @@ void ProcessPlacementSubscribers(Subscriber &subscriber,
 
 /////////////////////////////////////////////////
 /// @brief Handle a single USER_INPUT subscriber by routing to
-/// @ref ProcessSocketVisibilitySubscribers and @ref ProcessPlacementSubscribers.
+/// @ref ProcessSocketVisibilitySubscribers and @ref
+/// ProcessPlacementSubscribers.
 ///
 /// @param subscriber    Subscriber to process.
 /// @param scene_context SceneContext providing archetypes, entities, ghost
