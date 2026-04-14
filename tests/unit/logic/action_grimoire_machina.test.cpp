@@ -294,7 +294,8 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when no scaffold is active",
   REQUIRE_NOTHROW(steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost));
 
-  // scaffold was never created — nothing to check except no crash
+  // no scaffold was ever created — it must remain null
+  REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
 
 TEST_CASE(
@@ -572,6 +573,9 @@ TEST_CASE("PlaceFirstPiece does nothing when no scaffold is active",
 
   REQUIRE_NOTHROW(steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
       grimoire_machina, mr_ghost));
+
+  // no scaffold was ever created — it must remain null
+  REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
 
 TEST_CASE("PlaceFirstPiece does nothing when scaffold already has pieces",
@@ -854,7 +858,8 @@ TEST_CASE("ToggleSocketVisibility: toggling twice returns to original state",
 /// ProcessUserInputEvents tests
 /////////////////////////////////////////////////
 
-TEST_CASE("ProcessUserInputEvents: no payload is ignored without crash",
+TEST_CASE("ProcessUserInputEvents: missing captured_payload is ignored without "
+          "crash",
           "[unit][actions][grimoire_machina][ProcessUserInputEvents]") {
   steamrot::tests::TestFixture fixture;
   steamrot::SceneContext &scene_context = fixture.GetSceneContext();
