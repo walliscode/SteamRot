@@ -130,8 +130,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
 
           sf::Vertex sfml_vertex;
           sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
-          sfml_vertex.color =
-              sf::Color(col->r(), col->g(), col->b(), col->a());
+          sfml_vertex.color = sf::Color(col->r(), col->g(), col->b(), col->a());
 
           vertex_array.append(sfml_vertex);
         }
@@ -165,6 +164,15 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
     return std::unexpected(
         FailInfo{FailMode::FlatbuffersDataNotFound, "Joint name is missing"});
+  }
+
+  // configure origin
+  if (joint_fbs->origin()) {
+    joint.origin =
+        sf::Vector2f(joint_fbs->origin()->x(), joint_fbs->origin()->y());
+  } else {
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound, "Joint origin is missing"});
   }
 
   // Configure socket_config
@@ -268,8 +276,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
           sf::Vertex sfml_vertex;
           sfml_vertex.position = sf::Vector2f(pos->x(), pos->y());
-          sfml_vertex.color =
-              sf::Color(col->r(), col->g(), col->b(), col->a());
+          sfml_vertex.color = sf::Color(col->r(), col->g(), col->b(), col->a());
 
           vertex_array.append(sfml_vertex);
         }

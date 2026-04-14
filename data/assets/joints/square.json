@@ -1,5 +1,6 @@
 {
   "name": "square",
+  "origin": { "x": 10, "y": 10 },
   "socket_config": {
     "socket_count": 4,
     "radius": 14.142,

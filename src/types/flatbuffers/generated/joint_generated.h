@@ -129,11 +129,15 @@ struct JointFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef JointFbsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_NAME = 4,
-    VT_SOCKET_CONFIG = 6,
-    VT_MOVEMENT_VIEWS = 8
+    VT_ORIGIN = 6,
+    VT_SOCKET_CONFIG = 8,
+    VT_MOVEMENT_VIEWS = 10
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  const steamrot::Vector2fDataFbs *origin() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_ORIGIN);
   }
   const steamrot::SocketConfigFbs *socket_config() const {
     return GetPointer<const steamrot::SocketConfigFbs *>(VT_SOCKET_CONFIG);
@@ -145,6 +149,8 @@ struct JointFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffsetRequired(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyOffsetRequired(verifier, VT_ORIGIN) &&
+           verifier.VerifyTable(origin()) &&
            VerifyOffsetRequired(verifier, VT_SOCKET_CONFIG) &&
            verifier.VerifyTable(socket_config()) &&
            VerifyOffsetRequired(verifier, VT_MOVEMENT_VIEWS) &&
@@ -161,6 +167,9 @@ struct JointFbsBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(JointFbs::VT_NAME, name);
   }
+  void add_origin(::flatbuffers::Offset<steamrot::Vector2fDataFbs> origin) {
+    fbb_.AddOffset(JointFbs::VT_ORIGIN, origin);
+  }
   void add_socket_config(::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config) {
     fbb_.AddOffset(JointFbs::VT_SOCKET_CONFIG, socket_config);
   }
@@ -175,6 +184,7 @@ struct JointFbsBuilder {
     const auto end = fbb_.EndTable(start_);
     auto o = ::flatbuffers::Offset<JointFbs>(end);
     fbb_.Required(o, JointFbs::VT_NAME);
+    fbb_.Required(o, JointFbs::VT_ORIGIN);
     fbb_.Required(o, JointFbs::VT_SOCKET_CONFIG);
     fbb_.Required(o, JointFbs::VT_MOVEMENT_VIEWS);
     return o;
@@ -184,11 +194,13 @@ struct JointFbsBuilder {
 inline ::flatbuffers::Offset<JointFbs> CreateJointFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> origin = 0,
     ::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>>> movement_views = 0) {
   JointFbsBuilder builder_(_fbb);
   builder_.add_movement_views(movement_views);
   builder_.add_socket_config(socket_config);
+  builder_.add_origin(origin);
   builder_.add_name(name);
   return builder_.Finish();
 }
@@ -196,6 +208,7 @@ inline ::flatbuffers::Offset<JointFbs> CreateJointFbs(
 inline ::flatbuffers::Offset<JointFbs> CreateJointFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> origin = 0,
     ::flatbuffers::Offset<steamrot::SocketConfigFbs> socket_config = 0,
     const std::vector<::flatbuffers::Offset<steamrot::ViewFbs>> *movement_views = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
@@ -203,6 +216,7 @@ inline ::flatbuffers::Offset<JointFbs> CreateJointFbsDirect(
   return steamrot::CreateJointFbs(
       _fbb,
       name__,
+      origin,
       socket_config,
       movement_views__);
 }
