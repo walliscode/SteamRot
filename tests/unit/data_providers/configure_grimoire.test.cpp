@@ -10,6 +10,7 @@
 #include "FailInfo.h"
 #include "types_generated.h"
 #include "view_direction_generated.h"
+#include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 /////////////////////////////////////////////////
@@ -128,11 +129,13 @@ CreateTestFragmentFbs(flatbuffers::FlatBufferBuilder &builder,
 /////////////////////////////////////////////////
 flatbuffers::Offset<steamrot::JointFbs>
 CreateTestJointFbs(flatbuffers::FlatBufferBuilder &builder,
-                   const std::string &name = "test_joint", int socket_count = 4,
+                   const std::string &name = "test_joint",
+                   sf::Vector2f origin = {0.0, 0.0}, int socket_count = 4,
                    float radius = 10.f, float arc_min = 0.f,
                    float arc_max = 360.f, size_t num_views = 1) {
   auto name_offset = builder.CreateString(name);
-
+  auto origin_offset =
+      steamrot::CreateVector2fDataFbs(builder, origin.x, origin.y);
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(
       builder, socket_count, radius, arc_min, arc_max);
 
@@ -144,8 +147,8 @@ CreateTestJointFbs(flatbuffers::FlatBufferBuilder &builder,
   auto views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>(views);
 
-  return steamrot::CreateJointFbs(builder, name_offset, socket_config_offset,
-                                  views_vector);
+  return steamrot::CreateJointFbs(builder, name_offset, origin_offset,
+                                  socket_config_offset, views_vector);
 }
 
 } // anonymous namespace
@@ -371,7 +374,8 @@ TEST_CASE("ConfigureJoint returns unexpected when given nullptr",
 TEST_CASE("ConfigureJoint configures name successfully",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
-  auto joint_fbs_offset = CreateTestJointFbs(builder, "my_joint", 4, 10.f);
+  auto joint_fbs_offset =
+      CreateTestJointFbs(builder, "my_joint", {1, 1}, 4, 10.f);
   builder.Finish(joint_fbs_offset);
 
   auto joint_fbs =
@@ -388,6 +392,7 @@ TEST_CASE("ConfigureJoint returns unexpected when name is missing",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
 
+  auto origin_offset = steamrot::CreateVector2fDataFbs(builder, 0.f, 0.f);
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(builder, 4);
   auto view = CreateTestView(builder, steamrot::ViewDirectionFbs_FRONT, 2);
   auto views_vector =
@@ -397,8 +402,9 @@ TEST_CASE("ConfigureJoint returns unexpected when name is missing",
   auto empty_name_offset = builder.CreateString("");
 
   // Create JointFbs without name (empty string)
-  auto joint_fbs_offset = steamrot::CreateJointFbs(
-      builder, empty_name_offset, socket_config_offset, views_vector);
+  auto joint_fbs_offset =
+      steamrot::CreateJointFbs(builder, empty_name_offset, origin_offset,
+                               socket_config_offset, views_vector);
 
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =
@@ -411,11 +417,25 @@ TEST_CASE("ConfigureJoint returns unexpected when name is missing",
   REQUIRE(result.error().message == "Joint name is missing");
 }
 
-TEST_CASE("ConfigureJoint configures socket_config successfully",
+TEST_CASE("ConfigureJoint configures origin successfully",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
   auto joint_fbs_offset =
-      CreateTestJointFbs(builder, "test_joint", 3, 15.f, 10.f, 190.f, 1);
+      CreateTestJointFbs(builder, "test_joint", {5.f, 10.f}, 4, 10.f);
+  builder.Finish(joint_fbs_offset);
+  auto joint_fbs =
+      flatbuffers::GetRoot<steamrot::JointFbs>(builder.GetBufferPointer());
+  steamrot::Joint joint;
+  auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
+  REQUIRE(result.has_value());
+  REQUIRE(joint.origin.x == 5.f);
+  REQUIRE(joint.origin.y == 10.f);
+}
+TEST_CASE("ConfigureJoint configures socket_config successfully",
+          "[unit][ConfigureJoint]") {
+  flatbuffers::FlatBufferBuilder builder;
+  auto joint_fbs_offset = CreateTestJointFbs(builder, "test_joint", {1, 1}, 3,
+                                             15.f, 10.f, 190.f, 1);
   builder.Finish(joint_fbs_offset);
 
   auto joint_fbs =
@@ -436,6 +456,7 @@ TEST_CASE("ConfigureJoint returns unexpected when socket_count is not positive",
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_joint");
+  auto origin_offset = steamrot::CreateVector2fDataFbs(builder, 0.f, 0.f);
   // socket_count = 0 is invalid
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(builder, 0);
   auto view = CreateTestView(builder, steamrot::ViewDirectionFbs_FRONT, 2);
@@ -443,7 +464,7 @@ TEST_CASE("ConfigureJoint returns unexpected when socket_count is not positive",
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
 
   auto joint_fbs_offset = steamrot::CreateJointFbs(
-      builder, name_offset, socket_config_offset, views_vector);
+      builder, name_offset, origin_offset, socket_config_offset, views_vector);
 
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =
@@ -461,7 +482,7 @@ TEST_CASE("ConfigureJoint configures movement_views successfully",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
   auto joint_fbs_offset =
-      CreateTestJointFbs(builder, "test_joint", 4, 10.f, 0.f, 360.f, 1);
+      CreateTestJointFbs(builder, "test_joint", {2, 2}, 4, 10.f, 0.f, 360.f, 1);
   builder.Finish(joint_fbs_offset);
 
   auto joint_fbs =
@@ -485,6 +506,7 @@ TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_joint");
+  auto origin_offset = steamrot::CreateVector2fDataFbs(builder, 0.f, 0.f);
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(builder, 4);
 
   // Create empty views vector to represent missing movement_views
@@ -492,8 +514,9 @@ TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({});
 
   // Create JointFbs without movement_views (empty vector)
-  auto joint_fbs_offset = steamrot::CreateJointFbs(
-      builder, name_offset, socket_config_offset, empty_views_vector);
+  auto joint_fbs_offset =
+      steamrot::CreateJointFbs(builder, name_offset, origin_offset,
+                               socket_config_offset, empty_views_vector);
 
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =

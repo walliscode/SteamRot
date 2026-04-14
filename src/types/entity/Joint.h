@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Part.h"
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -80,6 +81,13 @@ struct SocketConfig {
 /// explicit positions, allowing them to rotate around the Joint's centre.
 /////////////////////////////////////////////////
 struct Joint : Part {
+
+  /////////////////////////////////////////////////
+  /// @brief Fixed local origin point for this Joint, used to calculate socket
+  /// positions from the SocketConfig.
+  /////////////////////////////////////////////////
+  sf::Vector2f origin{0.f, 0.f};
+
   /////////////////////////////////////////////////
   /// @brief Procedural socket layout description for this Joint.
   /////////////////////////////////////////////////

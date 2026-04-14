@@ -15,6 +15,7 @@ table SocketConfigFbs {
 
 table JointFbs{
   name: string (required);
+  origin: Vector2fDataFbs (required);
   socket_config: SocketConfigFbs (required);
   movement_views: [ViewFbs] (required);
 }
