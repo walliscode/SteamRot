@@ -934,6 +934,108 @@ TEST_CASE(
   REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
 }
 
+TEST_CASE(
+    "ProcessPlacementSubscribers: no payload blocks placement",
+    "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
+
+  // subscriber has no captured_payload
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+
+  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
+      *subscriber, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+}
+
+TEST_CASE(
+    "ProcessPlacementSubscribers: non-SELECT action blocks placement",
+    "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
+
+  // subscriber carries TOGGLE_SOCKET_VISIBILITY, not SELECT
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload = steamrot::InputPayload{
+      steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
+
+  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
+      *subscriber, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+}
+
+TEST_CASE(
+    "ProcessPlacementSubscribers: SELECT with valid conditions places fragment",
+    "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
+  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
+  // scene_state.is_mouse_over_ui_layer defaults to false
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
+  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
+      *subscriber, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+}
+
+TEST_CASE(
+    "ProcessPlacementSubscribers: SELECT with valid conditions places joint",
+    "[unit][actions][grimoire_machina][ProcessPlacementSubscribers]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina;
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+  grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
+  fixture.GetMrGhost().m_selection = steamrot::JointTag{"joint"};
+  // scene_state.is_mouse_over_ui_layer defaults to false
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
+  steamrot::logic::action::grimoire_machina::ProcessPlacementSubscribers(
+      *subscriber, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+}
+
 /////////////////////////////////////////////////
 /// ProcessSocketVisibilitySubscribers tests
 /////////////////////////////////////////////////

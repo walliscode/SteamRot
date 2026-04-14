@@ -91,6 +91,7 @@ void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
 /// guards pass, place the ghost item on the active scaffold.
 ///
 /// Guards checked in order:
+///  0. Subscriber must carry an InputPayload with action SELECT.
 ///  1. Ghost selection must not be monostate (an item must be selected).
 ///  2. SceneState::is_mouse_over_ui_layer must be false (no UI hover).
 ///  3. An active scaffold must exist on the GrimoireMachina.

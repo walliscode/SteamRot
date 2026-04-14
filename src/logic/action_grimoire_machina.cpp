@@ -174,6 +174,18 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 void ProcessPlacementSubscribers(Subscriber &subscriber,
                                  const SceneContext &scene_context,
                                  GrimoireMachina &grimoire_machina) {
+  // Guard 0: subscriber must carry a SELECT input action.
+  if (!subscriber.captured_payload.has_value())
+    return;
+
+  const InputPayload *input_payload =
+      std::get_if<InputPayload>(&subscriber.captured_payload.value());
+  if (!input_payload)
+    return;
+
+  if (input_payload->action != InputPayload::InputAction::SELECT)
+    return;
+
   // Guard 1: a ghost item must be selected (not monostate).
   if (std::holds_alternative<std::monostate>(scene_context.mr_ghost.m_selection))
     return;

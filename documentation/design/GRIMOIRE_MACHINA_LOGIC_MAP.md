@@ -197,7 +197,7 @@ GrimoireMachina-specific surface area is:
 | `GetAllJointNames` | Returns a `vector<string>` of all keys in `m_all_joints`. Used to populate UI drop-down lists with available joint names. |
 | `ProcessLogicEvents` | Extracts a `LogicPayload` from `subscriber.captured_payload` and dispatches to `Initialise…` or `Clear…` based on the `LogicToggle` value. |
 | `ProcessSocketVisibilitySubscribers` | Toggles `MachinaFormScaffold::are_sockets_visible` when the subscriber carries `InputPayload::TOGGLE_SOCKET_VISIBILITY`. |
-| `ProcessPlacementSubscribers` | Places the currently selected ghost item onto the scaffold when a `SELECT` input arrives and all three placement guards pass: (1) a ghost item is selected, (2) the click does not land on a visible UI element, (3) an active scaffold exists. |
+| `ProcessPlacementSubscribers` | Places the currently selected ghost item onto the scaffold when a `SELECT` input arrives and all placement guards pass: (0) subscriber must carry an `InputPayload` with action `SELECT`, (1) a ghost item is selected, (2) the click does not land on a visible UI element, (3) an active scaffold exists. |
 | `ProcessUserInputEvents` | Routes a `USER_INPUT` subscriber to `ProcessSocketVisibilitySubscribers` and `ProcessPlacementSubscribers`. |
 | `PlaceFirstPiece` | Handles the first piece on an empty scaffold. Looks up the `Fragment` or `Joint` identified by the ghost selection tag, centers it on `world_pos`, and appends a new instance to the scaffold with a fresh `next_id`. |
 | `PlaceGhostOnScaffold` | Routes to `PlaceFirstPiece` when the scaffold is empty. For subsequent pieces a positive socket-proximity result is required; because that collision detection is not yet implemented this path always returns an error. |
