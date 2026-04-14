@@ -128,6 +128,25 @@ public:
   /////////////////////////////////////////////////
   SceneContext GetSceneContext();
 
+  /////////////////////////////////////////////////
+  /// @brief Return a read-only reference to the SceneState of the Scene.
+  ///
+  /// @return Const reference to the SceneState.
+  /////////////////////////////////////////////////
+  const SceneState &GetSceneState() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a reference to the SceneState of the Scene.
+  ///
+  /// @return Reference to the SceneState.
+  /////////////////////////////////////////////////
+  SceneState &GetSceneState();
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a reference to the EntityManager of the Scene.
+  ///
+  /// @return Reference to the EntityManager.
+  /////////////////////////////////////////////////
   EntityManager &GetEntityManager();
 
 #ifdef DEBUG

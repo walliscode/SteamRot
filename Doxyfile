@@ -33,8 +33,6 @@ FULL_SIDEBAR           = NO
 #---------------------------------------------------------------------------
 
 # Include hand-written docs alongside API source.
-# The duplicate documentation/concepts/ directory is excluded because its
-# files are identical to the canonical documentation/design/ copies.
 INPUT                  = documentation \
                          src
 RECURSIVE              = YES
@@ -42,7 +40,7 @@ FILE_PATTERNS          = *.h \
                          *.hpp \
                          *.cpp \
                          *.md
-EXCLUDE                = documentation/concepts
+EXCLUDE                = 
 EXCLUDE_PATTERNS       = */_deps/* \
                          */build/*
 

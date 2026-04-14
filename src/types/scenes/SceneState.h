@@ -26,10 +26,15 @@ struct SceneState {
   /////////////////////////////////////////////////
   bool active{true};
 
-  // Future: additional runtime state
-  // - pause state
-  // - transition state
-  // - performance metrics
+  /////////////////////////////////////////////////
+  /// @brief State flag indicating whether the mouse is currently over any UI
+  /// layer in the scene.
+  ///
+  /// This flag is set by UICollisionLogic during mouse collision checks and can
+  /// be used by other logic to conditionally disable non-UI interactions when
+  /// the mouse is over the UI.
+  /////////////////////////////////////////////////
+  bool is_mouse_over_ui_layer{false};
 };
 
 } // namespace steamrot

@@ -8,12 +8,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
+#include "CUserInterface.h"
 #include "MachinaFormScaffold.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
+#include "entity_memory.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <vector>
 
 TEST_CASE("CheckMouseOver SocketState sets is_mouse_over correctly",
           "[unit][collision][mouse]") {
@@ -703,9 +706,7 @@ TEST_CASE("CheckMouseOver disabled UIElement clears stale hover on children",
   sf::Vector2i mouse_position(75, 75);
   steamrot::logic::collision::mouse::CheckMouseOver(mouse_position, parent);
 
-  SECTION("Parent is not hovered") {
-    REQUIRE(parent.is_mouse_over == false);
-  }
+  SECTION("Parent is not hovered") { REQUIRE(parent.is_mouse_over == false); }
 
   SECTION("Child stale hover is cleared") {
     REQUIRE(child_ref.is_mouse_over == false);
@@ -739,5 +740,44 @@ TEST_CASE("CheckMouseOver disabled child does not receive hover even when "
 
   SECTION("Parent receives hover because disabled child did not claim it") {
     REQUIRE(parent.is_mouse_over == true);
+  }
+}
+
+TEST_CASE(
+    "CheckMouseOverAllCUserInterfaceComponents toggles is_mouse_over_ui_layer "
+    "= true if mouse over any CUserInterfaceComponent",
+    "[unit][collision][mouse]") {
+
+  // Create an EntityMemoryPool and add a CUserInterfaceComponent
+  steamrot::EntityMemoryPool pool;
+  steamrot::entity::memory::ResizeEntityMemoryPool(pool, 1);
+  auto &ui_component =
+      steamrot::entity::memory::GetComponent<steamrot::CUserInterface>(0, pool);
+  ui_component.m_root_element = std::make_unique<steamrot::PanelElement>();
+  ui_component.m_root_element->position = {0, 0};
+  ui_component.m_root_element->size = {100, 100};
+
+  // set up variables for CheckMouseOverAllCUserInterfaceComponents
+  std::vector<size_t> ui_entity_ids = {0}; // only one UI component in the pool
+  const sf::Vector2i mouse_position(50, 50);
+  bool is_over_ui_layer{false};
+
+  SECTION("Mouse over the CUserInterfaceComponent and m_visible = false and "
+          "does not set is_over_ui_layer") {
+    ui_component.m_visible = false;
+
+    steamrot::logic::collision::mouse::
+        CheckMouseOverAllCUserInterfaceComponents(
+            ui_entity_ids, pool, mouse_position, is_over_ui_layer);
+    REQUIRE(is_over_ui_layer == false);
+  }
+  SECTION("Mouse over the CUserInterfaceComponent and m_visible = true and "
+          "sets is_over_ui_layer to true") {
+    ui_component.m_visible = true;
+
+    steamrot::logic::collision::mouse::
+        CheckMouseOverAllCUserInterfaceComponents(
+            ui_entity_ids, pool, mouse_position, is_over_ui_layer);
+    REQUIRE(is_over_ui_layer == true);
   }
 }
