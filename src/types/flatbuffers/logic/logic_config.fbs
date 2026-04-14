@@ -17,7 +17,7 @@ table LogicConfigCollectionFbs {
 test_logic: LogicConfigFbs;
 grimoire_machina_action_logic: LogicConfigFbs;
 ghost_action_logic: LogicConfigFbs;
-camera_zoom_action_logic: LogicConfigFbs;
+camera_action_logic: LogicConfigFbs;
 
 }
 

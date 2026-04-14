@@ -49,7 +49,7 @@
     ]
   },
 
-  "camera_zoom_action_logic": {
+  "camera_action_logic": {
     "subscriptions": [
       {
         "event_type": "CAMERA",
