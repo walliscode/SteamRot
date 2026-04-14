@@ -40,20 +40,21 @@ ctest --preset Debug
 ### Generate test dashboard
 
 ```bash
-# Activate the virtual environment first (see "Serve this wiki locally" below)
+# Activate a Python virtual environment first
 python -m tools.test_dashboard --tests-dir tests/
 ```
 
-### Serve this wiki locally
+### Generate and view docs locally
 
 ```bash
-# Activate the virtual environment (once per shell session)
-source .venv/bin/activate   # macOS/Linux
-# .venv\Scripts\activate    # Windows
+# Install Doxygen (once)
+sudo apt-get install doxygen   # Debian / Ubuntu
+# brew install doxygen         # macOS
 
-# Install dependencies (once)
-pip install -r tools/wiki/requirements.txt
+# Generate docs (from repository root)
+doxygen Doxyfile
 
-# Start the local wiki server
-mkdocs serve
+# Open in browser
+xdg-open docs/html/index.html  # Linux
+# open docs/html/index.html    # macOS
 ```

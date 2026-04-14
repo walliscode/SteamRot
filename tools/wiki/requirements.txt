@@ -1,2 +1,0 @@
-# SteamRot Wiki Dependencies
-mkdocs-material>=9.5,<10
