@@ -1016,7 +1016,7 @@ TEST_CASE(
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
   steamrot::logic::action::grimoire_machina::ProcessSocketVisibilitySubscribers(
-      subscribers, grimoire_machina);
+      *subscriber, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == false);
 }
