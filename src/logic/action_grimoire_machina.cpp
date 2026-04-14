@@ -222,28 +222,14 @@ void ProcessPlacementSubscribers(
     if (!grimoire_machina.m_scaffold_form)
       continue;
 
-    // Guard 4: the click must be inside the crafting canvas.
-    if (!collision::mouse::IsMouseOverBounds(
-            scene_context.mouse_position,
-            grimoire_machina.m_crafting_helpers.crafting_canvas))
-      continue;
-
-    // First piece: snap to canvas centre; subsequent pieces: use cursor.
+    // First piece: snap to world origin (0, 0); subsequent pieces: use cursor.
     MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
     const bool is_first_piece =
         scaffold->fragments.empty() && scaffold->joints.empty();
 
     sf::Vector2f place_pos = scene_context.world_mouse_position;
     if (is_first_piece) {
-      const sf::FloatRect &canvas =
-          grimoire_machina.m_crafting_helpers.crafting_canvas;
-      const sf::Vector2i canvas_center_pixel{
-          static_cast<int>(canvas.position.x + canvas.size.x / 2.f),
-          static_cast<int>(canvas.position.y + canvas.size.y / 2.f)};
-      const sf::View world_view = scene_context.camera_state.GetWorldView(
-          scene_context.scene_texture);
-      place_pos = scene_context.scene_texture.mapPixelToCoords(
-          canvas_center_pixel, world_view);
+      place_pos = {0.f, 0.f};
     }
 
     // [TODO:] handle the result and report failure if it fails.
@@ -339,28 +325,14 @@ void ProcessSubscribers(
       if (!grimoire_machina.m_scaffold_form)
         continue;
 
-      // Guard 4: the click must be inside the crafting canvas.
-      if (!collision::mouse::IsMouseOverBounds(
-              scene_context.mouse_position,
-              grimoire_machina.m_crafting_helpers.crafting_canvas))
-        continue;
-
-      // First piece: snap to canvas centre; subsequent pieces: use cursor.
+      // First piece: snap to world origin (0, 0); subsequent pieces: use cursor.
       MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
       const bool is_first_piece =
           scaffold->fragments.empty() && scaffold->joints.empty();
 
       sf::Vector2f place_pos = scene_context.world_mouse_position;
       if (is_first_piece) {
-        const sf::FloatRect &canvas =
-            grimoire_machina.m_crafting_helpers.crafting_canvas;
-        const sf::Vector2i canvas_center_pixel{
-            static_cast<int>(canvas.position.x + canvas.size.x / 2.f),
-            static_cast<int>(canvas.position.y + canvas.size.y / 2.f)};
-        const sf::View world_view = scene_context.camera_state.GetWorldView(
-            scene_context.scene_texture);
-        place_pos = scene_context.scene_texture.mapPixelToCoords(
-            canvas_center_pixel, world_view);
+        place_pos = {0.f, 0.f};
       }
 
       // [TODO:] handle the result and report failure if it fails.

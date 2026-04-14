@@ -21,47 +21,17 @@ void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form) {
 }
 
 /////////////////////////////////////////////////
-void DrawCraftingCanvasBorder(sf::RenderTexture &texture,
-                              sf::FloatRect &crafting_canvas) {
+void DrawNoMachinaFormIndicator(sf::RenderTexture &texture) {
+  static constexpr float k_half_size = 100.f;
+  static constexpr float k_outline_thickness = 3.f;
 
-  // create a rectangle shape for the border
-  sf::RectangleShape border;
-  float border_thickness = 3.f; // thickness of the border
-  // off set border by thicknes so that the border remains "inside" the crafting
-  // canvas
-  border.setPosition({crafting_canvas.position.x + border_thickness,
-                      crafting_canvas.position.y + border_thickness});
-  border.setSize({crafting_canvas.size.x - 2 * border_thickness,
-                  crafting_canvas.size.y - 2 * border_thickness});
-
-  border.setFillColor(sf::Color::Transparent);
-  border.setOutlineColor(sf::Color::White);
-  border.setOutlineThickness(border_thickness);
-
-  texture.draw(border);
-}
-
-/////////////////////////////////////////////////
-void DrawNoMachinaFormBox(sf::RenderTexture &texture,
-                          sf::FloatRect &crafting_canvas) {
-
-  // create a rectangle shape for the box
-  sf::RectangleShape box;
-  // set the size of the box to a third of the crafting canvas size
-  box.setSize({crafting_canvas.size.x / 3.f, crafting_canvas.size.y / 3.f});
-  // center the box in the crafting canvas
-  box.setPosition({crafting_canvas.position.x + crafting_canvas.size.x / 2.f -
-                       box.getSize().x / 2.f,
-                   crafting_canvas.position.y + crafting_canvas.size.y / 2.f -
-                       box.getSize().y / 2.f});
-  // set the fill color of the box to be a transparent
+  sf::RectangleShape box({k_half_size * 2.f, k_half_size * 2.f});
+  box.setOrigin({k_half_size, k_half_size});
+  box.setPosition({0.f, 0.f});
   box.setFillColor(sf::Color::Transparent);
-  // set the outline color of the box to be red
   box.setOutlineColor(sf::Color::Red);
-  // set the outline thickness of the box
-  box.setOutlineThickness(3.f);
+  box.setOutlineThickness(k_outline_thickness);
 
-  // draw the box on the texture
   texture.draw(box);
 }
 
@@ -129,12 +99,8 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
                                GrimoireMachina &grimoire_machina) {
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
 
-  DrawCraftingCanvasBorder(texture,
-                           grimoire_machina.m_crafting_helpers.crafting_canvas);
-
   if (!scaffold) {
-    DrawNoMachinaFormBox(texture,
-                         grimoire_machina.m_crafting_helpers.crafting_canvas);
+    DrawNoMachinaFormIndicator(texture);
     return;
   }
 
