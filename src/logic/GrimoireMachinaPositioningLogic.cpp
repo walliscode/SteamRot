@@ -15,5 +15,9 @@ GrimoireMachinaPositioningLogic::GrimoireMachinaPositioningLogic(
     : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
-void GrimoireMachinaPositioningLogic::ProcessLogic() {}
+void GrimoireMachinaPositioningLogic::ProcessLogic() {
+  // Intentionally empty: the crafting canvas has been replaced with an
+  // infinite canvas, so there is nothing to compute here.  This class is
+  // retained to preserve LogicFactory and LogicClassEnum compatibility.
+}
 } // namespace steamrot::logic
