@@ -869,11 +869,11 @@ TEST_CASE("PlaceFirstPiece only places one piece per game instance",
 }
 
 /////////////////////////////////////////////////
-/// ProcessScaffoldSubscribers tests
+/// ProcessLogicEvents tests
 /////////////////////////////////////////////////
 
-TEST_CASE("ProcessScaffoldSubscribers: inactive subscriber is skipped",
-          "[unit][actions][grimoire_machina][ProcessScaffoldSubscribers]") {
+TEST_CASE("ProcessLogicEvents: inactive subscriber is skipped",
+          "[unit][actions][grimoire_machina][ProcessLogicEvents]") {
   steamrot::GrimoireMachina grimoire_machina;
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
@@ -884,16 +884,16 @@ TEST_CASE("ProcessScaffoldSubscribers: inactive subscriber is skipped",
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
-  steamrot::logic::action::grimoire_machina::ProcessScaffoldSubscribers(
+  steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
       subscribers, grimoire_machina);
 
   // scaffold must not have been initialised
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
 }
 
-TEST_CASE("ProcessScaffoldSubscribers: active INITIATE subscriber initialises "
+TEST_CASE("ProcessLogicEvents: active INITIATE subscriber initialises "
           "scaffold",
-          "[unit][actions][grimoire_machina][ProcessScaffoldSubscribers]") {
+          "[unit][actions][grimoire_machina][ProcessLogicEvents]") {
   steamrot::GrimoireMachina grimoire_machina;
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
@@ -904,15 +904,15 @@ TEST_CASE("ProcessScaffoldSubscribers: active INITIATE subscriber initialises "
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
-  steamrot::logic::action::grimoire_machina::ProcessScaffoldSubscribers(
+  steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
       subscribers, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form != nullptr);
 }
 
-TEST_CASE("ProcessScaffoldSubscribers: active CLEAR subscriber clears existing "
+TEST_CASE("ProcessLogicEvents: active CLEAR subscriber clears existing "
           "scaffold",
-          "[unit][actions][grimoire_machina][ProcessScaffoldSubscribers]") {
+          "[unit][actions][grimoire_machina][ProcessLogicEvents]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
@@ -925,7 +925,7 @@ TEST_CASE("ProcessScaffoldSubscribers: active CLEAR subscriber clears existing "
 
   std::vector<std::shared_ptr<steamrot::Subscriber>> subscribers{subscriber};
 
-  steamrot::logic::action::grimoire_machina::ProcessScaffoldSubscribers(
+  steamrot::logic::action::grimoire_machina::ProcessLogicEvents(
       subscribers, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form == nullptr);

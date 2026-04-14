@@ -175,11 +175,13 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
 }
 
 /////////////////////////////////////////////////
-void ProcessScaffoldSubscribers(
+void ProcessLogicEvents(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     GrimoireMachina &grimoire_machina) {
   for (const auto &subscriber : subscribers) {
     if (!subscriber->m_active)
+      continue;
+    if (subscriber->event_type != EventType::LOGIC)
       continue;
     ProcessSubscriber(*subscriber, grimoire_machina);
   }
@@ -281,93 +283,19 @@ void ProcessSocketVisibilitySubscribers(
 }
 
 /////////////////////////////////////////////////
+void ProcessUserInputEvents(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
+  ProcessSocketVisibilitySubscribers(subscribers, grimoire_machina);
+  ProcessPlacementSubscribers(subscribers, scene_context, grimoire_machina);
+}
+
+/////////////////////////////////////////////////
 void ProcessSubscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
-  for (const auto &subscriber : subscribers) {
-    if (!subscriber->m_active)
-      continue;
-
-    if (subscriber->event_type == EventType::LOGIC) {
-      ProcessSubscriber(*subscriber, grimoire_machina);
-      continue;
-    }
-
-    if (subscriber->event_type != EventType::USER_INPUT)
-      continue;
-
-    if (!subscriber->captured_payload.has_value())
-      continue;
-
-    const InputPayload *input_payload =
-        std::get_if<InputPayload>(&subscriber->captured_payload.value());
-    if (!input_payload)
-      continue;
-
-    if (input_payload->action ==
-        InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY) {
-      MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-      if (!scaffold)
-        continue;
-      scaffold->are_sockets_visible = !scaffold->are_sockets_visible;
-
-    } else if (input_payload->action == InputPayload::InputAction::SELECT) {
-      // Guard 1: a ghost item must be selected (not monostate).
-      if (std::holds_alternative<std::monostate>(
-              scene_context.mr_ghost.m_selection))
-        continue;
-
-      // Guard 2: the click must not land on any visible UI element.
-      bool can_place = true;
-      const std::vector<size_t> ui_ids =
-          archetypes::GetEntitiesSortedByPriority<CUserInterface>(
-              scene_context.archetypes, scene_context.scene_entities,
-              /*ascending=*/false);
-      for (size_t id : ui_ids) {
-        const CUserInterface &ui = entity::memory::GetComponent<CUserInterface>(
-            id, scene_context.scene_entities);
-        if (ui.m_visible &&
-            collision::mouse::AnyMouseOver(*ui.m_root_element)) {
-          can_place = false;
-          break;
-        }
-      }
-      if (!can_place)
-        continue;
-
-      // Guard 3: the active scaffold must exist.
-      if (!grimoire_machina.m_scaffold_form)
-        continue;
-
-      // Guard 4: the click must be inside the crafting canvas.
-      if (!collision::mouse::IsMouseOverBounds(
-              scene_context.mouse_position,
-              grimoire_machina.m_crafting_helpers.crafting_canvas))
-        continue;
-
-      // First piece: snap to canvas centre; subsequent pieces: use cursor.
-      MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-      const bool is_first_piece =
-          scaffold->fragments.empty() && scaffold->joints.empty();
-
-      sf::Vector2f place_pos = scene_context.world_mouse_position;
-      if (is_first_piece) {
-        const sf::FloatRect &canvas =
-            grimoire_machina.m_crafting_helpers.crafting_canvas;
-        const sf::Vector2i canvas_center_pixel{
-            static_cast<int>(canvas.position.x + canvas.size.x / 2.f),
-            static_cast<int>(canvas.position.y + canvas.size.y / 2.f)};
-        const sf::View world_view = scene_context.camera_state.GetWorldView(
-            scene_context.scene_texture);
-        place_pos = scene_context.scene_texture.mapPixelToCoords(
-            canvas_center_pixel, world_view);
-      }
-
-      // [TODO:] handle the result and report failure if it fails.
-      (void)PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost,
-                                 place_pos);
-    }
-  }
+  ProcessLogicEvents(subscribers, grimoire_machina);
+  ProcessUserInputEvents(subscribers, scene_context, grimoire_machina);
 }
 
 } // namespace steamrot::logic::action::grimoire_machina

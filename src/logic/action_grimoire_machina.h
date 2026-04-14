@@ -78,13 +78,13 @@ void ProcessSubscriber(Subscriber &subscriber,
 /// @brief Process all active LOGIC-type subscribers for scaffold init/clear
 /// events.
 ///
-/// Iterates the subscriber list, skips inactive entries, and dispatches each
-/// active subscriber to @ref ProcessSubscriber.
+/// Iterates the subscriber list, skips inactive entries and non-LOGIC entries,
+/// and dispatches each active LOGIC subscriber to @ref ProcessSubscriber.
 ///
 /// @param subscribers Subscribers owned by the Logic instance.
 /// @param grimoire_machina GrimoireMachina instance to mutate.
 /////////////////////////////////////////////////
-void ProcessScaffoldSubscribers(
+void ProcessLogicEvents(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     GrimoireMachina &grimoire_machina);
 
@@ -118,6 +118,22 @@ void ProcessSocketVisibilitySubscribers(
 /// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
 /////////////////////////////////////////////////
 void ProcessPlacementSubscribers(
+    const std::vector<std::shared_ptr<Subscriber>> &subscribers,
+    const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Process all active USER_INPUT-type subscribers.
+///
+/// Iterates the subscriber list and dispatches each active USER_INPUT
+/// subscriber by routing to @ref ProcessSocketVisibilitySubscribers and
+/// @ref ProcessPlacementSubscribers.
+///
+/// @param subscribers Subscribers owned by the Logic instance.
+/// @param scene_context SceneContext providing archetypes, entities, ghost
+/// state, camera, and mouse position.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void ProcessUserInputEvents(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
@@ -159,17 +175,10 @@ PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
                      sf::Vector2f world_pos);
 
 /////////////////////////////////////////////////
-/// @brief Process all active subscribers in a single pass, dispatching each
-/// to the appropriate GrimoireMachina action.
+/// @brief Process all active subscribers by routing to event-type handlers.
 ///
-/// Iterates the subscriber list once, skipping inactive entries, then routes
-/// each active subscriber by event type:
-///  - LOGIC events are forwarded to @ref ProcessSubscriber for scaffold
-///    init/clear handling.
-///  - USER_INPUT TOGGLE_SOCKET_VISIBILITY events toggle socket visibility on
-///    the active scaffold.
-///  - USER_INPUT SELECT events run the full placement guard chain and, when
-///    all guards pass, place the ghost item via @ref PlaceGhostOnScaffold.
+/// Calls @ref ProcessLogicEvents for LOGIC subscribers and
+/// @ref ProcessUserInputEvents for USER_INPUT subscribers.
 ///
 /// @param subscribers    Subscribers owned by the Logic instance.
 /// @param scene_context  SceneContext providing ghost state, archetypes,
