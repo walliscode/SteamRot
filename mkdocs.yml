@@ -1,5 +1,6 @@
 site_name: SteamRot Wiki
-site_description: Documentation, workflows, and design notes for the SteamRot game engine
+site_description:
+  Documentation, workflows, and design notes for the SteamRot game engine
 site_url: https://walliscode.github.io/SteamRot/
 
 docs_dir: documentation
@@ -54,11 +55,3 @@ markdown_extensions:
 
 plugins:
   - search
-
-nav:
-  - Home: index.md
-  - Workflows:
-      - Adding Logic: workflows/ADDING_LOGIC.md
-      - SFML Event Conversion: workflows/SFML_EVENT_CONVERSION.md
-  - Design:
-      - Logic Decomposition: design/LOGIC_DECOMPOSITION.md
