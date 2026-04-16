@@ -90,7 +90,7 @@ struct PartInstance {
 /// @struct JointInstance
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
-/// Holds a reference to the Joint definition and Joint-specific runtime state.
+/// Derives from PartInstance and adds Joint-specific runtime state.
 /// World positions for sockets are derived on demand via:
 ///   ComputeSocketLocalPos(joint.socket_config, i, current_rotation)
 ///   followed by transform.transformPoint(local_pos)
@@ -138,8 +138,8 @@ struct JointInstance : public PartInstance {
 /// @struct FragmentInstance
 /// @brief A placed instance of a Fragment on the MachinaFormScaffold.
 ///
-/// Holds a reference to the Fragment definition. World positions for sockets
-/// are derived on demand via:
+/// Derives from PartInstance and adds Fragment-specific runtime state.
+/// World positions for sockets are derived on demand via:
 ///   transform.transformPoint(fragment.sockets[i])
 /////////////////////////////////////////////////
 struct FragmentInstance : public PartInstance {
