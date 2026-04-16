@@ -155,9 +155,13 @@ void ProcessUserInputEvents(Subscriber &subscriber,
   switch (input_payload->action) {
 
   case InputPayload::InputAction::SELECT:
+
+    // deal with Ghost placement on scaffold when SELECT action is triggered,
+    // checking guards in order checking for empty selection
     if (std::holds_alternative<std::monostate>(
             scene_context.mr_ghost.m_selection))
       break;
+    // if mouse is hovering over UI, do not place piece on scaffold
     if (scene_context.scene_state.is_mouse_over_ui_layer)
       break;
     PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost);
