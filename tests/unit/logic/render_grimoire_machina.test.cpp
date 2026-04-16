@@ -546,11 +546,8 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {50.f, 50.f});
-  if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed: " << result.error().message);
-  } // These are all the boolean states that the editor needs to track for the
+  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost);
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
@@ -570,11 +567,8 @@ TEST_CASE(
   mr_ghost.m_selection = steamrot::JointTag{"joint"};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  auto result = steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
-      grimoire_machina, mr_ghost, {50.f, 50.f});
-  if (!result.has_value()) {
-    FAIL("PlaceGhostOnScaffold failed: " << result.error().message);
-  } // These are all the boolean states that the editor needs to track for the
+  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+      grimoire_machina, mr_ghost);
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
           texture, grimoire_machina));
