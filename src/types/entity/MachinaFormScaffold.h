@@ -16,7 +16,9 @@
 #include "Joint.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cstdint>
+#include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace steamrot {
@@ -50,16 +52,50 @@ struct SocketState {
 };
 
 /////////////////////////////////////////////////
+/// @struct PartInstance
+/// @brief Common base for all placed instances on the MachinaFormScaffold.
+///
+/// Holds the stable unique ID, the world-space transform, and the per-socket
+/// runtime state that are shared by every placed part. Derive from this struct
+/// rather than duplicating these fields in JointInstance and FragmentInstance.
+/////////////////////////////////////////////////
+struct PartInstance {
+  /////////////////////////////////////////////////
+  /// @brief Construct a PartInstance with the given world-space transform.
+  ///
+  /// @param initial_transform Transform placing this instance in world space.
+  /////////////////////////////////////////////////
+  explicit PartInstance(
+      sf::Transform initial_transform = sf::Transform::Identity)
+      : transform{initial_transform} {}
+
+  /////////////////////////////////////////////////
+  /// @brief Stable ID assigned by MachinaFormScaffold when this instance is
+  /// added. Unique across both joints and fragments.
+  /////////////////////////////////////////////////
+  uint32_t id{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Single transform that positions this instance on the canvas.
+  /////////////////////////////////////////////////
+  sf::Transform transform{sf::Transform::Identity};
+
+  /////////////////////////////////////////////////
+  /// @brief Per-socket runtime state (connection status, hover).
+  /////////////////////////////////////////////////
+  std::vector<SocketState> socket_states;
+};
+
+/////////////////////////////////////////////////
 /// @struct JointInstance
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
-/// Holds a stable unique ID, a reference to the Joint definition, the single
-/// transform that positions the instance on the canvas, and per-socket runtime
-/// state. World positions for sockets are derived on demand via:
+/// Holds a reference to the Joint definition and Joint-specific runtime state.
+/// World positions for sockets are derived on demand via:
 ///   ComputeSocketLocalPos(joint.socket_config, i, current_rotation)
 ///   followed by transform.transformPoint(local_pos)
 /////////////////////////////////////////////////
-struct JointInstance {
+struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a JointInstance from a Joint definition.
   ///
@@ -71,38 +107,15 @@ struct JointInstance {
   /////////////////////////////////////////////////
   JointInstance(Joint &joint_ref,
                 sf::Transform initial_transform = sf::Transform::Identity)
-      : joint{joint_ref}, transform{initial_transform} {
+      : PartInstance{initial_transform}, joint{joint_ref} {
     socket_states.resize(
         static_cast<size_t>(joint_ref.socket_config.socket_count));
   }
 
   /////////////////////////////////////////////////
-  /// @brief Stable ID assigned by MachinaFormScaffold when this instance is
-  /// added. Unique across both joints and fragments.
-  /////////////////////////////////////////////////
-  uint32_t id{0};
-
-  /////////////////////////////////////////////////
   /// @brief Joint definition being referenced.
   /////////////////////////////////////////////////
   Joint &joint;
-
-  /////////////////////////////////////////////////
-  /// @brief Single transform that positions this instance on the canvas.
-  ///
-  /// Apply to a socket's local position to obtain the socket's world position.
-  /// Use ComputeSocketLocalPos(joint.socket_config, i, current_rotation) to
-  /// get the local position first.
-  /////////////////////////////////////////////////
-  sf::Transform transform{sf::Transform::Identity};
-
-  /////////////////////////////////////////////////
-  /// @brief Per-socket runtime state (connection status, hover).
-  ///
-  /// socket_states[i] corresponds to the i-th socket as described by
-  /// joint.socket_config.
-  /////////////////////////////////////////////////
-  std::vector<SocketState> socket_states;
 
   /////////////////////////////////////////////////
   /// @brief Current rotation angle (degrees) of the socket ring around the
@@ -125,12 +138,11 @@ struct JointInstance {
 /// @struct FragmentInstance
 /// @brief A placed instance of a Fragment on the MachinaFormScaffold.
 ///
-/// Holds a stable unique ID, a reference to the Fragment definition, the
-/// single transform that positions the instance on the canvas, and per-socket
-/// runtime state. World positions for sockets are derived on demand via:
+/// Holds a reference to the Fragment definition. World positions for sockets
+/// are derived on demand via:
 ///   transform.transformPoint(fragment.sockets[i])
 /////////////////////////////////////////////////
-struct FragmentInstance {
+struct FragmentInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a FragmentInstance from a Fragment definition.
   ///
@@ -142,34 +154,14 @@ struct FragmentInstance {
   /////////////////////////////////////////////////
   FragmentInstance(Fragment &fragment_ref,
                    sf::Transform initial_transform = sf::Transform::Identity)
-      : fragment{fragment_ref}, transform{initial_transform} {
+      : PartInstance{initial_transform}, fragment{fragment_ref} {
     socket_states.resize(fragment_ref.sockets.size());
   }
-
-  /////////////////////////////////////////////////
-  /// @brief Stable ID assigned by MachinaFormScaffold when this instance is
-  /// added. Unique across both joints and fragments.
-  /////////////////////////////////////////////////
-  uint32_t id{0};
 
   /////////////////////////////////////////////////
   /// @brief Fragment definition being referenced.
   /////////////////////////////////////////////////
   Fragment &fragment;
-
-  /////////////////////////////////////////////////
-  /// @brief Single transform that positions this instance on the canvas.
-  ///
-  /// Apply to fragment.sockets[i] to obtain each socket's world position.
-  /////////////////////////////////////////////////
-  sf::Transform transform{sf::Transform::Identity};
-
-  /////////////////////////////////////////////////
-  /// @brief Per-socket runtime state (connection status, hover).
-  ///
-  /// socket_states[i] corresponds to fragment.sockets[i].
-  /////////////////////////////////////////////////
-  std::vector<SocketState> socket_states;
 };
 
 /////////////////////////////////////////////////
@@ -225,14 +217,13 @@ struct MachinaFormScaffold {
   uint32_t next_id{0};
 
   /////////////////////////////////////////////////
-  /// @brief All JointInstances placed on the scaffold.
+  /// @brief All placed parts (JointInstances and FragmentInstances) keyed by
+  /// their stable IDs.
+  ///
+  /// Using std::map gives node-stable storage: insertions and erasures never
+  /// invalidate references or iterators to other elements.
   /////////////////////////////////////////////////
-  std::vector<JointInstance> joints;
-
-  /////////////////////////////////////////////////
-  /// @brief All FragmentInstances placed on the scaffold.
-  /////////////////////////////////////////////////
-  std::vector<FragmentInstance> fragments;
+  std::map<uint32_t, std::variant<JointInstance, FragmentInstance>> parts;
 
   /////////////////////////////////////////////////
   /// @brief All connections between sockets on the scaffold.

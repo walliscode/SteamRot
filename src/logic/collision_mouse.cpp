@@ -199,12 +199,9 @@ void CheckMouseOverAllCUserInterfaceComponents(
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
                                sf::Vector2f world_mouse) {
-  for (auto &joint : scaffold.joints) {
-    CheckMouseOver(world_mouse, joint);
-  }
-
-  for (auto &fragment : scaffold.fragments) {
-    CheckMouseOver(world_mouse, fragment);
+  for (auto &[id, part] : scaffold.parts) {
+    std::visit([&](auto &instance) { CheckMouseOver(world_mouse, instance); },
+               part);
   }
 }
 
