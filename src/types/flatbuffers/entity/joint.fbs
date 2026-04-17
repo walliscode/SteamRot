@@ -11,6 +11,8 @@ table SocketConfigFbs {
   min_gap: float = 0.0;
   fixed_socket_angle: float = 0.0;
   has_fixed_socket: bool = false;
+  rotation_arc_min: float = -180.0;
+  rotation_arc_max: float = 180.0;
 }
 
 table JointFbs{

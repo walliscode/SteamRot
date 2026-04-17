@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
-#include "SocketConfigUtils.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -93,10 +92,8 @@ void draw_fragment_instance_sockets(sf::RenderTexture &texture,
 void draw_joint_instance_sockets(sf::RenderTexture &texture,
                                  JointInstance &joint_instance) {
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
-    const sf::Vector2f local_pos = ComputeSocketLocalPos(
-        joint_instance.joint.socket_config, i, joint_instance.current_rotation);
-    const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(local_pos);
+    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
+        joint_instance.socket_local_positions[i]);
     draw_socket(texture, world_pos, joint_instance.socket_states[i]);
   }
 }

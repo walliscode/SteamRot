@@ -10,6 +10,7 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
+#include "SocketConfigUtils.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
@@ -249,34 +250,66 @@ TEST_CASE("JointInstance id defaults to zero",
   REQUIRE(instance.id == 0u);
 }
 
-TEST_CASE("JointInstance constructor defaults current_rotation to zero",
+TEST_CASE("JointInstance constructor populates socket_local_positions for each "
+          "socket",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.socket_config.socket_count = 1;
+  joint.socket_config.socket_count = 3;
+  joint.socket_config.radius = 10.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 360.f;
+  joint.socket_config.has_fixed_socket = false;
 
   steamrot::JointInstance instance{joint};
 
-  REQUIRE(instance.current_rotation == 0.f);
+  REQUIRE(instance.socket_local_positions.size() == 3u);
 }
 
-TEST_CASE("JointInstance constructor defaults rotation_min to -180",
+TEST_CASE("JointInstance constructor socket_local_positions size matches "
+          "socket_states size",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.socket_config.socket_count = 1;
+  joint.socket_config.socket_count = 4;
+  joint.socket_config.radius = 20.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 360.f;
+  joint.socket_config.has_fixed_socket = false;
 
   steamrot::JointInstance instance{joint};
 
-  REQUIRE(instance.rotation_min == -180.f);
+  REQUIRE(instance.socket_local_positions.size() ==
+          instance.socket_states.size());
 }
 
-TEST_CASE("JointInstance constructor defaults rotation_max to 180",
+TEST_CASE("JointInstance constructor with zero sockets has empty "
+          "socket_local_positions",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
-  joint.socket_config.socket_count = 1;
+  joint.socket_config.socket_count = 0;
 
   steamrot::JointInstance instance{joint};
 
-  REQUIRE(instance.rotation_max == 180.f);
+  REQUIRE(instance.socket_local_positions.empty());
+}
+
+TEST_CASE("JointInstance constructor socket_local_positions match "
+          "ComputeSocketLocalPos at zero rotation",
+          "[unit][JointInstance][MachinaFormScaffold]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 3;
+  joint.socket_config.radius = 10.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 360.f;
+  joint.socket_config.has_fixed_socket = false;
+
+  steamrot::JointInstance instance{joint};
+
+  for (size_t i = 0; i < 3u; ++i) {
+    const sf::Vector2f expected =
+        steamrot::ComputeSocketLocalPos(joint.socket_config, i, 0.f);
+    REQUIRE(instance.socket_local_positions[i].x == expected.x);
+    REQUIRE(instance.socket_local_positions[i].y == expected.y);
+  }
 }
 
 /////////////////////////////////////////////////

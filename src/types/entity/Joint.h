@@ -70,6 +70,18 @@ struct SocketConfig {
   /// @brief Whether socket index 0 is a fixed anchor that does not rotate.
   /////////////////////////////////////////////////
   bool has_fixed_socket{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Minimum rotation angle (degrees) the socket ring is permitted to
+  /// reach. Used by positioning Logic to clamp socket ring rotation.
+  /////////////////////////////////////////////////
+  float rotation_arc_min{-180.f};
+
+  /////////////////////////////////////////////////
+  /// @brief Maximum rotation angle (degrees) the socket ring is permitted to
+  /// reach. Used by positioning Logic to clamp socket ring rotation.
+  /////////////////////////////////////////////////
+  float rotation_arc_max{180.f};
 };
 
 /////////////////////////////////////////////////
