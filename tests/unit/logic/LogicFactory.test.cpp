@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CameraActionLogic.h"
+#include "CameraMovementLogic.h"
 #include "EventPayload.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
@@ -151,17 +151,15 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Action LogicType");
   }
   const auto &action_logics = action_it->second;
-  REQUIRE(action_logics.size() == 5);
-  REQUIRE(dynamic_cast<steamrot::logic::CameraActionLogic *>(
-      action_logics[0].get()));
+  REQUIRE(action_logics.size() == 4);
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[1].get()));
+      dynamic_cast<steamrot::logic::UIActionLogic *>(action_logics[0].get()));
   REQUIRE(
-      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[2].get()));
+      dynamic_cast<steamrot::logic::UIStateLogic *>(action_logics[1].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaActionLogic *>(
-      action_logics[3].get()));
+      action_logics[2].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GhostActionLogic *>(
-      action_logics[4].get()));
+      action_logics[3].get()));
 
   ///// CHECKING RENDER LOGICS /////
   auto render_it = logic_collection.find(steamrot::LogicGrouping::Render);
@@ -183,13 +181,15 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Movement LogicType");
   }
   const auto &movement_logics = movement_it->second;
-  REQUIRE(movement_logics.size() == 3);
+  REQUIRE(movement_logics.size() == 4);
   REQUIRE(dynamic_cast<steamrot::logic::UIPositioningLogic *>(
       movement_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
       movement_logics[1].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
       movement_logics[2].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::CameraMovementLogic *>(
+      movement_logics[3].get()));
 }
 
 TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "

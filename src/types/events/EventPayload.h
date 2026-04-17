@@ -253,7 +253,7 @@ struct GhostPayload {
 /// @brief Event payload carrying a mouse-scroll delta for camera zoom.
 ///
 /// Emitted each tick that a mouse-wheel event is detected by
-/// SFMLEventConverter and consumed by CameraActionLogic to update the
+/// SFMLEventConverter and consumed by CameraMovementLogic to update the
 /// scene CameraState.
 /////////////////////////////////////////////////
 struct CameraPayload {

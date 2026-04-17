@@ -23,7 +23,7 @@ namespace steamrot::logic::action::camera {
 ///
 /// Iterates the subscriber list, skips inactive entries, and for each active
 /// subscriber extracts a CameraPayload and applies its scroll_delta to
-/// @p camera_state via CameraState::ApplyScrollDelta.
+/// @p camera_state via movement::camera::ApplyZoom.
 ///
 /// @param subscribers  Subscribers owned by the Logic instance.
 /// @param camera_state CameraState instance to mutate.
