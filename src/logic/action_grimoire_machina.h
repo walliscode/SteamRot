@@ -12,13 +12,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "FailInfo.h"
 #include "GrimoireMachina.h"
+#include "MachinaFormScaffold.h"
 #include "MrGhost.h"
 #include "SceneContext.h"
 #include "Subscriber.h"
-#include <SFML/System/Vector2.hpp>
-#include <expected>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -31,8 +29,7 @@ namespace steamrot::logic::action::grimoire_machina {
 /// @param grimoire_machina GrimoireMachina to intialise the active MachinaForm
 /// in.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
+void InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Clear the active ClearActiveMachinaFormScaffold in the
@@ -40,8 +37,7 @@ InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 ///
 /// @param grimoire_machina GrimoireMachina to clear the active MachinaForm in.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
+void ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Return the string names of all fragments in the GrimoireMachina.
@@ -60,6 +56,14 @@ std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
 std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
+/// @brief Toggle the are_sockets_visible boolean on the active
+/// MachinaFormScaffold in the GrimoireMachina.
+///
+/// @param scaffold MachinaFormScaffold to toggle the socket visibility on.
+/////////////////////////////////////////////////
+void ToggleSocketVisibility(MachinaFormScaffold &scaffold);
+
+/////////////////////////////////////////////////
 /// @brief Handle a single LOGIC subscriber for scaffold init/clear events.
 ///
 /// Checks that the subscriber carries a LogicPayload, then switches on
@@ -73,40 +77,8 @@ void ProcessLogicEvents(Subscriber &subscriber,
                         GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Handle a single USER_INPUT TOGGLE_SOCKET_VISIBILITY subscriber and
-/// toggle are_sockets_visible on the active scaffold.
-///
-/// When triggered, toggles MachinaFormScaffold::are_sockets_visible. Does
-/// nothing if the payload is not TOGGLE_SOCKET_VISIBILITY or no active
-/// scaffold exists.
-///
-/// @param subscriber    Subscriber to process.
-/// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
-/////////////////////////////////////////////////
-void ProcessSocketVisibilitySubscribers(Subscriber &subscriber,
-                                        GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
 /// @brief Handle a single USER_INPUT SELECT subscriber and, when all placement
 /// guards pass, place the ghost item on the active scaffold.
-///
-/// Guards checked in order:
-///  1. Ghost selection must not be monostate (an item must be selected).
-///  2. The click must not land on any visible UI element.
-///  3. An active scaffold must exist on the GrimoireMachina.
-///
-/// @param subscriber    Subscriber to process.
-/// @param scene_context SceneContext providing archetypes, entities, ghost
-/// state, camera, and mouse position.
-/// @param grimoire_machina GrimoireMachina instance that owns the scaffold.
-/////////////////////////////////////////////////
-void ProcessPlacementSubscribers(Subscriber &subscriber,
-                                 const SceneContext &scene_context,
-                                 GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
-/// @brief Handle a single USER_INPUT subscriber by routing to
-/// @ref ProcessSocketVisibilitySubscribers and @ref ProcessPlacementSubscribers.
 ///
 /// @param subscriber    Subscriber to process.
 /// @param scene_context SceneContext providing archetypes, entities, ghost
@@ -121,38 +93,30 @@ void ProcessUserInputEvents(Subscriber &subscriber,
 /// @brief Place the currently selected ghost item as the very first piece on
 /// the active scaffold.
 ///
-/// Looks up the Fragment or Joint identified by @p mr_ghost's selection tag,
-/// builds an instance with a transform that centers it on @p world_pos, and
-/// appends it to the scaffold.  Returns an error if no scaffold is active,
-/// the scaffold already contains pieces (not the first piece), the selection
-/// is empty (std::monostate), or the key is not found in the GrimoireMachina's
-/// library.
+/// Looks up the Fragment or Joint identified by @p mr_ghost's selection tag
+/// and appends a default-transform instance to the scaffold. Does nothing if
+/// no scaffold is active, the scaffold already contains pieces, the selection
+/// is monostate, or the key is not found.
 ///
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
-/// @param world_pos        World-space position at which to center the piece.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                sf::Vector2f world_pos);
+void PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
 ///
-/// Routes to @ref PlaceFirstPiece when the scaffold is empty.  For subsequent
+/// Routes to @ref PlaceFirstPiece when the scaffold is empty. For subsequent
 /// pieces a positive socket-proximity collision result is required; because
-/// that logic is not yet implemented this path always returns an error.
+/// that logic is not yet implemented this path does nothing.
 ///
-/// Returns an error if no scaffold is active, the selection is empty
-/// (std::monostate), or the key is not found in the GrimoireMachina's library.
+/// Does nothing if no scaffold is active.
 ///
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
-/// @param world_pos        World-space position at which to place the part.
 /////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost,
-                     sf::Vector2f world_pos);
+void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
+                          const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers by iterating the list, checking

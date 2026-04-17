@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaRenderLogic.h"
+#include "movement_camera.h"
 #include "render_grimoire_machina.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -21,7 +22,8 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
 
   // Apply the world (zoomed) view before drawing world-space geometry.
   m_scene_context.scene_texture.setView(
-      m_scene_context.camera_state.GetWorldView(m_scene_context.scene_texture));
+      movement::camera::GetWorldView(m_scene_context.camera_state,
+                                     m_scene_context.scene_texture));
 
   // --- Asset section ---
   auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();

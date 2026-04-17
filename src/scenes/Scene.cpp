@@ -51,14 +51,14 @@ SceneInfo &Scene::GetSceneInfo() { return m_scene_info; }
 /////////////////////////////////////////////////
 SceneContext Scene::GetSceneContext() {
 
-  SceneContext scene_context{
-      m_scene_resources.scene_texture,
-      m_scene_resources.game_context.engine_resources,
-      m_scene_resources.entity_manager,
-      m_scene_resources.game_context.data_access_factory,
-      m_scene_resources.mr_ghost,
-      m_scene_resources.camera_state,
-      m_scene_resources.world_mouse_position};
+  SceneContext scene_context{m_scene_resources.scene_texture,
+                             m_scene_state,
+                             m_scene_resources.game_context.engine_resources,
+                             m_scene_resources.entity_manager,
+                             m_scene_resources.game_context.data_access_factory,
+                             m_scene_resources.mr_ghost,
+                             m_scene_state.camera_state,
+                             m_scene_resources.world_mouse_position};
 
   return scene_context;
 }

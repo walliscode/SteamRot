@@ -15,6 +15,7 @@
 #include "EntityManager.h"
 #include "EventHandler.h"
 #include "MrGhost.h"
+#include "SceneState.h"
 #include "containers.h"
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
@@ -43,11 +44,10 @@ struct SceneContext {
   /// @param entity_manager Reference to EntityManager (contains
   /// entities/archetypes)
   /////////////////////////////////////////////////
-  SceneContext(sf::RenderTexture &scene_texture,
+  SceneContext(sf::RenderTexture &scene_texture, SceneState &scene_state,
                EngineResources &engine_resources, EntityManager &entity_manager,
                DataAccessFactory &data_access_factory, MrGhost &mr_ghost,
-               CameraState &camera_state,
-               sf::Vector2f &world_mouse_position);
+               CameraState &camera_state, sf::Vector2f &world_mouse_position);
 
   /////////////////////////////////////////////////
   /// @brief Reference to the EntityMemoryPool for the Scene.
@@ -63,6 +63,11 @@ struct SceneContext {
   /// @brief Reference to the RenderTexture for the Scene.
   /////////////////////////////////////////////////
   sf::RenderTexture &scene_texture;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to the SceneState for the Scene.
+  /////////////////////////////////////////////////
+  SceneState &scene_state;
 
   /////////////////////////////////////////////////
   /// @brief Reference to the game window.
@@ -104,7 +109,7 @@ struct SceneContext {
   /// @brief Reference to the camera/view state for the scene.
   ///
   /// Provides all Logic classes with read/write access to the current
-  /// zoom level and the world view derived from it.
+  /// zoom level and camera position. Owned by SceneState.
   /////////////////////////////////////////////////
   CameraState &camera_state;
 
@@ -112,7 +117,7 @@ struct SceneContext {
   /// @brief World-space mouse position for the current tick.
   ///
   /// Computed once per tick by GhostPositioningLogic via
-  /// CameraState::MapToWorldCoords.  World-space systems (ghost rendering,
+  /// movement::camera::MapToWorldCoords.  World-space systems (ghost rendering,
   /// grimoire collision, piece placement) read this value; screen-space
   /// systems (UI collision) use mouse_position instead.
   ///

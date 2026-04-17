@@ -153,6 +153,12 @@ private:
   std::unique_ptr<SceneContext> m_scene_context;
 
   /////////////////////////////////////////////////
+  /// @brief Mock SceneState for testing (stand-in for
+  /// SceneContext::scene_state)
+  /////////////////////////////////////////////////
+  SceneState m_scene_state{};
+
+  /////////////////////////////////////////////////
   /// @brief Create core objects without full initialization
   /////////////////////////////////////////////////
   void CreateCores();
