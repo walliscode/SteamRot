@@ -189,15 +189,24 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
                  "Joint socket_config socket_count must be positive"});
   }
 
-  joint.socket_config.socket_count = sc->socket_count();
-  joint.socket_config.radius = sc->radius();
-  joint.socket_config.arc_min = sc->arc_min();
-  joint.socket_config.arc_max = sc->arc_max();
-  joint.socket_config.min_gap = sc->min_gap();
-  joint.socket_config.fixed_socket_angle = sc->fixed_socket_angle();
-  joint.socket_config.has_fixed_socket = sc->has_fixed_socket();
-  joint.socket_config.rotation_arc_min = sc->rotation_arc_min();
-  joint.socket_config.rotation_arc_max = sc->rotation_arc_max();
+  if (sc->socket_count())
+    joint.socket_config.socket_count = sc->socket_count();
+  if (sc->radius())
+    joint.socket_config.radius = sc->radius();
+  if (sc->arc_min())
+    joint.socket_config.arc_min = sc->arc_min();
+  if (sc->arc_max())
+    joint.socket_config.arc_max = sc->arc_max();
+  if (sc->min_gap())
+    joint.socket_config.min_gap = sc->min_gap();
+  if (sc->fixed_socket_angle())
+    joint.socket_config.fixed_socket_angle = sc->fixed_socket_angle();
+  if (sc->has_fixed_socket())
+    joint.socket_config.has_fixed_socket = sc->has_fixed_socket();
+  if (sc->rotation_arc_min())
+    joint.socket_config.rotation_arc_min = sc->rotation_arc_min();
+  if (sc->rotation_arc_max())
+    joint.socket_config.rotation_arc_max = sc->rotation_arc_max();
 
   // Configure movement_views
   if (!joint_fbs->movement_views()->empty()) {
