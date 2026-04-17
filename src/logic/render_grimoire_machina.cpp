@@ -108,11 +108,16 @@ void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
   bool draw_sockets = scaffold->are_sockets_visible;
 
   // Draw all placed instances on the active scaffold.
-  for (auto &joint : scaffold->joints) {
-    DrawJointInstance(texture, joint, draw_sockets);
-  }
-  for (auto &fragment : scaffold->fragments) {
-    DrawFragmentInstance(texture, fragment, draw_sockets);
+  for (auto &[id, part] : scaffold->parts) {
+    std::visit(
+        [&](auto &instance) {
+          if constexpr (std::is_same_v<std::decay_t<decltype(instance)>,
+                                       JointInstance>)
+            DrawJointInstance(texture, instance, draw_sockets);
+          else
+            DrawFragmentInstance(texture, instance, draw_sockets);
+        },
+        part);
   }
 }
 

@@ -310,8 +310,7 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 TEST_CASE("PlaceGhostOnScaffold does nothing when fragment key not found",
@@ -326,8 +325,7 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when fragment key not found",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 TEST_CASE("PlaceGhostOnScaffold does nothing when joint key not found",
@@ -342,8 +340,7 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when joint key not found",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 /////////////////////////////////////////////////
@@ -363,8 +360,9 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends fragment to scaffold",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE(
@@ -381,7 +379,9 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].id == 0u);
+  REQUIRE(std::get<steamrot::FragmentInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .id == 0u);
   REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
 }
 
@@ -399,8 +399,9 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].transform ==
-          sf::Transform::Identity);
+  REQUIRE(std::get<steamrot::FragmentInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .transform == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -420,8 +421,9 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends joint to scaffold",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE("PlaceGhostOnScaffold first piece: joint id and next_id are assigned",
@@ -437,7 +439,9 @@ TEST_CASE("PlaceGhostOnScaffold first piece: joint id and next_id are assigned",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].id == 0u);
+  REQUIRE(std::get<steamrot::JointInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .id == 0u);
   REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
 }
 
@@ -455,8 +459,9 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].transform ==
-          sf::Transform::Identity);
+  REQUIRE(std::get<steamrot::JointInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .transform == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -478,14 +483,15 @@ TEST_CASE(
   // Place the first piece successfully.
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
 
   // A second placement must not add any more pieces (no collision logic yet).
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE(
@@ -503,14 +509,15 @@ TEST_CASE(
   // Place the first piece successfully.
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
 
   // A second placement must not add any more pieces (no collision logic yet).
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 /////////////////////////////////////////////////
@@ -534,8 +541,9 @@ TEST_CASE("PlaceGhostOnScaffold only places one fragment per game instance",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE("PlaceGhostOnScaffold only places one joint per game instance",
@@ -555,8 +563,9 @@ TEST_CASE("PlaceGhostOnScaffold only places one joint per game instance",
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 /////////////////////////////////////////////////
@@ -591,13 +600,13 @@ TEST_CASE("PlaceFirstPiece does nothing when scaffold already has pieces",
   // Place the first piece.
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
 
   // A second call must be ignored.
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
 }
 
 TEST_CASE("PlaceFirstPiece does nothing when ghost selection is monostate",
@@ -611,8 +620,7 @@ TEST_CASE("PlaceFirstPiece does nothing when ghost selection is monostate",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 TEST_CASE("PlaceFirstPiece does nothing when fragment key not found",
@@ -627,8 +635,7 @@ TEST_CASE("PlaceFirstPiece does nothing when fragment key not found",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 TEST_CASE("PlaceFirstPiece does nothing when joint key not found",
@@ -643,8 +650,7 @@ TEST_CASE("PlaceFirstPiece does nothing when joint key not found",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 /////////////////////////////////////////////////
@@ -664,8 +670,9 @@ TEST_CASE("PlaceFirstPiece appends a fragment to an empty scaffold",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE("PlaceFirstPiece appends a joint to an empty scaffold",
@@ -681,8 +688,9 @@ TEST_CASE("PlaceFirstPiece appends a joint to an empty scaffold",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE("PlaceFirstPiece assigns fragment id 0 and increments next_id",
@@ -698,7 +706,9 @@ TEST_CASE("PlaceFirstPiece assigns fragment id 0 and increments next_id",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].id == 0u);
+  REQUIRE(std::get<steamrot::FragmentInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .id == 0u);
   REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
 }
 
@@ -715,7 +725,9 @@ TEST_CASE("PlaceFirstPiece assigns joint id 0 and increments next_id",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].id == 0u);
+  REQUIRE(std::get<steamrot::JointInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .id == 0u);
   REQUIRE(grimoire_machina.m_scaffold_form->next_id == 1u);
 }
 
@@ -732,8 +744,9 @@ TEST_CASE("PlaceFirstPiece: placed fragment has identity transform",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments[0].transform ==
-          sf::Transform::Identity);
+  REQUIRE(std::get<steamrot::FragmentInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .transform == sf::Transform::Identity);
 }
 
 TEST_CASE("PlaceFirstPiece: placed joint has identity transform",
@@ -749,8 +762,9 @@ TEST_CASE("PlaceFirstPiece: placed joint has identity transform",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints[0].transform ==
-          sf::Transform::Identity);
+  REQUIRE(std::get<steamrot::JointInstance>(
+              grimoire_machina.m_scaffold_form->parts.at(0))
+              .transform == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -774,8 +788,9 @@ TEST_CASE("PlaceFirstPiece only places one piece per game instance",
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                               mr_ghost);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 /////////////////////////////////////////////////
@@ -877,7 +892,7 @@ TEST_CASE("ProcessUserInputEvents: missing captured_payload is ignored without "
       steamrot::logic::action::grimoire_machina::ProcessUserInputEvents(
           subscriber, scene_context, grimoire_machina));
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 TEST_CASE(
@@ -945,8 +960,9 @@ TEST_CASE("ProcessUserInputEvents: SELECT with valid conditions places fragment"
   steamrot::logic::action::grimoire_machina::ProcessUserInputEvents(
       subscriber, scene_context, grimoire_machina);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE("ProcessUserInputEvents: SELECT with valid conditions places joint",
@@ -969,8 +985,9 @@ TEST_CASE("ProcessUserInputEvents: SELECT with valid conditions places joint",
   steamrot::logic::action::grimoire_machina::ProcessUserInputEvents(
       subscriber, scene_context, grimoire_machina);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.size() == 1);
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
 TEST_CASE(
@@ -993,8 +1010,7 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::ProcessUserInputEvents(
       subscriber, scene_context, grimoire_machina);
 
-  REQUIRE(grimoire_machina.m_scaffold_form->fragments.empty());
-  REQUIRE(grimoire_machina.m_scaffold_form->joints.empty());
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
 /////////////////////////////////////////////////
