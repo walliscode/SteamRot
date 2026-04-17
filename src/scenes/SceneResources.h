@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "CameraState.h"
 #include "EntityManager.h"
 #include "GameContext.h"
 #include "LogicFactory.h"
@@ -66,18 +65,10 @@ struct SceneResources {
   MrGhost mr_ghost{};
 
   /////////////////////////////////////////////////
-  /// @brief Camera/view state for the scene.
-  ///
-  /// Holds the current zoom level applied to world-space rendering.
-  /// Exposed to all Logic classes via SceneContext::camera_state.
-  /////////////////////////////////////////////////
-  CameraState camera_state{};
-
-  /////////////////////////////////////////////////
   /// @brief World-space mouse position for the current tick.
   ///
   /// Computed once per tick in GhostPositioningLogic from the screen-space
-  /// mouse_position via CameraState::MapToWorldCoords. All world-space
+  /// mouse_position via movement::camera::MapToWorldCoords. All world-space
   /// systems (ghost rendering, grimoire collision, piece placement) read from
   /// this value rather than performing the screen-to-world conversion
   /// themselves.

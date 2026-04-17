@@ -1,22 +1,22 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of the CameraActionLogic class.
+/// @brief Implementation of the CameraMovementLogic class.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "CameraActionLogic.h"
+#include "CameraMovementLogic.h"
 #include "action_camera.h"
 
 namespace steamrot::logic {
 
 /////////////////////////////////////////////////
-CameraActionLogic::CameraActionLogic(const SceneContext scene_context)
+CameraMovementLogic::CameraMovementLogic(const SceneContext scene_context)
     : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
-void CameraActionLogic::ProcessLogic() {
+void CameraMovementLogic::ProcessLogic() {
   action::camera::ProcessSubscribers(m_subscribers,
                                      m_scene_context.camera_state);
 }

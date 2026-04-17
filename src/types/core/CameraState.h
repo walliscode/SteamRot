@@ -8,9 +8,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/View.hpp>
-#include <algorithm>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -18,9 +16,8 @@ namespace steamrot {
 /// @struct CameraState
 /// @brief Holds the per-scene camera/view state.
 ///
-/// Currently tracks a single zoom level applied to the world view on the
-/// scene render texture.  UI rendering resets to the texture default view so
-/// that UI elements are never affected by the zoom.
+/// Pure data container. All view computation and zoom/pan mutations are
+/// performed by free functions in steamrot::logic::movement::camera.
 /////////////////////////////////////////////////
 struct CameraState {
 
@@ -48,49 +45,12 @@ struct CameraState {
   float m_zoom_level{1.0f};
 
   /////////////////////////////////////////////////
-  /// @brief Apply a mouse-scroll delta to the zoom level.
+  /// @brief World-space position of the camera centre.
   ///
-  /// Positive delta (scroll up) zooms in; negative (scroll down) zooms out.
-  /// The result is clamped to [kMinZoom, kMaxZoom].
-  ///
-  /// @param scroll_delta Raw scroll delta from the SFML mouse-wheel event.
+  /// Defaults to (0, 0) so the world origin is centred on screen at startup.
+  /// Future pan operations write to this field.
   /////////////////////////////////////////////////
-  void ApplyScrollDelta(float scroll_delta) {
-    m_zoom_level *= (1.0f - scroll_delta * kZoomStep);
-    m_zoom_level = std::clamp(m_zoom_level, kMinZoom, kMaxZoom);
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Build a zoomed world view for the given render texture.
-  ///
-  /// Returns the texture default view with the current zoom level applied.
-  /// Zooming is centred on the texture midpoint.
-  ///
-  /// @param texture Render texture whose default view is used as the base.
-  /// @return sf::View with zoom applied.
-  /////////////////////////////////////////////////
-  sf::View GetWorldView(const sf::RenderTexture &texture) const {
-    sf::View view = texture.getDefaultView();
-    view.zoom(m_zoom_level);
-    return view;
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Convert a screen-space pixel position to world-space coordinates.
-  ///
-  /// Applies the current world view (with zoom) to map the given screen-pixel
-  /// position to its corresponding world-space floating-point position.
-  /// This is the single authoritative screen-to-world conversion; callers
-  /// should use this instead of calling mapPixelToCoords directly.
-  ///
-  /// @param screen_pos Screen-space pixel position (e.g. mouse cursor).
-  /// @param texture    Render texture whose world view is used for the mapping.
-  /// @return World-space position corresponding to @p screen_pos.
-  /////////////////////////////////////////////////
-  sf::Vector2f MapToWorldCoords(sf::Vector2i screen_pos,
-                                const sf::RenderTexture &texture) const {
-    return texture.mapPixelToCoords(screen_pos, GetWorldView(texture));
-  }
+  sf::Vector2f m_position{0.f, 0.f};
 };
 
 } // namespace steamrot

@@ -17,7 +17,7 @@ add_library(logic
   GhostActionLogic.cpp
   GhostRenderLogic.cpp
 
-  CameraActionLogic.cpp
+  CameraMovementLogic.cpp
 
   action_ui.cpp
   state_ui.cpp
@@ -33,6 +33,8 @@ add_library(logic
   action_ghost.cpp
 
   action_camera.cpp
+
+  movement_camera.cpp
 
   positioning_grimoire_machina.cpp
 

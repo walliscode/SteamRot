@@ -109,7 +109,7 @@ struct SceneContext {
   /// @brief Reference to the camera/view state for the scene.
   ///
   /// Provides all Logic classes with read/write access to the current
-  /// zoom level and the world view derived from it.
+  /// zoom level and camera position. Owned by SceneState.
   /////////////////////////////////////////////////
   CameraState &camera_state;
 
@@ -117,7 +117,7 @@ struct SceneContext {
   /// @brief World-space mouse position for the current tick.
   ///
   /// Computed once per tick by GhostPositioningLogic via
-  /// CameraState::MapToWorldCoords.  World-space systems (ghost rendering,
+  /// movement::camera::MapToWorldCoords.  World-space systems (ghost rendering,
   /// grimoire collision, piece placement) read this value; screen-space
   /// systems (UI collision) use mouse_position instead.
   ///
