@@ -118,34 +118,34 @@ MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
 } // anonymous namespace
 
 /////////////////////////////////////////////////
-/// DrawView tests
+/// draw_view tests
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawView draws a populated view without throwing",
+TEST_CASE("draw_view draws a populated view without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   auto views = MakeViewsWithFrontTriangle();
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawView(
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front));
 }
 
-TEST_CASE("DrawView draws an empty VertexArray without throwing",
+TEST_CASE("draw_view draws an empty VertexArray without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   steamrot::Views views; // no entries populated
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawView(
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front));
 }
 
-TEST_CASE("DrawView produces pixels for a Front-direction triangle",
+TEST_CASE("draw_view produces pixels for a Front-direction triangle",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
   auto views = MakeViewsWithFrontTriangle(sf::Color::Red);
-  steamrot::logic::render::grimoire_machina::DrawView(
+  steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front);
   texture.display();
 
@@ -157,7 +157,7 @@ TEST_CASE("DrawView produces pixels for a Front-direction triangle",
   REQUIRE(centroid_pixel == sf::Color::Red);
 }
 
-TEST_CASE("DrawView selects the correct direction slot",
+TEST_CASE("draw_view selects the correct direction slot",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -172,7 +172,7 @@ TEST_CASE("DrawView selects the correct direction slot",
   views.insert_or_assign(steamrot::ViewDirection::Back, std::move(va));
 
   // Drawing Front (unpopulated) should produce no visible pixels
-  steamrot::logic::render::grimoire_machina::DrawView(
+  steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front);
   texture.display();
   sf::Image image_front = texture.getTexture().copyToImage();
@@ -180,113 +180,74 @@ TEST_CASE("DrawView selects the correct direction slot",
 
   // Drawing Back should produce white pixels
   texture.clear(sf::Color::Black);
-  steamrot::logic::render::grimoire_machina::DrawView(
+  steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Back);
   texture.display();
   sf::Image image_back = texture.getTexture().copyToImage();
   REQUIRE(image_back.getPixel({15, 15}) == sf::Color::White);
 }
 
-/////////////////////////////////////////////////
-/// DrawFragmentView tests
-/////////////////////////////////////////////////
-
-TEST_CASE("DrawFragmentView draws a Fragment view without throwing",
-          "[unit][render_grimoire_machina]") {
-  sf::RenderTexture texture{{100, 100}};
-  auto fragment = MakeFragmentWithFrontView();
-
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawFragmentView(
-      texture, fragment, steamrot::ViewDirection::Front));
-}
-
-TEST_CASE("DrawFragmentView produces pixels for a populated Front view",
+TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
+          "transformed position",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
   auto fragment = MakeFragmentWithFrontView(sf::Color::Green);
-  steamrot::logic::render::grimoire_machina::DrawFragmentView(
-      texture, fragment, steamrot::ViewDirection::Front);
+
+  sf::RenderStates states;
+  states.transform.translate({10.f, 10.f});
+  steamrot::logic::render::grimoire_machina::draw_view(
+      texture, fragment.movement_views, steamrot::ViewDirection::Front, states);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  // Centroid of the triangle at (5,5),(25,5),(15,25) = (15, 11.67) → pixel
-  // (15,12)
-  sf::Color centroid_pixel = image.getPixel({15, 12});
-  REQUIRE(centroid_pixel == sf::Color::Green);
+  // Centroid of (5,5),(25,5),(15,25) shifted by (10,10) → (15,15),(35,15),(25,35)
+  // centroid pixel (25, 22) should be green.
+  REQUIRE(image.getPixel({25, 22}) == sf::Color::Green);
 }
 
-TEST_CASE("DrawFragmentView draws an empty Fragment view without throwing",
-          "[unit][render_grimoire_machina]") {
-  sf::RenderTexture texture{{100, 100}};
-  steamrot::Fragment fragment; // no views populated
-
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawFragmentView(
-      texture, fragment, steamrot::ViewDirection::Front));
-}
-
-/////////////////////////////////////////////////
-/// DrawJointView tests
-/////////////////////////////////////////////////
-
-TEST_CASE("DrawJointView draws a Joint view without throwing",
-          "[unit][render_grimoire_machina]") {
-  sf::RenderTexture texture{{100, 100}};
-  auto joint = MakeJointWithFrontView();
-
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointView(
-      texture, joint, steamrot::ViewDirection::Front));
-}
-
-TEST_CASE("DrawJointView produces pixels for a populated Front view",
+TEST_CASE("draw_view with RenderStates draws Joint movement_views at "
+          "transformed position",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
   auto joint = MakeJointWithFrontView(sf::Color::Blue);
-  steamrot::logic::render::grimoire_machina::DrawJointView(
-      texture, joint, steamrot::ViewDirection::Front);
+
+  sf::RenderStates states;
+  states.transform.translate({10.f, 10.f});
+  steamrot::logic::render::grimoire_machina::draw_view(
+      texture, joint.movement_views, steamrot::ViewDirection::Front, states);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  // Centroid of the triangle at (10,10),(30,10),(20,30) = (20, 16.67) → pixel
-  // (20,17)
-  sf::Color centroid_pixel = image.getPixel({20, 17});
-  REQUIRE(centroid_pixel == sf::Color::Blue);
-}
-
-TEST_CASE("DrawJointView draws an empty Joint view without throwing",
-          "[unit][render_grimoire_machina]") {
-  sf::RenderTexture texture{{100, 100}};
-  steamrot::Joint joint; // no views populated
-
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointView(
-      texture, joint, steamrot::ViewDirection::Front));
+  // Centroid of (10,10),(30,10),(20,30) shifted by (10,10) → centroid (30,27)
+  REQUIRE(image.getPixel({30, 27}) == sf::Color::Blue);
 }
 
 /////////////////////////////////////////////////
-/// DrawSocket tests
+/// draw_socket tests
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawSocket draws a non-hovered socket without throwing",
+TEST_CASE("draw_socket draws a non-hovered socket without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   steamrot::SocketState socket_state; // default: Available, not hovered
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawSocket(
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_socket(
       texture, {50.f, 50.f}, socket_state));
 }
 
-TEST_CASE("DrawSocket produces white pixels at world_pos when not hovered",
+TEST_CASE("draw_socket produces white pixels at world_pos when not hovered",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
   steamrot::SocketState socket_state;
   socket_state.is_mouse_over = false;
-  steamrot::logic::render::grimoire_machina::DrawSocket(texture, {50.f, 50.f},
-                                                        socket_state);
+  steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
+                                                         socket_state);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -294,15 +255,15 @@ TEST_CASE("DrawSocket produces white pixels at world_pos when not hovered",
   REQUIRE(image.getPixel({50, 50}) == sf::Color::White);
 }
 
-TEST_CASE("DrawSocket produces yellow pixels at world_pos when hovered",
+TEST_CASE("draw_socket produces yellow pixels at world_pos when hovered",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
   steamrot::SocketState socket_state;
   socket_state.is_mouse_over = true;
-  steamrot::logic::render::grimoire_machina::DrawSocket(texture, {50.f, 50.f},
-                                                        socket_state);
+  steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
+                                                         socket_state);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -310,10 +271,10 @@ TEST_CASE("DrawSocket produces yellow pixels at world_pos when hovered",
 }
 
 /////////////////////////////////////////////////
-/// Draw(FragmentInstance) tests
+/// draw_fragment_instance_sockets tests
 /////////////////////////////////////////////////
 
-TEST_CASE("Draw(FragmentInstance) draws socket circles without throwing",
+TEST_CASE("draw_fragment_instance_sockets draws socket circles without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   auto fragment = MakeFragmentWithOriginTriangle();
@@ -323,12 +284,13 @@ TEST_CASE("Draw(FragmentInstance) draws socket circles without throwing",
   steamrot::FragmentInstance instance{fragment, t};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawFragmentInstanceSockets(
+      steamrot::logic::render::grimoire_machina::draw_fragment_instance_sockets(
           texture, instance));
 }
 
 TEST_CASE(
-    "Draw(FragmentInstance) renders socket at the transform-mapped world pos",
+    "draw_fragment_instance_sockets renders socket at the transform-mapped "
+    "world pos",
     "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -339,7 +301,7 @@ TEST_CASE(
   t.translate({40.f, 40.f});
   steamrot::FragmentInstance instance{fragment, t};
 
-  steamrot::logic::render::grimoire_machina::DrawFragmentInstanceSockets(
+  steamrot::logic::render::grimoire_machina::draw_fragment_instance_sockets(
       texture, instance);
   texture.display();
 
@@ -349,10 +311,10 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
-/// Draw(JointInstance) tests
+/// draw_joint_instance_sockets tests
 /////////////////////////////////////////////////
 
-TEST_CASE("Draw(JointInstance) draws socket circles without throwing",
+TEST_CASE("draw_joint_instance_sockets draws socket circles without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   auto joint = MakeJointWithOriginTriangle();
@@ -362,12 +324,13 @@ TEST_CASE("Draw(JointInstance) draws socket circles without throwing",
   steamrot::JointInstance instance{joint, t};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawJointInstanceSockets(
+      steamrot::logic::render::grimoire_machina::draw_joint_instance_sockets(
           texture, instance));
 }
 
 TEST_CASE(
-    "Draw(JointInstance) renders socket at the transform-mapped world pos",
+    "draw_joint_instance_sockets renders socket at the transform-mapped world "
+    "pos",
     "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -378,8 +341,8 @@ TEST_CASE(
   t.translate({40.f, 45.f});
   steamrot::JointInstance instance{joint, t};
 
-  steamrot::logic::render::grimoire_machina::DrawJointInstanceSockets(texture,
-                                                                      instance);
+  steamrot::logic::render::grimoire_machina::draw_joint_instance_sockets(
+      texture, instance);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -387,10 +350,10 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
-/// DrawFragmentInstance tests
+/// draw_fragment_instance tests
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawFragmentInstance draws fragment geometry and sockets without "
+TEST_CASE("draw_fragment_instance draws fragment geometry and sockets without "
           "throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -401,11 +364,11 @@ TEST_CASE("DrawFragmentInstance draws fragment geometry and sockets without "
   steamrot::FragmentInstance instance{fragment, t};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+      steamrot::logic::render::grimoire_machina::draw_fragment_instance(
           texture, instance, true));
 }
 
-TEST_CASE("DrawFragmentInstance draws fragment but no sockets when "
+TEST_CASE("draw_fragment_instance draws fragment but no sockets when "
           "draw_sockets is false",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -414,7 +377,7 @@ TEST_CASE("DrawFragmentInstance draws fragment but no sockets when "
   t.translate({10.f, 10.f});
   steamrot::FragmentInstance instance{fragment, t};
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+      steamrot::logic::render::grimoire_machina::draw_fragment_instance(
           texture, instance, false));
 
   // test the Fragment View
@@ -426,10 +389,9 @@ TEST_CASE("DrawFragmentInstance draws fragment but no sockets when "
   REQUIRE(image.getPixel({15, 15}) == sf::Color::Green);
 }
 
-TEST_CASE(
-    "DrawFragmentInstance renders fragment view  and socketsat transformed "
-    "position when draw_sockets is true",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("draw_fragment_instance renders fragment view and sockets at "
+          "transformed position when draw_sockets is true",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
@@ -442,7 +404,7 @@ TEST_CASE(
   t.translate({10.f, 10.f});
   steamrot::FragmentInstance instance{fragment, t};
 
-  steamrot::logic::render::grimoire_machina::DrawFragmentInstance(
+  steamrot::logic::render::grimoire_machina::draw_fragment_instance(
       texture, instance, true);
   texture.display();
 
@@ -455,10 +417,11 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
-/// DrawJointInstance tests
+/// draw_joint_instance tests
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawJointInstance draws joint geometry and sockets without throwing",
+TEST_CASE("draw_joint_instance draws joint geometry and sockets without "
+          "throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   auto joint = MakeJointWithOriginTriangle();
@@ -467,11 +430,11 @@ TEST_CASE("DrawJointInstance draws joint geometry and sockets without throwing",
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointInstance(
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_joint_instance(
       texture, instance, true));
 }
 
-TEST_CASE("DrawJointInstance draws joint but no sockets when draw_sockets is "
+TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
           "false",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -479,7 +442,7 @@ TEST_CASE("DrawJointInstance draws joint but no sockets when draw_sockets is "
   sf::Transform t;
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::DrawJointInstance(
+  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_joint_instance(
       texture, instance, false));
   // test the Joint View
   texture.display();
@@ -489,7 +452,8 @@ TEST_CASE("DrawJointInstance draws joint but no sockets when draw_sockets is "
   // due to the triangle's blue fill, not white.
   REQUIRE(image.getPixel({15, 10}) == sf::Color::Blue);
 }
-TEST_CASE("DrawJointInstance renders joint view geometry at transformed "
+
+TEST_CASE("draw_joint_instance renders joint view geometry at transformed "
           "position when draw_sockets is true",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -504,8 +468,8 @@ TEST_CASE("DrawJointInstance renders joint view geometry at transformed "
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
 
-  steamrot::logic::render::grimoire_machina::DrawJointInstance(texture,
-                                                               instance, true);
+  steamrot::logic::render::grimoire_machina::draw_joint_instance(texture,
+                                                                  instance, true);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -517,26 +481,24 @@ TEST_CASE("DrawJointInstance renders joint view geometry at transformed "
 }
 
 /////////////////////////////////////////////////
-/// DrawScaffoldOrPlaceholder tests
+/// render_machina_form tests
 /////////////////////////////////////////////////
 
-TEST_CASE(
-    "DrawScaffoldOrPlaceholder draws without throwing when no scaffold is "
-    "active",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("render_machina_form draws without throwing when no scaffold is "
+          "active",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   steamrot::GrimoireMachina grimoire_machina;
   // m_scaffold_form is null by default
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
+      steamrot::logic::render::grimoire_machina::render_machina_form(
           texture, grimoire_machina));
 }
 
-TEST_CASE(
-    "DrawScaffoldOrPlaceholder draws without throwing when scaffold has placed "
-    "fragments",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
+          "fragments",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
@@ -550,14 +512,13 @@ TEST_CASE(
       grimoire_machina, mr_ghost);
 
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
+      steamrot::logic::render::grimoire_machina::render_machina_form(
           texture, grimoire_machina));
 }
 
-TEST_CASE(
-    "DrawScaffoldOrPlaceholder draws without throwing when scaffold has placed "
-    "joints",
-    "[unit][render_grimoire_machina]") {
+TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
+          "joints",
+          "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
@@ -569,7 +530,8 @@ TEST_CASE(
       std::make_unique<steamrot::MachinaFormScaffold>();
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
+
   REQUIRE_NOTHROW(
-      steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder(
+      steamrot::logic::render::grimoire_machina::render_machina_form(
           texture, grimoire_machina));
 }
