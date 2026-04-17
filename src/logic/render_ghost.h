@@ -26,10 +26,9 @@ namespace steamrot::logic::render::ghost {
 ///
 /// @param texture          RenderTexture to draw on.
 /// @param mr_ghost         MrGhost carrying the current selection and position.
-/// @param grimoire_machina GrimoireMachina providing fragment/joint data
-///                         (reserved for future geometry rendering).
+/// @param grimoire_machina GrimoireMachina providing fragment/joint data.
 /////////////////////////////////////////////////
-void DrawGhostItem(sf::RenderTexture &texture, const MrGhost &mr_ghost,
-                   GrimoireMachina &grimoire_machina);
+void draw_ghost_item(sf::RenderTexture &texture, const MrGhost &mr_ghost,
+                     GrimoireMachina &grimoire_machina);
 
 } // namespace steamrot::logic::render::ghost

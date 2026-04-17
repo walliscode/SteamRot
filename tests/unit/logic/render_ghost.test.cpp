@@ -23,7 +23,8 @@
 namespace {
 
 /////////////////////////////////////////////////
-/// @brief Make a filled 20x20 square VertexArray (Triangles) starting at (x, y).
+/// @brief Make a filled 20x20 square VertexArray (Triangles) starting at (x,
+/// y).
 /////////////////////////////////////////////////
 sf::VertexArray MakeFilledSquare(float x, float y, sf::Color color) {
   sf::VertexArray va(sf::PrimitiveType::Triangles, 6);
@@ -37,9 +38,11 @@ sf::VertexArray MakeFilledSquare(float x, float y, sf::Color color) {
 }
 
 /////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named fragment that has NO view geometry.
+/// @brief Build a GrimoireMachina with one named fragment that has NO view
+/// geometry.
 /////////////////////////////////////////////////
-steamrot::GrimoireMachina MakeGrimoireWithEmptyFragment(const std::string &name) {
+steamrot::GrimoireMachina
+MakeGrimoireWithEmptyFragment(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
@@ -52,20 +55,21 @@ steamrot::GrimoireMachina MakeGrimoireWithEmptyFragment(const std::string &name)
 /// @brief Build a GrimoireMachina with one named fragment whose Front view
 ///        is a solid white 20x20 square centred at the origin.
 /////////////////////////////////////////////////
-steamrot::GrimoireMachina MakeGrimoireWithPopulatedFragment(
-    const std::string &name) {
+steamrot::GrimoireMachina
+MakeGrimoireWithPopulatedFragment(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                            MakeFilledSquare(0.f, 0.f,
-                                                             sf::Color::White));
+  fragment.movement_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      MakeFilledSquare(0.f, 0.f, sf::Color::White));
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
 }
 
 /////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named joint that has NO view geometry.
+/// @brief Build a GrimoireMachina with one named joint that has NO view
+/// geometry.
 /////////////////////////////////////////////////
 steamrot::GrimoireMachina MakeGrimoireWithEmptyJoint(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
@@ -79,14 +83,14 @@ steamrot::GrimoireMachina MakeGrimoireWithEmptyJoint(const std::string &name) {
 /// @brief Build a GrimoireMachina with one named joint whose Front view
 ///        is a solid white 20x20 square centred at the origin.
 /////////////////////////////////////////////////
-steamrot::GrimoireMachina MakeGrimoireWithPopulatedJoint(
-    const std::string &name) {
+steamrot::GrimoireMachina
+MakeGrimoireWithPopulatedJoint(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Joint joint;
   joint.name = name;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                         MakeFilledSquare(0.f, 0.f,
-                                                          sf::Color::White));
+  joint.movement_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      MakeFilledSquare(0.f, 0.f, sf::Color::White));
   grimoire.m_all_joints.insert({name, std::move(joint)});
   return grimoire;
 }
@@ -99,7 +103,7 @@ steamrot::GrimoireMachina MakeGrimoireWithPopulatedJoint(
 // MakeFilledSquare(0, 0, White) produces a 20×20 square with:
 //   bounds.position = (0, 0)   bounds.size = (20, 20)
 //
-// DrawGhostItem computes:
+// draw_ghost_item computes:
 //   translate = mr_ghost.m_position - bounds.position - bounds.size - (5, 5)
 //
 // With mr_ghost.m_position = (100, 100):
@@ -122,9 +126,9 @@ MakeGrimoireWithFragmentAndSocket(const std::string &name,
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           MakeFilledSquare(0.f, 0.f,
-                                                            sf::Color::White));
+  fragment.movement_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      MakeFilledSquare(0.f, 0.f, sf::Color::White));
   fragment.sockets.push_back(socket_local_pos);
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
@@ -140,9 +144,9 @@ MakeGrimoireWithFragmentAndSockets(const std::string &name,
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           MakeFilledSquare(0.f, 0.f,
-                                                            sf::Color::White));
+  fragment.movement_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      MakeFilledSquare(0.f, 0.f, sf::Color::White));
   fragment.sockets = std::move(socket_positions);
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
@@ -161,9 +165,9 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Joint joint;
   joint.name = name;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        MakeFilledSquare(0.f, 0.f,
-                                                         sf::Color::White));
+  joint.movement_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      MakeFilledSquare(0.f, 0.f, sf::Color::White));
   // socket_count=1, radius=25, arc_min=arc_max=0 -> local pos (25, 0)
   joint.socket_config.socket_count = 1;
   joint.socket_config.radius = 25.f;
@@ -174,13 +178,13 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   return grimoire;
 }
 
-} // anonymous namespace (second block — socket helpers)
+} // namespace
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — monostate (nothing selected)
+/// draw_ghost_item — monostate (nothing selected)
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws nothing when selection is monostate",
+TEST_CASE("draw_ghost_item draws nothing when selection is monostate",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -190,7 +194,7 @@ TEST_CASE("DrawGhostItem draws nothing when selection is monostate",
 
   steamrot::GrimoireMachina grimoire;
 
-  REQUIRE_NOTHROW(steamrot::logic::render::ghost::DrawGhostItem(
+  REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
 
   texture.display();
@@ -201,10 +205,10 @@ TEST_CASE("DrawGhostItem draws nothing when selection is monostate",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — FragmentTag: key not in grimoire
+/// draw_ghost_item — FragmentTag: key not in grimoire
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem does not throw when FragmentTag key is not found",
+TEST_CASE("draw_ghost_item does not throw when FragmentTag key is not found",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -215,7 +219,7 @@ TEST_CASE("DrawGhostItem does not throw when FragmentTag key is not found",
 
   steamrot::GrimoireMachina grimoire; // empty — no fragments
 
-  REQUIRE_NOTHROW(steamrot::logic::render::ghost::DrawGhostItem(
+  REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
 
   texture.display();
@@ -224,10 +228,10 @@ TEST_CASE("DrawGhostItem does not throw when FragmentTag key is not found",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — FragmentTag: empty view draws nothing
+/// draw_ghost_item — FragmentTag: empty view draws nothing
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws nothing when the fragment view is empty",
+TEST_CASE("draw_ghost_item draws nothing when the fragment view is empty",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -239,7 +243,7 @@ TEST_CASE("DrawGhostItem draws nothing when the fragment view is empty",
   // fragment exists but has an empty movement_views
   steamrot::GrimoireMachina grimoire = MakeGrimoireWithEmptyFragment("stone");
 
-  REQUIRE_NOTHROW(steamrot::logic::render::ghost::DrawGhostItem(
+  REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
 
   texture.display();
@@ -248,10 +252,10 @@ TEST_CASE("DrawGhostItem draws nothing when the fragment view is empty",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — FragmentTag: populated view draws pixels at cursor
+/// draw_ghost_item — FragmentTag: populated view draws pixels at cursor
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem uses DrawFragmentView to draw at the cursor position",
+TEST_CASE("draw_ghost_item uses draw_view to draw at the cursor position",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{200, 200}};
   texture.clear(sf::Color::Black);
@@ -262,11 +266,11 @@ TEST_CASE("DrawGhostItem uses DrawFragmentView to draw at the cursor position",
 
   // fragment has a 20x20 white square at local origin.
   // translate = m_position(50,50) - bounds.position(0,0) - bounds.size(20,20)
-  //             - corner_offset(5,5) = (25,25).  Square lands at [25..45, 25..45].
-  steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithPopulatedFragment("arm");
+  //             - corner_offset(5,5) = (25,25).  Square lands at
+  //             [25..45, 25..45].
+  steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedFragment("arm");
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -278,10 +282,10 @@ TEST_CASE("DrawGhostItem uses DrawFragmentView to draw at the cursor position",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — JointTag: key not in grimoire
+/// draw_ghost_item — JointTag: key not in grimoire
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem does not throw when JointTag key is not found",
+TEST_CASE("draw_ghost_item does not throw when JointTag key is not found",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -292,7 +296,7 @@ TEST_CASE("DrawGhostItem does not throw when JointTag key is not found",
 
   steamrot::GrimoireMachina grimoire; // empty — no joints
 
-  REQUIRE_NOTHROW(steamrot::logic::render::ghost::DrawGhostItem(
+  REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
 
   texture.display();
@@ -301,10 +305,10 @@ TEST_CASE("DrawGhostItem does not throw when JointTag key is not found",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — JointTag: empty view draws nothing
+/// draw_ghost_item — JointTag: empty view draws nothing
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws nothing when the joint view is empty",
+TEST_CASE("draw_ghost_item draws nothing when the joint view is empty",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
@@ -315,7 +319,7 @@ TEST_CASE("DrawGhostItem draws nothing when the joint view is empty",
 
   steamrot::GrimoireMachina grimoire = MakeGrimoireWithEmptyJoint("hinge");
 
-  REQUIRE_NOTHROW(steamrot::logic::render::ghost::DrawGhostItem(
+  REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
 
   texture.display();
@@ -324,37 +328,12 @@ TEST_CASE("DrawGhostItem draws nothing when the joint view is empty",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — JointTag: populated view draws pixels at cursor
+/// draw_ghost_item — position is respected
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem uses DrawJointView to draw at the cursor position",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{200, 200}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"pivot"};
-  mr_ghost.m_position = {50.f, 50.f};
-
-  // joint has a 20x20 white square at local origin; same translate as fragment:
-  // (50,50) - (0,0) - (20,20) - (5,5) = (25,25) → square at [25..45, 25..45]
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedJoint("pivot");
-
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
-  texture.display();
-
-  const sf::Image image = texture.getTexture().copyToImage();
-
-  REQUIRE(image.getPixel({35, 35}) == sf::Color::White);
-  REQUIRE(image.getPixel({5, 5}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
-/// DrawGhostItem — position is respected
-/////////////////////////////////////////////////
-
-TEST_CASE("DrawGhostItem renders fragment geometry at the stored cursor position",
-          "[unit][render_ghost]") {
+TEST_CASE(
+    "draw_ghost_item renders fragment geometry at the stored cursor position",
+    "[unit][render_ghost]") {
   sf::RenderTexture texture{{300, 300}};
   texture.clear(sf::Color::Black);
 
@@ -364,7 +343,7 @@ TEST_CASE("DrawGhostItem renders fragment geometry at the stored cursor position
 
   steamrot::GrimoireMachina grimoire =
       MakeGrimoireWithPopulatedFragment("rock");
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -377,10 +356,10 @@ TEST_CASE("DrawGhostItem renders fragment geometry at the stored cursor position
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — sockets: FragmentTag, socket drawn outside geometry
+/// draw_ghost_item — sockets: FragmentTag, socket drawn outside geometry
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws socket circle for a FragmentTag selection",
+TEST_CASE("draw_ghost_item draws socket circle for a FragmentTag selection",
           "[unit][render_ghost]") {
   // Texture large enough to contain geometry + socket
   sf::RenderTexture texture{{200, 200}};
@@ -391,11 +370,12 @@ TEST_CASE("DrawGhostItem draws socket circle for a FragmentTag selection",
   mr_ghost.m_position = {100.f, 100.f};
 
   // Socket at local (25, 10) → texture (100, 85): outside the white square
-  // [75..95, 75..95] so the background there is black before the socket is drawn.
+  // [75..95, 75..95] so the background there is black before the socket is
+  // drawn.
   steamrot::GrimoireMachina grimoire =
       MakeGrimoireWithFragmentAndSocket("leaf", {25.f, 10.f});
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -407,10 +387,11 @@ TEST_CASE("DrawGhostItem draws socket circle for a FragmentTag selection",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — sockets: FragmentTag, no sockets → socket area stays black
+/// draw_ghost_item — sockets: FragmentTag, no sockets → socket area stays black
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws no socket pixels when fragment sockets list is empty",
+TEST_CASE("draw_ghost_item draws no socket pixels when fragment sockets list "
+          "is empty",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{200, 200}};
   texture.clear(sf::Color::Black);
@@ -423,7 +404,7 @@ TEST_CASE("DrawGhostItem draws no socket pixels when fragment sockets list is em
   steamrot::GrimoireMachina grimoire =
       MakeGrimoireWithPopulatedFragment("bare");
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -434,10 +415,10 @@ TEST_CASE("DrawGhostItem draws no socket pixels when fragment sockets list is em
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — sockets: JointTag, socket drawn outside geometry
+/// draw_ghost_item — sockets: JointTag, socket drawn outside geometry
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws socket circle for a JointTag selection",
+TEST_CASE("draw_ghost_item draws socket circle for a JointTag selection",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{200, 200}};
   texture.clear(sf::Color::Black);
@@ -451,7 +432,7 @@ TEST_CASE("DrawGhostItem draws socket circle for a JointTag selection",
   steamrot::GrimoireMachina grimoire =
       MakeGrimoireWithJointAndSocket("knuckle");
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -461,10 +442,10 @@ TEST_CASE("DrawGhostItem draws socket circle for a JointTag selection",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — sockets: JointTag, no sockets → socket area stays black
+/// draw_ghost_item — sockets: JointTag, no sockets → socket area stays black
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws no socket pixels when joint has zero sockets",
+TEST_CASE("draw_ghost_item draws no socket pixels when joint has zero sockets",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{200, 200}};
   texture.clear(sf::Color::Black);
@@ -475,10 +456,9 @@ TEST_CASE("DrawGhostItem draws no socket pixels when joint has zero sockets",
 
   // Joint with geometry but socket_count=0 (MakeGrimoireWithPopulatedJoint
   // default-constructs the Joint, so socket_config.socket_count = 0)
-  steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithPopulatedJoint("bare");
+  steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedJoint("bare");
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -487,10 +467,11 @@ TEST_CASE("DrawGhostItem draws no socket pixels when joint has zero sockets",
 }
 
 /////////////////////////////////////////////////
-/// DrawGhostItem — sockets: multiple sockets are all drawn
+/// draw_ghost_item — sockets: multiple sockets are all drawn
 /////////////////////////////////////////////////
 
-TEST_CASE("DrawGhostItem draws all socket circles when fragment has multiple sockets",
+TEST_CASE("draw_ghost_item draws all socket circles when fragment has multiple "
+          "sockets",
           "[unit][render_ghost]") {
   sf::RenderTexture texture{{200, 200}};
   texture.clear(sf::Color::Black);
@@ -503,10 +484,10 @@ TEST_CASE("DrawGhostItem draws all socket circles when fragment has multiple soc
   // square [75..95, 75..95] once the transform (75, 75) is applied:
   //   local (25, 10)  → texture (100, 85)
   //   local (30, 25)  → texture (105, 100)
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithFragmentAndSockets(
-      "multi", {{25.f, 10.f}, {30.f, 25.f}});
+  steamrot::GrimoireMachina grimoire =
+      MakeGrimoireWithFragmentAndSockets("multi", {{25.f, 10.f}, {30.f, 25.f}});
 
-  steamrot::logic::render::ghost::DrawGhostItem(texture, mr_ghost, grimoire);
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();

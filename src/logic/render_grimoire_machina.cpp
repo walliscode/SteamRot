@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
 /// @brief Implementation of the free functions related to the rendering of the
-/// grimoire
+/// grimoire machina.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -17,11 +17,27 @@
 namespace steamrot::logic::render::grimoire_machina {
 
 /////////////////////////////////////////////////
-void DrawEmptyActiveMachinaForm(sf::RenderTexture &texture, MachinaForm &form) {
+void render_machina_form(sf::RenderTexture &texture,
+                         GrimoireMachina &grimoire_machina) {
+  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+
+  if (!scaffold) {
+    draw_no_machina_form_indicator(texture);
+    return;
+  }
+
+  const bool draw_sockets = scaffold->are_sockets_visible;
+
+  for (auto &[id, part] : scaffold->parts) {
+    if (auto *joint = std::get_if<JointInstance>(&part))
+      draw_joint_instance(texture, *joint, draw_sockets);
+    else if (auto *fragment = std::get_if<FragmentInstance>(&part))
+      draw_fragment_instance(texture, *fragment, draw_sockets);
+  }
 }
 
 /////////////////////////////////////////////////
-void DrawNoMachinaFormIndicator(sf::RenderTexture &texture) {
+void draw_no_machina_form_indicator(sf::RenderTexture &texture) {
   static constexpr float k_half_size = 100.f;
   static constexpr float k_outline_thickness = 3.f;
 
@@ -35,12 +51,63 @@ void DrawNoMachinaFormIndicator(sf::RenderTexture &texture) {
   texture.draw(box);
 }
 
-void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
-                const SocketState &socket_state) {
+/////////////////////////////////////////////////
+void draw_empty_active_machina_form(sf::RenderTexture &texture,
+                                    MachinaForm &form) {}
+
+/////////////////////////////////////////////////
+void draw_fragment_instance(sf::RenderTexture &texture,
+                            FragmentInstance &fragment_instance,
+                            const bool draw_sockets) {
+  sf::RenderStates states;
+  states.transform = fragment_instance.transform;
+  draw_view(texture, fragment_instance.fragment.movement_views,
+            ViewDirection::Front, states);
+  if (draw_sockets)
+    draw_fragment_instance_sockets(texture, fragment_instance);
+}
+
+/////////////////////////////////////////////////
+void draw_joint_instance(sf::RenderTexture &texture,
+                         JointInstance &joint_instance,
+                         const bool draw_sockets) {
+  sf::RenderStates states;
+  states.transform = joint_instance.transform;
+  draw_view(texture, joint_instance.joint.movement_views, ViewDirection::Front,
+            states);
+  if (draw_sockets)
+    draw_joint_instance_sockets(texture, joint_instance);
+}
+
+/////////////////////////////////////////////////
+void draw_fragment_instance_sockets(sf::RenderTexture &texture,
+                                    FragmentInstance &fragment_instance) {
+  for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
+    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
+        fragment_instance.fragment.sockets[i]);
+    draw_socket(texture, world_pos, fragment_instance.socket_states[i]);
+  }
+}
+
+/////////////////////////////////////////////////
+void draw_joint_instance_sockets(sf::RenderTexture &texture,
+                                 JointInstance &joint_instance) {
+  for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+    const sf::Vector2f local_pos = ComputeSocketLocalPos(
+        joint_instance.joint.socket_config, i, joint_instance.current_rotation);
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(local_pos);
+    draw_socket(texture, world_pos, joint_instance.socket_states[i]);
+  }
+}
+
+/////////////////////////////////////////////////
+void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
+                 const SocketState &socket_state) {
   static constexpr float k_radius = 2.f;
   static constexpr int k_point_count = 10;
   static const sf::Color k_base_color{sf::Color::White};
-  static const sf::Color k_hover_color{sf::Color::Yellow};
+  static const sf::Color k_hover_color{sf::Color::Blue};
 
   sf::CircleShape circle(k_radius, k_point_count);
   circle.setOrigin({k_radius, k_radius});
@@ -51,106 +118,15 @@ void DrawSocket(sf::RenderTexture &texture, sf::Vector2f world_pos,
 }
 
 /////////////////////////////////////////////////
-void DrawFragmentInstanceSockets(sf::RenderTexture &texture,
-                                 FragmentInstance &fragment_instance) {
-  for (size_t i = 0; i < fragment_instance.socket_states.size(); ++i) {
-    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        fragment_instance.fragment.sockets[i]);
-    DrawSocket(texture, world_pos, fragment_instance.socket_states[i]);
-  }
-}
-
-/////////////////////////////////////////////////
-void DrawJointInstanceSockets(sf::RenderTexture &texture,
-                              JointInstance &joint_instance) {
-  for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
-    const sf::Vector2f local_pos = ComputeSocketLocalPos(
-        joint_instance.joint.socket_config, i, joint_instance.current_rotation);
-    const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(local_pos);
-    DrawSocket(texture, world_pos, joint_instance.socket_states[i]);
-  }
-}
-
-/////////////////////////////////////////////////
-void DrawFragmentInstance(sf::RenderTexture &texture,
-                          FragmentInstance &fragment_instance,
-                          const bool draw_sockets) {
-  sf::RenderStates states;
-  states.transform = fragment_instance.transform;
-  DrawFragmentView(texture, fragment_instance.fragment, ViewDirection::Front,
-                   states);
-  if (draw_sockets)
-    DrawFragmentInstanceSockets(texture, fragment_instance);
-}
-
-/////////////////////////////////////////////////
-void DrawJointInstance(sf::RenderTexture &texture,
-                       JointInstance &joint_instance, const bool draw_sockets) {
-  sf::RenderStates states;
-  states.transform = joint_instance.transform;
-  DrawJointView(texture, joint_instance.joint, ViewDirection::Front, states);
-  if (draw_sockets)
-    DrawJointInstanceSockets(texture, joint_instance);
-}
-
-/////////////////////////////////////////////////
-void DrawScaffoldOrPlaceholder(sf::RenderTexture &texture,
-                               GrimoireMachina &grimoire_machina) {
-  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-
-  if (!scaffold) {
-    DrawNoMachinaFormIndicator(texture);
-    return;
-  }
-
-  // pull out the bool that indicates whether to draw sockets or not
-  bool draw_sockets = scaffold->are_sockets_visible;
-
-  // Draw all placed instances on the active scaffold.
-  for (auto &[id, part] : scaffold->parts) {
-    std::visit(
-        [&](auto &instance) {
-          if constexpr (std::is_same_v<std::decay_t<decltype(instance)>,
-                                       JointInstance>)
-            DrawJointInstance(texture, instance, draw_sockets);
-          else
-            DrawFragmentInstance(texture, instance, draw_sockets);
-        },
-        part);
-  }
-}
-
-/////////////////////////////////////////////////
-void DrawView(sf::RenderTexture &texture, const Views &views,
-              ViewDirection view_direction) {
+void draw_view(sf::RenderTexture &texture, const Views &views,
+               ViewDirection view_direction) {
   texture.draw(views[view_direction]);
 }
 
 /////////////////////////////////////////////////
-void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
-                      ViewDirection view_direction) {
-  DrawView(texture, fragment.movement_views, view_direction);
-}
-
-/////////////////////////////////////////////////
-void DrawFragmentView(sf::RenderTexture &texture, const Fragment &fragment,
-                      ViewDirection view_direction,
-                      const sf::RenderStates &states) {
-  texture.draw(fragment.movement_views[view_direction], states);
-}
-
-/////////////////////////////////////////////////
-void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
-                   ViewDirection view_direction) {
-  DrawView(texture, joint.movement_views, view_direction);
-}
-
-/////////////////////////////////////////////////
-void DrawJointView(sf::RenderTexture &texture, const Joint &joint,
-                   ViewDirection view_direction,
-                   const sf::RenderStates &states) {
-  texture.draw(joint.movement_views[view_direction], states);
+void draw_view(sf::RenderTexture &texture, const Views &views,
+               ViewDirection view_direction, const sf::RenderStates &states) {
+  texture.draw(views[view_direction], states);
 }
 
 } // namespace steamrot::logic::render::grimoire_machina

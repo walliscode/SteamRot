@@ -30,8 +30,8 @@ void GhostRenderLogic::ProcessLogic() {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
-  render::ghost::DrawGhostItem(m_scene_context.scene_texture,
-                                m_scene_context.mr_ghost, grimoire_machina);
+  render::ghost::draw_ghost_item(m_scene_context.scene_texture,
+                                 m_scene_context.mr_ghost, grimoire_machina);
 }
 
 } // namespace steamrot::logic

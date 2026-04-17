@@ -32,7 +32,7 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
-  render::grimoire_machina::DrawScaffoldOrPlaceholder(
+  render::grimoire_machina::render_machina_form(
       m_scene_context.scene_texture, grimoire_machina);
 }
 
