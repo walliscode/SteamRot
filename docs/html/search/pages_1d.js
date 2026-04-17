@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['what_20is_20steamrot_0',['What is SteamRot?',['../index.html#autotoc_md100',1,'']]],
+  ['what_20zoom_20does_1',['What Zoom Does',['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md9',1,'']]],
+  ['when_20member_20functions_20are_20acceptable_2',['When member functions are acceptable',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html#autotoc_md88',1,'']]],
+  ['when_20to_20create_20a_20logic_20class_3',['When to Create a Logic Class',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md112',1,'']]],
+  ['where_20the_20conversion_20happens_4',['Where the Conversion Happens',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md24',1,'']]],
+  ['which_20field_20to_20use_5',['Quick Reference: Which Field to Use',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md44',1,'']]],
+  ['wiki_6',['SteamRot Wiki',['../index.html',1,'']]],
+  ['with_20logicfactory_7',['Step 3: Register with LogicFactory',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md129',1,'']]],
+  ['with_20the_20wrong_20view_8',['❌ Calling &lt;span class=&quot;tt&quot;&gt;mapPixelToCoords&lt;/span&gt; with the wrong view',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md37',1,'']]],
+  ['work_9',['How SFML Views Work',['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md8',1,'']]],
+  ['workflow_10',['Workflow',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html',1,'SFML Event Conversion Workflow'],['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md119',1,'Step-by-Step Workflow']]],
+  ['world_20position_11',['❌ Casting &lt;span class=&quot;tt&quot;&gt;mouse_position&lt;/span&gt; to float and using it as world position',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md36',1,'']]],
+  ['world_20space_12',['World Space',['../md_documentation_2concepts_2COORDINATE__SPACES.html',1,'Coordinate Spaces: Screen Space vs World Space'],['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md5',1,'World Space']]],
+  ['world_20space_20logic_13',['Rules for Adding New World-Space Logic',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md42',1,'']]],
+  ['world_20space_20logic_20that_20reads_20world_5fmouse_5fposition_20before_20ghostpositioninglogic_20has_20run_14',['❌ Adding a new world-space Logic that reads &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; before &lt;span class=&quot;tt&quot;&gt;GhostPositioningLogic&lt;/span&gt; has run',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md40',1,'']]],
+  ['world_5fmouse_5fposition_20before_20ghostpositioninglogic_20has_20run_15',['❌ Adding a new world-space Logic that reads &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; before &lt;span class=&quot;tt&quot;&gt;GhostPositioningLogic&lt;/span&gt; has run',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md40',1,'']]],
+  ['world_5fmouse_5fposition_20to_20ui_20collision_16',['❌ Passing &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; to UI collision',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md39',1,'']]],
+  ['wrapper_20function_17',['Guide: Adding a New Wrapper Function',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html#autotoc_md90',1,'']]],
+  ['write_20a_20unit_20test_18',['Step 6 – Write a unit test',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html#autotoc_md96',1,'']]],
+  ['write_20tests_19',['Step 5: Write Tests',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md196',1,'']]],
+  ['write_20unit_20tests_20',['Step 4: Write Unit Tests',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md134',1,'']]],
+  ['wrong_20action_20fires_21',['Two patterns both match, wrong action fires',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md214',1,'']]],
+  ['wrong_20execution_20order_22',['Wrong Execution Order',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md172',1,'']]],
+  ['wrong_20view_23',['❌ Calling &lt;span class=&quot;tt&quot;&gt;mapPixelToCoords&lt;/span&gt; with the wrong view',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md37',1,'']]]
+];

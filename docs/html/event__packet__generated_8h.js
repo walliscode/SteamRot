@@ -1,0 +1,37 @@
+var event__packet__generated_8h =
+[
+    [ "steamrot::FLATBUFFERS_FINAL_CLASS", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS" ],
+    [ "steamrot::EventPacketFbsBuilder", "structsteamrot_1_1EventPacketFbsBuilder.html", "structsteamrot_1_1EventPacketFbsBuilder" ],
+    [ "steamrot::EventTypeFbs", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978d", [
+      [ "steamrot::EventTypeFbs_NONE", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da824adc246496738e8e7098c41176c195", null ],
+      [ "steamrot::EventTypeFbs_USER_INPUT", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da86fbff4f70bed65f7d08c284055c0959", null ],
+      [ "steamrot::EventTypeFbs_UI", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da720563000397f84f675326a13eb4bd51", null ],
+      [ "steamrot::EventTypeFbs_LOGIC", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da06b25b63b6c452ade540b0936979053c", null ],
+      [ "steamrot::EventTypeFbs_SCENE", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da55bc1cb7182df306508f30d62f19e6b4", null ],
+      [ "steamrot::EventTypeFbs_SYSTEM", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da790d99f3f4e59c9948098266b02b9af9", null ],
+      [ "steamrot::EventTypeFbs_GHOST", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da084f0129801950e5a2af52c3527d1508", null ],
+      [ "steamrot::EventTypeFbs_CAMERA", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978daee7c5ad562956506853ea5f338c891d0", null ],
+      [ "steamrot::EventTypeFbs_MIN", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978da33588d4f709ecb6b087b6145a67d48e5", null ],
+      [ "steamrot::EventTypeFbs_MAX", "namespacesteamrot.html#a46ba42c1810100d54486de67d2c9978dadbc8736030c010f5cafd7aac98337110", null ]
+    ] ],
+    [ "steamrot::CreateEventPacketFbs", "namespacesteamrot.html#ac8aa54e8c2360c116fed0faf28bea3d6", null ],
+    [ "steamrot::EnumNameEventTypeFbs", "namespacesteamrot.html#abb6a9276df9df73986debb3ab7da2e0d", null ],
+    [ "steamrot::EnumNamesEventTypeFbs", "namespacesteamrot.html#a977d7f29b0eec9e6b4d091081ea2154b", null ],
+    [ "steamrot::EnumValuesEventTypeFbs", "namespacesteamrot.html#a080601c30a380bcd5ea7a868ec326df1", null ],
+    [ "steamrot::payload_as< steamrot::CameraPayloadFbs >", "namespacesteamrot.html#a7e4ece2bb738fcd0187ebcb93da7d0bd", null ],
+    [ "steamrot::payload_as< steamrot::GhostPayloadFbs >", "namespacesteamrot.html#a626dbc88d017d71bcb19327bd7353c28", null ],
+    [ "steamrot::payload_as< steamrot::InputPayloadFbs >", "namespacesteamrot.html#ac3c651f5ec3d74684c04050b818885f3", null ],
+    [ "steamrot::payload_as< steamrot::LogicPayloadFbs >", "namespacesteamrot.html#aa5f6c41ea8cf657cee252e069a88376d", null ],
+    [ "steamrot::payload_as< steamrot::ScenePayloadFbs >", "namespacesteamrot.html#a7183249fca4ba2b00a66fecc87480198", null ],
+    [ "steamrot::payload_as< steamrot::SystemPayloadFbs >", "namespacesteamrot.html#a28796363d85386e58cd6c802680e4e6f", null ],
+    [ "steamrot::payload_as< steamrot::UIPayloadFbs >", "namespacesteamrot.html#aef4126c283bfac278f553ecbae7c4b82", null ],
+    [ "steamrot::FinishEventPacketFbsBuffer", "namespacesteamrot.html#ac9db3ac9ebc8dd3438407123ae818026", null ],
+    [ "steamrot::FinishSizePrefixedEventPacketFbsBuffer", "namespacesteamrot.html#ab11b104f764f50b458c94eddffed00cd", null ],
+    [ "steamrot::GetEventPacketFbs", "namespacesteamrot.html#a7af37fc8583277ce7367064cfc0539ce", null ],
+    [ "steamrot::GetSizePrefixedEventPacketFbs", "namespacesteamrot.html#a965eac227fb1a3d62ef14d0e611abfc7", null ],
+    [ "steamrot::VerifyEventPacketFbsBuffer", "namespacesteamrot.html#ac1b493412d6dda7f132e834618463a51", null ],
+    [ "steamrot::VerifySizePrefixedEventPacketFbsBuffer", "namespacesteamrot.html#aa487d94219b6dfe52e07358edf21aaa4", null ],
+    [ "VT_CONTEXT", "event__packet__generated_8h.html#a5c52c20ae4671499fd7aebbbbfa0265f", null ],
+    [ "VT_PAYLOAD_TYPE", "event__packet__generated_8h.html#aa26243130a1cb3f2c87ceabf25936c28", null ],
+    [ "VT_TYPE", "event__packet__generated_8h.html#a9899c62dd30928ac9776a9a29707f9d7", null ]
+];

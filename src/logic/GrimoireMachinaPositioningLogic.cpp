@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaPositioningLogic.h"
+#include "positioning_grimoire_machina.h"
 
 namespace steamrot::logic {
 /////////////////////////////////////////////////
@@ -16,8 +17,15 @@ GrimoireMachinaPositioningLogic::GrimoireMachinaPositioningLogic(
 
 /////////////////////////////////////////////////
 void GrimoireMachinaPositioningLogic::ProcessLogic() {
-  // Intentionally empty: the crafting canvas has been replaced with an
-  // infinite canvas, so there is nothing to compute here.  This class is
-  // retained to preserve LogicFactory and LogicClassEnum compatibility.
+
+  auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
+  if (!grimoire_result.has_value())
+    return;
+  GrimoireMachina &grimoire_machina = *grimoire_result.value();
+
+  // position the MachinaFormScaffold if active
+  if (grimoire_machina.m_scaffold_form)
+    positioning::grimoire_machina::position_machina_form_scaffold(
+        grimoire_machina.m_scaffold_form->parts);
 }
 } // namespace steamrot::logic

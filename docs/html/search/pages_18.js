@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['reads_20world_5fmouse_5fposition_20before_20ghostpositioninglogic_20has_20run_0',['❌ Adding a new world-space Logic that reads &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; before &lt;span class=&quot;tt&quot;&gt;GhostPositioningLogic&lt;/span&gt; has run',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md40',1,'']]],
+  ['recognised_1',['New action enum value not recognised',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md213',1,'']]],
+  ['reference_2',['Build Errors: &quot;undefined reference&quot;',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md174',1,'']]],
+  ['reference_3a_20which_20field_20to_20use_3',['Quick Reference: Which Field to Use',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md44',1,'']]],
+  ['referenced_4',['Data Types Referenced',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html#autotoc_md69',1,'']]],
+  ['register_20logictype_20enum_5',['Step 2: Register LogicType Enum',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md125',1,'']]],
+  ['register_20with_20logicfactory_6',['Step 3: Register with LogicFactory',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md129',1,'']]],
+  ['registry_20is_20empty_20at_20runtime_7',['Registry is empty at runtime',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md212',1,'']]],
+  ['render_20—_20grimoiremachinarenderlogic_8',['Render — GrimoireMachinaRenderLogic',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html#autotoc_md58',1,'']]],
+  ['render_20—_20render_5fgrimoire_5fmachina_9',['Render — &lt;span class=&quot;tt&quot;&gt;render_grimoire_machina&lt;/span&gt;',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html#autotoc_md67',1,'']]],
+  ['render_5fgrimoire_5fmachina_10',['Render — &lt;span class=&quot;tt&quot;&gt;render_grimoire_machina&lt;/span&gt;',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html#autotoc_md67',1,'']]],
+  ['rendering_20logic_11',['Rendering Logic',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md159',1,'']]],
+  ['rendering_20pass_12',['4. The View Must Match the Rendering Pass',['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md16',1,'']]],
+  ['repeating_20the_20conversion_20in_20multiple_20logic_20classes_13',['❌ Repeating the conversion in multiple Logic classes',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md38',1,'']]],
+  ['resources_14',['Resources',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md180',1,'Additional Resources'],['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md220',1,'Additional Resources']]],
+  ['responsibility_20map_15',['GrimoireMachina Logic Responsibility Map',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html',1,'']]],
+  ['returned_20null_16',['Test Failures: &quot;dynamic_cast returned null&quot;',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md173',1,'']]],
+  ['rules_20for_20adding_20new_20world_20space_20logic_17',['Rules for Adding New World-Space Logic',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md42',1,'']]],
+  ['run_18',['❌ Adding a new world-space Logic that reads &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; before &lt;span class=&quot;tt&quot;&gt;GhostPositioningLogic&lt;/span&gt; has run',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md40',1,'']]],
+  ['run_20tests_19',['7.2 Run Tests',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md149',1,'']]],
+  ['run_20tests_20',['Run tests',['../index.html#autotoc_md104',1,'']]],
+  ['runtime_21',['Registry is empty at runtime',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md212',1,'']]]
+];

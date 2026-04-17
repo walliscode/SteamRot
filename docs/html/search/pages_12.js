@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['links_0',['Quick Links',['../index.html#autotoc_md101',1,'']]],
+  ['list_1',['Step 3 – Determine the minimal parameter list',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html#autotoc_md93',1,'']]],
+  ['loading_2',['FlatBuffers Configuration Not Loading',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md176',1,'']]],
+  ['locally_3',['Generate and view docs locally',['../index.html#autotoc_md106',1,'']]],
+  ['locate_20or_20create_20the_20free_20function_20module_4',['Step 2 – Locate or create the free-function module',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html#autotoc_md92',1,'']]],
+  ['logic_5',['Logic',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md160',1,'Event-Driven Logic'],['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md159',1,'Rendering Logic'],['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md42',1,'Rules for Adding New World-Space Logic']]],
+  ['logic_20class_6',['When to Create a Logic Class',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md112',1,'']]],
+  ['logic_20class_20files_7',['Step 1: Create the Logic Class Files',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md120',1,'']]],
+  ['logic_20classes_8',['Logic Classes',['../md_documentation_2workflows_2ADDING__LOGIC.html',1,'Adding Logic Classes'],['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html#autotoc_md51',1,'Logic Classes']]],
+  ['logic_20classes_9',['❌ Repeating the conversion in multiple Logic classes',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md38',1,'']]],
+  ['logic_20decomposition_3a_20keeping_20processlogic_20clean_10',['Logic Decomposition: Keeping &lt;span class=&quot;tt&quot;&gt;ProcessLogic&lt;/span&gt; Clean',['../md_documentation_2design_2LOGIC__DECOMPOSITION.html',1,'']]],
+  ['logic_20not_20executing_11',['Logic Not Executing',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md171',1,'']]],
+  ['logic_20responsibility_20map_12',['GrimoireMachina Logic Responsibility Map',['../md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html',1,'']]],
+  ['logic_20system_20architecture_13',['Logic System Architecture',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md114',1,'']]],
+  ['logic_20that_20reads_20world_5fmouse_5fposition_20before_20ghostpositioninglogic_20has_20run_14',['❌ Adding a new world-space Logic that reads &lt;span class=&quot;tt&quot;&gt;world_mouse_position&lt;/span&gt; before &lt;span class=&quot;tt&quot;&gt;GhostPositioningLogic&lt;/span&gt; has run',['../md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html#autotoc_md40',1,'']]],
+  ['logic_20timedcolorlogic_20cpp_15',['Implementation (&lt;span class=&quot;tt&quot;&gt;src/logic/TimedColorLogic.cpp&lt;/span&gt;)',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md154',1,'']]],
+  ['logic_20timedcolorlogic_20h_16',['Header (&lt;span class=&quot;tt&quot;&gt;src/logic/TimedColorLogic.h&lt;/span&gt;)',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md153',1,'']]],
+  ['logic_20timedcolorlogic_20test_20cpp_17',['Test (&lt;span class=&quot;tt&quot;&gt;tests/unit/logic/TimedColorLogic.test.cpp&lt;/span&gt;)',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md155',1,'']]],
+  ['logicfactory_18',['Step 3: Register with LogicFactory',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md129',1,'']]],
+  ['logicfactory_20tests_19',['Step 5: Update LogicFactory Tests',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md138',1,'']]],
+  ['logicgrouping_20categories_20',['LogicGrouping Categories',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md115',1,'']]],
+  ['logictype_20enum_21',['LogicType Enum',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md126',1,'2.1 Add to LogicType Enum'],['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md125',1,'Step 2: Register LogicType Enum']]]
+];
