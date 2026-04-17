@@ -1,0 +1,74 @@
+# Doxyfile for SteamRot
+#
+# Generate documentation with:
+#   doxygen Doxyfile
+#
+# Output is written to docs/html/.
+# Run from the repository root.
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "SteamRot"
+PROJECT_NUMBER         = 0.1.0
+PROJECT_BRIEF          = "A data-driven C++ game engine"
+PROJECT_LOGO           =
+
+#---------------------------------------------------------------------------
+# Output
+#---------------------------------------------------------------------------
+
+OUTPUT_DIRECTORY       = docs
+HTML_OUTPUT            = html
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# Produce a collapsible sidebar tree (requires JavaScript)
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+
+# Include hand-written docs alongside API source.
+INPUT                  = documentation \
+                         src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h \
+                         *.hpp \
+                         *.cpp \
+                         *.md
+EXCLUDE                = 
+EXCLUDE_PATTERNS       = */_deps/* \
+                         */build/*
+
+#---------------------------------------------------------------------------
+# Markdown / main page
+#---------------------------------------------------------------------------
+
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+EXTENSION_MAPPING      = md=Markdown
+
+# Make documentation/index.md the Doxygen main page
+USE_MDFILE_AS_MAINPAGE = documentation/index.md
+
+# Enable Mermaid diagrams (Doxygen 1.9.3+)
+MERMAID_VERSION        = latest
+
+#---------------------------------------------------------------------------
+# Extraction
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+#---------------------------------------------------------------------------
+# Diagrams
+#---------------------------------------------------------------------------
+
+# Graphviz/dot is not required; disable for simpler CI setup
+HAVE_DOT               = NO

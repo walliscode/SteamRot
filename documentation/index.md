@@ -19,8 +19,8 @@ SteamRot is a data-driven C++ game engine built with:
 |---------|-------------|
 | [Workflows](workflows/ADDING_LOGIC.md) | Step-by-step guides for common development tasks |
 | [Design](design/LOGIC_DECOMPOSITION.md) | Architectural decisions and design notes |
-| [Coordinate Spaces](design/COORDINATE_SPACES.md) | Screen space vs world space — concepts and mechanics |
-| [Coordinate Spaces in SteamRot](design/COORDINATE_SPACES_STEAMROT.md) | How the codebase handles coordinate conversion and pitfalls |
+| [Coordinate Spaces](concepts/COORDINATE_SPACES.md) | Screen space vs world space — concepts and mechanics |
+| [Coordinate Spaces in SteamRot](concepts/COORDINATE_SPACES_STEAMROT.md) | How the codebase handles coordinate conversion and pitfalls |
 | [GrimoireMachina Logic Map](design/GRIMOIRE_MACHINA_LOGIC_MAP.md) | Audit and responsibility map for all GrimoireMachina logic (Collision / Action / Positioning / Render) |
 
 ## Getting Started
@@ -41,20 +41,21 @@ ctest --preset Debug
 ### Generate test dashboard
 
 ```bash
-# Activate the virtual environment first (see "Serve this wiki locally" below)
+# Activate a Python virtual environment first
 python -m tools.test_dashboard --tests-dir tests/
 ```
 
-### Serve this wiki locally
+### Generate and view docs locally
 
 ```bash
-# Activate the virtual environment (once per shell session)
-source .venv/bin/activate   # macOS/Linux
-# .venv\Scripts\activate    # Windows
+# Install Doxygen (once)
+sudo apt-get install doxygen   # Debian / Ubuntu
+# brew install doxygen         # macOS
 
-# Install dependencies (once)
-pip install -r tools/wiki/requirements.txt
+# Generate docs (from repository root)
+doxygen Doxyfile
 
-# Start the local wiki server
-mkdocs serve
+# Open in browser
+xdg-open docs/html/index.html  # Linux
+# open docs/html/index.html    # macOS
 ```
