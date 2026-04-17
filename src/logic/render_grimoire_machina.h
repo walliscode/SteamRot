@@ -12,9 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Fragment.h"
 #include "GrimoireMachina.h"
-#include "Joint.h"
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"

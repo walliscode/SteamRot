@@ -202,8 +202,8 @@ TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  // Centroid of (5,5),(25,5),(15,25) shifted by (10,10) → (15,15),(35,15),(25,35)
-  // centroid pixel (25, 22) should be green.
+  // Centroid of (5,5),(25,5),(15,25) shifted by (10,10) →
+  // (15,15),(35,15),(25,35) centroid pixel (25, 22) should be green.
   REQUIRE(image.getPixel({25, 22}) == sf::Color::Green);
 }
 
@@ -267,15 +267,16 @@ TEST_CASE("draw_socket produces yellow pixels at world_pos when hovered",
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
-  REQUIRE(image.getPixel({50, 50}) == sf::Color::Yellow);
+  REQUIRE(image.getPixel({50, 50}) == sf::Color::Blue);
 }
 
 /////////////////////////////////////////////////
 /// draw_fragment_instance_sockets tests
 /////////////////////////////////////////////////
 
-TEST_CASE("draw_fragment_instance_sockets draws socket circles without throwing",
-          "[unit][render_grimoire_machina]") {
+TEST_CASE(
+    "draw_fragment_instance_sockets draws socket circles without throwing",
+    "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
   auto fragment = MakeFragmentWithOriginTriangle();
 
@@ -430,8 +431,9 @@ TEST_CASE("draw_joint_instance draws joint geometry and sockets without "
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
 
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_joint_instance(
-      texture, instance, true));
+  REQUIRE_NOTHROW(
+      steamrot::logic::render::grimoire_machina::draw_joint_instance(
+          texture, instance, true));
 }
 
 TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
@@ -442,8 +444,9 @@ TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
   sf::Transform t;
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
-  REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_joint_instance(
-      texture, instance, false));
+  REQUIRE_NOTHROW(
+      steamrot::logic::render::grimoire_machina::draw_joint_instance(
+          texture, instance, false));
   // test the Joint View
   texture.display();
   const sf::Image image = texture.getTexture().copyToImage();
@@ -468,8 +471,8 @@ TEST_CASE("draw_joint_instance renders joint view geometry at transformed "
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{joint, t};
 
-  steamrot::logic::render::grimoire_machina::draw_joint_instance(texture,
-                                                                  instance, true);
+  steamrot::logic::render::grimoire_machina::draw_joint_instance(
+      texture, instance, true);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();

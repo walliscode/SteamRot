@@ -107,7 +107,7 @@ void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
   static constexpr float k_radius = 2.f;
   static constexpr int k_point_count = 10;
   static const sf::Color k_base_color{sf::Color::White};
-  static const sf::Color k_hover_color{sf::Color::Yellow};
+  static const sf::Color k_hover_color{sf::Color::Blue};
 
   sf::CircleShape circle(k_radius, k_point_count);
   circle.setOrigin({k_radius, k_radius});
