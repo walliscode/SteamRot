@@ -195,8 +195,12 @@ struct Connection {
   Endpoint socket_b;
 };
 
+/// using helpers ///
+using PartMap =
+    std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
+
 /////////////////////////////////////////////////
-/// @struct MachinaFormScaffold
+/// 3struct MachinaFormScaffold
 /// @brief Contains all data necessary to create a MachinaForm.
 ///
 /// This is designed to be an "unbaked" editor workspace. When committed to a
@@ -223,7 +227,7 @@ struct MachinaFormScaffold {
   /// Using std::map gives node-stable storage: insertions and erasures never
   /// invalidate references or iterators to other elements.
   /////////////////////////////////////////////////
-  std::map<uint32_t, std::variant<JointInstance, FragmentInstance>> parts;
+  PartMap parts;
 
   /////////////////////////////////////////////////
   /// @brief All connections between sockets on the scaffold.

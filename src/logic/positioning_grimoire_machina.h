@@ -8,11 +8,17 @@
 /////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "MachinaFormScaffold.h"
+
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at
 /// 0,0 of the canvas
 /////////////////////////////////////////////////
-void position_first_part_of_machina_form_scaffold();
+void position_first_part_of_machina_form_scaffold(PartMap &parts);
+
 } // namespace steamrot::logic::positioning::grimoire_machina
