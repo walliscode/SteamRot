@@ -10,10 +10,11 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
-#include "SocketConfigUtils.h"
+#include "positioning_grimoire_machina.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <memory>
 
 TEST_CASE("InitialiseActiveMachinaForm adds a new MachinaForm to the "
@@ -292,8 +293,7 @@ TEST_CASE("JointInstance constructor with zero sockets has empty "
   REQUIRE(instance.socket_local_positions.empty());
 }
 
-TEST_CASE("JointInstance constructor socket_local_positions match "
-          "ComputeSocketLocalPos at zero rotation",
+TEST_CASE("JointInstance constructor socket_local_positions are zero-initialised",
           "[unit][JointInstance][MachinaFormScaffold]") {
   steamrot::Joint joint;
   joint.socket_config.socket_count = 3;
@@ -305,8 +305,49 @@ TEST_CASE("JointInstance constructor socket_local_positions match "
   steamrot::JointInstance instance{joint};
 
   for (size_t i = 0; i < 3u; ++i) {
+    REQUIRE(instance.socket_local_positions[i].x == 0.f);
+    REQUIRE(instance.socket_local_positions[i].y == 0.f);
+  }
+}
+
+TEST_CASE("compute_socket_local_pos returns expected positions at zero ring "
+          "rotation",
+          "[unit][positioning_grimoire_machina]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 3;
+  joint.socket_config.radius = 10.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 360.f;
+  joint.socket_config.has_fixed_socket = false;
+
+  for (size_t i = 0; i < 3u; ++i) {
+    // Each socket should be at radius distance from origin
+    const sf::Vector2f pos =
+        steamrot::logic::positioning::grimoire_machina::compute_socket_local_pos(
+            joint.socket_config, i, 0.f);
+    const float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
+    REQUIRE(std::abs(dist - joint.socket_config.radius) < 1e-4f);
+  }
+}
+
+TEST_CASE("initialize_joint_socket_positions populates socket_local_positions "
+          "from SocketConfig at zero rotation",
+          "[unit][positioning_grimoire_machina]") {
+  steamrot::Joint joint;
+  joint.socket_config.socket_count = 3;
+  joint.socket_config.radius = 10.f;
+  joint.socket_config.arc_min = 0.f;
+  joint.socket_config.arc_max = 360.f;
+  joint.socket_config.has_fixed_socket = false;
+
+  steamrot::JointInstance instance{joint};
+  steamrot::logic::positioning::grimoire_machina::initialize_joint_socket_positions(
+      instance);
+
+  for (size_t i = 0; i < 3u; ++i) {
     const sf::Vector2f expected =
-        steamrot::ComputeSocketLocalPos(joint.socket_config, i, 0.f);
+        steamrot::logic::positioning::grimoire_machina::compute_socket_local_pos(
+            joint.socket_config, i, 0.f);
     REQUIRE(instance.socket_local_positions[i].x == expected.x);
     REQUIRE(instance.socket_local_positions[i].y == expected.y);
   }

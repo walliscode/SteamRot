@@ -7,8 +7,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_ghost.h"
-#include "SocketConfigUtils.h"
 #include "ViewDirection.h"
+#include "positioning_grimoire_machina.h"
 #include "render_grimoire_machina.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -60,7 +60,8 @@ compute_joint_ghost_sockets(const steamrot::SocketConfig &config) {
   const size_t count = static_cast<size_t>(config.socket_count);
   positions.reserve(count);
   for (size_t i = 0; i < count; ++i) {
-    positions.push_back(steamrot::ComputeSocketLocalPos(config, i, 0.f));
+    positions.push_back(steamrot::logic::positioning::grimoire_machina::
+                            compute_socket_local_pos(config, i, 0.f));
   }
   return positions;
 }

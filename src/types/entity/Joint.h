@@ -72,16 +72,20 @@ struct SocketConfig {
   bool has_fixed_socket{false};
 
   /////////////////////////////////////////////////
-  /// @brief Minimum rotation angle (degrees) the socket ring is permitted to
-  /// reach. Used by positioning Logic to clamp socket ring rotation.
+  /// @brief Minimum rotation angle (degrees, 0–360) representing the mechanical
+  /// lower limit of the socket ring. Used by positioning Logic to clamp the
+  /// ring's rotation. World-space orientation of the joint is encoded in the
+  /// instance transform, not in this value.
   /////////////////////////////////////////////////
-  float rotation_arc_min{-180.f};
+  float rotation_arc_min{0.f};
 
   /////////////////////////////////////////////////
-  /// @brief Maximum rotation angle (degrees) the socket ring is permitted to
-  /// reach. Used by positioning Logic to clamp socket ring rotation.
+  /// @brief Maximum rotation angle (degrees, 0–360) representing the mechanical
+  /// upper limit of the socket ring. Used by positioning Logic to clamp the
+  /// ring's rotation. World-space orientation of the joint is encoded in the
+  /// instance transform, not in this value.
   /////////////////////////////////////////////////
-  float rotation_arc_max{180.f};
+  float rotation_arc_max{360.f};
 };
 
 /////////////////////////////////////////////////

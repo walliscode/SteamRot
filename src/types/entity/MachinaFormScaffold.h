@@ -14,7 +14,6 @@
 /////////////////////////////////////////////////
 #include "Fragment.h"
 #include "Joint.h"
-#include "SocketConfigUtils.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cstdint>
 #include <map>
@@ -103,9 +102,10 @@ struct JointInstance : public PartInstance {
   /// @brief Construct a JointInstance from a Joint definition.
   ///
   /// Initialises socket_states with one default-constructed SocketState per
-  /// socket described by the Joint's SocketConfig, and populates
-  /// socket_local_positions by computing each socket's initial local position
-  /// from the SocketConfig at zero rotation.
+  /// socket described by the Joint's SocketConfig, and reserves
+  /// socket_local_positions to the same count. Actual position values are
+  /// filled in by positioning Logic (e.g. via
+  /// positioning_grimoire_machina::initialize_joint_socket_positions).
   ///
   /// @param joint_ref         Joint definition to reference.
   /// @param initial_transform Transform placing this instance in world space.
@@ -116,11 +116,7 @@ struct JointInstance : public PartInstance {
     const size_t count =
         static_cast<size_t>(joint_ref.socket_config.socket_count);
     socket_states.resize(count);
-    socket_local_positions.reserve(count);
-    for (size_t i = 0; i < count; ++i) {
-      socket_local_positions.push_back(
-          ComputeSocketLocalPos(joint_ref.socket_config, i, 0.f));
-    }
+    socket_local_positions.resize(count);
   }
 
   /////////////////////////////////////////////////
