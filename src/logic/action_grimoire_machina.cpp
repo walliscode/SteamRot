@@ -97,7 +97,7 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
   if (!scaffold)
     return;
 
-  if (!scaffold->fragments.empty() || !scaffold->joints.empty())
+  if (!scaffold->parts.empty())
     return;
 
   if (std::holds_alternative<FragmentTag>(mr_ghost.m_selection)) {
@@ -107,8 +107,9 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
       return;
 
     FragmentInstance instance{it->second};
-    instance.id = scaffold->next_id++;
-    scaffold->fragments.push_back(std::move(instance));
+    const uint32_t id = scaffold->next_id++;
+    instance.id = id;
+    scaffold->parts.emplace(id, std::move(instance));
 
   } else if (std::holds_alternative<JointTag>(mr_ghost.m_selection)) {
     const auto &tag = std::get<JointTag>(mr_ghost.m_selection);
@@ -117,8 +118,9 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
       return;
 
     JointInstance instance{it->second};
-    instance.id = scaffold->next_id++;
-    scaffold->joints.push_back(std::move(instance));
+    const uint32_t id = scaffold->next_id++;
+    instance.id = id;
+    scaffold->parts.emplace(id, std::move(instance));
   }
 }
 
@@ -130,7 +132,7 @@ void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
   if (!scaffold)
     return;
 
-  if (scaffold->fragments.empty() && scaffold->joints.empty()) {
+  if (scaffold->parts.empty()) {
     PlaceFirstPiece(grimoire_machina, mr_ghost);
     return;
   }
