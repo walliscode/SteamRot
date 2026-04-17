@@ -1,0 +1,27 @@
+var user__preferences__generated_8h =
+[
+    [ "steamrot::FLATBUFFERS_FINAL_CLASS", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS" ],
+    [ "steamrot::DisplayPreferencesFbsBuilder", "structsteamrot_1_1DisplayPreferencesFbsBuilder.html", "structsteamrot_1_1DisplayPreferencesFbsBuilder" ],
+    [ "steamrot::AudioPreferencesFbsBuilder", "structsteamrot_1_1AudioPreferencesFbsBuilder.html", "structsteamrot_1_1AudioPreferencesFbsBuilder" ],
+    [ "steamrot::AccessibilityPreferencesFbsBuilder", "structsteamrot_1_1AccessibilityPreferencesFbsBuilder.html", "structsteamrot_1_1AccessibilityPreferencesFbsBuilder" ],
+    [ "steamrot::UserPreferencesDataFbsBuilder", "structsteamrot_1_1UserPreferencesDataFbsBuilder.html", "structsteamrot_1_1UserPreferencesDataFbsBuilder" ],
+    [ "steamrot::CreateAccessibilityPreferencesFbs", "namespacesteamrot.html#a4bc8485233de8f62df6458ba0675129a", null ],
+    [ "steamrot::CreateAccessibilityPreferencesFbsDirect", "namespacesteamrot.html#a54c28bf75ac9a3234c1dcb77a25d0e5f", null ],
+    [ "steamrot::CreateAudioPreferencesFbs", "namespacesteamrot.html#ab961d8055f70742ee3c03dd8d0ac243a", null ],
+    [ "steamrot::CreateDisplayPreferencesFbs", "namespacesteamrot.html#aebb0f9825f213ece111412c40ddc002f", null ],
+    [ "steamrot::CreateUserPreferencesDataFbs", "namespacesteamrot.html#a8a2a383e3807340468a8d9b966dde860", null ],
+    [ "steamrot::FinishSizePrefixedUserPreferencesDataFbsBuffer", "namespacesteamrot.html#ad2b3bdb618d080c1484e60a4e423f9b4", null ],
+    [ "steamrot::FinishUserPreferencesDataFbsBuffer", "namespacesteamrot.html#a2384f566c414e47955d5aaed73569e07", null ],
+    [ "steamrot::GetSizePrefixedUserPreferencesDataFbs", "namespacesteamrot.html#a0dd9df3c75121d39be3aaa619e303841", null ],
+    [ "steamrot::GetUserPreferencesDataFbs", "namespacesteamrot.html#a703fbb7dca2ef870a9f1e2b84d87625d", null ],
+    [ "steamrot::VerifySizePrefixedUserPreferencesDataFbsBuffer", "namespacesteamrot.html#a2a1467d95dd12d53b6e676aa39f9444c", null ],
+    [ "steamrot::VerifyUserPreferencesDataFbsBuffer", "namespacesteamrot.html#a8226d28aa8344b852663a98453209b00", null ],
+    [ "VT_ACCESSIBILITY", "user__preferences__generated_8h.html#af42f9a0d1cee03f15694d6a0999e16f2", null ],
+    [ "VT_AUDIO", "user__preferences__generated_8h.html#afe19ee07dc3d4d0530da3f2ed8a56b01", null ],
+    [ "VT_DISPLAY", "user__preferences__generated_8h.html#a5f404b9bec3c901edc25b7c76593fc73", null ],
+    [ "VT_FULLSCREEN", "user__preferences__generated_8h.html#ae04da5dda26df918c210e96ac4f023fb", null ],
+    [ "VT_MASTER_VOLUME", "user__preferences__generated_8h.html#a39f998e38f80b189ad5b2c2d6f934b8c", null ],
+    [ "VT_MUSIC_VOLUME", "user__preferences__generated_8h.html#a07958969612c6081f77ca2b113688cdb", null ],
+    [ "VT_SFX_VOLUME", "user__preferences__generated_8h.html#ae4439ba3794fa0d26e93f766cc924e66", null ],
+    [ "VT_UI_SCALE", "user__preferences__generated_8h.html#a9d987dbba5de8216ae0d6563a4deda21", null ]
+];
