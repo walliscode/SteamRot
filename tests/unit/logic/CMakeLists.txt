@@ -7,6 +7,7 @@ action_camera.test.cpp
 movement_camera.test.cpp
 render_ui.test.cpp
 logic_render_test_helpers.cpp
+grimoire_machina_test_helpers.cpp
 state_ui.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp

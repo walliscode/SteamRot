@@ -6,12 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "grimoire_machina_test_helpers.h"
 #include "render_ghost.h"
-#include "Fragment.h"
 #include "GrimoireMachina.h"
-#include "Joint.h"
 #include "MrGhost.h"
-#include "ViewDirection.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
@@ -19,83 +17,6 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
-
-namespace {
-
-/////////////////////////////////////////////////
-/// @brief Make a filled 20x20 square VertexArray (Triangles) starting at (x,
-/// y).
-/////////////////////////////////////////////////
-sf::VertexArray MakeFilledSquare(float x, float y, sf::Color color) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles, 6);
-  va[0] = sf::Vertex{{x, y}, color};
-  va[1] = sf::Vertex{{x + 20.f, y}, color};
-  va[2] = sf::Vertex{{x + 20.f, y + 20.f}, color};
-  va[3] = sf::Vertex{{x, y}, color};
-  va[4] = sf::Vertex{{x + 20.f, y + 20.f}, color};
-  va[5] = sf::Vertex{{x, y + 20.f}, color};
-  return va;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named fragment that has NO view
-/// geometry.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithEmptyFragment(const std::string &name) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Fragment fragment;
-  fragment.name = name;
-  // movement_views is empty by default
-  grimoire.m_all_fragments.insert({name, std::move(fragment)});
-  return grimoire;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named fragment whose Front view
-///        is a solid white 20x20 square centred at the origin.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithPopulatedFragment(const std::string &name) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Fragment fragment;
-  fragment.name = name;
-  fragment.movement_views.insert_or_assign(
-      steamrot::ViewDirection::Front,
-      MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  grimoire.m_all_fragments.insert({name, std::move(fragment)});
-  return grimoire;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named joint that has NO view
-/// geometry.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina MakeGrimoireWithEmptyJoint(const std::string &name) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Joint joint;
-  joint.name = name;
-  grimoire.m_all_joints.insert({name, std::move(joint)});
-  return grimoire;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named joint whose Front view
-///        is a solid white 20x20 square centred at the origin.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithPopulatedJoint(const std::string &name) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Joint joint;
-  joint.name = name;
-  joint.movement_views.insert_or_assign(
-      steamrot::ViewDirection::Front,
-      MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  grimoire.m_all_joints.insert({name, std::move(joint)});
-  return grimoire;
-}
-
-} // anonymous namespace
 
 // ---------------------------------------------------------------------------
 // Coordinate reference used by socket tests
@@ -114,69 +35,7 @@ MakeGrimoireWithPopulatedJoint(const std::string &name) {
 // is pure black before the socket circle is painted.
 // ---------------------------------------------------------------------------
 
-namespace {
 
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named fragment (20×20 white Front
-///        view) and a single socket at the given local position.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithFragmentAndSocket(const std::string &name,
-                                  sf::Vector2f socket_local_pos) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Fragment fragment;
-  fragment.name = name;
-  fragment.movement_views.insert_or_assign(
-      steamrot::ViewDirection::Front,
-      MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  fragment.sockets.push_back(socket_local_pos);
-  grimoire.m_all_fragments.insert({name, std::move(fragment)});
-  return grimoire;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named fragment (20×20 white Front
-///        view) and multiple sockets at the given local positions.
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithFragmentAndSockets(const std::string &name,
-                                   std::vector<sf::Vector2f> socket_positions) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Fragment fragment;
-  fragment.name = name;
-  fragment.movement_views.insert_or_assign(
-      steamrot::ViewDirection::Front,
-      MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  fragment.sockets = std::move(socket_positions);
-  grimoire.m_all_fragments.insert({name, std::move(fragment)});
-  return grimoire;
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GrimoireMachina with one named joint (20×20 white Front
-///        view) and a socket_config that places one socket at local (25, 0).
-///
-/// The ghost transform for mr_ghost.m_position={100,100} over a 20x20 view
-/// with k_corner_offset=5 gives translate(75, 75). Socket at local (25, 0)
-/// therefore lands at texture pixel (100, 75).
-/////////////////////////////////////////////////
-steamrot::GrimoireMachina
-MakeGrimoireWithJointAndSocket(const std::string &name) {
-  steamrot::GrimoireMachina grimoire;
-  steamrot::Joint joint;
-  joint.name = name;
-  joint.movement_views.insert_or_assign(
-      steamrot::ViewDirection::Front,
-      MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  // socket_count=1, radius=25, arc_min=arc_max=0 -> local pos (25, 0)
-  joint.socket_config.socket_count = 1;
-  joint.socket_config.radius = 25.f;
-  joint.socket_config.has_fixed_socket = false;
-  grimoire.m_all_joints.insert({name, std::move(joint)});
-  return grimoire;
-}
-
-} // namespace
 
 /////////////////////////////////////////////////
 /// draw_ghost_item — monostate (nothing selected)
@@ -239,7 +98,7 @@ TEST_CASE("draw_ghost_item draws nothing when the fragment view is empty",
   mr_ghost.m_position = {50.f, 50.f};
 
   // fragment exists but has an empty movement_views
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithEmptyFragment("stone");
+  steamrot::GrimoireMachina grimoire = steamrot::tests::MakeGrimoireWithEmptyFragment("stone");
 
   REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
@@ -266,7 +125,7 @@ TEST_CASE("draw_ghost_item uses draw_view to draw at the cursor position",
   // translate = m_position(50,50) - bounds.position(0,0) - bounds.size(20,20)
   //             - corner_offset(5,5) = (25,25).  Square lands at
   //             [25..45, 25..45].
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedFragment("arm");
+  steamrot::GrimoireMachina grimoire = steamrot::tests::MakeGrimoireWithPopulatedFragment("arm");
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
@@ -315,7 +174,7 @@ TEST_CASE("draw_ghost_item draws nothing when the joint view is empty",
   mr_ghost.m_selection = steamrot::JointTag{"hinge"};
   mr_ghost.m_position = {50.f, 50.f};
 
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithEmptyJoint("hinge");
+  steamrot::GrimoireMachina grimoire = steamrot::tests::MakeGrimoireWithEmptyJoint("hinge");
 
   REQUIRE_NOTHROW(steamrot::logic::render::ghost::draw_ghost_item(
       texture, mr_ghost, grimoire));
@@ -340,7 +199,7 @@ TEST_CASE(
   mr_ghost.m_position = {200.f, 200.f}; // far corner
 
   steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithPopulatedFragment("rock");
+      steamrot::tests::MakeGrimoireWithPopulatedFragment("rock");
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
 
@@ -371,7 +230,7 @@ TEST_CASE("draw_ghost_item draws socket circle for a FragmentTag selection",
   // [75..95, 75..95] so the background there is black before the socket is
   // drawn.
   steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithFragmentAndSocket("leaf", {25.f, 10.f});
+      steamrot::tests::MakeGrimoireWithFragmentAndSocket("leaf", {25.f, 10.f});
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
@@ -400,7 +259,7 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment sockets list "
 
   // Fragment with geometry but NO sockets
   steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithPopulatedFragment("bare");
+      steamrot::tests::MakeGrimoireWithPopulatedFragment("bare");
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
   texture.display();
