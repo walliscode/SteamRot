@@ -8,9 +8,6 @@
 /////////////////////////////////////////////////
 #include "payload_matchers.h"
 #include "EventPayload.h"
-#include "Fragment.h"
-#include "Joint.h"
-#include "MachinaFormScaffold.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("MatchPayload deals with various configurations of InputPayload",
@@ -198,12 +195,12 @@ TEST_CASE("MatchPayload deals with various configurations of EventPayload",
   }
 
   SECTION("Matching GhostPayload EventPayloads match") {
-    steamrot::Fragment fragment;
-    steamrot::GhostInstance instance = steamrot::FragmentInstance{&fragment};
     steamrot::EventPayload filter_payload = steamrot::GhostPayload(
-        steamrot::GhostPayload::GhostAction::SELECT, instance);
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"stone"});
     steamrot::EventPayload event_payload = steamrot::GhostPayload(
-        steamrot::GhostPayload::GhostAction::SELECT, instance);
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"stone"});
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
@@ -223,7 +220,7 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
   steamrot::GhostPayload filter_payload;
   steamrot::GhostPayload event_payload;
 
-  SECTION("Empty payloads (monostate instance) match") {
+  SECTION("Empty payloads (monostate selection) match") {
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
@@ -233,84 +230,73 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Same FragmentInstance pointer matches") {
-    steamrot::Fragment fragment;
+  SECTION("Matching FragmentTag keys match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::FragmentInstance{&fragment};
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::FragmentInstance{&fragment};
+    event_payload.m_selection = steamrot::FragmentTag{"copper"};
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Different FragmentInstance pointers do not match") {
-    steamrot::Fragment fragment_a;
-    steamrot::Fragment fragment_b;
+  SECTION("Different FragmentTag keys do not match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::FragmentInstance{&fragment_a};
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::FragmentInstance{&fragment_b};
+    event_payload.m_selection = steamrot::FragmentTag{"iron"};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Mismatched instance variant types do not match") {
-    steamrot::Fragment fragment;
+  SECTION("Mismatched selection variant types do not match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::FragmentInstance{&fragment};
+    filter_payload.m_selection = steamrot::FragmentTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = std::monostate{};
+    event_payload.m_selection = std::monostate{};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("CLEAR action with monostate instances match") {
+  SECTION("CLEAR action with monostate selections match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
     event_payload.action = steamrot::GhostPayload::GhostAction::CLEAR;
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Same JointInstance pointer matches") {
-    steamrot::Joint joint;
+  SECTION("Matching JointTag keys match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::JointInstance{&joint};
+    filter_payload.m_selection = steamrot::JointTag{"square"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::JointInstance{&joint};
+    event_payload.m_selection = steamrot::JointTag{"square"};
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Different JointInstance pointers do not match") {
-    steamrot::Joint joint_a;
-    steamrot::Joint joint_b;
+  SECTION("Different JointTag keys do not match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::JointInstance{&joint_a};
+    filter_payload.m_selection = steamrot::JointTag{"square"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::JointInstance{&joint_b};
+    event_payload.m_selection = steamrot::JointTag{"circle"};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("JointInstance and FragmentInstance do not match") {
-    steamrot::Fragment fragment;
-    steamrot::Joint joint;
+  SECTION("JointTag and FragmentTag with same key do not match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = steamrot::JointInstance{&joint};
+    filter_payload.m_selection = steamrot::JointTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::FragmentInstance{&fragment};
+    event_payload.m_selection = steamrot::FragmentTag{"copper"};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Monostate filter acts as wildcard for any instance type") {
-    steamrot::Fragment fragment;
+  SECTION("Monostate filter acts as wildcard for any selection type") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = std::monostate{};
+    filter_payload.m_selection = std::monostate{};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::FragmentInstance{&fragment};
+    event_payload.m_selection = steamrot::FragmentTag{"stone"};
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Monostate filter acts as wildcard for JointInstance too") {
-    steamrot::Joint joint;
+  SECTION("Monostate filter acts as wildcard for JointTag too") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    filter_payload.m_instance = std::monostate{};
+    filter_payload.m_selection = std::monostate{};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
-    event_payload.m_instance = steamrot::JointInstance{&joint};
+    event_payload.m_selection = steamrot::JointTag{"hinge"};
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 }

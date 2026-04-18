@@ -80,9 +80,9 @@ CreateSystemEventPacket(const uint8_t lifetime,
 std::expected<EventPacket, FailInfo>
 CreateGhostEventPacket(const uint8_t lifetime,
                        const GhostPayload::GhostAction action,
-                       const GhostInstance &instance) {
+                       const GhostSelection &selection) {
   EventContext context{lifetime};
-  GhostPayload payload(action, instance);
+  GhostPayload payload(action, selection);
   EventPacket packet{context, EventType::GHOST, payload};
   return packet;
 }

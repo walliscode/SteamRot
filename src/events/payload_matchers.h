@@ -72,7 +72,7 @@ bool MatchPayload(const SystemPayload &filter_payload,
 /////////////////////////////////////////////////
 /// @brief Returns true if the filter payload matches the event payload.
 ///
-/// Compares GhostAction and the GhostInstance variant (type + pointer).
+/// Compares GhostAction and the GhostSelection variant (type + key string).
 ///
 /// @param filter_payload GhostPayload from Subscriber filter
 /// @param event_payload  GhostPayload from EventBus

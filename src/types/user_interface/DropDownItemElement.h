@@ -28,12 +28,12 @@ struct DropDownItemElement : public UIElement {
   std::string value{"value..."};
 
 /////////////////////////////////////////////////
-  /// @brief The GhostInstance to emit when this item is clicked.
+  /// @brief The selection tag to emit when this item is clicked.
   ///
   /// Set by ProcessDropDownListElementActions when the item is created.
   /// std::monostate indicates no ghost selection is associated.
 /////////////////////////////////////////////////
-  GhostInstance ghost_selection_tag{std::monostate{}};
+  GhostSelection ghost_selection_tag{std::monostate{}};
 
 /////////////////////////////////////////////////
   /// @brief Create a deep copy of this DropDownItemElement

@@ -11,7 +11,6 @@
 #include "DropDownButtonElement.h"
 #include "DropDownItemElement.h"
 #include "action_grimoire_machina.h"
-#include "positioning_grimoire_machina.h"
 
 namespace steamrot::logic::action::ui {
 
@@ -252,12 +251,8 @@ void ProcessDropDownListElementActions(
     dropdown_item->priority = 2;
     dropdown_item->label = fragment_name;
 
-    // build a FragmentInstance pointing directly at the Fragment definition
-    if (grimoire_ptr) {
-      auto it = grimoire_ptr->m_all_fragments.find(fragment_name);
-      if (it != grimoire_ptr->m_all_fragments.end())
-        dropdown_item->ghost_selection_tag = FragmentInstance{&it->second};
-    }
+    // store a lightweight tag; action_ghost resolves it to a FragmentInstance
+    dropdown_item->ghost_selection_tag = FragmentTag{fragment_name};
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events
     auto subscriber = std::make_shared<Subscriber>();
@@ -279,16 +274,8 @@ void ProcessDropDownListElementActions(
     dropdown_item->priority = 2;
     dropdown_item->label = joint_name;
 
-    // build a JointInstance pointing directly at the Joint definition
-    if (grimoire_ptr) {
-      auto it = grimoire_ptr->m_all_joints.find(joint_name);
-      if (it != grimoire_ptr->m_all_joints.end()) {
-        JointInstance joint_instance{&it->second};
-        positioning::grimoire_machina::initialize_joint_socket_positions(
-            joint_instance);
-        dropdown_item->ghost_selection_tag = std::move(joint_instance);
-      }
-    }
+    // store a lightweight tag; action_ghost resolves it to a JointInstance
+    dropdown_item->ghost_selection_tag = JointTag{joint_name};
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events
     auto subscriber = std::make_shared<Subscriber>();

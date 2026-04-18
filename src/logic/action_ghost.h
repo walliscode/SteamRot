@@ -12,22 +12,29 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "AssetManager.h"
 #include "MrGhost.h"
 #include "Subscriber.h"
 
 namespace steamrot::logic::action::ghost {
 
 /////////////////////////////////////////////////
-/// @brief Apply a ghost instance to MrGhost.
+/// @brief Resolve a GhostSelection tag to an instance and apply it to
+/// MrGhost.
 ///
-/// Sets mr_ghost.m_instance to the provided @p instance value.
-/// Callers are responsible for choosing this function when the relevant
-/// GhostPayload::GhostAction is SELECT.
+/// Looks up the Fragment or Joint identified by @p selection in @p
+/// asset_manager, constructs the corresponding FragmentInstance or
+/// JointInstance, and stores it in mr_ghost.m_instance. If the tag cannot
+/// be resolved (e.g. GrimoireMachina is unavailable or the key is missing),
+/// mr_ghost is left unchanged.
 ///
-/// @param mr_ghost MrGhost instance to update.
-/// @param instance GhostInstance variant describing the chosen item.
+/// @param mr_ghost     MrGhost instance to update.
+/// @param selection    GhostSelection tag identifying the chosen item.
+/// @param asset_manager AssetManager used to resolve the tag to a Part
+///                     definition.
 /////////////////////////////////////////////////
-void SelectGhostItem(MrGhost &mr_ghost, const GhostInstance &instance);
+void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection,
+                     AssetManager &asset_manager);
 
 /////////////////////////////////////////////////
 /// @brief Clear the current ghost instance on MrGhost.
@@ -49,10 +56,13 @@ void ClearGhostSelection(MrGhost &mr_ghost);
 /// ClearGhostSelection (CLEAR / NONE). Callers are responsible for checking
 /// that @p subscriber is active before passing it in.
 ///
-/// @param subscriber Active subscriber whose captured_payload holds the action.
-/// @param mr_ghost   MrGhost instance to mutate.
+/// @param subscriber    Active subscriber whose captured_payload holds the
+///                      action.
+/// @param mr_ghost      MrGhost instance to mutate.
+/// @param asset_manager AssetManager used to resolve a SELECT tag.
 /////////////////////////////////////////////////
-void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost);
+void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost,
+                       AssetManager &asset_manager);
 
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers and apply their ghost actions to
@@ -61,11 +71,12 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost);
 /// Iterates the subscriber list, skips inactive entries, and dispatches each
 /// active subscriber to @ref ProcessSubscriber.
 ///
-/// @param subscribers Subscribers owned by the Logic instance.
-/// @param mr_ghost    MrGhost instance to mutate.
+/// @param subscribers   Subscribers owned by the Logic instance.
+/// @param mr_ghost      MrGhost instance to mutate.
+/// @param asset_manager AssetManager used to resolve SELECT tags.
 /////////////////////////////////////////////////
 void ProcessSubscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    MrGhost &mr_ghost);
+    MrGhost &mr_ghost, AssetManager &asset_manager);
 
 } // namespace steamrot::logic::action::ghost

@@ -95,35 +95,34 @@ bool MatchPayload(const GhostPayload &filter_payload,
     return false;
   }
 
-  // A monostate filter instance acts as a wildcard: it matches any instance
+  // A monostate filter selection acts as a wildcard: it matches any selection
   // type carried by the event. This allows subscribers to listen for all
-  // SELECT (or CLEAR) events without specifying a particular part.
-  if (std::holds_alternative<std::monostate>(filter_payload.m_instance)) {
+  // SELECT (or CLEAR) events without specifying a particular part name.
+  if (std::holds_alternative<std::monostate>(filter_payload.m_selection)) {
     return true;
   }
 
-  // Compare the instance variant type index — Fragment vs Joint must match
-  if (filter_payload.m_instance.index() != event_payload.m_instance.index()) {
+  // Compare the selection variant type index — Fragment vs Joint must match
+  if (filter_payload.m_selection.index() != event_payload.m_selection.index()) {
     return false;
   }
 
-  // Same type: compare by the underlying Part definition pointer address
+  // Same type: compare by key string
   return std::visit(
-      [](const auto &filter_inst, const auto &event_inst) -> bool {
-        using F = std::decay_t<decltype(filter_inst)>;
-        using E = std::decay_t<decltype(event_inst)>;
+      [](const auto &filter_sel, const auto &event_sel) -> bool {
+        using F = std::decay_t<decltype(filter_sel)>;
+        using E = std::decay_t<decltype(event_sel)>;
         if constexpr (std::is_same_v<F, E>) {
           if constexpr (std::is_same_v<F, std::monostate>) {
             return true;
-          } else if constexpr (std::is_same_v<F, FragmentInstance>) {
-            return filter_inst.fragment == event_inst.fragment;
-          } else if constexpr (std::is_same_v<F, JointInstance>) {
-            return filter_inst.joint == event_inst.joint;
+          } else {
+            // Both FragmentTag and JointTag have a .key member
+            return filter_sel.key == event_sel.key;
           }
         }
         return false;
       },
-      filter_payload.m_instance, event_payload.m_instance);
+      filter_payload.m_selection, event_payload.m_selection);
 }
 
 /////////////////////////////////////////////////

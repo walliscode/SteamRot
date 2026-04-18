@@ -10,9 +10,6 @@
 #include "EventPacket.h"
 #include "EventPayload.h"
 #include "EventType.h"
-#include "Fragment.h"
-#include "Joint.h"
-#include "MachinaFormScaffold.h"
 #include <catch2/catch_test_macros.hpp>
 #include <set>
 #include <variant>
@@ -236,15 +233,14 @@ TEST_CASE("CreateSystemEventPacket: Creates packet with NONE action",
 }
 
 TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
-          "GhostPayload (FragmentInstance)",
+          "GhostPayload (FragmentTag)",
           "[unit][events][event_factory]") {
-  steamrot::Fragment fragment;
   const uint8_t lifetime = 3;
   const auto action = steamrot::GhostPayload::GhostAction::SELECT;
-  const steamrot::GhostInstance instance = steamrot::FragmentInstance{&fragment};
+  const steamrot::GhostSelection selection = steamrot::FragmentTag{"copper"};
 
   auto result =
-      steamrot::events::CreateGhostEventPacket(lifetime, action, instance);
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
@@ -256,21 +252,19 @@ TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
   const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
   REQUIRE(payload.action == action);
   REQUIRE(
-      std::holds_alternative<steamrot::FragmentInstance>(payload.m_instance));
-  REQUIRE(std::get<steamrot::FragmentInstance>(payload.m_instance).fragment ==
-          &fragment);
+      std::holds_alternative<steamrot::FragmentTag>(payload.m_selection));
+  REQUIRE(std::get<steamrot::FragmentTag>(payload.m_selection).key == "copper");
 }
 
 TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
-          "GhostPayload (JointInstance)",
+          "GhostPayload (JointTag)",
           "[unit][events][event_factory]") {
-  steamrot::Joint joint;
   const uint8_t lifetime = 3;
   const auto action = steamrot::GhostPayload::GhostAction::SELECT;
-  const steamrot::GhostInstance instance = steamrot::JointInstance{&joint};
+  const steamrot::GhostSelection selection = steamrot::JointTag{"pivot"};
 
   auto result =
-      steamrot::events::CreateGhostEventPacket(lifetime, action, instance);
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
@@ -281,25 +275,25 @@ TEST_CASE("CreateGhostEventPacket: Creates valid EventPacket with "
 
   const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
   REQUIRE(payload.action == action);
-  REQUIRE(std::holds_alternative<steamrot::JointInstance>(payload.m_instance));
-  REQUIRE(std::get<steamrot::JointInstance>(payload.m_instance).joint == &joint);
+  REQUIRE(std::holds_alternative<steamrot::JointTag>(payload.m_selection));
+  REQUIRE(std::get<steamrot::JointTag>(payload.m_selection).key == "pivot");
 }
 
 TEST_CASE("CreateGhostEventPacket: Creates packet with CLEAR action",
           "[unit][events][event_factory]") {
   const uint8_t lifetime = 1;
   const auto action = steamrot::GhostPayload::GhostAction::CLEAR;
-  const steamrot::GhostInstance instance = std::monostate{};
+  const steamrot::GhostSelection selection = std::monostate{};
 
   auto result =
-      steamrot::events::CreateGhostEventPacket(lifetime, action, instance);
+      steamrot::events::CreateGhostEventPacket(lifetime, action, selection);
 
   REQUIRE(result.has_value());
   const auto &packet = result.value();
 
   const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
   REQUIRE(payload.action == action);
-  REQUIRE(std::holds_alternative<std::monostate>(payload.m_instance));
+  REQUIRE(std::holds_alternative<std::monostate>(payload.m_selection));
 }
 
 TEST_CASE("Event factory: All functions respect custom lifetime values",
@@ -352,10 +346,10 @@ TEST_CASE("Event factory: All functions respect custom lifetime values",
   }
 
   SECTION("GhostEventPacket") {
-    const steamrot::GhostInstance instance = std::monostate{};
+    const steamrot::GhostSelection selection = std::monostate{};
     auto result = steamrot::events::CreateGhostEventPacket(
         custom_lifetime, steamrot::GhostPayload::GhostAction::CLEAR,
-        instance);
+        selection);
     REQUIRE(result.has_value());
     REQUIRE(result.value().context.lifetime == custom_lifetime);
   }
@@ -424,9 +418,9 @@ TEST_CASE("CreateRandomEventPacket: Generates valid random EventPackets",
     case steamrot::EventType::GHOST: {
       REQUIRE(std::holds_alternative<steamrot::GhostPayload>(packet.payload));
       const auto &payload = std::get<steamrot::GhostPayload>(packet.payload);
-      // Random generation always uses CLEAR with monostate instance
+      // Random generation always uses CLEAR with monostate selection
       REQUIRE(payload.action == steamrot::GhostPayload::GhostAction::CLEAR);
-      REQUIRE(std::holds_alternative<std::monostate>(payload.m_instance));
+      REQUIRE(std::holds_alternative<std::monostate>(payload.m_selection));
       break;
     }
 

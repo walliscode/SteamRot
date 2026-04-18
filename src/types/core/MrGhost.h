@@ -13,9 +13,43 @@
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
 #include <SFML/System/Vector2.hpp>
+#include <string>
 #include <variant>
 
 namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @struct FragmentTag
+/// @brief Lightweight tag identifying a Fragment by name.
+///
+/// Used in GhostSelection and GhostPayload to refer to a Fragment without
+/// holding a pointer. action_ghost resolves this tag to a FragmentInstance
+/// via GrimoireMachina at selection time.
+/////////////////////////////////////////////////
+struct FragmentTag {
+  std::string key{};
+};
+
+/////////////////////////////////////////////////
+/// @struct JointTag
+/// @brief Lightweight tag identifying a Joint by name.
+///
+/// Used in GhostSelection and GhostPayload to refer to a Joint without
+/// holding a pointer. action_ghost resolves this tag to a JointInstance
+/// via GrimoireMachina at selection time.
+/////////////////////////////////////////////////
+struct JointTag {
+  std::string key{};
+};
+
+/////////////////////////////////////////////////
+/// @brief Variant carrying a lightweight selection tag for a ghost item.
+///
+/// Transported in GhostPayload and stored on DropDownItemElement.
+/// std::monostate indicates no active selection or a CLEAR action.
+/// Resolved to a GhostInstance by action_ghost::SelectGhostItem.
+/////////////////////////////////////////////////
+using GhostSelection = std::variant<std::monostate, FragmentTag, JointTag>;
 
 /////////////////////////////////////////////////
 /// @brief Variant representing the currently active ghost instance.
