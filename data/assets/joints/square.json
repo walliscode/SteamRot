@@ -2,11 +2,11 @@
   "name": "square",
   "origin": { "x": 10, "y": 10 },
   "socket_config": {
-    "socket_count": 4,
-    "radius": 14.142,
-    "arc_min": 45.0,
-    "arc_max": 315.0,
-    "min_gap": 90.0,
+    "socket_count": 2,
+    "radius": 13,
+    "rotation_arc_min": 0,
+    "rotation_arc_max": 270,
+    "min_gap": 10,
     "has_fixed_socket": false,
     "fixed_socket_angle": 0.0
   },

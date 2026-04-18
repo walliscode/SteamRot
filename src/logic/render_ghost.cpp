@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_ghost.h"
-#include "SocketConfigUtils.h"
 #include "ViewDirection.h"
 #include "render_grimoire_machina.h"
 #include <SFML/Graphics/CircleShape.hpp>
@@ -47,24 +46,6 @@ void draw_ghost_sockets(sf::RenderTexture &texture,
   }
 }
 
-/////////////////////////////////////////////////
-/// @brief Compute local socket positions for a Joint's SocketConfig at zero
-/// rotation, suitable for ghost preview rendering.
-///
-/// @param config SocketConfig to compute positions from.
-/// @return Vector of local socket positions.
-/////////////////////////////////////////////////
-std::vector<sf::Vector2f>
-compute_joint_ghost_sockets(const steamrot::SocketConfig &config) {
-  std::vector<sf::Vector2f> positions;
-  const size_t count = static_cast<size_t>(config.socket_count);
-  positions.reserve(count);
-  for (size_t i = 0; i < count; ++i) {
-    positions.push_back(steamrot::ComputeSocketLocalPos(config, i, 0.f));
-  }
-  return positions;
-}
-
 } // namespace
 
 /////////////////////////////////////////////////
@@ -73,6 +54,7 @@ void draw_ghost_item(sf::RenderTexture &texture, const MrGhost &mr_ghost,
 
   static constexpr float k_corner_offset = 5.f;
 
+  /// FragmentTag Logic ///
   if (auto *fragment_tag = std::get_if<FragmentTag>(&mr_ghost.m_selection)) {
     auto it = grimoire_machina.m_all_fragments.find(fragment_tag->key);
     if (it == grimoire_machina.m_all_fragments.end())
@@ -87,10 +69,13 @@ void draw_ghost_item(sf::RenderTexture &texture, const MrGhost &mr_ghost,
                                 ViewDirection::Front, states);
     draw_ghost_sockets(texture, it->second.sockets, states);
 
+    /// JointTag Logic ///
   } else if (auto *joint_tag = std::get_if<JointTag>(&mr_ghost.m_selection)) {
+
     auto it = grimoire_machina.m_all_joints.find(joint_tag->key);
     if (it == grimoire_machina.m_all_joints.end())
       return;
+
     const sf::FloatRect bounds =
         it->second.movement_views[ViewDirection::Front].getBounds();
     sf::RenderStates states;
@@ -99,9 +84,6 @@ void draw_ghost_item(sf::RenderTexture &texture, const MrGhost &mr_ghost,
                                sf::Vector2f(k_corner_offset, k_corner_offset));
     grimoire_machina::draw_view(texture, it->second.movement_views,
                                 ViewDirection::Front, states);
-    draw_ghost_sockets(texture,
-                       compute_joint_ghost_sockets(it->second.socket_config),
-                       states);
   }
 }
 

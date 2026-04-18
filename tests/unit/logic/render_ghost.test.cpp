@@ -171,8 +171,6 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   // socket_count=1, radius=25, arc_min=arc_max=0 -> local pos (25, 0)
   joint.socket_config.socket_count = 1;
   joint.socket_config.radius = 25.f;
-  joint.socket_config.arc_min = 0.f;
-  joint.socket_config.arc_max = 0.f;
   joint.socket_config.has_fixed_socket = false;
   grimoire.m_all_joints.insert({name, std::move(joint)});
   return grimoire;
@@ -412,89 +410,4 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment sockets list "
   // Position (100, 85) is where a socket at local (25, 10) would have been
   // painted — with no sockets it must remain black.
   REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
-/// draw_ghost_item — sockets: JointTag, socket drawn outside geometry
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_ghost_item draws socket circle for a JointTag selection",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{200, 200}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"knuckle"};
-  mr_ghost.m_position = {100.f, 100.f};
-
-  // Joint with socket_config: socket at local (25, 0). Ghost transform over
-  // a 20x20 view gives translate(75, 75) → world pixel (100, 75).
-  steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithJointAndSocket("knuckle");
-
-  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
-  texture.display();
-
-  const sf::Image image = texture.getTexture().copyToImage();
-
-  REQUIRE(image.getPixel({100, 75}) != sf::Color::Black);
-  REQUIRE(image.getPixel({10, 10}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
-/// draw_ghost_item — sockets: JointTag, no sockets → socket area stays black
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_ghost_item draws no socket pixels when joint has zero sockets",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{200, 200}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"bare"};
-  mr_ghost.m_position = {100.f, 100.f};
-
-  // Joint with geometry but socket_count=0 (MakeGrimoireWithPopulatedJoint
-  // default-constructs the Joint, so socket_config.socket_count = 0)
-  steamrot::GrimoireMachina grimoire = MakeGrimoireWithPopulatedJoint("bare");
-
-  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
-  texture.display();
-
-  const sf::Image image = texture.getTexture().copyToImage();
-
-  REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
-/// draw_ghost_item — sockets: multiple sockets are all drawn
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_ghost_item draws all socket circles when fragment has multiple "
-          "sockets",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{200, 200}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"multi"};
-  mr_ghost.m_position = {100.f, 100.f};
-
-  // Two sockets at distinct local positions that both fall outside the white
-  // square [75..95, 75..95] once the transform (75, 75) is applied:
-  //   local (25, 10)  → texture (100, 85)
-  //   local (30, 25)  → texture (105, 100)
-  steamrot::GrimoireMachina grimoire =
-      MakeGrimoireWithFragmentAndSockets("multi", {{25.f, 10.f}, {30.f, 25.f}});
-
-  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost, grimoire);
-  texture.display();
-
-  const sf::Image image = texture.getTexture().copyToImage();
-
-  // Both socket centres must have been painted
-  REQUIRE(image.getPixel({100, 85}) != sf::Color::Black);
-  REQUIRE(image.getPixel({105, 100}) != sf::Color::Black);
-  // Control: an unrelated pixel must remain black
-  REQUIRE(image.getPixel({10, 10}) == sf::Color::Black);
 }

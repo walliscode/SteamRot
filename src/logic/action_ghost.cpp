@@ -27,7 +27,8 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost) {
   if (!subscriber.captured_payload.has_value())
     return;
 
-  if (!std::holds_alternative<GhostPayload>(subscriber.captured_payload.value()))
+  if (!std::holds_alternative<GhostPayload>(
+          subscriber.captured_payload.value()))
     return;
 
   const GhostPayload &ghost_payload =
@@ -37,15 +38,15 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost) {
   case GhostPayload::GhostAction::SELECT:
     SelectGhostItem(mr_ghost, ghost_payload.m_selection);
     break;
+
   case GhostPayload::GhostAction::CLEAR:
-  case GhostPayload::GhostAction::NONE:
     ClearGhostSelection(mr_ghost);
     break;
+
   default:
     break;
   }
 }
-
 
 /////////////////////////////////////////////////
 void ProcessSubscribers(

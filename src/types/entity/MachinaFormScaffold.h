@@ -91,16 +91,21 @@ struct PartInstance {
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
 /// Derives from PartInstance and adds Joint-specific runtime state.
-/// World positions for sockets are derived on demand via:
-///   ComputeSocketLocalPos(joint.socket_config, i, current_rotation)
-///   followed by transform.transformPoint(local_pos)
+/// Each socket's local-space position is stored in socket_local_positions and
+/// initialised from the Joint's SocketConfig at construction time. Positioning
+/// Logic may update individual entries to reposition sockets independently.
+/// World-space position of socket i is obtained via:
+///   transform.transformPoint(socket_local_positions[i])
 /////////////////////////////////////////////////
 struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a JointInstance from a Joint definition.
   ///
   /// Initialises socket_states with one default-constructed SocketState per
-  /// socket described by the Joint's SocketConfig.
+  /// socket described by the Joint's SocketConfig, and reserves
+  /// socket_local_positions to the same count. Actual position values are
+  /// filled in by positioning Logic (e.g. via
+  /// positioning_grimoire_machina::initialize_joint_socket_positions).
   ///
   /// @param joint_ref         Joint definition to reference.
   /// @param initial_transform Transform placing this instance in world space.
@@ -108,8 +113,10 @@ struct JointInstance : public PartInstance {
   JointInstance(Joint &joint_ref,
                 sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, joint{joint_ref} {
-    socket_states.resize(
-        static_cast<size_t>(joint_ref.socket_config.socket_count));
+    const size_t count =
+        static_cast<size_t>(joint_ref.socket_config.socket_count);
+    socket_states.resize(count);
+    socket_local_positions.resize(count);
   }
 
   /////////////////////////////////////////////////
@@ -118,20 +125,13 @@ struct JointInstance : public PartInstance {
   Joint &joint;
 
   /////////////////////////////////////////////////
-  /// @brief Current rotation angle (degrees) of the socket ring around the
-  /// Joint's local origin.
+  /// @brief Local-space positions5of all sockets for this Joint instance.
+  ///
+  /// Initialised from the Joint's SocketConfig at construction. Positioning
+  /// Logic may update individual entries to reposition sockets independently of
+  /// one another. Apply the instance's transform to convert to world space.
   /////////////////////////////////////////////////
-  float current_rotation{0.f};
-
-  /////////////////////////////////////////////////
-  /// @brief Minimum allowed rotation angle (degrees, hard stop).
-  /////////////////////////////////////////////////
-  float rotation_min{-180.f};
-
-  /////////////////////////////////////////////////
-  /// @brief Maximum allowed rotation angle (degrees, hard stop).
-  /////////////////////////////////////////////////
-  float rotation_max{180.f};
+  std::vector<sf::Vector2f> socket_local_positions;
 };
 
 /////////////////////////////////////////////////

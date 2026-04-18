@@ -29,23 +29,17 @@ struct SocketConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SOCKET_COUNT = 4,
     VT_RADIUS = 6,
-    VT_ARC_MIN = 8,
-    VT_ARC_MAX = 10,
-    VT_MIN_GAP = 12,
-    VT_FIXED_SOCKET_ANGLE = 14,
-    VT_HAS_FIXED_SOCKET = 16
+    VT_MIN_GAP = 8,
+    VT_FIXED_SOCKET_ANGLE = 10,
+    VT_HAS_FIXED_SOCKET = 12,
+    VT_ROTATION_ARC_MIN = 14,
+    VT_ROTATION_ARC_MAX = 16
   };
   int32_t socket_count() const {
     return GetField<int32_t>(VT_SOCKET_COUNT, 0);
   }
   float radius() const {
     return GetField<float>(VT_RADIUS, 10.0f);
-  }
-  float arc_min() const {
-    return GetField<float>(VT_ARC_MIN, 0.0f);
-  }
-  float arc_max() const {
-    return GetField<float>(VT_ARC_MAX, 360.0f);
   }
   float min_gap() const {
     return GetField<float>(VT_MIN_GAP, 0.0f);
@@ -56,15 +50,21 @@ struct SocketConfigFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool has_fixed_socket() const {
     return GetField<uint8_t>(VT_HAS_FIXED_SOCKET, 0) != 0;
   }
+  float rotation_arc_min() const {
+    return GetField<float>(VT_ROTATION_ARC_MIN, 0.0f);
+  }
+  float rotation_arc_max() const {
+    return GetField<float>(VT_ROTATION_ARC_MAX, 360.0f);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_SOCKET_COUNT, 4) &&
            VerifyField<float>(verifier, VT_RADIUS, 4) &&
-           VerifyField<float>(verifier, VT_ARC_MIN, 4) &&
-           VerifyField<float>(verifier, VT_ARC_MAX, 4) &&
            VerifyField<float>(verifier, VT_MIN_GAP, 4) &&
            VerifyField<float>(verifier, VT_FIXED_SOCKET_ANGLE, 4) &&
            VerifyField<uint8_t>(verifier, VT_HAS_FIXED_SOCKET, 1) &&
+           VerifyField<float>(verifier, VT_ROTATION_ARC_MIN, 4) &&
+           VerifyField<float>(verifier, VT_ROTATION_ARC_MAX, 4) &&
            verifier.EndTable();
   }
 };
@@ -79,12 +79,6 @@ struct SocketConfigFbsBuilder {
   void add_radius(float radius) {
     fbb_.AddElement<float>(SocketConfigFbs::VT_RADIUS, radius, 10.0f);
   }
-  void add_arc_min(float arc_min) {
-    fbb_.AddElement<float>(SocketConfigFbs::VT_ARC_MIN, arc_min, 0.0f);
-  }
-  void add_arc_max(float arc_max) {
-    fbb_.AddElement<float>(SocketConfigFbs::VT_ARC_MAX, arc_max, 360.0f);
-  }
   void add_min_gap(float min_gap) {
     fbb_.AddElement<float>(SocketConfigFbs::VT_MIN_GAP, min_gap, 0.0f);
   }
@@ -93,6 +87,12 @@ struct SocketConfigFbsBuilder {
   }
   void add_has_fixed_socket(bool has_fixed_socket) {
     fbb_.AddElement<uint8_t>(SocketConfigFbs::VT_HAS_FIXED_SOCKET, static_cast<uint8_t>(has_fixed_socket), 0);
+  }
+  void add_rotation_arc_min(float rotation_arc_min) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_ROTATION_ARC_MIN, rotation_arc_min, 0.0f);
+  }
+  void add_rotation_arc_max(float rotation_arc_max) {
+    fbb_.AddElement<float>(SocketConfigFbs::VT_ROTATION_ARC_MAX, rotation_arc_max, 360.0f);
   }
   explicit SocketConfigFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -109,16 +109,16 @@ inline ::flatbuffers::Offset<SocketConfigFbs> CreateSocketConfigFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int32_t socket_count = 0,
     float radius = 10.0f,
-    float arc_min = 0.0f,
-    float arc_max = 360.0f,
     float min_gap = 0.0f,
     float fixed_socket_angle = 0.0f,
-    bool has_fixed_socket = false) {
+    bool has_fixed_socket = false,
+    float rotation_arc_min = 0.0f,
+    float rotation_arc_max = 360.0f) {
   SocketConfigFbsBuilder builder_(_fbb);
+  builder_.add_rotation_arc_max(rotation_arc_max);
+  builder_.add_rotation_arc_min(rotation_arc_min);
   builder_.add_fixed_socket_angle(fixed_socket_angle);
   builder_.add_min_gap(min_gap);
-  builder_.add_arc_max(arc_max);
-  builder_.add_arc_min(arc_min);
   builder_.add_radius(radius);
   builder_.add_socket_count(socket_count);
   builder_.add_has_fixed_socket(has_fixed_socket);

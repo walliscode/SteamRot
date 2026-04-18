@@ -8,7 +8,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
-#include "SocketConfigUtils.h"
 #include "UIElement.h"
 #include "entity_memory.h"
 #include <algorithm>
@@ -139,12 +138,10 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
   // cycle through all sockets in the joint and check if any are hovered
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
 
-    // compute the socket's local position from the SocketConfig, then apply
-    // the joint's transform to get world space
-    const sf::Vector2f local_pos = ComputeSocketLocalPos(
-        joint_instance.joint.socket_config, i, joint_instance.current_rotation);
-    const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(local_pos);
+    // get the world position of the socket by applying the joint's transform
+    // to the stored local socket position
+    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
+        joint_instance.socket_local_positions[i]);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly

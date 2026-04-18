@@ -7,9 +7,60 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cmath>
 
 namespace steamrot::logic::positioning::grimoire_machina {
+
+/////////////////////////////////////////////////
+void compute_socket_local_positions_even_spread(
+    const SocketConfig &config, sf::Vector2f &origin,
+    std::vector<sf::Vector2f> &local_positions) {
+
+  // if no sockets, return early (also avoids divide by zero in later
+  // calculations)
+  if (config.socket_count == 0) {
+    return;
+  }
+  // extra guard statement to prevent undefined access
+  local_positions.clear();
+  local_positions.resize(config.socket_count);
+
+  // calculate the angle at which to place the socket(s) using the socket
+  // config's arc min and mx and socket count
+  const float arc_min = config.rotation_arc_min;
+  const float arc_max = config.rotation_arc_max;
+  const float arc_range = arc_max - arc_min;
+  const float angle_between_sockets = arc_range / (config.socket_count + 1);
+
+  // The following logic can change:
+  // sockets are not placed on the arc endpoints, so we add
+  // angle_between_sockets to arc_min to get the angle of the first socket, and
+  // then add angle_between_sockets for each subsequent socket
+
+  for (int i = 0; i < config.socket_count; ++i) {
+    const float angle_deg = arc_min + angle_between_sockets * (i + 1);
+    const float angle_rad = sf::degrees(angle_deg).asRadians();
+
+    local_positions[i] =
+        origin +
+        sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
+  }
+
+  return;
+}
+
+/////////////////////////////////////////////////
+void initialize_joint_socket_positions(JointInstance &joint_instance) {
+  const auto &config = joint_instance.joint.socket_config;
+
+  // pass the origin and local_positions vector by reference to be filled in by
+  // the helper
+  compute_socket_local_positions_even_spread(
+      config, joint_instance.joint.origin,
+      joint_instance.socket_local_positions);
+}
 
 /////////////////////////////////////////////////
 void position_first_part_of_machina_form_scaffold(PartMap &parts) {
@@ -58,6 +109,9 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
     joint_instance->transform.translate(-joint_instance->joint.origin);
+
+    // initialise socket positions now that the transform is established
+    initialize_joint_socket_positions(*joint_instance);
 
     return;
   }

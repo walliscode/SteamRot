@@ -178,7 +178,7 @@ GrimoireMachina-specific surface area is:
 |----------|-----------|----------------|
 | `CheckMouseOver` | `(sf::Vector2f world_mouse, sf::Vector2f world_pos, SocketState &)` | Sets `is_mouse_over` on a single `SocketState` based on distance from the mouse to the socket's world centre. Hit radius matches the visual draw radius. |
 | `CheckMouseOver` | `(sf::Vector2f world_mouse, FragmentInstance &)` | Iterates all sockets of a `FragmentInstance`. For each socket, applies the instance's transform to the local socket position to get world space, then calls the `SocketState` overload. |
-| `CheckMouseOver` | `(sf::Vector2f world_mouse, JointInstance &)` | Like the `FragmentInstance` overload but uses `ComputeSocketLocalPos` to account for `joint_instance.current_rotation` before transforming to world space. |
+| `CheckMouseOver` | `(sf::Vector2f world_mouse, JointInstance &)` | Like the `FragmentInstance` overload but reads `socket_local_positions[i]` directly instead of recomputing per-frame, then transforms to world space. |
 | `ProcessScaffoldCollisions` | `(MachinaFormScaffold &, sf::Vector2f world_mouse)` | Top-level entry point. Iterates all `JointInstance`s then all `FragmentInstance`s in the scaffold and calls the appropriate `CheckMouseOver` overload for each. |
 
 ---
@@ -208,8 +208,12 @@ GrimoireMachina-specific surface area is:
 **Files**: `src/logic/positioning_grimoire_machina.h/cpp`
 **Namespace**: `steamrot::logic::positioning::grimoire_machina`
 
-Currently empty. Reserved for future positioning logic such as socket-snap
-assistance, layout-constraint resolution, or piece-alignment helpers.
+| Function | Signature | Responsibility |
+|----------|-----------|----------------|
+| `compute_socket_local_pos` | `(const SocketConfig&, size_t socket_index, float ring_rotation = 0.f) → sf::Vector2f` | Computes the local-space position of a single socket. Uses SFML angle utilities for degree-to-radian conversion. Fixed anchor sockets sit at `fixed_socket_angle`; remaining sockets are distributed evenly across the layout arc and optionally offset by `ring_rotation`. |
+| `initialize_joint_socket_positions` | `(JointInstance &)` | Fills all `socket_local_positions` entries by calling `compute_socket_local_pos` at zero ring rotation. Called by positioning functions after the instance transform is established. |
+| `position_first_part_of_machina_form_scaffold` | `(PartMap &)` | Translates the transform of the part at key 0 so its anchor (fragment bounding-box centre or joint origin) maps to world-space `(0, 0)`. For `JointInstance`s also calls `initialize_joint_socket_positions`. |
+| `position_machina_form_scaffold` | `(PartMap &)` | Top-level entry point. Currently delegates to `position_first_part_of_machina_form_scaffold`. |
 
 ---
 
@@ -224,7 +228,7 @@ assistance, layout-constraint resolution, or piece-alignment helpers.
 | `DrawNoMachinaFormIndicator` | Draws a red 200×200 outline rectangle centred at world-space origin `(0, 0)` to signal that no scaffold is active. |
 | `DrawSocket` | Draws a small circle at a given world position. Colour is yellow when `socket_state.is_mouse_over` is true, white otherwise. |
 | `DrawFragmentInstanceSockets` | Iterates all sockets of a `FragmentInstance`, applies the instance's transform to the local socket position, and calls `DrawSocket` for each. |
-| `DrawJointInstanceSockets` | Like `DrawFragmentInstanceSockets` but uses `ComputeSocketLocalPos` to resolve the rotation-aware local position before transforming to world space. |
+| `DrawJointInstanceSockets` | Like `DrawFragmentInstanceSockets` but reads `socket_local_positions[i]` directly and transforms to world space. |
 | `DrawFragmentInstance` | Sets `RenderStates` from the instance's stored transform, draws the fragment's `Front` view geometry, and optionally draws all socket indicators. |
 | `DrawJointInstance` | Same as `DrawFragmentInstance` for joints. |
 | `DrawScaffoldOrPlaceholder` | Checks whether `m_scaffold_form` is set. If not, calls `DrawNoMachinaFormIndicator`. If set, iterates all joints then all fragments and calls the appropriate `Draw*Instance` function for each. |
