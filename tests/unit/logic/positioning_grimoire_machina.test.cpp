@@ -113,7 +113,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
                  steamrot::tests::EqualsVector2f(expected_position));
   }
 
-  SECTION("POsitions origin of first JointInstance at 0,0") {
+  SECTION("Positions origin of first JointInstance at 0,0") {
     // Arrange
     auto joint = MakeJointWithFrontView();
     joint.origin = {5.f, 5.f}; // set origin to (5,5)

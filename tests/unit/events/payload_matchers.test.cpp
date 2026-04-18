@@ -304,4 +304,13 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     event_payload.m_instance = steamrot::FragmentInstance{&fragment};
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
+
+  SECTION("Monostate filter acts as wildcard for JointInstance too") {
+    steamrot::Joint joint;
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_instance = std::monostate{};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_instance = steamrot::JointInstance{&joint};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
 }
