@@ -125,7 +125,7 @@ struct JointInstance : public PartInstance {
   Joint &joint;
 
   /////////////////////////////////////////////////
-  /// @brief Local-space positions of all sockets for this Joint instance.
+  /// @brief Local-space positions5of all sockets for this Joint instance.
   ///
   /// Initialised from the Joint's SocketConfig at construction. Positioning
   /// Logic may update individual entries to reposition sockets independently of
