@@ -43,6 +43,8 @@ add_library(logic
   positioning_ghost.cpp
 
   collision_mouse.cpp
+
+  collision_grimoire_machina.cpp
 )
 
 target_include_directories(logic

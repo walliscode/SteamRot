@@ -17,6 +17,7 @@ render_ghost.test.cpp
 GhostRenderLogic.test.cpp
 positioning_ui.test.cpp
 collision_mouse.test.cpp
+collision_grimoire_machina.test.cpp
 # pixel_render.test.cpp
 
 )
