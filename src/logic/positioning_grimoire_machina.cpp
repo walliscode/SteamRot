@@ -52,17 +52,6 @@ void compute_socket_local_positions_even_spread(
 }
 
 /////////////////////////////////////////////////
-void initialize_joint_socket_positions(JointInstance &joint_instance) {
-  const auto &config = joint_instance.joint->socket_config;
-
-  // pass the origin and local_positions vector by reference to be filled in by
-  // the helper
-  compute_socket_local_positions_even_spread(
-      config, joint_instance.joint->origin,
-      joint_instance.socket_local_positions);
-}
-
-/////////////////////////////////////////////////
 void position_first_part_of_machina_form_scaffold(PartMap &parts) {
   // check that parts is not empty, if not return early
   if (parts.empty()) {
@@ -109,9 +98,6 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
     joint_instance->transform.translate(-joint_instance->joint->origin);
-
-    // initialise socket positions now that the transform is established
-    initialize_joint_socket_positions(*joint_instance);
 
     return;
   }

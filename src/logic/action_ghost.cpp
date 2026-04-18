@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "action_ghost.h"
 #include "EventPayload.h"
-#include "positioning_grimoire_machina.h"
 
 namespace steamrot::logic::action::ghost {
 
@@ -29,10 +28,7 @@ void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection,
   } else if (const auto *tag = std::get_if<JointTag>(&selection)) {
     auto it = grimoire->m_all_joints.find(tag->key);
     if (it != grimoire->m_all_joints.end()) {
-      JointInstance instance{&it->second};
-      positioning::grimoire_machina::initialize_joint_socket_positions(
-          instance);
-      mr_ghost.m_instance = std::move(instance);
+      mr_ghost.m_instance = JointInstance{&it->second};
     }
   }
 }

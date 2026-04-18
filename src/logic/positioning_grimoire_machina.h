@@ -36,15 +36,6 @@ void compute_socket_local_positions_even_spread(
     std::vector<sf::Vector2f> &local_positions);
 
 /////////////////////////////////////////////////
-/// @brief Initialise all socket_local_positions entries on a JointInstance by
-/// computing each socket's position from the Joint's SocketConfig at zero ring
-/// rotation.
-///
-/// @param joint_instance JointInstance whose socket_local_positions to fill.
-/////////////////////////////////////////////////
-void initialize_joint_socket_positions(JointInstance &joint_instance);
-
-/////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at
 /// 0,0 of the canvas
 /////////////////////////////////////////////////

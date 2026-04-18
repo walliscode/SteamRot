@@ -15,6 +15,9 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/System/Angle.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <cmath>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -52,12 +55,44 @@ struct SocketState {
 };
 
 /////////////////////////////////////////////////
+/// @struct SocketData
+/// @brief Bundles the immutable local position and mutable runtime state for a
+/// single socket on a placed part instance.
+///
+/// @c local_position is set once at construction and cannot be changed
+/// afterwards. @c state holds the mutable connection status and hover flag
+/// that are updated each tick by Logic.
+/////////////////////////////////////////////////
+struct SocketData {
+  /////////////////////////////////////////////////
+  /// @brief Construct a SocketData with the given local-space position.
+  ///
+  /// @param pos Local-space position of this socket.
+  /////////////////////////////////////////////////
+  explicit SocketData(sf::Vector2f pos) : local_position{pos} {}
+
+  /////////////////////////////////////////////////
+  /// @brief Immutable local-space position of this socket.
+  ///
+  /// Set once at construction from the owning Part definition and never
+  /// changed. Apply the owning instance's transform to obtain the world-space
+  /// position.
+  /////////////////////////////////////////////////
+  const sf::Vector2f local_position;
+
+  /////////////////////////////////////////////////
+  /// @brief Mutable runtime state of this socket (connection status, hover).
+  /////////////////////////////////////////////////
+  SocketState state{};
+};
+
+/////////////////////////////////////////////////
 /// @struct PartInstance
 /// @brief Common base for all placed instances on the MachinaFormScaffold.
 ///
-/// Holds the stable unique ID, the world-space transform, and the per-socket
-/// runtime state that are shared by every placed part. Derive from this struct
-/// rather than duplicating these fields in JointInstance and FragmentInstance.
+/// Holds the stable unique ID and the world-space transform shared by every
+/// placed part. Socket data (position + state) is held in the concrete
+/// subtype's @c sockets vector, which is fully initialised at construction.
 /////////////////////////////////////////////////
 struct PartInstance {
   /////////////////////////////////////////////////
@@ -79,11 +114,6 @@ struct PartInstance {
   /// @brief Single transform that positions this instance on the canvas.
   /////////////////////////////////////////////////
   sf::Transform transform{sf::Transform::Identity};
-
-  /////////////////////////////////////////////////
-  /// @brief Per-socket runtime state (connection status, hover).
-  /////////////////////////////////////////////////
-  std::vector<SocketState> socket_states;
 };
 
 /////////////////////////////////////////////////
@@ -91,21 +121,19 @@ struct PartInstance {
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
 /// Derives from PartInstance and adds Joint-specific runtime state.
-/// Each socket's local-space position is stored in socket_local_positions and
-/// initialised from the Joint's SocketConfig at construction time. Positioning
-/// Logic may update individual entries to reposition sockets independently.
-/// World-space position of socket i is obtained via:
-///   transform.transformPoint(socket_local_positions[i])
+/// All socket data (local position + runtime state) is stored in the @c sockets
+/// vector, which is fully computed from the Joint's SocketConfig at
+/// construction time and never resized afterwards. World-space position of
+/// socket i is obtained via:
+///   transform.transformPoint(sockets[i].local_position)
 /////////////////////////////////////////////////
 struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a JointInstance from a Joint definition.
   ///
-  /// Initialises socket_states with one default-constructed SocketState per
-  /// socket described by the Joint's SocketConfig, and reserves
-  /// socket_local_positions to the same count. Actual position values are
-  /// filled in by positioning Logic (e.g. via
-  /// positioning_grimoire_machina::initialize_joint_socket_positions).
+  /// Computes every socket's local-space position from the Joint's SocketConfig
+  /// and stores it alongside a default-constructed SocketState in @c sockets.
+  /// No further resizing or position assignment is needed after construction.
   ///
   /// @param joint_ptr         Pointer to the Joint definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
@@ -113,11 +141,27 @@ struct JointInstance : public PartInstance {
   JointInstance(Joint *joint_ptr,
                 sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, joint{joint_ptr} {
-    if (joint_ptr) {
-      const size_t count =
-          static_cast<size_t>(joint_ptr->socket_config.socket_count);
-      socket_states.resize(count);
-      socket_local_positions.resize(count);
+    if (!joint_ptr)
+      return;
+
+    const auto &config = joint_ptr->socket_config;
+    if (config.socket_count == 0)
+      return;
+
+    const float arc_min = config.rotation_arc_min;
+    const float arc_max = config.rotation_arc_max;
+    const float arc_range = arc_max - arc_min;
+    const float angle_between = arc_range / (config.socket_count + 1);
+
+    sockets.reserve(config.socket_count);
+    for (int i = 0; i < config.socket_count; ++i) {
+      const float angle_deg = arc_min + angle_between * (i + 1);
+      const float angle_rad = sf::degrees(angle_deg).asRadians();
+      const sf::Vector2f pos =
+          joint_ptr->origin +
+          sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
+              config.radius;
+      sockets.emplace_back(pos);
     }
   }
 
@@ -127,13 +171,14 @@ struct JointInstance : public PartInstance {
   Joint *joint{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Local-space positions of all sockets for this Joint instance.
+  /// @brief Per-socket data (immutable local position + mutable state) for
+  /// this Joint instance.
   ///
-  /// Initialised from the Joint's SocketConfig at construction. Positioning
-  /// Logic may update individual entries to reposition sockets independently of
-  /// one another. Apply the instance's transform to convert to world space.
+  /// Fully initialised from the Joint's SocketConfig at construction. Apply
+  /// the instance's transform to @c sockets[i].local_position to obtain the
+  /// world-space position of socket @c i.
   /////////////////////////////////////////////////
-  std::vector<sf::Vector2f> socket_local_positions;
+  std::vector<SocketData> sockets;
 };
 
 /////////////////////////////////////////////////
@@ -141,15 +186,18 @@ struct JointInstance : public PartInstance {
 /// @brief A placed instance of a Fragment on the MachinaFormScaffold.
 ///
 /// Derives from PartInstance and adds Fragment-specific runtime state.
-/// World positions for sockets are derived on demand via:
-///   transform.transformPoint(fragment.sockets[i])
+/// All socket data (local position + runtime state) is stored in the @c sockets
+/// vector, which is fully initialised at construction from the Fragment
+/// definition's socket positions. World position of socket i is obtained via:
+///   transform.transformPoint(sockets[i].local_position)
 /////////////////////////////////////////////////
 struct FragmentInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a FragmentInstance from a Fragment definition.
   ///
-  /// Initialises socket_states with one default-constructed SocketState per
-  /// socket in the Fragment definition.
+  /// Populates @c sockets with one SocketData per socket in the Fragment
+  /// definition, copying the local position and default-constructing the
+  /// SocketState. No further resizing or position assignment is needed.
   ///
   /// @param fragment_ptr      Pointer to the Fragment definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
@@ -158,7 +206,10 @@ struct FragmentInstance : public PartInstance {
                    sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, fragment{fragment_ptr} {
     if (fragment_ptr) {
-      socket_states.resize(fragment_ptr->sockets.size());
+      sockets.reserve(fragment_ptr->sockets.size());
+      for (const auto &pos : fragment_ptr->sockets) {
+        sockets.emplace_back(pos);
+      }
     }
   }
 
@@ -166,6 +217,16 @@ struct FragmentInstance : public PartInstance {
   /// @brief Pointer to the Fragment definition being referenced.
   /////////////////////////////////////////////////
   Fragment *fragment{nullptr};
+
+  /////////////////////////////////////////////////
+  /// @brief Per-socket data (immutable local position + mutable state) for
+  /// this Fragment instance.
+  ///
+  /// Fully initialised from the Fragment definition at construction. Apply
+  /// the instance's transform to @c sockets[i].local_position to obtain the
+  /// world-space position of socket @c i.
+  /////////////////////////////////////////////////
+  std::vector<SocketData> sockets;
 };
 
 /////////////////////////////////////////////////
@@ -189,8 +250,7 @@ struct Connection {
     uint32_t part_id{0};
 
     /////////////////////////////////////////////////
-    /// @brief Index into that instance's socket_states (and the Part
-    /// definition's sockets vector).
+    /// @brief Index into that instance's sockets vector.
     /////////////////////////////////////////////////
     size_t socket_index{0};
   };
