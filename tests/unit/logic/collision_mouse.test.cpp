@@ -80,8 +80,6 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
     // Single socket at local (100, 0) via socket_config (radius=100, angle=0)
     joint.socket_config.socket_count = 1;
     joint.socket_config.radius = 100.f;
-    joint.socket_config.arc_min = 0.f;
-    joint.socket_config.arc_max = 0.f;
     joint.socket_config.has_fixed_socket = false;
     steamrot::JointInstance joint_instance{joint};
     sf::Vector2f world_mouse{103.f, 3.f};
@@ -94,8 +92,6 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
     steamrot::Joint joint;
     joint.socket_config.socket_count = 1;
     joint.socket_config.radius = 100.f;
-    joint.socket_config.arc_min = 0.f;
-    joint.socket_config.arc_max = 0.f;
     joint.socket_config.has_fixed_socket = false;
     steamrot::JointInstance joint_instance{joint};
     sf::Vector2f world_mouse{200.f, 200.f};

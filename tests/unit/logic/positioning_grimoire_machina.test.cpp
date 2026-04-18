@@ -139,3 +139,76 @@ TEST_CASE("position_first_part_of_machina_form tests",
                  steamrot::tests::EqualsVector2f(expected_position));
   }
 }
+
+TEST_CASE("compute_socket_local_positions_even_spread tests",
+          "[positioning_grimoire_machina]") {
+  // Arrange
+  steamrot::SocketConfig config;
+  sf::Vector2f origin{0.f, 0.f};
+  std::vector<sf::Vector2f> local_positions; // prepare vector for 3 sockets
+
+  SECTION("Does not throw with zero sockets") {
+
+    // Arrange
+    config.socket_count = 0;
+    // Act & Assert
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        compute_socket_local_positions_even_spread(
+                            config, origin, local_positions));
+  }
+  SECTION("Clears and resizes local_positions to socket_count") {
+    // Arrange
+    config.socket_count = 3;
+    local_positions = {{1.f, 1.f},
+                       {2.f, 2.f},
+                       {3.f, 3.f},
+                       {4.f, 4.f}}; // start with 4 positions
+    // Act
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        compute_socket_local_positions_even_spread(
+                            config, origin, local_positions));
+    // Assert: local_positions should be cleared and resized to 3
+    REQUIRE(local_positions.size() == 3);
+  }
+  SECTION("Places one socket at the centre of the arc") {
+    // Arrange
+    config.socket_count = 1;
+    config.radius = 10.f;
+    config.rotation_arc_min = 0.f;
+    config.rotation_arc_max = 90.f; // arc from 0° to 90°, so centre is 45°
+    // Act
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        compute_socket_local_positions_even_spread(
+                            config, origin, local_positions));
+
+    // Assert: socket should be at radius distance from origin at 45°
+    sf::Vector2f expected_position{7.071f,
+                                   7.071f}; // (10 * cos(45°), 10 * sin(45°))
+    REQUIRE_THAT(local_positions[0],
+                 steamrot::tests::EqualsVector2f(expected_position, 0.001f));
+  }
+
+  SECTION("Evenly spaces two sockets around the arc") {
+    // Arrange
+    config.socket_count = 2;
+    config.radius = 10.f;
+    config.rotation_arc_min = 0.f;
+    config.rotation_arc_max = 90.f; // arc from 0° to 90°
+    // Act
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        compute_socket_local_positions_even_spread(
+                            config, origin, local_positions));
+    // Assert: sockets should be at radius distance from origin at 30° and
+    // 60°
+    sf::Vector2f expected_position_1{8.660f,
+                                     5.f}; // (10 * cos(30°), 10 * sin(30°))
+    sf::Vector2f expected_position_2{5.f,
+                                     8.660f}; // (10 * cos(60°), 10 * sin(60°))
+    // socket 1 should be at 30°
+    // socket 2 should be at 60°
+    REQUIRE_THAT(local_positions[0],
+                 steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+    REQUIRE_THAT(local_positions[1],
+                 steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
+  }
+}

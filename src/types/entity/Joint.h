@@ -13,6 +13,8 @@
 /////////////////////////////////////////////////
 #include "Part.h"
 #include <SFML/System/Vector2.hpp>
+#include <cstdint>
+#include <sys/types.h>
 
 namespace steamrot {
 
@@ -30,28 +32,21 @@ namespace steamrot {
 /// Remaining sockets rotate with the ring.
 /////////////////////////////////////////////////
 struct SocketConfig {
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor
+  /////////////////////////////////////////////////
+  SocketConfig() = default;
+
   /////////////////////////////////////////////////
   /// @brief Total number of sockets including the fixed anchor (if present).
   /////////////////////////////////////////////////
-  int socket_count{0};
+  uint8_t socket_count{0};
 
   /////////////////////////////////////////////////
   /// @brief Distance of all sockets from the Joint's local origin.
   /////////////////////////////////////////////////
   float radius{10.f};
-
-  /////////////////////////////////////////////////
-  /// @brief Start angle (degrees) of the socket distribution arc.
-  /////////////////////////////////////////////////
-  float arc_min{0.f};
-
-  /////////////////////////////////////////////////
-  /// @brief End angle (degrees) of the socket distribution arc.
-  ///
-  /// When arc_max - arc_min == 360, sockets are distributed over a full
-  /// circle without duplicating the start/end position.
-  /////////////////////////////////////////////////
-  float arc_max{360.f};
 
   /////////////////////////////////////////////////
   /// @brief Minimum angular separation (degrees) between adjacent rotatable

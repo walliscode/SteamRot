@@ -14,52 +14,52 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
-sf::Vector2f compute_socket_local_pos(const SocketConfig &config,
-                                      size_t socket_index,
-                                      float ring_rotation) {
-  // Fixed anchor socket: sits at fixed_socket_angle and does not rotate
-  if (config.has_fixed_socket && socket_index == 0) {
-    const float rad = sf::degrees(config.fixed_socket_angle).asRadians();
-    return {config.radius * std::cos(rad), config.radius * std::sin(rad)};
+void compute_socket_local_positions_even_spread(
+    const SocketConfig &config, sf::Vector2f &origin,
+    std::vector<sf::Vector2f> &local_positions) {
+
+  // if no sockets, return early (also avoids divide by zero in later
+  // calculations)
+  if (config.socket_count == 0) {
+    return;
+  }
+  // extra guard statement to prevent undefined access
+  local_positions.clear();
+  local_positions.resize(config.socket_count);
+
+  // calculate the angle at which to place the socket(s) using the socket
+  // config's arc min and mx and socket count
+  const float arc_min = config.rotation_arc_min;
+  const float arc_max = config.rotation_arc_max;
+  const float arc_range = arc_max - arc_min;
+  const float angle_between_sockets = arc_range / (config.socket_count + 1);
+
+  // The following logic can change:
+  // sockets are not placed on the arc endpoints, so we add
+  // angle_between_sockets to arc_min to get the angle of the first socket, and
+  // then add angle_between_sockets for each subsequent socket
+
+  for (int i = 0; i < config.socket_count; ++i) {
+    const float angle_deg = arc_min + angle_between_sockets * (i + 1);
+    const float angle_rad = sf::degrees(angle_deg).asRadians();
+
+    local_positions[i] =
+        origin +
+        sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
   }
 
-  // Offset index to account for fixed socket occupying slot 0
-  const size_t rot_index =
-      config.has_fixed_socket ? socket_index - 1 : socket_index;
-  const size_t rot_count =
-      config.has_fixed_socket
-          ? static_cast<size_t>(config.socket_count) - 1
-          : static_cast<size_t>(config.socket_count);
-
-  float base_angle_deg;
-  if (rot_count <= 1) {
-    base_angle_deg = (config.arc_min + config.arc_max) / 2.f;
-  } else {
-    const float span = config.arc_max - config.arc_min;
-    // Full circle: avoid duplicating the start/end position
-    if (std::abs(span - 360.f) < 1e-3f) {
-      base_angle_deg = config.arc_min + static_cast<float>(rot_index) *
-                                            360.f /
-                                            static_cast<float>(rot_count);
-    } else {
-      base_angle_deg = config.arc_min + static_cast<float>(rot_index) * span /
-                                            static_cast<float>(rot_count - 1);
-    }
-  }
-
-  const float rad = sf::degrees(base_angle_deg + ring_rotation).asRadians();
-  return {config.radius * std::cos(rad), config.radius * std::sin(rad)};
+  return;
 }
 
 /////////////////////////////////////////////////
 void initialize_joint_socket_positions(JointInstance &joint_instance) {
   const auto &config = joint_instance.joint.socket_config;
-  const size_t count = static_cast<size_t>(config.socket_count);
-  joint_instance.socket_local_positions.resize(count);
-  for (size_t i = 0; i < count; ++i) {
-    joint_instance.socket_local_positions[i] =
-        compute_socket_local_pos(config, i, 0.f);
-  }
+
+  // pass the origin and local_positions vector by reference to be filled in by
+  // the helper
+  compute_socket_local_positions_even_spread(
+      config, joint_instance.joint.origin,
+      joint_instance.socket_local_positions);
 }
 
 /////////////////////////////////////////////////

@@ -171,8 +171,6 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   // socket_count=1, radius=25, arc_min=arc_max=0 -> local pos (25, 0)
   joint.socket_config.socket_count = 1;
   joint.socket_config.radius = 25.f;
-  joint.socket_config.arc_min = 0.f;
-  joint.socket_config.arc_max = 0.f;
   joint.socket_config.has_fixed_socket = false;
   grimoire.m_all_joints.insert({name, std::move(joint)});
   return grimoire;

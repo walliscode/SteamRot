@@ -113,10 +113,9 @@ struct JointInstance : public PartInstance {
   JointInstance(Joint &joint_ref,
                 sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, joint{joint_ref} {
-    const size_t count =
-        static_cast<size_t>(joint_ref.socket_config.socket_count);
-    socket_states.resize(count);
-    socket_local_positions.resize(count);
+
+    // Initialise socket_states
+    socket_states.resize(joint_ref.socket_config.socket_count);
   }
 
   /////////////////////////////////////////////////
@@ -155,6 +154,7 @@ struct FragmentInstance : public PartInstance {
   FragmentInstance(Fragment &fragment_ref,
                    sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, fragment{fragment_ref} {
+
     socket_states.resize(fragment_ref.sockets.size());
   }
 

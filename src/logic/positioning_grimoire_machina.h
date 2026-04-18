@@ -18,24 +18,22 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
-/// @brief Compute the local-space position of a single socket on a Joint.
+/// @brief Calculates an even spread of socket local positions for a Joint based
+/// on its SocketConfig.
 ///
-/// Fixed anchor sockets (socket index 0 when SocketConfig::has_fixed_socket is
-/// true) are placed at SocketConfig::fixed_socket_angle and are not affected by
-/// @p ring_rotation. All other sockets are distributed evenly within the arc
-/// [arc_min, arc_max] and then rotated by @p ring_rotation.
+/// This uses the rotation_arc_min and rotation_arc_max to determine the upper
+/// and lower bounds of the arc. This arc distance is divided evenly to
+/// calculate the positions of the sockets.
 ///
-/// When the arc spans exactly 360 degrees, sockets are distributed with equal
-/// spacing and no duplicate at the wrap-around point.
-///
-/// @param config       SocketConfig describing the Joint's socket layout.
-/// @param socket_index Index of the socket to compute (0-based).
-/// @param ring_rotation Current rotation of the socket ring in degrees.
-/// @return Local-space position of the requested socket.
+/// @param config SocketConfig to calculate from
+/// @param origin Local origin of the Joint, used as the center point for
+/// calculating socket
+/// @param local_positions All the local positions of the sockets will be
+/// written into this vector.
 /////////////////////////////////////////////////
-sf::Vector2f compute_socket_local_pos(const SocketConfig &config,
-                                      size_t socket_index,
-                                      float ring_rotation = 0.f);
+void compute_socket_local_positions_even_spread(
+    const SocketConfig &config, sf::Vector2f &origin,
+    std::vector<sf::Vector2f> &local_positions);
 
 /////////////////////////////////////////////////
 /// @brief Initialise all socket_local_positions entries on a JointInstance by

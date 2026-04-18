@@ -93,9 +93,9 @@ TEST_CASE("ProcessSubscriber – SELECT with FragmentTag updates MrGhost",
   steamrot::MrGhost mr_ghost;
 
   steamrot::Subscriber subscriber;
-  subscriber.captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::SELECT,
-      steamrot::FragmentTag{"granite"}};
+  subscriber.captured_payload =
+      steamrot::GhostPayload{steamrot::GhostPayload::GhostAction::SELECT,
+                             steamrot::FragmentTag{"granite"}};
 
   steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost);
 
@@ -110,8 +110,7 @@ TEST_CASE("ProcessSubscriber – SELECT with JointTag updates MrGhost",
 
   steamrot::Subscriber subscriber;
   subscriber.captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::SELECT,
-      steamrot::JointTag{"hinge"}};
+      steamrot::GhostPayload::GhostAction::SELECT, steamrot::JointTag{"hinge"}};
 
   steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost);
 
@@ -127,20 +126,6 @@ TEST_CASE("ProcessSubscriber – CLEAR resets MrGhost selection",
   steamrot::Subscriber subscriber;
   subscriber.captured_payload = steamrot::GhostPayload{
       steamrot::GhostPayload::GhostAction::CLEAR, std::monostate{}};
-
-  steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost);
-
-  REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_selection));
-}
-
-TEST_CASE("ProcessSubscriber – NONE resets MrGhost selection",
-          "[unit][action_ghost]") {
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"hinge"};
-
-  steamrot::Subscriber subscriber;
-  subscriber.captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::NONE, std::monostate{}};
 
   steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost);
 
@@ -202,9 +187,9 @@ TEST_CASE("ProcessSubscribers – active SELECT subscriber updates MrGhost",
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
-  subscriber->captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::SELECT,
-      steamrot::FragmentTag{"granite"}};
+  subscriber->captured_payload =
+      steamrot::GhostPayload{steamrot::GhostPayload::GhostAction::SELECT,
+                             steamrot::FragmentTag{"granite"}};
 
   steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost);
 

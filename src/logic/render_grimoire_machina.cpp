@@ -92,6 +92,8 @@ void draw_fragment_instance_sockets(sf::RenderTexture &texture,
 void draw_joint_instance_sockets(sf::RenderTexture &texture,
                                  JointInstance &joint_instance) {
   for (size_t i = 0; i < joint_instance.socket_states.size(); ++i) {
+    // transform the socket's local position to get its world position, then
+    // draw
     const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
         joint_instance.socket_local_positions[i]);
     draw_socket(texture, world_pos, joint_instance.socket_states[i]);

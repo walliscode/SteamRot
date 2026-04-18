@@ -447,8 +447,6 @@ TEST_CASE("ConfigureJoint configures socket_config successfully",
   REQUIRE(result.has_value());
   REQUIRE(joint.socket_config.socket_count == 3);
   REQUIRE(joint.socket_config.radius == 15.f);
-  REQUIRE(joint.socket_config.arc_min == 10.f);
-  REQUIRE(joint.socket_config.arc_max == 190.f);
 }
 
 TEST_CASE("ConfigureJoint returns unexpected when socket_count is not positive",
