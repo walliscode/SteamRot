@@ -7,10 +7,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "grimoire_machina_test_helpers.h"
 #include "render_grimoire_machina.h"
-#include "Fragment.h"
 #include "GrimoireMachina.h"
-#include "Joint.h"
 #include "MachinaFormScaffold.h"
 #include "action_grimoire_machina.h"
 #include <SFML/Graphics/Color.hpp>
@@ -20,101 +19,6 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-namespace {
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Views object with a single coloured triangle in the
-/// Front slot.
-/////////////////////////////////////////////////
-steamrot::Views MakeViewsWithFrontTriangle(sf::Color colour = sf::Color::Red) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{10.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{15.f, 20.f}, colour});
-
-  steamrot::Views views;
-  views.insert_or_assign(steamrot::ViewDirection::Front, std::move(va));
-  return views;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Fragment with a coloured triangle in the Front slot.
-/////////////////////////////////////////////////
-steamrot::Fragment
-MakeFragmentWithFrontView(sf::Color colour = sf::Color::Green) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{5.f, 5.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{25.f, 5.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{15.f, 25.f}, colour});
-
-  steamrot::Fragment fragment;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           std::move(va));
-  return fragment;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Joint with a coloured triangle in the Front slot.
-/////////////////////////////////////////////////
-steamrot::Joint MakeJointWithFrontView(sf::Color colour = sf::Color::Blue) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{10.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{30.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 30.f}, colour});
-
-  steamrot::Joint joint;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        std::move(va));
-  return joint;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Fragment with a socket at (0,0) and a coloured
-/// triangle in the Front slot, placed at origin.
-///
-/// Vertices at (0,0),(20,0),(10,20): bounds position={0,0} size={20,20},
-/// true centroid = (10, 6.67) ≈ pixel (10, 7).
-/////////////////////////////////////////////////
-steamrot::Fragment
-MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{0.f, 0.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 0.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, colour});
-
-  steamrot::Fragment fragment;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           std::move(va));
-  fragment.sockets = {{5.f, 5.f}};
-  return fragment;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Joint with a single socket at local (5,0) and a
-/// colored triangle in the Front slot, placed at origin.
-///
-/// SocketConfig: socket_count=1, radius=5, arc_min=arc_max=0 (angle 0°) so the
-/// socket lands at local (5, 0). Callers that need a specific world position
-/// can translate by (world_x - 5, world_y).
-/////////////////////////////////////////////////
-steamrot::Joint
-MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{0.f, 0.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 0.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, colour});
-
-  steamrot::Joint joint;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        std::move(va));
-  joint.socket_config.socket_count = 1;
-  joint.socket_config.radius = 5.f;
-  joint.socket_config.has_fixed_socket = false;
-  return joint;
-}
-
-} // anonymous namespace
-
 /////////////////////////////////////////////////
 /// draw_view tests
 /////////////////////////////////////////////////
@@ -122,7 +26,7 @@ MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue) {
 TEST_CASE("draw_view draws a populated view without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto views = MakeViewsWithFrontTriangle();
+  auto views = steamrot::tests::MakeViewsWithFrontTriangle();
 
   REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front));
@@ -142,7 +46,7 @@ TEST_CASE("draw_view produces pixels for a Front-direction triangle",
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  auto views = MakeViewsWithFrontTriangle(sf::Color::Red);
+  auto views = steamrot::tests::MakeViewsWithFrontTriangle(sf::Color::Red);
   steamrot::logic::render::grimoire_machina::draw_view(
       texture, views, steamrot::ViewDirection::Front);
   texture.display();
@@ -191,7 +95,7 @@ TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  auto fragment = MakeFragmentWithFrontView(sf::Color::Green);
+  auto fragment = steamrot::tests::MakeFragmentWithFrontView(sf::Color::Green);
 
   sf::RenderStates states;
   states.transform.translate({10.f, 10.f});
@@ -211,7 +115,7 @@ TEST_CASE("draw_view with RenderStates draws Joint movement_views at "
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  auto joint = MakeJointWithFrontView(sf::Color::Blue);
+  auto joint = steamrot::tests::MakeJointWithFrontView(sf::Color::Blue);
 
   sf::RenderStates states;
   states.transform.translate({10.f, 10.f});
@@ -276,7 +180,7 @@ TEST_CASE(
     "draw_fragment_instance_sockets draws socket circles without throwing",
     "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto fragment = MakeFragmentWithOriginTriangle();
+  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle();
 
   sf::Transform t;
   t.translate({50.f, 50.f});
@@ -294,7 +198,7 @@ TEST_CASE(
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  auto fragment = MakeFragmentWithOriginTriangle();
+  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle();
   // socket is at local (5,5); translate by (40,40) → world pos (45,45)
   sf::Transform t;
   t.translate({40.f, 40.f});
@@ -316,7 +220,7 @@ TEST_CASE(
 TEST_CASE("draw_joint_instance_sockets draws socket circles without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto joint = MakeJointWithOriginTriangle();
+  auto joint = steamrot::tests::MakeJointWithOriginTriangle();
 
   sf::Transform t;
   t.translate({50.f, 50.f});
@@ -336,7 +240,7 @@ TEST_CASE("draw_fragment_instance draws fragment geometry and sockets without "
           "throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto fragment = MakeFragmentWithOriginTriangle();
+  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle();
 
   sf::Transform t;
   t.translate({10.f, 10.f});
@@ -351,7 +255,7 @@ TEST_CASE("draw_fragment_instance draws fragment but no sockets when "
           "draw_sockets is false",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto fragment = MakeFragmentWithOriginTriangle();
+  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle();
   sf::Transform t;
   t.translate({10.f, 10.f});
   steamrot::FragmentInstance instance{&fragment, t};
@@ -377,7 +281,7 @@ TEST_CASE("draw_fragment_instance renders fragment view and sockets at "
   // Triangle at (0,0),(20,0),(10,20); translate by (10,10) →
   // (10,10),(30,10),(20,30). True centroid = (20, 16.67); integer pixel (20,17)
   // should be green.
-  auto fragment = MakeFragmentWithOriginTriangle(sf::Color::Green);
+  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle(sf::Color::Green);
 
   sf::Transform t;
   t.translate({10.f, 10.f});
@@ -403,7 +307,7 @@ TEST_CASE("draw_joint_instance draws joint geometry and sockets without "
           "throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto joint = MakeJointWithOriginTriangle();
+  auto joint = steamrot::tests::MakeJointWithOriginTriangle();
 
   sf::Transform t;
   t.translate({10.f, 10.f});
@@ -418,7 +322,7 @@ TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
           "false",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  auto joint = MakeJointWithOriginTriangle();
+  auto joint = steamrot::tests::MakeJointWithOriginTriangle();
   sf::Transform t;
   t.translate({10.f, 10.f});
   steamrot::JointInstance instance{&joint, t};
@@ -444,7 +348,7 @@ TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
 //   // (10,10),(30,10),(20,30). True centroid = (20, 16.67); integer pixel
 //   (20,17)
 //   // should be blue.
-//   auto joint = MakeJointWithOriginTriangle(sf::Color::Blue);
+//   auto joint = steamrot::tests::MakeJointWithOriginTriangle(sf::Color::Blue);
 //
 //   sf::Transform t;
 //   t.translate({10.f, 10.f});
@@ -485,7 +389,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_fragments["frag"] = MakeFragmentWithOriginTriangle();
+  grimoire_machina.m_all_fragments["frag"] = steamrot::tests::MakeFragmentWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance =
@@ -506,7 +410,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_joints["joint"] = MakeJointWithOriginTriangle();
+  grimoire_machina.m_all_joints["joint"] = steamrot::tests::MakeJointWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance =

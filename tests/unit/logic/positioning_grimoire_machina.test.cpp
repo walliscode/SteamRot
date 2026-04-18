@@ -6,59 +6,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "grimoire_machina_test_helpers.h"
 #include "positioning_grimoire_machina.h"
-#include "Fragment.h"
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Views object with a single coloured triangle in the
-/// Front slot.
-/////////////////////////////////////////////////
-steamrot::Views MakeViewsWithFrontTriangle(sf::Color colour = sf::Color::Red) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{10.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{15.f, 20.f}, colour});
-
-  steamrot::Views views;
-  views.insert_or_assign(steamrot::ViewDirection::Front, std::move(va));
-  return views;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Fragment with a coloured triangle in the Front slot.
-/////////////////////////////////////////////////
-steamrot::Fragment
-MakeFragmentWithFrontView(sf::Color colour = sf::Color::Green) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{5.f, 5.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{25.f, 5.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{15.f, 25.f}, colour});
-
-  steamrot::Fragment fragment;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           std::move(va));
-  return fragment;
-}
-
-/////////////////////////////////////////////////
-/// @brief Helper: build a Joint with a coloured triangle in the Front slot.
-/////////////////////////////////////////////////
-steamrot::Joint MakeJointWithFrontView(sf::Color colour = sf::Color::Blue) {
-  sf::VertexArray va(sf::PrimitiveType::Triangles);
-  va.append(sf::Vertex{sf::Vector2f{10.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{30.f, 10.f}, colour});
-  va.append(sf::Vertex{sf::Vector2f{20.f, 30.f}, colour});
-
-  steamrot::Joint joint;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        std::move(va));
-  return joint;
-}
 
 TEST_CASE("position_first_part_of_machina_form tests",
           "[positioning_grimoire_machina]") {
@@ -88,7 +42,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
 
   SECTION("Positions centre of first Fragmentinstance's FRONT view at 0,0") {
     // Arrange
-    auto fragment = MakeFragmentWithFrontView();
+    auto fragment = steamrot::tests::MakeFragmentWithFrontView();
     steamrot::FragmentInstance fragment_instance{fragment};
     fragment_instance.id = 0;
     parts.emplace(fragment_instance.id, fragment_instance);
@@ -115,7 +69,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
 
   SECTION("Positions origin of first JointInstance at 0,0") {
     // Arrange
-    auto joint = MakeJointWithFrontView();
+    auto joint = steamrot::tests::MakeJointWithFrontView();
     joint.origin = {5.f, 5.f}; // set origin to (5,5)
     steamrot::JointInstance joint_instance{joint};
     joint_instance.id = 0;

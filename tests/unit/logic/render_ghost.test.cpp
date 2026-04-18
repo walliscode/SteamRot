@@ -6,12 +6,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "grimoire_machina_test_helpers.h"
 #include "render_ghost.h"
 #include "Fragment.h"
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
 #include "MrGhost.h"
-#include "ViewDirection.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
