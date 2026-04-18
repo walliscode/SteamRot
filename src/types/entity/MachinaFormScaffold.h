@@ -107,22 +107,24 @@ struct JointInstance : public PartInstance {
   /// filled in by positioning Logic (e.g. via
   /// positioning_grimoire_machina::initialize_joint_socket_positions).
   ///
-  /// @param joint_ref         Joint definition to reference.
+  /// @param joint_ptr         Pointer to the Joint definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
-  JointInstance(Joint &joint_ref,
+  JointInstance(Joint *joint_ptr,
                 sf::Transform initial_transform = sf::Transform::Identity)
-      : PartInstance{initial_transform}, joint{joint_ref} {
-    const size_t count =
-        static_cast<size_t>(joint_ref.socket_config.socket_count);
-    socket_states.resize(count);
-    socket_local_positions.resize(count);
+      : PartInstance{initial_transform}, joint{joint_ptr} {
+    if (joint_ptr) {
+      const size_t count =
+          static_cast<size_t>(joint_ptr->socket_config.socket_count);
+      socket_states.resize(count);
+      socket_local_positions.resize(count);
+    }
   }
 
   /////////////////////////////////////////////////
-  /// @brief Joint definition being referenced.
+  /// @brief Pointer to the Joint definition being referenced.
   /////////////////////////////////////////////////
-  Joint &joint;
+  Joint *joint{nullptr};
 
   /////////////////////////////////////////////////
   /// @brief Local-space positions5of all sockets for this Joint instance.
@@ -149,19 +151,21 @@ struct FragmentInstance : public PartInstance {
   /// Initialises socket_states with one default-constructed SocketState per
   /// socket in the Fragment definition.
   ///
-  /// @param fragment_ref      Fragment definition to reference.
+  /// @param fragment_ptr      Pointer to the Fragment definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
-  FragmentInstance(Fragment &fragment_ref,
+  FragmentInstance(Fragment *fragment_ptr,
                    sf::Transform initial_transform = sf::Transform::Identity)
-      : PartInstance{initial_transform}, fragment{fragment_ref} {
-    socket_states.resize(fragment_ref.sockets.size());
+      : PartInstance{initial_transform}, fragment{fragment_ptr} {
+    if (fragment_ptr) {
+      socket_states.resize(fragment_ptr->sockets.size());
+    }
   }
 
   /////////////////////////////////////////////////
-  /// @brief Fragment definition being referenced.
+  /// @brief Pointer to the Fragment definition being referenced.
   /////////////////////////////////////////////////
-  Fragment &fragment;
+  Fragment *fragment{nullptr};
 };
 
 /////////////////////////////////////////////////

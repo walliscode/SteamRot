@@ -114,7 +114,7 @@ TEST_CASE(
   steamrot::Fragment fragment;
   fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}, {50.f, 60.f}};
 
-  steamrot::FragmentInstance instance{fragment};
+  steamrot::FragmentInstance instance{&fragment};
 
   REQUIRE(instance.socket_states.size() == 3);
 }
@@ -125,9 +125,9 @@ TEST_CASE("FragmentInstance constructor stores the Fragment reference",
   fragment.name = "test_fragment";
   fragment.sockets = {{0.f, 0.f}};
 
-  steamrot::FragmentInstance instance{fragment};
+  steamrot::FragmentInstance instance{&fragment};
 
-  REQUIRE(&instance.fragment == &fragment);
+  REQUIRE(instance.fragment == &fragment);
 }
 
 TEST_CASE("FragmentInstance constructor stores the initial transform",
@@ -138,7 +138,7 @@ TEST_CASE("FragmentInstance constructor stores the initial transform",
   sf::Transform transform;
   transform.translate({50.f, 75.f});
 
-  steamrot::FragmentInstance instance{fragment, transform};
+  steamrot::FragmentInstance instance{&fragment, transform};
 
   REQUIRE(instance.transform == transform);
 }
@@ -149,7 +149,7 @@ TEST_CASE("FragmentInstance constructor with no sockets creates empty "
   steamrot::Fragment fragment;
   fragment.sockets = {};
 
-  steamrot::FragmentInstance instance{fragment};
+  steamrot::FragmentInstance instance{&fragment};
 
   REQUIRE(instance.socket_states.empty());
 }
@@ -159,7 +159,7 @@ TEST_CASE("FragmentInstance constructor initialises socket states to Available",
   steamrot::Fragment fragment;
   fragment.sockets = {{10.f, 20.f}, {30.f, 40.f}};
 
-  steamrot::FragmentInstance instance{fragment};
+  steamrot::FragmentInstance instance{&fragment};
 
   REQUIRE(instance.socket_states[0].state ==
           steamrot::SocketState::State::Available);
@@ -172,7 +172,7 @@ TEST_CASE("FragmentInstance id defaults to zero",
   steamrot::Fragment fragment;
   fragment.sockets = {{0.f, 0.f}};
 
-  steamrot::FragmentInstance instance{fragment};
+  steamrot::FragmentInstance instance{&fragment};
 
   REQUIRE(instance.id == 0u);
 }
@@ -186,7 +186,7 @@ TEST_CASE("JointInstance constructor creates one socket state per Joint socket",
   steamrot::Joint joint;
   joint.socket_config.socket_count = 2;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_states.size() == 2);
 }
@@ -197,9 +197,9 @@ TEST_CASE("JointInstance constructor stores the Joint reference",
   joint.name = "test_joint";
   joint.socket_config.socket_count = 1;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
-  REQUIRE(&instance.joint == &joint);
+  REQUIRE(instance.joint == &joint);
 }
 
 TEST_CASE("JointInstance constructor stores the initial transform",
@@ -210,7 +210,7 @@ TEST_CASE("JointInstance constructor stores the initial transform",
   sf::Transform transform;
   transform.translate({50.f, 75.f});
 
-  steamrot::JointInstance instance{joint, transform};
+  steamrot::JointInstance instance{&joint, transform};
 
   REQUIRE(instance.transform == transform);
 }
@@ -221,7 +221,7 @@ TEST_CASE("JointInstance constructor with socket_count zero creates empty "
   steamrot::Joint joint;
   joint.socket_config.socket_count = 0;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_states.empty());
 }
@@ -231,7 +231,7 @@ TEST_CASE("JointInstance constructor initialises socket states to Available",
   steamrot::Joint joint;
   joint.socket_config.socket_count = 2;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_states[0].state ==
           steamrot::SocketState::State::Available);
@@ -244,7 +244,7 @@ TEST_CASE("JointInstance id defaults to zero",
   steamrot::Joint joint;
   joint.socket_config.socket_count = 1;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.id == 0u);
 }
@@ -259,7 +259,7 @@ TEST_CASE("JointInstance constructor populates socket_local_positions for each "
   joint.socket_config.rotation_arc_max = 360.f;
   joint.socket_config.has_fixed_socket = false;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_local_positions.size() == 3u);
 }
@@ -274,7 +274,7 @@ TEST_CASE("JointInstance constructor socket_local_positions size matches "
   joint.socket_config.rotation_arc_max = 360.f;
   joint.socket_config.has_fixed_socket = false;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_local_positions.size() ==
           instance.socket_states.size());
@@ -286,7 +286,7 @@ TEST_CASE("JointInstance constructor with zero sockets has empty "
   steamrot::Joint joint;
   joint.socket_config.socket_count = 0;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   REQUIRE(instance.socket_local_positions.empty());
 }
@@ -301,7 +301,7 @@ TEST_CASE(
   joint.socket_config.rotation_arc_max = 360.f;
   joint.socket_config.has_fixed_socket = false;
 
-  steamrot::JointInstance instance{joint};
+  steamrot::JointInstance instance{&joint};
 
   for (size_t i = 0; i < 3u; ++i) {
     REQUIRE(instance.socket_local_positions[i].x == 0.f);
@@ -319,7 +319,7 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when no scaffold is active",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   REQUIRE_NOTHROW(
       steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
@@ -343,14 +343,14 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when ghost selection is monostate",
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
-TEST_CASE("PlaceGhostOnScaffold does nothing when fragment key not found",
+TEST_CASE("PlaceGhostOnScaffold does nothing when fragment pointer is null",
           "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"nonexistent_fragment"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{nullptr};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -358,14 +358,14 @@ TEST_CASE("PlaceGhostOnScaffold does nothing when fragment key not found",
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
-TEST_CASE("PlaceGhostOnScaffold does nothing when joint key not found",
+TEST_CASE("PlaceGhostOnScaffold does nothing when joint pointer is null",
           "[unit][actions][grimoire_machina][PlaceGhostOnScaffold]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"nonexistent_joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{nullptr};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -385,7 +385,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends fragment to scaffold",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -404,7 +404,7 @@ TEST_CASE(
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -424,7 +424,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: fragment instance has identity "
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -446,7 +446,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: appends joint to scaffold",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -464,7 +464,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: joint id and next_id are assigned",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -484,7 +484,7 @@ TEST_CASE(
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -508,7 +508,7 @@ TEST_CASE(
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   // Place the first piece successfully.
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
@@ -534,7 +534,7 @@ TEST_CASE(
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   // Place the first piece successfully.
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
@@ -562,7 +562,7 @@ TEST_CASE("PlaceGhostOnScaffold only places one fragment per game instance",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -584,7 +584,7 @@ TEST_CASE("PlaceGhostOnScaffold only places one joint per game instance",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
       grimoire_machina, mr_ghost);
@@ -608,7 +608,7 @@ TEST_CASE("PlaceFirstPiece does nothing when no scaffold is active",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   REQUIRE_NOTHROW(steamrot::logic::action::grimoire_machina::PlaceFirstPiece(
       grimoire_machina, mr_ghost));
@@ -625,7 +625,7 @@ TEST_CASE("PlaceFirstPiece does nothing when scaffold already has pieces",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   // Place the first piece.
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
@@ -653,14 +653,14 @@ TEST_CASE("PlaceFirstPiece does nothing when ghost selection is monostate",
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
-TEST_CASE("PlaceFirstPiece does nothing when fragment key not found",
+TEST_CASE("PlaceFirstPiece does nothing when fragment pointer is null",
           "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"nonexistent"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{nullptr};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -668,14 +668,14 @@ TEST_CASE("PlaceFirstPiece does nothing when fragment key not found",
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
-TEST_CASE("PlaceFirstPiece does nothing when joint key not found",
+TEST_CASE("PlaceFirstPiece does nothing when joint pointer is null",
           "[unit][actions][grimoire_machina][PlaceFirstPiece]") {
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"nonexistent"};
+  mr_ghost.m_instance = steamrot::JointInstance{nullptr};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -695,7 +695,7 @@ TEST_CASE("PlaceFirstPiece appends a fragment to an empty scaffold",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -713,7 +713,7 @@ TEST_CASE("PlaceFirstPiece appends a joint to an empty scaffold",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -731,7 +731,7 @@ TEST_CASE("PlaceFirstPiece assigns fragment id 0 and increments next_id",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -750,7 +750,7 @@ TEST_CASE("PlaceFirstPiece assigns joint id 0 and increments next_id",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -769,7 +769,7 @@ TEST_CASE("PlaceFirstPiece: placed fragment has identity transform",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -787,7 +787,7 @@ TEST_CASE("PlaceFirstPiece: placed joint has identity transform",
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -809,7 +809,7 @@ TEST_CASE("PlaceFirstPiece only places one piece per game instance",
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
 
   steamrot::logic::action::grimoire_machina::PlaceFirstPiece(grimoire_machina,
                                                              mr_ghost);
@@ -978,7 +978,7 @@ TEST_CASE(
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   grimoire_machina.m_all_fragments["frag"] = steamrot::Fragment{};
-  fixture.GetMrGhost().m_selection = steamrot::FragmentTag{"frag"};
+  fixture.GetMrGhost().m_instance = steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
   // scene_state.is_mouse_over_ui_layer defaults to false
 
   steamrot::Subscriber subscriber;
@@ -1004,7 +1004,7 @@ TEST_CASE("ProcessUserInputEvents: SELECT with valid conditions places joint",
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   grimoire_machina.m_all_joints["joint"] = steamrot::Joint{};
-  fixture.GetMrGhost().m_selection = steamrot::JointTag{"joint"};
+  fixture.GetMrGhost().m_instance = steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
 
   steamrot::Subscriber subscriber;
   subscriber.m_active = true;

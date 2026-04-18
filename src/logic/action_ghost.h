@@ -18,21 +18,21 @@
 namespace steamrot::logic::action::ghost {
 
 /////////////////////////////////////////////////
-/// @brief Apply a ghost selection to MrGhost.
+/// @brief Apply a ghost instance to MrGhost.
 ///
-/// Sets mr_ghost.m_selection to the provided @p selection value.
+/// Sets mr_ghost.m_instance to the provided @p instance value.
 /// Callers are responsible for choosing this function when the relevant
 /// GhostPayload::GhostAction is SELECT.
 ///
-/// @param mr_ghost  MrGhost instance to update.
-/// @param selection GhostSelection variant describing the chosen item.
+/// @param mr_ghost MrGhost instance to update.
+/// @param instance GhostInstance variant describing the chosen item.
 /////////////////////////////////////////////////
-void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection);
+void SelectGhostItem(MrGhost &mr_ghost, const GhostInstance &instance);
 
 /////////////////////////////////////////////////
-/// @brief Clear the current GhostSelection on MrGhost.
+/// @brief Clear the current ghost instance on MrGhost.
 ///
-/// Sets mr_ghost.m_selection to std::monostate, indicating no active
+/// Sets mr_ghost.m_instance to std::monostate, indicating no active
 /// selection. Callers are responsible for choosing this function when
 /// the relevant GhostPayload::GhostAction is CLEAR or NONE.
 ///

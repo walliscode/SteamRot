@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPayloadEqualsMatcher.h"
+#include "MrGhost.h"
 #include "conmat.h"
 #include "magic_enum/magic_enum.hpp"
 
@@ -259,42 +260,63 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
           << "\n";
     }
 
-    // Compare selection variant type index
-    if (actual_payload.m_selection.index() !=
-        expected_payload.m_selection.index()) {
+    // Compare instance variant type index
+    if (actual_payload.m_instance.index() !=
+        expected_payload.m_instance.index()) {
       oss << conmat::Indent(1) << conmat::TestFailed()
-          << "GhostPayload selection type differs:" << "\n";
+          << "GhostPayload instance type differs:" << "\n";
       oss << conmat::Indent(2) << "actual index: "
           << conmat::Colorize(
-                 static_cast<int>(actual_payload.m_selection.index()),
+                 static_cast<int>(actual_payload.m_instance.index()),
                  conmat::Color::Red)
           << "\n";
       oss << conmat::Indent(2) << "expected index: "
           << conmat::Colorize(
-                 static_cast<int>(expected_payload.m_selection.index()),
+                 static_cast<int>(expected_payload.m_instance.index()),
                  conmat::Color::Blue)
           << "\n";
     } else {
-      // Same type — compare keys (monostate has no key)
+      // Same type — compare Part definition pointer (monostate has no pointer)
       std::visit(
-          [&](const auto &actual_sel, const auto &expected_sel) {
-            if constexpr (std::is_same_v<decltype(actual_sel),
-                                         decltype(expected_sel)> &&
-                          !std::is_same_v<std::decay_t<decltype(actual_sel)>,
-                                          std::monostate>) {
-              if (actual_sel.key != expected_sel.key) {
-                oss << conmat::Indent(1) << conmat::TestFailed()
-                    << "GhostPayload selection key differs:" << "\n";
-                oss << conmat::Indent(2) << "actual: "
-                    << conmat::Colorize(actual_sel.key, conmat::Color::Red)
-                    << "\n";
-                oss << conmat::Indent(2) << "expected: "
-                    << conmat::Colorize(expected_sel.key, conmat::Color::Blue)
-                    << "\n";
+          [&](const auto &actual_inst, const auto &expected_inst) {
+            using A = std::decay_t<decltype(actual_inst)>;
+            using E = std::decay_t<decltype(expected_inst)>;
+            if constexpr (std::is_same_v<A, E> &&
+                          !std::is_same_v<A, std::monostate>) {
+              if constexpr (std::is_same_v<A, FragmentInstance>) {
+                if (actual_inst.fragment != expected_inst.fragment) {
+                  oss << conmat::Indent(1) << conmat::TestFailed()
+                      << "GhostPayload FragmentInstance pointer differs:" << "\n";
+                  oss << conmat::Indent(2) << "actual: "
+                      << conmat::Colorize(
+                             reinterpret_cast<uintptr_t>(actual_inst.fragment),
+                             conmat::Color::Red)
+                      << "\n";
+                  oss << conmat::Indent(2) << "expected: "
+                      << conmat::Colorize(
+                             reinterpret_cast<uintptr_t>(expected_inst.fragment),
+                             conmat::Color::Blue)
+                      << "\n";
+                }
+              } else if constexpr (std::is_same_v<A, JointInstance>) {
+                if (actual_inst.joint != expected_inst.joint) {
+                  oss << conmat::Indent(1) << conmat::TestFailed()
+                      << "GhostPayload JointInstance pointer differs:" << "\n";
+                  oss << conmat::Indent(2) << "actual: "
+                      << conmat::Colorize(
+                             reinterpret_cast<uintptr_t>(actual_inst.joint),
+                             conmat::Color::Red)
+                      << "\n";
+                  oss << conmat::Indent(2) << "expected: "
+                      << conmat::Colorize(
+                             reinterpret_cast<uintptr_t>(expected_inst.joint),
+                             conmat::Color::Blue)
+                      << "\n";
+                }
               }
             }
           },
-          actual_payload.m_selection, expected_payload.m_selection);
+          actual_payload.m_instance, expected_payload.m_instance);
     }
   }
 

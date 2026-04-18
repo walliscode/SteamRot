@@ -13,13 +13,13 @@
 namespace steamrot::logic::action::ghost {
 
 /////////////////////////////////////////////////
-void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection) {
-  mr_ghost.m_selection = selection;
+void SelectGhostItem(MrGhost &mr_ghost, const GhostInstance &instance) {
+  mr_ghost.m_instance = instance;
 }
 
 /////////////////////////////////////////////////
 void ClearGhostSelection(MrGhost &mr_ghost) {
-  mr_ghost.m_selection = std::monostate{};
+  mr_ghost.m_instance = std::monostate{};
 }
 
 /////////////////////////////////////////////////
@@ -36,7 +36,7 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost) {
 
   switch (ghost_payload.action) {
   case GhostPayload::GhostAction::SELECT:
-    SelectGhostItem(mr_ghost, ghost_payload.m_selection);
+    SelectGhostItem(mr_ghost, ghost_payload.m_instance);
     break;
 
   case GhostPayload::GhostAction::CLEAR:

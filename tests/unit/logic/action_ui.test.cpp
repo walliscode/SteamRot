@@ -806,9 +806,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits a GHOST "
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Fragment fragment;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = true;
-  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.ghost_selection_tag = steamrot::FragmentInstance{&fragment};
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
@@ -824,22 +825,23 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits a GHOST "
   const auto *ghost_payload = std::get_if<steamrot::GhostPayload>(&evt.payload);
   REQUIRE(ghost_payload != nullptr);
   REQUIRE(ghost_payload->action == steamrot::GhostPayload::GhostAction::SELECT);
-  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(
-      ghost_payload->m_selection));
-  REQUIRE(std::get<steamrot::FragmentTag>(ghost_payload->m_selection).key ==
-          "stone");
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      ghost_payload->m_instance));
+  REQUIRE(std::get<steamrot::FragmentInstance>(ghost_payload->m_instance)
+              .fragment == &fragment);
 }
 
 TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits GHOST "
-          "SELECT with JointTag",
+          "SELECT with JointInstance",
           "[unit][action_ui][ProcessDropDownItemElementActions]") {
   steamrot::tests::TestFixture fixture;
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Joint joint;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = true;
-  item.ghost_selection_tag = steamrot::JointTag{"hinge"};
+  item.ghost_selection_tag = steamrot::JointInstance{&joint};
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
@@ -852,9 +854,9 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions emits GHOST "
   const auto *ghost_payload = std::get_if<steamrot::GhostPayload>(&evt.payload);
   REQUIRE(ghost_payload != nullptr);
   REQUIRE(
-      std::holds_alternative<steamrot::JointTag>(ghost_payload->m_selection));
-  REQUIRE(std::get<steamrot::JointTag>(ghost_payload->m_selection).key ==
-          "hinge");
+      std::holds_alternative<steamrot::JointInstance>(ghost_payload->m_instance));
+  REQUIRE(std::get<steamrot::JointInstance>(ghost_payload->m_instance).joint ==
+          &joint);
 }
 
 TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
@@ -864,9 +866,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Fragment fragment;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = false;
-  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.ghost_selection_tag = steamrot::FragmentInstance{&fragment};
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
@@ -884,9 +887,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Fragment fragment;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = true;
-  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.ghost_selection_tag = steamrot::FragmentInstance{&fragment};
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = false;
 
@@ -904,9 +908,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions does not emit "
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Fragment fragment;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = true;
-  item.ghost_selection_tag = steamrot::FragmentTag{"stone"};
+  item.ghost_selection_tag = steamrot::FragmentInstance{&fragment};
   item.subscription = nullptr;
 
   steamrot::logic::action::ui::ProcessDropDownItemElementActions(item,
@@ -923,9 +928,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownItemElementActions deactivates "
   steamrot::EventHandler &event_handler =
       fixture.GetGameContext().event_handler;
 
+  steamrot::Fragment fragment;
   steamrot::DropDownItemElement item;
   item.is_mouse_over = true;
-  item.ghost_selection_tag = steamrot::FragmentTag{"granite"};
+  item.ghost_selection_tag = steamrot::FragmentInstance{&fragment};
   item.subscription = std::make_shared<steamrot::Subscriber>();
   item.subscription->m_active = true;
 
@@ -1005,8 +1011,7 @@ TEST_CASE("logic::ui::action::ProcessDropDownContainerElementActions "
     if (evt.type == steamrot::EventType::GHOST) {
       const auto *gp = std::get_if<steamrot::GhostPayload>(&evt.payload);
       if (gp && gp->action == steamrot::GhostPayload::GhostAction::SELECT &&
-          std::holds_alternative<steamrot::FragmentTag>(gp->m_selection) &&
-          std::get<steamrot::FragmentTag>(gp->m_selection).key == "rock") {
+          std::holds_alternative<steamrot::FragmentInstance>(gp->m_instance)) {
         found_ghost = true;
       }
     }
@@ -1046,10 +1051,10 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   REQUIRE(item != nullptr);
   REQUIRE(item->priority ==
           2); // priority should be set to 2 for any dropdown list item
-  REQUIRE(
-      std::holds_alternative<steamrot::FragmentTag>(item->ghost_selection_tag));
-  REQUIRE(std::get<steamrot::FragmentTag>(item->ghost_selection_tag).key ==
-          "arm");
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      item->ghost_selection_tag));
+  REQUIRE(std::get<steamrot::FragmentInstance>(item->ghost_selection_tag)
+              .fragment == &grimoire.m_all_fragments["arm"]);
 }
 
 TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
@@ -1084,10 +1089,11 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   REQUIRE(item != nullptr);
   REQUIRE(item->priority ==
           2); // priority should be set to 2 for any dropdown list item
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      item->ghost_selection_tag));
   REQUIRE(
-      std::holds_alternative<steamrot::JointTag>(item->ghost_selection_tag));
-  REQUIRE(std::get<steamrot::JointTag>(item->ghost_selection_tag).key ==
-          "pivot");
+      std::get<steamrot::JointInstance>(item->ghost_selection_tag).joint ==
+      &grimoire.m_all_joints["pivot"]);
 }
 
 TEST_CASE("logic::ui::action::ProcessDropDownListElementActions creates a "

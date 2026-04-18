@@ -226,26 +226,26 @@ struct GhostPayload {
   /////////////////////////////////////////////////
   /// @brief Constructor for a SELECT action carrying the chosen item.
   ///
-  /// @param selection The GhostSelection variant describing what was selected.
+  /// @param instance The GhostInstance variant describing what was selected.
   /////////////////////////////////////////////////
-  GhostPayload(const GhostSelection &selection)
-      : action(GhostAction::SELECT), m_selection(selection) {}
+  GhostPayload(const GhostInstance &instance)
+      : action(GhostAction::SELECT), m_instance(instance) {}
 
   /////////////////////////////////////////////////
-  /// @brief Constructor taking an explicit action and optional selection.
+  /// @brief Constructor taking an explicit action and optional instance.
   ///
   /// @param ghost_action GhostAction enum value to set the action member to.
-  /// @param selection The GhostSelection variant (relevant for SELECT action).
+  /// @param instance The GhostInstance variant (relevant for SELECT action).
   /////////////////////////////////////////////////
-  GhostPayload(const GhostAction ghost_action, const GhostSelection &selection)
-      : action(ghost_action), m_selection(selection) {}
+  GhostPayload(const GhostAction ghost_action, const GhostInstance &instance)
+      : action(ghost_action), m_instance(instance) {}
 
   /////////////////////////////////////////////////
-  /// @brief The typed selection carried by this payload.
+  /// @brief The typed ghost instance carried by this payload.
   ///
   /// std::monostate when action is CLEAR or NONE.
   /////////////////////////////////////////////////
-  GhostSelection m_selection{std::monostate{}};
+  GhostInstance m_instance{std::monostate{}};
 };
 
 /////////////////////////////////////////////////

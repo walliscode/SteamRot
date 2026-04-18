@@ -11,6 +11,7 @@
 #include "DropDownButtonElement.h"
 #include "DropDownItemElement.h"
 #include "action_grimoire_machina.h"
+#include "positioning_grimoire_machina.h"
 
 namespace steamrot::logic::action::ui {
 
@@ -215,18 +216,25 @@ void ProcessDropDownListElementActions(
   std::vector<std::string> fragment_names;
   std::vector<std::string> joint_names;
 
+  // get GrimoireMachina once for both lookup and instance construction
+  GrimoireMachina *grimoire_ptr =
+      scene_context.asset_manager.GetGrimoireMachina().has_value()
+          ? scene_context.asset_manager.GetGrimoireMachina().value()
+          : nullptr;
+
   // switch on the DataPopulationFunction enum
   switch (dropdown_list_element.data_population_function) {
 
   case DataPopulationFunction::GetAllFragmentNames:
-    fragment_names = grimoire_machina::GetAllFragmentNames(
-        *scene_context.asset_manager.GetGrimoireMachina().value());
+    if (grimoire_ptr)
+      fragment_names =
+          grimoire_machina::GetAllFragmentNames(*grimoire_ptr);
 
     break;
 
   case DataPopulationFunction::GetAllJointNames:
-    joint_names = grimoire_machina::GetAllJointNames(
-        *scene_context.asset_manager.GetGrimoireMachina().value());
+    if (grimoire_ptr)
+      joint_names = grimoire_machina::GetAllJointNames(*grimoire_ptr);
 
     break;
 
@@ -243,7 +251,13 @@ void ProcessDropDownListElementActions(
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->priority = 2;
     dropdown_item->label = fragment_name;
-    dropdown_item->ghost_selection_tag = FragmentTag{fragment_name};
+
+    // build a FragmentInstance pointing directly at the Fragment definition
+    if (grimoire_ptr) {
+      auto it = grimoire_ptr->m_all_fragments.find(fragment_name);
+      if (it != grimoire_ptr->m_all_fragments.end())
+        dropdown_item->ghost_selection_tag = FragmentInstance{&it->second};
+    }
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events
     auto subscriber = std::make_shared<Subscriber>();
@@ -264,7 +278,17 @@ void ProcessDropDownListElementActions(
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->priority = 2;
     dropdown_item->label = joint_name;
-    dropdown_item->ghost_selection_tag = JointTag{joint_name};
+
+    // build a JointInstance pointing directly at the Joint definition
+    if (grimoire_ptr) {
+      auto it = grimoire_ptr->m_all_joints.find(joint_name);
+      if (it != grimoire_ptr->m_all_joints.end()) {
+        JointInstance joint_instance{&it->second};
+        positioning::grimoire_machina::initialize_joint_socket_positions(
+            joint_instance);
+        dropdown_item->ghost_selection_tag = std::move(joint_instance);
+      }
+    }
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events
     auto subscriber = std::make_shared<Subscriber>();

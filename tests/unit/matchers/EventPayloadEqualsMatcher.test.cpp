@@ -8,6 +8,9 @@
 /////////////////////////////////////////////////
 #include "EventPayloadEqualsMatcher.h"
 #include "EventPayload.h"
+#include "Fragment.h"
+#include "Joint.h"
+#include "MachinaFormScaffold.h"
 #include "catch2/catch_test_macros.hpp"
 #include "conmat.h"
 #include "uuid.h"
@@ -178,12 +181,13 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for SystemPayload",
 
 TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
           "[unit][Events][EventPayload][matcher]") {
-  SECTION("Matcher detects equality for GhostPayload (FragmentTag)") {
+  SECTION("Matcher detects equality for GhostPayload (same FragmentInstance)") {
+    steamrot::Fragment fragment;
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
-        steamrot::FragmentTag{"copper"}};
+        steamrot::FragmentInstance{&fragment}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::FragmentTag{"copper"}};
+                                  steamrot::FragmentInstance{&fragment}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -191,12 +195,14 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality for different GhostPayload key") {
+  SECTION("Matcher detects inequality for different FragmentInstance pointers") {
+    steamrot::Fragment fragment_a;
+    steamrot::Fragment fragment_b;
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
-        steamrot::FragmentTag{"copper"}};
+        steamrot::FragmentInstance{&fragment_a}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::FragmentTag{"iron"}};
+                                  steamrot::FragmentInstance{&fragment_b}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -205,11 +211,12 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
   }
 
   SECTION("Matcher detects inequality for different GhostPayload action") {
+    steamrot::Fragment fragment;
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
-        steamrot::FragmentTag{"copper"}};
+        steamrot::FragmentInstance{&fragment}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::CLEAR,
-                                  steamrot::FragmentTag{"copper"}};
+                                  steamrot::FragmentInstance{&fragment}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -217,11 +224,12 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(!matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality for different GhostPayload selection "
+  SECTION("Matcher detects inequality for different GhostPayload instance "
           "variant type") {
+    steamrot::Fragment fragment;
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
-        steamrot::FragmentTag{"copper"}};
+        steamrot::FragmentInstance{&fragment}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
                                   std::monostate{}};
 
@@ -243,11 +251,12 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects equality for GhostPayload (JointTag)") {
+  SECTION("Matcher detects equality for GhostPayload (same JointInstance)") {
+    steamrot::Joint joint;
     steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
-                                    steamrot::JointTag{"square"}};
+                                    steamrot::JointInstance{&joint}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::JointTag{"square"}};
+                                  steamrot::JointInstance{&joint}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -255,11 +264,13 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality for different GhostPayload JointTag key") {
+  SECTION("Matcher detects inequality for different JointInstance pointers") {
+    steamrot::Joint joint_a;
+    steamrot::Joint joint_b;
     steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
-                                    steamrot::JointTag{"square"}};
+                                    steamrot::JointInstance{&joint_a}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::JointTag{"circle"}};
+                                  steamrot::JointInstance{&joint_b}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;
@@ -267,12 +278,13 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(!matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality between FragmentTag and JointTag with "
-          "the same key") {
+  SECTION("Matcher detects inequality between FragmentInstance and JointInstance") {
+    steamrot::Fragment fragment;
+    steamrot::Joint joint;
     steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
-                                    steamrot::FragmentTag{"copper"}};
+                                    steamrot::FragmentInstance{&fragment}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
-                                  steamrot::JointTag{"copper"}};
+                                  steamrot::JointInstance{&joint}};
 
     steamrot::EventPayload expected_payload = expected;
     steamrot::EventPayload actual_payload = actual;

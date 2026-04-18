@@ -488,7 +488,8 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   grimoire_machina.m_all_fragments["frag"] = MakeFragmentWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::FragmentTag{"frag"};
+  mr_ghost.m_instance =
+      steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
@@ -508,7 +509,8 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   grimoire_machina.m_all_joints["joint"] = MakeJointWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_selection = steamrot::JointTag{"joint"};
+  mr_ghost.m_instance =
+      steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
   steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
