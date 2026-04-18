@@ -124,7 +124,7 @@ void CheckMouseOver(sf::Vector2f world_mouse,
     // get the world position of the socket by applying the fragment's transform
     // to the socket's local position
     const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        fragment_instance.fragment.sockets[i]);
+        fragment_instance.fragment->sockets[i]);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly

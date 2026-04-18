@@ -97,23 +97,26 @@ bool MatchPayload(const GhostPayload &filter_payload,
 
   // A monostate filter selection acts as a wildcard: it matches any selection
   // type carried by the event. This allows subscribers to listen for all
-  // SELECT (or CLEAR) events without specifying a particular selection key.
+  // SELECT (or CLEAR) events without specifying a particular part name.
   if (std::holds_alternative<std::monostate>(filter_payload.m_selection)) {
     return true;
   }
 
-  // Compare the selection variant (type + key must both match)
+  // Compare the selection variant type index — Fragment vs Joint must match
   if (filter_payload.m_selection.index() != event_payload.m_selection.index()) {
     return false;
   }
 
+  // Same type: compare by key string
   return std::visit(
       [](const auto &filter_sel, const auto &event_sel) -> bool {
-        if constexpr (std::is_same_v<decltype(filter_sel), decltype(event_sel)>) {
-          if constexpr (std::is_same_v<std::decay_t<decltype(filter_sel)>,
-                                       std::monostate>) {
+        using F = std::decay_t<decltype(filter_sel)>;
+        using E = std::decay_t<decltype(event_sel)>;
+        if constexpr (std::is_same_v<F, E>) {
+          if constexpr (std::is_same_v<F, std::monostate>) {
             return true;
           } else {
+            // Both FragmentTag and JointTag have a .key member
             return filter_sel.key == event_sel.key;
           }
         }

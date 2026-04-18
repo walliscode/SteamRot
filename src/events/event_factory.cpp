@@ -221,10 +221,10 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   }
 
   case EventType::GHOST: {
-    const std::string random_key = "key_" + std::to_string(lifetime_dist(gen));
-    GhostSelection selection{FragmentTag{random_key}};
-    return CreateGhostEventPacket(lifetime, GhostPayload::GhostAction::SELECT,
-                                  selection);
+    // emit a CLEAR event; a meaningful SELECT requires a valid Fragment/Joint
+    // pointer which is not available in the random packet generator
+    return CreateGhostEventPacket(lifetime, GhostPayload::GhostAction::CLEAR,
+                                  std::monostate{});
   }
 
   case EventType::CAMERA: {

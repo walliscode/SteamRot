@@ -11,24 +11,22 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "GrimoireMachina.h"
 #include "MrGhost.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 namespace steamrot::logic::render::ghost {
 
 /////////////////////////////////////////////////
-/// @brief Draw the ghost item at the cursor position.
+/// @brief Draw the ghost item at the position encoded in its instance transform.
 ///
-/// Renders the fragment or joint geometry at mr_ghost.m_position when a
-/// selection is active, along with pale blue socket indicator circles at each
-/// socket position. Draws nothing when the selection is empty (monostate).
+/// Dispatches to draw_fragment_instance or draw_joint_instance depending on
+/// which alternative is active in mr_ghost.m_instance. Draws nothing when the
+/// instance is monostate (empty selection).
 ///
-/// @param texture          RenderTexture to draw on.
-/// @param mr_ghost         MrGhost carrying the current selection and position.
-/// @param grimoire_machina GrimoireMachina providing fragment/joint data.
+/// @param texture  RenderTexture to draw on.
+/// @param mr_ghost MrGhost carrying the current instance (transform already
+///                 updated by GhostPositioningLogic this tick).
 /////////////////////////////////////////////////
-void draw_ghost_item(sf::RenderTexture &texture, const MrGhost &mr_ghost,
-                     GrimoireMachina &grimoire_machina);
+void draw_ghost_item(sf::RenderTexture &texture, MrGhost &mr_ghost);
 
 } // namespace steamrot::logic::render::ghost

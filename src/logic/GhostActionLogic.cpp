@@ -17,7 +17,8 @@ GhostActionLogic::GhostActionLogic(const SceneContext scene_context)
 
 /////////////////////////////////////////////////
 void GhostActionLogic::ProcessLogic() {
-  action::ghost::ProcessSubscribers(m_subscribers, m_scene_context.mr_ghost);
+  action::ghost::ProcessSubscribers(m_subscribers, m_scene_context.mr_ghost,
+                                    m_scene_context.asset_manager);
 }
 
 } // namespace steamrot::logic

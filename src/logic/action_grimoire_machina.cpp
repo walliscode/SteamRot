@@ -100,24 +100,24 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
   if (!scaffold->parts.empty())
     return;
 
-  if (std::holds_alternative<FragmentTag>(mr_ghost.m_selection)) {
-    const auto &tag = std::get<FragmentTag>(mr_ghost.m_selection);
-    auto it = grimoire_machina.m_all_fragments.find(tag.key);
-    if (it == grimoire_machina.m_all_fragments.end())
+  if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
+    const FragmentInstance &ghost_fi =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
+    if (!ghost_fi.fragment)
       return;
 
-    FragmentInstance instance{it->second};
+    FragmentInstance instance{ghost_fi};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
     scaffold->parts.emplace(id, std::move(instance));
 
-  } else if (std::holds_alternative<JointTag>(mr_ghost.m_selection)) {
-    const auto &tag = std::get<JointTag>(mr_ghost.m_selection);
-    auto it = grimoire_machina.m_all_joints.find(tag.key);
-    if (it == grimoire_machina.m_all_joints.end())
+  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
+    const JointInstance &ghost_ji =
+        std::get<JointInstance>(mr_ghost.m_instance);
+    if (!ghost_ji.joint)
       return;
 
-    JointInstance instance{it->second};
+    JointInstance instance{ghost_ji};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
     scaffold->parts.emplace(id, std::move(instance));
@@ -161,7 +161,7 @@ void ProcessUserInputEvents(Subscriber &subscriber,
     // deal with Ghost placement on scaffold when SELECT action is triggered,
     // checking guards in order checking for empty selection
     if (std::holds_alternative<std::monostate>(
-            scene_context.mr_ghost.m_selection))
+            scene_context.mr_ghost.m_instance))
       break;
     // if mouse is hovering over UI, do not place piece on scaffold
     if (scene_context.scene_state.is_mouse_over_ui_layer)

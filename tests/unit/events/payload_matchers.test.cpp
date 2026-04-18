@@ -195,11 +195,12 @@ TEST_CASE("MatchPayload deals with various configurations of EventPayload",
   }
 
   SECTION("Matching GhostPayload EventPayloads match") {
-    steamrot::GhostSelection selection = steamrot::FragmentTag{"iron"};
     steamrot::EventPayload filter_payload = steamrot::GhostPayload(
-        steamrot::GhostPayload::GhostAction::SELECT, selection);
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"stone"});
     steamrot::EventPayload event_payload = steamrot::GhostPayload(
-        steamrot::GhostPayload::GhostAction::SELECT, selection);
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"stone"});
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
@@ -229,7 +230,7 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Matching FragmentTag selections match") {
+  SECTION("Matching FragmentTag keys match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
     filter_payload.m_selection = steamrot::FragmentTag{"copper"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
@@ -259,7 +260,7 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 
-  SECTION("Matching JointTag selections match") {
+  SECTION("Matching JointTag keys match") {
     filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
     filter_payload.m_selection = steamrot::JointTag{"square"};
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
@@ -281,5 +282,21 @@ TEST_CASE("MatchPayload deals with various configurations of GhostPayload",
     event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
     event_payload.m_selection = steamrot::FragmentTag{"copper"};
     REQUIRE_FALSE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Monostate filter acts as wildcard for any selection type") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = std::monostate{};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::FragmentTag{"stone"};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
+  }
+
+  SECTION("Monostate filter acts as wildcard for JointTag too") {
+    filter_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    filter_payload.m_selection = std::monostate{};
+    event_payload.action = steamrot::GhostPayload::GhostAction::SELECT;
+    event_payload.m_selection = steamrot::JointTag{"hinge"};
+    REQUIRE(MatchPayload(filter_payload, event_payload));
   }
 }

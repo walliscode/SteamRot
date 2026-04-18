@@ -24,14 +24,8 @@ void GhostRenderLogic::ProcessLogic() {
       movement::camera::GetWorldView(m_scene_context.camera_state,
                                      m_scene_context.scene_texture));
 
-  auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();
-  if (!grimoire_result.has_value()) {
-    return;
-  }
-  GrimoireMachina &grimoire_machina = *grimoire_result.value();
-
   render::ghost::draw_ghost_item(m_scene_context.scene_texture,
-                                 m_scene_context.mr_ghost, grimoire_machina);
+                                 m_scene_context.mr_ghost);
 }
 
 } // namespace steamrot::logic

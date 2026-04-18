@@ -53,12 +53,12 @@ void compute_socket_local_positions_even_spread(
 
 /////////////////////////////////////////////////
 void initialize_joint_socket_positions(JointInstance &joint_instance) {
-  const auto &config = joint_instance.joint.socket_config;
+  const auto &config = joint_instance.joint->socket_config;
 
   // pass the origin and local_positions vector by reference to be filled in by
   // the helper
   compute_socket_local_positions_even_spread(
-      config, joint_instance.joint.origin,
+      config, joint_instance.joint->origin,
       joint_instance.socket_local_positions);
 }
 
@@ -80,13 +80,13 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
           std::get_if<FragmentInstance>(&it->second)) {
 
     // if views is empty, return early
-    if (fragment_instance->fragment.movement_views.empty())
+    if (fragment_instance->fragment->movement_views.empty())
       return;
 
     // working off the FRONT view only, get the center of the bounding box of
     // the FRONT view's vertex array
     const sf::VertexArray &va =
-        fragment_instance->fragment.movement_views[ViewDirection::Front];
+        fragment_instance->fragment->movement_views[ViewDirection::Front];
     // get centre using built in sfml functions
     sf::Vector2f center = va.getBounds().getCenter();
 
@@ -100,7 +100,7 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
 
   if (JointInstance *joint_instance = std::get_if<JointInstance>(&it->second)) {
     // if views is empty, return early
-    if (joint_instance->joint.movement_views.empty())
+    if (joint_instance->joint->movement_views.empty())
       return;
 
     // reset the transform of the joint instance to identity
@@ -108,7 +108,7 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
     // we work of the origin of the joint for positioning
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
-    joint_instance->transform.translate(-joint_instance->joint.origin);
+    joint_instance->transform.translate(-joint_instance->joint->origin);
 
     // initialise socket positions now that the transform is established
     initialize_joint_socket_positions(*joint_instance);

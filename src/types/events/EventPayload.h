@@ -210,6 +210,9 @@ struct SystemPayload {
 /// Emitted by Logic classes that write to MrGhost (e.g. a UI action logic
 /// that detects a menu item click). Logic classes that need to react to
 /// selection changes subscribe to EventType::GHOST and inspect this payload.
+/// The selection is stored as a lightweight GhostSelection tag; the actual
+/// FragmentInstance / JointInstance is resolved in action_ghost by looking
+/// up the name in GrimoireMachina.
 /////////////////////////////////////////////////
 struct GhostPayload {
 
@@ -224,26 +227,27 @@ struct GhostPayload {
   GhostPayload() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Constructor for a SELECT action carrying the chosen item.
+  /// @brief Constructor for a SELECT action carrying the chosen tag.
   ///
-  /// @param selection The GhostSelection variant describing what was selected.
+  /// @param selection The GhostSelection tag identifying the chosen item.
   /////////////////////////////////////////////////
   GhostPayload(const GhostSelection &selection)
       : action(GhostAction::SELECT), m_selection(selection) {}
 
   /////////////////////////////////////////////////
-  /// @brief Constructor taking an explicit action and optional selection.
+  /// @brief Constructor taking an explicit action and selection tag.
   ///
-  /// @param ghost_action GhostAction enum value to set the action member to.
-  /// @param selection The GhostSelection variant (relevant for SELECT action).
+  /// @param ghost_action GhostAction enum value.
+  /// @param selection    GhostSelection tag (relevant for SELECT action).
   /////////////////////////////////////////////////
   GhostPayload(const GhostAction ghost_action, const GhostSelection &selection)
       : action(ghost_action), m_selection(selection) {}
 
   /////////////////////////////////////////////////
-  /// @brief The typed selection carried by this payload.
+  /// @brief Lightweight tag identifying the selected item.
   ///
-  /// std::monostate when action is CLEAR or NONE.
+  /// std::monostate when action is CLEAR or NONE. Resolved to a
+  /// GhostInstance by action_ghost::SelectGhostItem.
   /////////////////////////////////////////////////
   GhostSelection m_selection{std::monostate{}};
 };

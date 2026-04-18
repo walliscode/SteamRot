@@ -215,18 +215,25 @@ void ProcessDropDownListElementActions(
   std::vector<std::string> fragment_names;
   std::vector<std::string> joint_names;
 
+  // get GrimoireMachina once for both lookup and instance construction
+  GrimoireMachina *grimoire_ptr =
+      scene_context.asset_manager.GetGrimoireMachina().has_value()
+          ? scene_context.asset_manager.GetGrimoireMachina().value()
+          : nullptr;
+
   // switch on the DataPopulationFunction enum
   switch (dropdown_list_element.data_population_function) {
 
   case DataPopulationFunction::GetAllFragmentNames:
-    fragment_names = grimoire_machina::GetAllFragmentNames(
-        *scene_context.asset_manager.GetGrimoireMachina().value());
+    if (grimoire_ptr)
+      fragment_names =
+          grimoire_machina::GetAllFragmentNames(*grimoire_ptr);
 
     break;
 
   case DataPopulationFunction::GetAllJointNames:
-    joint_names = grimoire_machina::GetAllJointNames(
-        *scene_context.asset_manager.GetGrimoireMachina().value());
+    if (grimoire_ptr)
+      joint_names = grimoire_machina::GetAllJointNames(*grimoire_ptr);
 
     break;
 
@@ -243,6 +250,8 @@ void ProcessDropDownListElementActions(
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->priority = 2;
     dropdown_item->label = fragment_name;
+
+    // store a lightweight tag; action_ghost resolves it to a FragmentInstance
     dropdown_item->ghost_selection_tag = FragmentTag{fragment_name};
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events
@@ -264,6 +273,8 @@ void ProcessDropDownListElementActions(
     auto dropdown_item = std::make_unique<DropDownItemElement>();
     dropdown_item->priority = 2;
     dropdown_item->label = joint_name;
+
+    // store a lightweight tag; action_ghost resolves it to a JointInstance
     dropdown_item->ghost_selection_tag = JointTag{joint_name};
 
     // create a subscriber so the item reacts to USER_INPUT SELECT events

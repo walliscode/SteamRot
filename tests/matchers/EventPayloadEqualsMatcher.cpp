@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "EventPayloadEqualsMatcher.h"
+#include "MrGhost.h"
 #include "conmat.h"
 #include "magic_enum/magic_enum.hpp"
 
@@ -275,13 +276,13 @@ bool EventPayloadEqualsMatcher::match(const EventPayload &actual) const {
                  conmat::Color::Blue)
           << "\n";
     } else {
-      // Same type — compare keys (monostate has no key)
+      // Same type — compare by key string (monostate has no key)
       std::visit(
           [&](const auto &actual_sel, const auto &expected_sel) {
-            if constexpr (std::is_same_v<decltype(actual_sel),
-                                         decltype(expected_sel)> &&
-                          !std::is_same_v<std::decay_t<decltype(actual_sel)>,
-                                          std::monostate>) {
+            using A = std::decay_t<decltype(actual_sel)>;
+            using E = std::decay_t<decltype(expected_sel)>;
+            if constexpr (std::is_same_v<A, E> &&
+                          !std::is_same_v<A, std::monostate>) {
               if (actual_sel.key != expected_sel.key) {
                 oss << conmat::Indent(1) << conmat::TestFailed()
                     << "GhostPayload selection key differs:" << "\n";

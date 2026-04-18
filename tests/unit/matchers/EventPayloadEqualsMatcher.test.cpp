@@ -178,7 +178,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for SystemPayload",
 
 TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
           "[unit][Events][EventPayload][matcher]") {
-  SECTION("Matcher detects equality for GhostPayload (FragmentTag)") {
+  SECTION("Matcher detects equality for GhostPayload (same FragmentTag)") {
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
         steamrot::FragmentTag{"copper"}};
@@ -191,7 +191,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality for different GhostPayload key") {
+  SECTION("Matcher detects inequality for different FragmentTag keys") {
     steamrot::GhostPayload expected{
         steamrot::GhostPayload::GhostAction::SELECT,
         steamrot::FragmentTag{"copper"}};
@@ -243,7 +243,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects equality for GhostPayload (JointTag)") {
+  SECTION("Matcher detects equality for GhostPayload (same JointTag)") {
     steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
                                     steamrot::JointTag{"square"}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
@@ -255,7 +255,7 @@ TEST_CASE("EventPayloadEqualsMatcher works correctly for GhostPayload",
     REQUIRE(matcher.match(actual_payload));
   }
 
-  SECTION("Matcher detects inequality for different GhostPayload JointTag key") {
+  SECTION("Matcher detects inequality for different JointTag keys") {
     steamrot::GhostPayload expected{steamrot::GhostPayload::GhostAction::SELECT,
                                     steamrot::JointTag{"square"}};
     steamrot::GhostPayload actual{steamrot::GhostPayload::GhostAction::SELECT,
