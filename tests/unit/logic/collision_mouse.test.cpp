@@ -7,13 +7,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "grimoire_machina_test_helpers.h"
 #include "collision_mouse.h"
 #include "CUserInterface.h"
 #include "MachinaFormScaffold.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
 #include "entity_memory.h"
+#include "grimoire_machina_test_helpers.h"
 #include "positioning_grimoire_machina.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -79,8 +79,8 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is over a socket on the joint") {
     // Single socket at local (100, 0) via socket_config (radius=100, angle=0)
-    auto joint = steamrot::tests::MakeJointWithSocketConfig(1, 100.f, false,
-                                                            0.f, 180.f);
+    auto joint =
+        steamrot::tests::MakeJointWithSocketConfig(1, 100.f, false, 0.f, 180.f);
     steamrot::JointInstance joint_instance{&joint};
     // position the sockets
     steamrot::logic::positioning::grimoire_machina::
@@ -95,7 +95,7 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is not over any socket on the joint") {
     auto joint = steamrot::tests::MakeJointWithSocketConfig(1, 100.f);
-    steamrot::JointInstance joint_instance{joint};
+    steamrot::JointInstance joint_instance{&joint};
     sf::Vector2f world_mouse{200.f, 200.f};
     steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
                                                       joint_instance);
@@ -104,7 +104,7 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Joint with no sockets does not crash") {
     auto joint = steamrot::tests::MakeJoint();
-    steamrot::JointInstance joint_instance{joint};
+    steamrot::JointInstance joint_instance{&joint};
     sf::Vector2f world_mouse{100.f, 100.f};
     REQUIRE_NOTHROW(steamrot::logic::collision::mouse::CheckMouseOver(
         world_mouse, joint_instance));

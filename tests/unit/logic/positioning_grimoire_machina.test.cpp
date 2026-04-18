@@ -6,10 +6,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "grimoire_machina_test_helpers.h"
 #include "positioning_grimoire_machina.h"
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
+#include "grimoire_machina_test_helpers.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -29,7 +29,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
     // Arrange
     steamrot::Fragment fragment{}; // empty fragment
     steamrot::FragmentInstance fragment_instance{
-        fragment}; // instance of that fragment
+        &fragment}; // instance of that fragment
     fragment_instance.id = 0;
 
     parts.emplace(fragment_instance.id, fragment_instance); // add to parts map
@@ -43,7 +43,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
   SECTION("Positions centre of first Fragmentinstance's FRONT view at 0,0") {
     // Arrange
     auto fragment = steamrot::tests::MakeFragmentWithFrontView();
-    steamrot::FragmentInstance fragment_instance{fragment};
+    steamrot::FragmentInstance fragment_instance{&fragment};
     fragment_instance.id = 0;
     parts.emplace(fragment_instance.id, fragment_instance);
     REQUIRE(parts.size() == 1); // sanity check
@@ -71,7 +71,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
     // Arrange
     auto joint = steamrot::tests::MakeJointWithFrontView();
     joint.origin = {5.f, 5.f}; // set origin to (5,5)
-    steamrot::JointInstance joint_instance{joint};
+    steamrot::JointInstance joint_instance{&joint};
     joint_instance.id = 0;
     parts.emplace(joint_instance.id, joint_instance);
     REQUIRE(parts.size() == 1); // sanity check
@@ -87,7 +87,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
     sf::Vector2f expected_position{0.f, 0.f};
 
     sf::Vector2f actual_position =
-        instance.transform.transformPoint(instance.joint.origin);
+        instance.transform.transformPoint(instance.joint->origin);
 
     REQUIRE_THAT(actual_position,
                  steamrot::tests::EqualsVector2f(expected_position));
