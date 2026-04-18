@@ -1,15 +1,19 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the PartLibrary test helper.
+/// @brief Declaration of the TestPartLibrary struct and PartLibraryBuilder
+///        class for test infrastructure.
 ///
-/// PartLibrary is a test-only in-memory catalog of named Fragment and Joint
-/// definitions. Tests can build a library with AddFragment / AddJoint, look up
-/// parts by name, and use the builder methods to create FragmentInstances,
-/// JointInstances, and PartMaps for use in unit tests.
+/// TestPartLibrary is a value-type struct that holds a small, fixed set of
+/// pre-defined Fragment and Joint objects keyed by name. Instantiate it via
+/// TestPartLibrary::Create() to get the standard catalog.
 ///
-/// ⚠ Instances created by this class hold raw pointers into the library's
-/// internal storage.  The PartLibrary must therefore outlive any instances or
-/// PartMaps it produces.
+/// PartLibraryBuilder wraps a TestPartLibrary reference and provides
+/// convenience methods to create FragmentInstances, JointInstances, and
+/// PartMaps backed by the library's storage.
+///
+/// ⚠ Instances produced by PartLibraryBuilder hold raw pointers into the
+/// TestPartLibrary they were built from. The library must outlive any
+/// instances or PartMaps it produces.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -32,117 +36,83 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-/// @class PartLibrary
-/// @brief Test-only catalog of named Fragment and Joint definitions.
+/// @struct TestPartLibrary
+/// @brief Fixed catalog of named Fragment and Joint test definitions.
+///
+/// The catalog is pre-populated by TestPartLibrary::Create() with the
+/// following named parts:
+///
+/// Fragments:
+///   "fragment_no_socket"   — green triangle in Front view, no sockets
+///   "fragment_one_socket"  — green origin triangle + one socket at (5, 5)
+///   "fragment_two_sockets" — white 20×20 square + sockets at (0, 10) and (20, 10)
+///
+/// Joints:
+///   "joint_no_socket"    — blue triangle in Front view, no sockets
+///   "joint_one_socket"   — 1 socket at radius 10, full rotation arc
+///   "joint_two_sockets"  — 2 sockets at radius 15, full rotation arc
+/////////////////////////////////////////////////
+struct TestPartLibrary {
+  /////////////////////////////////////////////////
+  /// @brief Named Fragment definitions.
+  /////////////////////////////////////////////////
+  std::map<std::string, Fragment> fragments;
+
+  /////////////////////////////////////////////////
+  /// @brief Named Joint definitions.
+  /////////////////////////////////////////////////
+  std::map<std::string, Joint> joints;
+
+  /////////////////////////////////////////////////
+  /// @brief Create a TestPartLibrary pre-populated with the standard catalog.
+  ///
+  /// @return TestPartLibrary containing the predefined Fragments and Joints.
+  /////////////////////////////////////////////////
+  static TestPartLibrary Create();
+};
+
+/////////////////////////////////////////////////
+/// @class PartLibraryBuilder
+/// @brief Creates instances and PartMaps from a TestPartLibrary.
+///
+/// Wraps a TestPartLibrary reference and exposes convenience methods for
+/// constructing FragmentInstances, JointInstances, and PartMaps in tests.
+/// Each builder maintains its own ID counter so IDs are unique within a
+/// single builder's lifetime.
 ///
 /// Usage example:
 /// @code
-/// PartLibrary lib;
-/// lib.AddFragment("arm", MakeFragmentWithFrontView())
-///    .AddJoint("shoulder", MakeJointWithSocketConfig(2, 10.f));
+/// TestPartLibrary lib = TestPartLibrary::Create();
+/// PartLibraryBuilder builder{lib};
 ///
-/// // Single lookup
-/// const Fragment& arm = lib.GetFragment("arm");
+/// // Look up individual parts
+/// const Fragment& f = lib.fragments.at("fragment_one_socket");
 ///
-/// // Create a FragmentInstance (pointer into lib storage — lib must stay alive)
-/// FragmentInstance inst = lib.MakeFragmentInstance("arm");
+/// // Create instances (raw pointers into lib — lib must outlive instances)
+/// FragmentInstance fi = builder.MakeFragmentInstance("fragment_one_socket");
+/// JointInstance    ji = builder.MakeJointInstance("joint_two_sockets");
 ///
-/// // Create a PartMap from a subset of the catalog
-/// PartMap parts = lib.MakePartMap({"arm"}, {"shoulder"});
+/// // Build a PartMap from a named subset
+/// PartMap parts = builder.MakePartMap({"fragment_no_socket"},
+///                                     {"joint_one_socket"});
 /// @endcode
 /////////////////////////////////////////////////
-class PartLibrary {
+class PartLibraryBuilder {
 public:
   /////////////////////////////////////////////////
-  /// @brief Default constructor — creates an empty library.
+  /// @brief Construct a builder that draws from the given library.
+  ///
+  /// @param library TestPartLibrary to use as the part source.
   /////////////////////////////////////////////////
-  PartLibrary() = default;
+  explicit PartLibraryBuilder(TestPartLibrary &library);
 
   /////////////////////////////////////////////////
-  /// @brief Add (or replace) a named Fragment in the library.
+  /// @brief Create a FragmentInstance backed by the named Fragment.
   ///
-  /// Returns *this to allow fluent chaining.
-  ///
-  /// @param name     Key used for later lookup.
-  /// @param fragment Fragment definition to store.
-  /// @return Reference to this library.
-  /////////////////////////////////////////////////
-  PartLibrary &AddFragment(std::string name, Fragment fragment);
-
-  /////////////////////////////////////////////////
-  /// @brief Add (or replace) a named Joint in the library.
-  ///
-  /// Returns *this to allow fluent chaining.
-  ///
-  /// @param name  Key used for later lookup.
-  /// @param joint Joint definition to store.
-  /// @return Reference to this library.
-  /////////////////////////////////////////////////
-  PartLibrary &AddJoint(std::string name, Joint joint);
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve a Fragment by name.
-  ///
-  /// Terminates the test (via REQUIRE) if the name is not found.
-  ///
-  /// @param name Key to look up.
-  /// @return Reference to the stored Fragment.
-  /////////////////////////////////////////////////
-  Fragment &GetFragment(const std::string &name);
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve a Fragment by name (const overload).
-  ///
-  /// @param name Key to look up.
-  /// @return Const reference to the stored Fragment.
-  /////////////////////////////////////////////////
-  const Fragment &GetFragment(const std::string &name) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve a Joint by name.
-  ///
-  /// Terminates the test (via REQUIRE) if the name is not found.
-  ///
-  /// @param name Key to look up.
-  /// @return Reference to the stored Joint.
-  /////////////////////////////////////////////////
-  Joint &GetJoint(const std::string &name);
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve a Joint by name (const overload).
-  ///
-  /// @param name Key to look up.
-  /// @return Const reference to the stored Joint.
-  /////////////////////////////////////////////////
-  const Joint &GetJoint(const std::string &name) const;
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve multiple Fragments by name.
-  ///
-  /// Each name must exist in the library (tested via REQUIRE).
-  /// The returned pointers are stable as long as the library is alive and no
-  /// AddFragment call replaces the same key.
-  ///
-  /// @param names Ordered list of Fragment keys.
-  /// @return Vector of non-owning pointers, one per name, in the same order.
-  /////////////////////////////////////////////////
-  std::vector<Fragment *> GetFragments(const std::vector<std::string> &names);
-
-  /////////////////////////////////////////////////
-  /// @brief Retrieve multiple Joints by name.
-  ///
-  /// @param names Ordered list of Joint keys.
-  /// @return Vector of non-owning pointers, one per name, in the same order.
-  /////////////////////////////////////////////////
-  std::vector<Joint *> GetJoints(const std::vector<std::string> &names);
-
-  /////////////////////////////////////////////////
-  /// @brief Create a FragmentInstance backed by a stored Fragment definition.
-  ///
-  /// The returned instance holds a raw pointer into this library's storage.
+  /// The returned instance holds a raw pointer into the library's storage.
   /// The library must outlive the instance.
   ///
-  /// @param name             Key of the Fragment to instantiate.
+  /// @param name              Key of the Fragment to instantiate.
   /// @param initial_transform World-space transform for the instance.
   /// @return A new FragmentInstance referencing the stored Fragment.
   /////////////////////////////////////////////////
@@ -151,12 +121,12 @@ public:
                        sf::Transform initial_transform = sf::Transform::Identity);
 
   /////////////////////////////////////////////////
-  /// @brief Create a JointInstance backed by a stored Joint definition.
+  /// @brief Create a JointInstance backed by the named Joint.
   ///
-  /// The returned instance holds a raw pointer into this library's storage.
+  /// The returned instance holds a raw pointer into the library's storage.
   /// The library must outlive the instance.
   ///
-  /// @param name             Key of the Joint to instantiate.
+  /// @param name              Key of the Joint to instantiate.
   /// @param initial_transform World-space transform for the instance.
   /// @return A new JointInstance referencing the stored Joint.
   /////////////////////////////////////////////////
@@ -167,11 +137,11 @@ public:
   /////////////////////////////////////////////////
   /// @brief Build a PartMap from named Fragments and Joints in the library.
   ///
-  /// Each entry in the returned map is assigned a monotonically increasing ID
-  /// from an internal counter.  Fragment names are inserted first (in order),
-  /// then Joint names.
+  /// Fragment instances are inserted first (in order), then Joint instances.
+  /// Each entry is assigned a monotonically increasing ID from this builder's
+  /// internal counter.
   ///
-  /// All raw pointers in the returned instances point into this library's
+  /// All raw pointers in the returned instances point into the library's
   /// storage — the library must outlive the PartMap.
   ///
   /// @param fragment_names Names of Fragments to include, in order.
@@ -181,34 +151,14 @@ public:
   PartMap MakePartMap(const std::vector<std::string> &fragment_names,
                       const std::vector<std::string> &joint_names);
 
-  /////////////////////////////////////////////////
-  /// @brief Returns the names of all stored Fragments.
-  ///
-  /// @return Vector of Fragment keys in map iteration order.
-  /////////////////////////////////////////////////
-  std::vector<std::string> FragmentNames() const;
-
-  /////////////////////////////////////////////////
-  /// @brief Returns the names of all stored Joints.
-  ///
-  /// @return Vector of Joint keys in map iteration order.
-  /////////////////////////////////////////////////
-  std::vector<std::string> JointNames() const;
-
 private:
   /////////////////////////////////////////////////
-  /// @brief Named Fragment definitions.
+  /// @brief Reference to the library this builder draws from.
   /////////////////////////////////////////////////
-  std::map<std::string, Fragment> m_fragments;
+  TestPartLibrary &m_library;
 
   /////////////////////////////////////////////////
-  /// @brief Named Joint definitions.
-  /////////////////////////////////////////////////
-  std::map<std::string, Joint> m_joints;
-
-  /////////////////////////////////////////////////
-  /// @brief Counter used to generate unique IDs for instances created by
-  /// MakeFragmentInstance, MakeJointInstance, and MakePartMap.
+  /// @brief Monotonically increasing counter for assigning instance IDs.
   /////////////////////////////////////////////////
   uint32_t m_next_id{0};
 };
