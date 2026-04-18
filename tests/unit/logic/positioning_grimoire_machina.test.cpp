@@ -166,3 +166,46 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
                  steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
   }
 }
+
+TEST_CASE("initialize_joint_socket_positions tests",
+          "[unit][positioning_grimoire_machina]") {
+
+  SECTION("Does not throw when joint pointer is null") {
+    steamrot::JointInstance instance{nullptr};
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        initialize_joint_socket_positions(instance));
+  }
+
+  SECTION("Populates socket positions from SocketConfig even spread") {
+    // arc_range=360, socket_count=3: angle_between = 360/(3+1) = 90 degrees
+    // socket 0 at 90°  → ( 0,  10) (approx)
+    // socket 1 at 180° → (-10,  0) (approx)
+    // socket 2 at 270° → ( 0, -10) (approx)
+    steamrot::Joint joint;
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 360.f;
+
+    steamrot::JointInstance instance{&joint};
+    steamrot::logic::positioning::grimoire_machina::
+        initialize_joint_socket_positions(instance);
+
+    REQUIRE_THAT(instance.sockets[0].local_position,
+                 steamrot::tests::EqualsVector2f({0.f, 10.f}, 0.001f));
+    REQUIRE_THAT(instance.sockets[1].local_position,
+                 steamrot::tests::EqualsVector2f({-10.f, 0.f}, 0.001f));
+    REQUIRE_THAT(instance.sockets[2].local_position,
+                 steamrot::tests::EqualsVector2f({0.f, -10.f}, 0.001f));
+  }
+
+  SECTION("Does nothing when socket_count is zero") {
+    steamrot::Joint joint;
+    joint.socket_config.socket_count = 0;
+
+    steamrot::JointInstance instance{&joint};
+    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
+                        initialize_joint_socket_positions(instance));
+    REQUIRE(instance.sockets.empty());
+  }
+}

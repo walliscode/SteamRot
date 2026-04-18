@@ -14,6 +14,20 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
+void initialize_joint_socket_positions(JointInstance &instance) {
+  if (!instance.joint)
+    return;
+
+  std::vector<sf::Vector2f> positions;
+  compute_socket_local_positions_even_spread(
+      instance.joint->socket_config, instance.joint->origin, positions);
+
+  for (size_t i = 0; i < positions.size(); ++i) {
+    instance.sockets[i].local_position = positions[i];
+  }
+}
+
+/////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
     const SocketConfig &config, sf::Vector2f &origin,
     std::vector<sf::Vector2f> &local_positions) {
@@ -49,17 +63,6 @@ void compute_socket_local_positions_even_spread(
   }
 
   return;
-}
-
-/////////////////////////////////////////////////
-void initialize_joint_socket_positions(JointInstance &joint_instance) {
-  const auto &config = joint_instance.joint->socket_config;
-
-  // pass the origin and local_positions vector by reference to be filled in by
-  // the helper
-  compute_socket_local_positions_even_spread(
-      config, joint_instance.joint->origin,
-      joint_instance.socket_local_positions);
 }
 
 /////////////////////////////////////////////////
@@ -110,7 +113,7 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
     // still account for the possibility of an offset
     joint_instance->transform.translate(-joint_instance->joint->origin);
 
-    // initialise socket positions now that the transform is established
+    // populate socket positions now that the joint is placed
     initialize_joint_socket_positions(*joint_instance);
 
     return;

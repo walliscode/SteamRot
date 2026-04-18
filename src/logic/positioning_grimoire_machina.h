@@ -18,6 +18,19 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
+/// @brief Populates the socket local positions of a JointInstance using the
+/// even-spread algorithm.
+///
+/// Calls @c compute_socket_local_positions_even_spread internally and writes
+/// the resulting positions back into @c instance.sockets[i].local_position.
+/// This must be called after construction to give the sockets their correct
+/// positions.
+///
+/// @param instance JointInstance whose sockets should be positioned.
+/////////////////////////////////////////////////
+void initialize_joint_socket_positions(JointInstance &instance);
+
+/////////////////////////////////////////////////
 /// @brief Calculates an even spread of socket local positions for a Joint based
 /// on its SocketConfig.
 ///
@@ -34,15 +47,6 @@ namespace steamrot::logic::positioning::grimoire_machina {
 void compute_socket_local_positions_even_spread(
     const SocketConfig &config, sf::Vector2f &origin,
     std::vector<sf::Vector2f> &local_positions);
-
-/////////////////////////////////////////////////
-/// @brief Initialise all socket_local_positions entries on a JointInstance by
-/// computing each socket's position from the Joint's SocketConfig at zero ring
-/// rotation.
-///
-/// @param joint_instance JointInstance whose socket_local_positions to fill.
-/////////////////////////////////////////////////
-void initialize_joint_socket_positions(JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at
