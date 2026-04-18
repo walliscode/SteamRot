@@ -292,7 +292,8 @@ TEST_CASE("JointInstance constructor with zero sockets has empty sockets vector"
 TEST_CASE(
     "JointInstance constructor computes socket positions from SocketConfig",
     "[unit][JointInstance][MachinaFormScaffold]") {
-  // arc_range=360, socket_count=3: angle_between = 360/4 = 90 degrees
+  // arc_range=360, socket_count=3: angle_between = 360/(3+1) = 90 degrees
+  // sockets are placed at multiples of angle_between from arc_min (not on the endpoints)
   // socket 0 at 90°  → ( 0,  10) (approx)
   // socket 1 at 180° → (-10,  0) (approx)
   // socket 2 at 270° → ( 0, -10) (approx)
