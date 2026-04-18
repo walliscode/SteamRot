@@ -56,12 +56,13 @@ struct SocketState {
 
 /////////////////////////////////////////////////
 /// @struct SocketData
-/// @brief Bundles the immutable local position and mutable runtime state for a
-/// single socket on a placed part instance.
+/// @brief Bundles the local position and mutable runtime state for a single
+/// socket on a placed part instance.
 ///
-/// @c local_position is set once at construction and cannot be changed
-/// afterwards. @c state holds the mutable connection status and hover flag
-/// that are updated each tick by Logic.
+/// @c local_position is initialised at construction from the owning Part
+/// definition and may be updated by positioning Logic (e.g. to rotate the
+/// socket ring of a JointInstance). @c state holds the mutable connection
+/// status and hover flag that are updated each tick by Logic.
 /////////////////////////////////////////////////
 struct SocketData {
   /////////////////////////////////////////////////
@@ -72,13 +73,13 @@ struct SocketData {
   explicit SocketData(sf::Vector2f pos) : local_position{pos} {}
 
   /////////////////////////////////////////////////
-  /// @brief Immutable local-space position of this socket.
+  /// @brief Local-space position of this socket.
   ///
-  /// Set once at construction from the owning Part definition and never
-  /// changed. Apply the owning instance's transform to obtain the world-space
-  /// position.
+  /// Initialised at construction. Positioning Logic may update this value to
+  /// reposition the socket (e.g. rotating a JointInstance's socket ring).
+  /// Apply the owning instance's transform to obtain the world-space position.
   /////////////////////////////////////////////////
-  const sf::Vector2f local_position;
+  sf::Vector2f local_position;
 
   /////////////////////////////////////////////////
   /// @brief Mutable runtime state of this socket (connection status, hover).
@@ -122,8 +123,9 @@ struct PartInstance {
 ///
 /// Derives from PartInstance and adds Joint-specific runtime state.
 /// All socket data (local position + runtime state) is stored in the @c sockets
-/// vector, which is fully computed from the Joint's SocketConfig at
-/// construction time and never resized afterwards. World-space position of
+/// vector, which is fully computed from the Joint's SocketConfig at construction
+/// time. Positioning Logic may update individual @c sockets[i].local_position
+/// entries at runtime (e.g. to rotate the socket ring). World-space position of
 /// socket i is obtained via:
 ///   transform.transformPoint(sockets[i].local_position)
 /////////////////////////////////////////////////
@@ -171,11 +173,13 @@ struct JointInstance : public PartInstance {
   Joint *joint{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Per-socket data (immutable local position + mutable state) for
-  /// this Joint instance.
+  /// @brief Per-socket data (local position + mutable state) for this Joint
+  /// instance.
   ///
-  /// Fully initialised from the Joint's SocketConfig at construction. Apply
-  /// the instance's transform to @c sockets[i].local_position to obtain the
+  /// Fully initialised from the Joint's SocketConfig at construction.
+  /// Positioning Logic may update @c sockets[i].local_position to reposition
+  /// individual sockets (e.g. to apply socket ring rotation). Apply the
+  /// instance's transform to @c sockets[i].local_position to obtain the
   /// world-space position of socket @c i.
   /////////////////////////////////////////////////
   std::vector<SocketData> sockets;
@@ -219,12 +223,14 @@ struct FragmentInstance : public PartInstance {
   Fragment *fragment{nullptr};
 
   /////////////////////////////////////////////////
-  /// @brief Per-socket data (immutable local position + mutable state) for
-  /// this Fragment instance.
+  /// @brief Per-socket data (local position + mutable state) for this Fragment
+  /// instance.
   ///
-  /// Fully initialised from the Fragment definition at construction. Apply
-  /// the instance's transform to @c sockets[i].local_position to obtain the
-  /// world-space position of socket @c i.
+  /// Fully initialised from the Fragment definition at construction. Fragment
+  /// socket positions are static (derived from the Part definition) and are not
+  /// changed after construction. Apply the instance's transform to
+  /// @c sockets[i].local_position to obtain the world-space position of socket
+  /// @c i.
   /////////////////////////////////////////////////
   std::vector<SocketData> sockets;
 };
