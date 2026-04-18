@@ -280,7 +280,7 @@ TEST_CASE(
 
   sf::Transform t;
   t.translate({50.f, 50.f});
-  steamrot::FragmentInstance instance{fragment, t};
+  steamrot::FragmentInstance instance{&fragment, t};
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_fragment_instance_sockets(
@@ -298,7 +298,7 @@ TEST_CASE(
   // socket is at local (5,5); translate by (40,40) → world pos (45,45)
   sf::Transform t;
   t.translate({40.f, 40.f});
-  steamrot::FragmentInstance instance{fragment, t};
+  steamrot::FragmentInstance instance{&fragment, t};
 
   steamrot::logic::render::grimoire_machina::draw_fragment_instance_sockets(
       texture, instance);
@@ -321,7 +321,7 @@ TEST_CASE("draw_joint_instance_sockets draws socket circles without throwing",
   sf::Transform t;
   t.translate({50.f, 50.f});
 
-  steamrot::JointInstance instance{joint, t};
+  steamrot::JointInstance instance{&joint, t};
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_joint_instance_sockets(
@@ -340,7 +340,7 @@ TEST_CASE("draw_fragment_instance draws fragment geometry and sockets without "
 
   sf::Transform t;
   t.translate({10.f, 10.f});
-  steamrot::FragmentInstance instance{fragment, t};
+  steamrot::FragmentInstance instance{&fragment, t};
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_fragment_instance(
@@ -354,7 +354,7 @@ TEST_CASE("draw_fragment_instance draws fragment but no sockets when "
   auto fragment = MakeFragmentWithOriginTriangle();
   sf::Transform t;
   t.translate({10.f, 10.f});
-  steamrot::FragmentInstance instance{fragment, t};
+  steamrot::FragmentInstance instance{&fragment, t};
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_fragment_instance(
           texture, instance, false));
@@ -381,7 +381,7 @@ TEST_CASE("draw_fragment_instance renders fragment view and sockets at "
 
   sf::Transform t;
   t.translate({10.f, 10.f});
-  steamrot::FragmentInstance instance{fragment, t};
+  steamrot::FragmentInstance instance{&fragment, t};
 
   steamrot::logic::render::grimoire_machina::draw_fragment_instance(
       texture, instance, true);
@@ -407,7 +407,7 @@ TEST_CASE("draw_joint_instance draws joint geometry and sockets without "
 
   sf::Transform t;
   t.translate({10.f, 10.f});
-  steamrot::JointInstance instance{joint, t};
+  steamrot::JointInstance instance{&joint, t};
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_joint_instance(
@@ -421,7 +421,7 @@ TEST_CASE("draw_joint_instance draws joint but no sockets when draw_sockets is "
   auto joint = MakeJointWithOriginTriangle();
   sf::Transform t;
   t.translate({10.f, 10.f});
-  steamrot::JointInstance instance{joint, t};
+  steamrot::JointInstance instance{&joint, t};
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::draw_joint_instance(
           texture, instance, false));
