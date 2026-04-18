@@ -77,9 +77,8 @@ TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is over a socket on the joint") {
     // Single socket at local (100, 0) via socket_config (radius=100, angle=0)
-    auto joint = steamrot::tests::MakeJointWithSocketConfig(1, 100.f);
-    joint.socket_config.rotation_arc_min = 0;
-    joint.socket_config.rotation_arc_max = 180;
+    auto joint = steamrot::tests::MakeJointWithSocketConfig(1, 100.f, false,
+                                                            0.f, 180.f);
     steamrot::JointInstance joint_instance{joint};
     // position the sockets
     steamrot::logic::positioning::grimoire_machina::

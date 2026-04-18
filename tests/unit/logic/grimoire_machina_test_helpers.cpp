@@ -124,11 +124,14 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour) {
 
 /////////////////////////////////////////////////
 steamrot::Joint MakeJointWithSocketConfig(uint8_t socket_count, float radius,
-                                          bool has_fixed_socket) {
+                                          bool has_fixed_socket, float arc_min,
+                                          float arc_max) {
   steamrot::Joint joint;
   joint.socket_config.socket_count = socket_count;
   joint.socket_config.radius = radius;
   joint.socket_config.has_fixed_socket = has_fixed_socket;
+  joint.socket_config.rotation_arc_min = arc_min;
+  joint.socket_config.rotation_arc_max = arc_max;
   return joint;
 }
 

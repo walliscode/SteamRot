@@ -120,13 +120,17 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue);
 /// @brief Build a Joint with the given SocketConfig parameters and no view
 ///        geometry.
 ///
-/// @param socket_count   Total number of sockets.
-/// @param radius         Distance of sockets from the Joint's origin.
-/// @param has_fixed_socket Whether socket index 0 is a fixed anchor.
+/// @param socket_count      Total number of sockets.
+/// @param radius            Distance of sockets from the Joint's origin.
+/// @param has_fixed_socket  Whether socket index 0 is a fixed anchor.
+/// @param arc_min           Minimum rotation arc angle in degrees (default 0).
+/// @param arc_max           Maximum rotation arc angle in degrees (default 360).
 /// @return Joint with the specified SocketConfig.
 /////////////////////////////////////////////////
 steamrot::Joint MakeJointWithSocketConfig(uint8_t socket_count, float radius,
-                                          bool has_fixed_socket = false);
+                                          bool has_fixed_socket = false,
+                                          float arc_min = 0.f,
+                                          float arc_max = 360.f);
 
 /////////////////////////////////////////////////
 /// @brief Build a vector of N default-constructed empty Joints.
