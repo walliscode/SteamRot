@@ -13,7 +13,6 @@
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
-#include <cmath>
 #include <memory>
 
 TEST_CASE("InitialiseActiveMachinaForm adds a new MachinaForm to the "
@@ -290,13 +289,8 @@ TEST_CASE("JointInstance constructor with zero sockets has empty sockets vector"
 }
 
 TEST_CASE(
-    "JointInstance constructor computes socket positions from SocketConfig",
+    "JointInstance constructor zero-initialises socket positions",
     "[unit][JointInstance][MachinaFormScaffold]") {
-  // arc_range=360, socket_count=3: angle_between = 360/(3+1) = 90 degrees
-  // sockets are placed at multiples of angle_between from arc_min (not on the endpoints)
-  // socket 0 at 90°  → ( 0,  10) (approx)
-  // socket 1 at 180° → (-10,  0) (approx)
-  // socket 2 at 270° → ( 0, -10) (approx)
   steamrot::Joint joint;
   joint.socket_config.socket_count = 3;
   joint.socket_config.radius = 10.f;
@@ -306,12 +300,14 @@ TEST_CASE(
 
   steamrot::JointInstance instance{&joint};
 
-  static constexpr float k_tolerance = 0.001f;
-  REQUIRE(std::abs(instance.sockets[0].local_position.y - 10.f) < k_tolerance);
-  REQUIRE(std::abs(instance.sockets[1].local_position.x - (-10.f)) <
-          k_tolerance);
-  REQUIRE(std::abs(instance.sockets[2].local_position.y - (-10.f)) <
-          k_tolerance);
+  // Positions are zero-initialised at construction; call
+  // initialize_joint_socket_positions() to populate them.
+  REQUIRE(instance.sockets[0].local_position.x == 0.f);
+  REQUIRE(instance.sockets[0].local_position.y == 0.f);
+  REQUIRE(instance.sockets[1].local_position.x == 0.f);
+  REQUIRE(instance.sockets[1].local_position.y == 0.f);
+  REQUIRE(instance.sockets[2].local_position.x == 0.f);
+  REQUIRE(instance.sockets[2].local_position.y == 0.f);
 }
 
 /////////////////////////////////////////////////

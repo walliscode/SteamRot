@@ -15,9 +15,7 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include <SFML/Graphics/Transform.hpp>
-#include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <cmath>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -122,20 +120,21 @@ struct PartInstance {
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
 /// Derives from PartInstance and adds Joint-specific runtime state.
-/// All socket data (local position + runtime state) is stored in the @c sockets
-/// vector, which is fully computed from the Joint's SocketConfig at construction
-/// time. Positioning Logic may update individual @c sockets[i].local_position
-/// entries at runtime (e.g. to rotate the socket ring). World-space position of
-/// socket i is obtained via:
+/// The @c sockets vector is sized to @c joint_ptr->socket_config.socket_count
+/// at construction, with all positions zero-initialised. Call
+/// @c initialize_joint_socket_positions() to populate the positions using the
+/// even-spread algorithm before the instance is rendered or hit-tested.
+/// World-space position of socket i is obtained via:
 ///   transform.transformPoint(sockets[i].local_position)
 /////////////////////////////////////////////////
 struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Construct a JointInstance from a Joint definition.
   ///
-  /// Computes every socket's local-space position from the Joint's SocketConfig
-  /// and stores it alongside a default-constructed SocketState in @c sockets.
-  /// No further resizing or position assignment is needed after construction.
+  /// Allocates one @c SocketData per socket declared in the Joint's
+  /// SocketConfig (positions are zero-initialised). Call
+  /// @c initialize_joint_socket_positions() afterwards to compute the
+  /// even-spread positions from the Joint's SocketConfig.
   ///
   /// @param joint_ptr         Pointer to the Joint definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
@@ -145,26 +144,8 @@ struct JointInstance : public PartInstance {
       : PartInstance{initial_transform}, joint{joint_ptr} {
     if (!joint_ptr)
       return;
-
-    const auto &config = joint_ptr->socket_config;
-    if (config.socket_count == 0)
-      return;
-
-    const float arc_min = config.rotation_arc_min;
-    const float arc_max = config.rotation_arc_max;
-    const float arc_range = arc_max - arc_min;
-    const float angle_between = arc_range / (config.socket_count + 1);
-
-    sockets.reserve(config.socket_count);
-    for (int i = 0; i < config.socket_count; ++i) {
-      const float angle_deg = arc_min + angle_between * (i + 1);
-      const float angle_rad = sf::degrees(angle_deg).asRadians();
-      const sf::Vector2f pos =
-          joint_ptr->origin +
-          sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
-              config.radius;
-      sockets.emplace_back(pos);
-    }
+    sockets.resize(joint_ptr->socket_config.socket_count,
+                   SocketData{sf::Vector2f{0.f, 0.f}});
   }
 
   /////////////////////////////////////////////////
@@ -176,11 +157,13 @@ struct JointInstance : public PartInstance {
   /// @brief Per-socket data (local position + mutable state) for this Joint
   /// instance.
   ///
-  /// Fully initialised from the Joint's SocketConfig at construction.
-  /// Positioning Logic may update @c sockets[i].local_position to reposition
-  /// individual sockets (e.g. to apply socket ring rotation). Apply the
-  /// instance's transform to @c sockets[i].local_position to obtain the
-  /// world-space position of socket @c i.
+  /// Sized at construction; positions are zero-initialised. Call
+  /// @c initialize_joint_socket_positions() to populate positions via the
+  /// even-spread algorithm. Positioning Logic may subsequently update
+  /// @c sockets[i].local_position to reposition individual sockets (e.g. to
+  /// apply socket ring rotation). Apply the instance's transform to
+  /// @c sockets[i].local_position to obtain the world-space position of socket
+  /// @c i.
   /////////////////////////////////////////////////
   std::vector<SocketData> sockets;
 };

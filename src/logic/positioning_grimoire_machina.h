@@ -18,6 +18,19 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
+/// @brief Populates the socket local positions of a JointInstance using the
+/// even-spread algorithm.
+///
+/// Calls @c compute_socket_local_positions_even_spread internally and writes
+/// the resulting positions back into @c instance.sockets[i].local_position.
+/// This must be called after construction to give the sockets their correct
+/// positions.
+///
+/// @param instance JointInstance whose sockets should be positioned.
+/////////////////////////////////////////////////
+void initialize_joint_socket_positions(JointInstance &instance);
+
+/////////////////////////////////////////////////
 /// @brief Calculates an even spread of socket local positions for a Joint based
 /// on its SocketConfig.
 ///
