@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "action_ghost.h"
 #include "EventPayload.h"
+#include "positioning_grimoire_machina.h"
 
 namespace steamrot::logic::action::ghost {
 
@@ -29,6 +30,11 @@ void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection,
     auto it = grimoire->m_all_joints.find(tag->key);
     if (it != grimoire->m_all_joints.end()) {
       mr_ghost.m_instance = JointInstance{&it->second};
+      // create an initial spacing of the sockets
+      JointInstance &instance = std::get<JointInstance>(mr_ghost.m_instance);
+
+      positioning::grimoire_machina::initialize_joint_socket_positions(
+          instance);
     }
   }
 }
