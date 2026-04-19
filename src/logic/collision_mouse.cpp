@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
+#include "MachinaFormScaffold.h"
 #include "UIElement.h"
 #include "entity_memory.h"
 #include <algorithm>
@@ -99,8 +100,9 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   }
 }
 
+/////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketState &socket_state) {
+                    SocketData &socket_data) {
 
   // give the socket a circular hitbox with a fixed radius;
   static constexpr float k_radius = 5.f;
@@ -110,7 +112,7 @@ void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
 
   // checks squared distance to avoid costly square root; if within radius, mark
   // socket as is_mouse_over = true, else false
-  socket_state.is_mouse_over =
+  socket_data.is_mouse_over =
       (delta.x * delta.x + delta.y * delta.y) <= (k_radius * k_radius);
 }
 
@@ -128,7 +130,7 @@ void CheckMouseOver(sf::Vector2f world_mouse,
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(world_mouse, world_pos, fragment_instance.sockets[i].state);
+    CheckMouseOver(world_mouse, world_pos, fragment_instance.sockets[i]);
   }
 }
 
@@ -145,7 +147,7 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(world_mouse, world_pos, joint_instance.sockets[i].state);
+    CheckMouseOver(world_mouse, world_pos, joint_instance.sockets[i]);
   }
 }
 

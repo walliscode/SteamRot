@@ -7,11 +7,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "grimoire_machina_test_helpers.h"
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
 #include "action_grimoire_machina.h"
+#include "grimoire_machina_test_helpers.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
@@ -135,10 +135,11 @@ TEST_CASE("draw_view with RenderStates draws Joint movement_views at "
 TEST_CASE("draw_socket draws a non-hovered socket without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  steamrot::SocketState socket_state; // default: Available, not hovered
+  steamrot::SocketData socket_data{
+      {0.0f, 0.0f}}; // default: Available, not hovered
 
   REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_socket(
-      texture, {50.f, 50.f}, socket_state));
+      texture, {50.f, 50.f}, socket_data));
 }
 
 TEST_CASE("draw_socket produces white pixels at world_pos when not hovered",
@@ -146,10 +147,10 @@ TEST_CASE("draw_socket produces white pixels at world_pos when not hovered",
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketState socket_state;
-  socket_state.is_mouse_over = false;
+  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  socket_data.is_mouse_over = false;
   steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
-                                                         socket_state);
+                                                         socket_data);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -162,10 +163,10 @@ TEST_CASE("draw_socket produces yellow pixels at world_pos when hovered",
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketState socket_state;
-  socket_state.is_mouse_over = true;
+  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  socket_data.is_mouse_over = true;
   steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
-                                                         socket_state);
+                                                         socket_data);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -281,7 +282,8 @@ TEST_CASE("draw_fragment_instance renders fragment view and sockets at "
   // Triangle at (0,0),(20,0),(10,20); translate by (10,10) →
   // (10,10),(30,10),(20,30). True centroid = (20, 16.67); integer pixel (20,17)
   // should be green.
-  auto fragment = steamrot::tests::MakeFragmentWithOriginTriangle(sf::Color::Green);
+  auto fragment =
+      steamrot::tests::MakeFragmentWithOriginTriangle(sf::Color::Green);
 
   sf::Transform t;
   t.translate({10.f, 10.f});
@@ -389,7 +391,8 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_fragments["frag"] = steamrot::tests::MakeFragmentWithOriginTriangle();
+  grimoire_machina.m_all_fragments["frag"] =
+      steamrot::tests::MakeFragmentWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance =
@@ -410,7 +413,8 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
   sf::RenderTexture texture{{100, 100}};
 
   steamrot::GrimoireMachina grimoire_machina;
-  grimoire_machina.m_all_joints["joint"] = steamrot::tests::MakeJointWithOriginTriangle();
+  grimoire_machina.m_all_joints["joint"] =
+      steamrot::tests::MakeJointWithOriginTriangle();
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance =

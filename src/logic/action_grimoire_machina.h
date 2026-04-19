@@ -18,7 +18,6 @@
 #include "SceneContext.h"
 #include "Subscriber.h"
 #include <memory>
-#include <variant>
 #include <vector>
 
 namespace steamrot::logic::action::grimoire_machina {
@@ -101,7 +100,8 @@ void ProcessUserInputEvents(Subscriber &subscriber,
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
-void PlaceFirstPiece(GrimoireMachina &grimoire_machina, const MrGhost &mr_ghost);
+void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
+                     const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
