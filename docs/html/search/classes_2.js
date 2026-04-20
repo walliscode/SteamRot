@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['cameramovementlogic_0',['CameraMovementLogic',['../classsteamrot_1_1logic_1_1CameraMovementLogic.html',1,'steamrot::logic']]],
-  ['camerapayload_1',['CameraPayload',['../structsteamrot_1_1CameraPayload.html',1,'steamrot']]],
-  ['camerapayloadfbsbuilder_2',['CameraPayloadFbsBuilder',['../structsteamrot_1_1CameraPayloadFbsBuilder.html',1,'steamrot']]],
+  ['camerapayload_0',['CameraPayload',['../structsteamrot_1_1CameraPayload.html',1,'steamrot']]],
+  ['camerapayloadfbsbuilder_1',['CameraPayloadFbsBuilder',['../structsteamrot_1_1CameraPayloadFbsBuilder.html',1,'steamrot']]],
+  ['camerapositioninglogic_2',['CameraPositioningLogic',['../classsteamrot_1_1logic_1_1CameraPositioningLogic.html',1,'steamrot::logic']]],
   ['camerastate_3',['CameraState',['../structsteamrot_1_1CameraState.html',1,'steamrot']]],
   ['childdatafbsbuilder_4',['ChildDataFbsBuilder',['../structsteamrot_1_1ChildDataFbsBuilder.html',1,'steamrot']]],
   ['cmachinaform_5',['CMachinaForm',['../classCMachinaForm.html',1,'']]],

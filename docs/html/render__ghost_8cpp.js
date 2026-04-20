@@ -1,4 +1,4 @@
 var render__ghost_8cpp =
 [
-    [ "steamrot::logic::render::ghost::DrawGhostItem", "namespacesteamrot_1_1logic_1_1render_1_1ghost.html#a12d39338eb082cd871331d641de6c7e2", null ]
+    [ "steamrot::logic::render::ghost::draw_ghost_item", "namespacesteamrot_1_1logic_1_1render_1_1ghost.html#a8e638bf0fd46d4464a7569c77032207d", null ]
 ];

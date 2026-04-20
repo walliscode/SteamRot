@@ -19,6 +19,25 @@
 namespace steamrot::logic::action::camera {
 
 /////////////////////////////////////////////////
+/// @brief Apply a mouse-scroll delta to the camera zoom level.
+///
+/// Positive delta (scroll up) zooms in; negative (scroll down) zooms out.
+/// The result is clamped to [CameraState::kMinZoom, CameraState::kMaxZoom].
+///
+/// @param camera_state Camera state whose zoom level will be mutated.
+/// @param scroll_delta Raw scroll delta from the SFML mouse-wheel event.
+/////////////////////////////////////////////////
+void apply_zoom(CameraState &camera_state, float scroll_delta);
+
+/////////////////////////////////////////////////
+/// @brief Reset the camera zoom level to the default value.
+///
+/// @param camera_state Camera state whose zoom level will be reset to the
+/// default value.
+/////////////////////////////////////////////////
+void reset_zoom(CameraState &camera_state);
+
+/////////////////////////////////////////////////
 /// @brief Process all active subscribers and apply their camera scroll deltas.
 ///
 /// Iterates the subscriber list, skips inactive entries, and for each active
@@ -28,7 +47,7 @@ namespace steamrot::logic::action::camera {
 /// @param subscribers  Subscribers owned by the Logic instance.
 /// @param camera_state CameraState instance to mutate.
 /////////////////////////////////////////////////
-void ProcessSubscribers(
+void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     CameraState &camera_state);
 

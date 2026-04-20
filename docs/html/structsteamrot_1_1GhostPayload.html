@@ -93,7 +93,7 @@ $(function(){initNavTree('structsteamrot_1_1GhostPayload.html','','structsteamro
 </div><!--header-->
 <div class="contents">
 
-<p>Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> selection changes.  
+<p>Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> selection changes.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="EventPayload_8h_source.html">EventPayload.h</a>&gt;</code></p>
@@ -111,19 +111,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad03f3c28d2738f807f79f934e01eff18" id="r_ad03f3c28d2738f807f79f934e01eff18"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad03f3c28d2738f807f79f934e01eff18">GhostPayload</a> ()=default</td></tr>
 <tr class="memdesc:ad03f3c28d2738f807f79f934e01eff18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor for <a class="el" href="structsteamrot_1_1GhostPayload.html" title="Event payload for MrGhost selection changes.">GhostPayload</a>, sets action to NONE.  <br /></td></tr>
 <tr class="memitem:a7e5589fb1a7ef7bca1b28d1dff7497cf" id="r_a7e5589fb1a7ef7bca1b28d1dff7497cf"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a7e5589fb1a7ef7bca1b28d1dff7497cf">GhostPayload</a> (const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;selection)</td></tr>
-<tr class="memdesc:a7e5589fb1a7ef7bca1b28d1dff7497cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a SELECT action carrying the chosen item.  <br /></td></tr>
+<tr class="memdesc:a7e5589fb1a7ef7bca1b28d1dff7497cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a SELECT action carrying the chosen tag.  <br /></td></tr>
 <tr class="memitem:a80445bfaceb3f796962d20b67fc25e5a" id="r_a80445bfaceb3f796962d20b67fc25e5a"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a80445bfaceb3f796962d20b67fc25e5a">GhostPayload</a> (const <a class="el" href="#abc819b3dbb65d3a18b48232988cfa46c">GhostAction</a> ghost_action, const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;selection)</td></tr>
-<tr class="memdesc:a80445bfaceb3f796962d20b67fc25e5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking an explicit action and optional selection.  <br /></td></tr>
+<tr class="memdesc:a80445bfaceb3f796962d20b67fc25e5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking an explicit action and selection tag.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ace6c2e79c436a9c95393f0d877c59ce5" id="r_ace6c2e79c436a9c95393f0d877c59ce5"><td class="memItemLeft">enum <a class="el" href="#abc819b3dbb65d3a18b48232988cfa46c">steamrot::GhostPayload::GhostAction</a>&#160;</td><td class="memItemRight"><a class="el" href="#ace6c2e79c436a9c95393f0d877c59ce5">NONE</a></td></tr>
 <tr class="memitem:abca30428d1b7bf2579c754f56aac30fd" id="r_abca30428d1b7bf2579c754f56aac30fd"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a>&#160;</td><td class="memItemRight"><a class="el" href="#abca30428d1b7bf2579c754f56aac30fd">m_selection</a> {std::monostate{}}</td></tr>
-<tr class="memdesc:abca30428d1b7bf2579c754f56aac30fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The typed selection carried by this payload.  <br /></td></tr>
+<tr class="memdesc:abca30428d1b7bf2579c754f56aac30fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lightweight tag identifying the selected item.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> selection changes. </p>
-<p>Emitted by Logic classes that write to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> (e.g. a UI action logic that detects a menu item click). Logic classes that need to react to selection changes subscribe to <a class="el" href="namespacesteamrot.html#ac88f3bda138e187719062f9972ef4bcda30047325d9201304e95ffb83105002de">EventType::GHOST</a> and inspect this payload. </p>
+<div class="textblock"><p>Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> selection changes. </p>
+<p>Emitted by Logic classes that write to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> (e.g. a UI action logic that detects a menu item click). Logic classes that need to react to selection changes subscribe to <a class="el" href="namespacesteamrot.html#ac88f3bda138e187719062f9972ef4bcda30047325d9201304e95ffb83105002de">EventType::GHOST</a> and inspect this payload. The selection is stored as a lightweight <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag; the actual <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> / <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> is resolved in action_ghost by looking up the name in <a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a>. </p>
 </div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Member Enumeration Documentation</h2>
 <a id="abc819b3dbb65d3a18b48232988cfa46c" name="abc819b3dbb65d3a18b48232988cfa46c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abc819b3dbb65d3a18b48232988cfa46c">&#9670;&#160;</a></span>GhostAction</h2>
@@ -205,10 +205,10 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructor for a SELECT action carrying the chosen item. </p>
+<p>Constructor for a SELECT action carrying the chosen tag. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">selection</td><td>The <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant representing the currently selected item in MrGhost.">GhostSelection</a> variant describing what was selected. </td></tr>
+    <tr><td class="paramname">selection</td><td>The <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag identifying the chosen item. </td></tr>
   </table>
   </dd>
 </dl>
@@ -242,11 +242,11 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructor taking an explicit action and optional selection. </p>
+<p>Constructor taking an explicit action and selection tag. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ghost_action</td><td><a class="el" href="#abc819b3dbb65d3a18b48232988cfa46c" title="Discriminates between selecting and clearing the ghost state.">GhostAction</a> enum value to set the action member to. </td></tr>
-    <tr><td class="paramname">selection</td><td>The <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant representing the currently selected item in MrGhost.">GhostSelection</a> variant (relevant for SELECT action). </td></tr>
+    <tr><td class="paramname">ghost_action</td><td><a class="el" href="#abc819b3dbb65d3a18b48232988cfa46c" title="Discriminates between selecting and clearing the ghost state.">GhostAction</a> enum value. </td></tr>
+    <tr><td class="paramname">selection</td><td><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag (relevant for SELECT action). </td></tr>
   </table>
   </dd>
 </dl>
@@ -266,8 +266,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The typed selection carried by this payload. </p>
-<p>std::monostate when action is CLEAR or NONE. </p>
+<p>Lightweight tag identifying the selected item. </p>
+<p>std::monostate when action is CLEAR or NONE. Resolved to a <a class="el" href="namespacesteamrot.html#a229897ac32baf73be6d5cfa35241f63e" title="Variant representing the currently active ghost instance.">GhostInstance</a> by action_ghost::SelectGhostItem. </p>
 
 </div>
 </div>

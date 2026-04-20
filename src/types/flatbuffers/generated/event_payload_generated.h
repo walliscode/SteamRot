@@ -234,6 +234,42 @@ inline const char *EnumNameGhostActionFbs(GhostActionFbs e) {
 }
 
 ////////////////////////////////////////////////////////////
+/// Camera action types
+////////////////////////////////////////////////////////////
+enum CameraActionFbs : int8_t {
+  CameraActionFbs_NONE = 0,
+  CameraActionFbs_SCROLL = 1,
+  CameraActionFbs_RESET_ZOOM = 2,
+  CameraActionFbs_MIN = CameraActionFbs_NONE,
+  CameraActionFbs_MAX = CameraActionFbs_RESET_ZOOM
+};
+
+inline const CameraActionFbs (&EnumValuesCameraActionFbs())[3] {
+  static const CameraActionFbs values[] = {
+    CameraActionFbs_NONE,
+    CameraActionFbs_SCROLL,
+    CameraActionFbs_RESET_ZOOM
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesCameraActionFbs() {
+  static const char * const names[4] = {
+    "NONE",
+    "SCROLL",
+    "RESET_ZOOM",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameCameraActionFbs(CameraActionFbs e) {
+  if (::flatbuffers::IsOutRange(e, CameraActionFbs_NONE, CameraActionFbs_RESET_ZOOM)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesCameraActionFbs()[index];
+}
+
+////////////////////////////////////////////////////////////
 /// Union of all payload types
 ////////////////////////////////////////////////////////////
 enum EventPayloadFbs : uint8_t {
@@ -644,8 +680,15 @@ inline ::flatbuffers::Offset<GhostPayloadFbs> CreateGhostPayloadFbs(
 ////////////////////////////////////////////////////////////
 struct CameraPayloadFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef CameraPayloadFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ACTION = 4
+  };
+  steamrot::CameraActionFbs action() const {
+    return static_cast<steamrot::CameraActionFbs>(GetField<int8_t>(VT_ACTION, 0));
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_ACTION, 1) &&
            verifier.EndTable();
   }
 };
@@ -654,6 +697,9 @@ struct CameraPayloadFbsBuilder {
   typedef CameraPayloadFbs Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
+  void add_action(steamrot::CameraActionFbs action) {
+    fbb_.AddElement<int8_t>(CameraPayloadFbs::VT_ACTION, static_cast<int8_t>(action), 0);
+  }
   explicit CameraPayloadFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -666,8 +712,10 @@ struct CameraPayloadFbsBuilder {
 };
 
 inline ::flatbuffers::Offset<CameraPayloadFbs> CreateCameraPayloadFbs(
-    ::flatbuffers::FlatBufferBuilder &_fbb) {
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    steamrot::CameraActionFbs action = steamrot::CameraActionFbs_NONE) {
   CameraPayloadFbsBuilder builder_(_fbb);
+  builder_.add_action(action);
   return builder_.Finish();
 }
 

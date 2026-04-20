@@ -4,7 +4,7 @@ var LogicType_8h =
       [ "steamrot::LogicGrouping::Collision", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a15fb6ccbd11ebebcea2b48dc477f3561", null ],
       [ "steamrot::LogicGrouping::Render", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a5e520da5341f2fec6d3bbfe7ef357922", null ],
       [ "steamrot::LogicGrouping::Action", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a004bf6c9a40003140292e97330236c53", null ],
-      [ "steamrot::LogicGrouping::Movement", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a", null ]
+      [ "steamrot::LogicGrouping::Positioning", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9aa52fce78b8f3903d4789878f2635a977", null ]
     ] ],
     [ "steamrot::LogicType", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995e", [
       [ "steamrot::LogicType::None", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea6adf97f83acf6453d4a6a4b1070f3754", null ],
@@ -23,7 +23,7 @@ var LogicType_8h =
       [ "steamrot::LogicType::GhostAction", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eafb6543864473a5074c83f653d16f78d3", null ],
       [ "steamrot::LogicType::GhostPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8", null ],
       [ "steamrot::LogicType::GhostRender", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d", null ],
-      [ "steamrot::LogicType::CameraMovement", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea8b0c2c10f7c8647391a4a1fc7cd4181f", null ]
+      [ "steamrot::LogicType::CameraPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0", null ]
     ] ],
     [ "steamrot::EnumNameLogicGrouping", "namespacesteamrot.html#ab70ec017d683aae03cdfe8b3caddfb09", null ],
     [ "steamrot::EnumNameLogicType", "namespacesteamrot.html#a10492ae039fa81a3ca85e6c64e9d48a1", null ]

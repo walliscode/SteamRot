@@ -1,13 +1,15 @@
 var namespacesteamrot_1_1logic_1_1action =
 [
     [ "camera", "namespacesteamrot_1_1logic_1_1action_1_1camera.html", [
-      [ "ProcessSubscribers", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#a0f93dae6aba9724d302371aa1ba7520b", null ]
+      [ "apply_zoom", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#ab2178c2daeef0a485704a309da32fd30", null ],
+      [ "process_subscribers", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3", null ],
+      [ "reset_zoom", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#abb0ba3c92238fabe9b78127f9e6de47f", null ]
     ] ],
     [ "ghost", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html", [
       [ "ClearGhostSelection", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a62b0b9e3d2bca8faae553a0801c3aa2c", null ],
-      [ "ProcessSubscriber", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#ae86fd50ebd8cbf8b279b8bcd03923c83", null ],
-      [ "ProcessSubscribers", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a4303dafc773ba717052ec26ab548f060", null ],
-      [ "SelectGhostItem", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a322e46fbe904ed3bbbba7c0c1b900f65", null ]
+      [ "ProcessSubscriber", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#ae031af741b30b8f45f640bac41d958b7", null ],
+      [ "ProcessSubscribers", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#af0e42ef5acc2f4b398cbb586e97053a5", null ],
+      [ "SelectGhostItem", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a5822cc57ac5658382ad1fb3d1f1142ab", null ]
     ] ],
     [ "grimoire_machina", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html", [
       [ "ClearActiveMachinaFormScaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a6fe6338daf0dfc17cfd9947b2df86f10", null ],

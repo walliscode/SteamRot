@@ -5,7 +5,7 @@ var annotated_dup =
     ] ],
     [ "steamrot", "namespacesteamrot.html", [
       [ "logic", "namespacesteamrot_1_1logic.html", [
-        [ "CameraMovementLogic", "classsteamrot_1_1logic_1_1CameraMovementLogic.html", "classsteamrot_1_1logic_1_1CameraMovementLogic" ],
+        [ "CameraPositioningLogic", "classsteamrot_1_1logic_1_1CameraPositioningLogic.html", "classsteamrot_1_1logic_1_1CameraPositioningLogic" ],
         [ "GhostActionLogic", "classsteamrot_1_1logic_1_1GhostActionLogic.html", "classsteamrot_1_1logic_1_1GhostActionLogic" ],
         [ "GhostPositioningLogic", "classsteamrot_1_1logic_1_1GhostPositioningLogic.html", "classsteamrot_1_1logic_1_1GhostPositioningLogic" ],
         [ "GhostRenderLogic", "classsteamrot_1_1logic_1_1GhostRenderLogic.html", "classsteamrot_1_1logic_1_1GhostRenderLogic" ],
@@ -92,7 +92,7 @@ var annotated_dup =
       [ "SocketConfig", "structsteamrot_1_1SocketConfig.html", "structsteamrot_1_1SocketConfig" ],
       [ "Joint", "structsteamrot_1_1Joint.html", "structsteamrot_1_1Joint" ],
       [ "MachinaForm", "structsteamrot_1_1MachinaForm.html", "structsteamrot_1_1MachinaForm" ],
-      [ "SocketState", "structsteamrot_1_1SocketState.html", "structsteamrot_1_1SocketState" ],
+      [ "SocketData", "structsteamrot_1_1SocketData.html", "structsteamrot_1_1SocketData" ],
       [ "PartInstance", "structsteamrot_1_1PartInstance.html", "structsteamrot_1_1PartInstance" ],
       [ "JointInstance", "structsteamrot_1_1JointInstance.html", "structsteamrot_1_1JointInstance" ],
       [ "FragmentInstance", "structsteamrot_1_1FragmentInstance.html", "structsteamrot_1_1FragmentInstance" ],
@@ -259,6 +259,7 @@ var annotated_dup =
     [ "DropDownListStyle", "structDropDownListStyle.html", "structDropDownListStyle" ],
     [ "Logger", "classLogger.html", "classLogger" ],
     [ "PanelStyle", "structPanelStyle.html", null ],
+    [ "SocketState", "structSocketState.html", null ],
     [ "Style", "structStyle.html", "structStyle" ],
     [ "TextureProvider", "classTextureProvider.html", null ],
     [ "Tile", "classTile.html", "classTile" ]

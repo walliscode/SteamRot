@@ -31,7 +31,12 @@ struct InputPayload {
   /// Any user input events are converted to this format for ease of use in the
   /// EventHandler
   /////////////////////////////////////////////////
-  enum class InputAction { NONE, SELECT, TOGGLE_SOCKET_VISIBILITY, ROTATE_GHOST } action;
+  enum class InputAction {
+    NONE,
+    SELECT,
+    TOGGLE_SOCKET_VISIBILITY,
+    ROTATE_GHOST
+  } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for InputPayload, sets action to NONE
@@ -263,11 +268,14 @@ struct GhostPayload {
 struct CameraPayload {
 
   /////////////////////////////////////////////////
-  /// @brief Raw scroll delta from SFML this tick.
-  ///
-  /// Positive = scroll up (zoom in); negative = scroll down (zoom out).
+  /// @brief Enum discriminating between different types of camera-related
+  /// actions.
   /////////////////////////////////////////////////
-  float scroll_delta{0.0f};
+  enum class CameraAction {
+    NONE,
+    SCROLL,
+    RESET_ZOOM
+  } action{CameraAction::NONE};
 
   /////////////////////////////////////////////////
   /// @brief Default constructor.
@@ -275,15 +283,30 @@ struct CameraPayload {
   CameraPayload() = default;
 
   /////////////////////////////////////////////////
+  /// @brief Constructor taking a CameraAction enum value.
+  ///
+  /// @param camera_action CameraAction enum value to set the action member to
+  /////////////////////////////////////////////////
+  CameraPayload(const CameraAction camera_action) : action(camera_action) {};
+
+  /////////////////////////////////////////////////
   /// @brief Constructor taking a scroll delta.
   ///
   /// @param delta Raw scroll delta from the SFML mouse-wheel event.
   /////////////////////////////////////////////////
-  explicit CameraPayload(float delta) : scroll_delta(delta) {}
+  explicit CameraPayload(float delta)
+      : action(CameraAction::SCROLL), scroll_delta(delta) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Raw scroll delta from SFML this tick.
+  ///
+  /// Positive = scroll up (zoom in); negative = scroll down (zoom out).
+  /////////////////////////////////////////////////
+  float scroll_delta{0.0f};
 };
 
-using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
-                                  LogicPayload, ScenePayload, SystemPayload,
-                                  GhostPayload, CameraPayload>;
+using EventPayload =
+    std::variant<std::monostate, InputPayload, UIPayload, LogicPayload,
+                 ScenePayload, SystemPayload, GhostPayload, CameraPayload>;
 
 } // namespace steamrot

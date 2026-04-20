@@ -119,7 +119,7 @@ var namespacesteamrot =
     [ "SocketConfig", "structsteamrot_1_1SocketConfig.html", "structsteamrot_1_1SocketConfig" ],
     [ "Joint", "structsteamrot_1_1Joint.html", "structsteamrot_1_1Joint" ],
     [ "MachinaForm", "structsteamrot_1_1MachinaForm.html", "structsteamrot_1_1MachinaForm" ],
-    [ "SocketState", "structsteamrot_1_1SocketState.html", "structsteamrot_1_1SocketState" ],
+    [ "SocketData", "structsteamrot_1_1SocketData.html", "structsteamrot_1_1SocketData" ],
     [ "PartInstance", "structsteamrot_1_1PartInstance.html", "structsteamrot_1_1PartInstance" ],
     [ "JointInstance", "structsteamrot_1_1JointInstance.html", "structsteamrot_1_1JointInstance" ],
     [ "FragmentInstance", "structsteamrot_1_1FragmentInstance.html", "structsteamrot_1_1FragmentInstance" ],
@@ -284,10 +284,12 @@ var namespacesteamrot =
     [ "EntityMemoryPool", "namespacesteamrot.html#aa33879dc691e5c5409bdbeff670cef1e", null ],
     [ "EntityTransportVariant", "namespacesteamrot.html#ac63afcf635ef357d447afe8e06a4c2f9", null ],
     [ "EventBus", "namespacesteamrot.html#a7830fcc34149a0e2188eb23bebd2ba82", null ],
-    [ "EventPayload", "namespacesteamrot.html#a44eac92bcfde0a28526e41a9fd5b9e1e", null ],
+    [ "EventPayload", "namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d", null ],
+    [ "GhostInstance", "namespacesteamrot.html#a229897ac32baf73be6d5cfa35241f63e", null ],
     [ "GhostSelection", "namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d", null ],
     [ "InputActionRegistry", "namespacesteamrot.html#af33d736d39c814827131608029cf38a1", null ],
     [ "LogicConfigCollection", "namespacesteamrot.html#a2237087557d8af08abdcd7b14b1a2a41", null ],
+    [ "PartMap", "namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8", null ],
     [ "SceneCollectionData", "namespacesteamrot.html#afb417d2b3fca9434af018114d30f24b1", null ],
     [ "SimulationElement", "namespacesteamrot.html#a68645cd1721485fa903c64349b01542b", null ],
     [ "Views", "namespacesteamrot.html#a7cc60055c6f67b80ad932c96835b2227", null ],
@@ -376,6 +378,7 @@ var namespacesteamrot =
     [ "InputActionFbs", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244", [
       [ "InputActionFbs_SELECT", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a", null ],
       [ "InputActionFbs_TOGGLE_SOCKET_VISIBILITY", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a2c7ae3f50fed353a004b9ee61508cd0f", null ],
+      [ "InputActionFbs_ROTATE_GHOST", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a5efa720ad2e658ca9f6b84c9290da47f", null ],
       [ "InputActionFbs_MIN", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a48b79a756fd9590cf7825d6215ba4e06", null ],
       [ "InputActionFbs_MAX", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519", null ]
     ] ],
@@ -466,7 +469,7 @@ var namespacesteamrot =
       [ "Collision", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a15fb6ccbd11ebebcea2b48dc477f3561", null ],
       [ "Render", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a5e520da5341f2fec6d3bbfe7ef357922", null ],
       [ "Action", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a004bf6c9a40003140292e97330236c53", null ],
-      [ "Movement", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a", null ]
+      [ "Positioning", "namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9aa52fce78b8f3903d4789878f2635a977", null ]
     ] ],
     [ "LogicToggleFbs", "namespacesteamrot.html#a5dd2b6c05f378b284019be357690f4f2", [
       [ "LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD", "namespacesteamrot.html#a5dd2b6c05f378b284019be357690f4f2a9ecaa5260a098712998749f2f49c572b", null ],
@@ -491,7 +494,7 @@ var namespacesteamrot =
       [ "GhostAction", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eafb6543864473a5074c83f653d16f78d3", null ],
       [ "GhostPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8", null ],
       [ "GhostRender", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d", null ],
-      [ "CameraMovement", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea8b0c2c10f7c8647391a4a1fc7cd4181f", null ]
+      [ "CameraPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0", null ]
     ] ],
     [ "MouseInputFbs", "namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86", [
       [ "MouseInputFbs_LEFT_CLICK", "namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86ac4d9e5607ba20d6a29b993cf357b869f", null ],
@@ -521,6 +524,11 @@ var namespacesteamrot =
       [ "SceneTypeFbs_CRAFTING", "namespacesteamrot.html#a8fbb96fab930780c3d8e52527b6d9b4ba233eac7221b7d22ea3c6422e355e7789", null ],
       [ "SceneTypeFbs_MIN", "namespacesteamrot.html#a8fbb96fab930780c3d8e52527b6d9b4ba1bed5756d5697b4a5b5cff3b04c84176", null ],
       [ "SceneTypeFbs_MAX", "namespacesteamrot.html#a8fbb96fab930780c3d8e52527b6d9b4ba92dfc51020f2169ae9bf2de54d88c8c1", null ]
+    ] ],
+    [ "SocketState", "namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1", [
+      [ "Available", "namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a78945de8de090e90045d299651a68a9b", null ],
+      [ "Connected", "namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7", null ],
+      [ "Blocked", "namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2", null ]
     ] ],
     [ "SpacingAndSizing", "namespacesteamrot.html#ac518a10136fc8dfc532484a2504efe51", [
       [ "None", "namespacesteamrot.html#ac518a10136fc8dfc532484a2504efe51a6adf97f83acf6453d4a6a4b1070f3754", null ],
@@ -578,7 +586,6 @@ var namespacesteamrot =
     [ "clear_viewtable_entry", "namespacesteamrot.html#ad3f61278fa102a733ded84bc7e996a6e", null ],
     [ "clear_viewtable_entry", "namespacesteamrot.html#ad2f5df2cc161f6d907215be0c94a70d7", null ],
     [ "clear_viewtable_entry", "namespacesteamrot.html#ac40a0600e35c71b93e65911f8a3cb410", null ],
-    [ "ComputeSocketLocalPos", "namespacesteamrot.html#adb45f8ad2ece5d309911565e32d95f62", null ],
     [ "ConvertSceneTypeFbsToSceneType", "namespacesteamrot.html#aa5cc9fa3e2545043f602a6fd20b957fc", null ],
     [ "CreateAccessibilityPreferencesFbs", "namespacesteamrot.html#a4bc8485233de8f62df6458ba0675129a", null ],
     [ "CreateAccessibilityPreferencesFbsDirect", "namespacesteamrot.html#a54c28bf75ac9a3234c1dcb77a25d0e5f", null ],
@@ -623,8 +630,8 @@ var namespacesteamrot =
     [ "CreateEventPacketFbs", "namespacesteamrot.html#ac8aa54e8c2360c116fed0faf28bea3d6", null ],
     [ "CreateFontDataFbs", "namespacesteamrot.html#ab76e896ea1205e30e829a92575f5fccc", null ],
     [ "CreateFontDataFbsDirect", "namespacesteamrot.html#afd7af7b3859c6e651d6d50505c72c4ad", null ],
-    [ "CreateFragmentFbs", "namespacesteamrot.html#a8c2b0f5b789af03d96859dbd22a6dee5", null ],
-    [ "CreateFragmentFbsDirect", "namespacesteamrot.html#ac7e856455f9cf626d7c71ad9f019c39c", null ],
+    [ "CreateFragmentFbs", "namespacesteamrot.html#ae358da4de4ea138a14b70cf89c9e05ed", null ],
+    [ "CreateFragmentFbsDirect", "namespacesteamrot.html#a7d63f365e12807c0c3b4a171e97dc682", null ],
     [ "CreateGhostPayloadFbs", "namespacesteamrot.html#a0f1ee7e34011d67b0278b6c287b543fd", null ],
     [ "CreateGrimoireMachinaDataFbs", "namespacesteamrot.html#a1bc62c5f76e6af9d6c64b0e19502f7bb", null ],
     [ "CreateGrimoireMachinaDataFbsDirect", "namespacesteamrot.html#ad54e7662db280f5681dbc40721f7722a", null ],
@@ -637,10 +644,10 @@ var namespacesteamrot =
     [ "CreateInputPayloadFbs", "namespacesteamrot.html#a69c5f53f2639c6775de0dd681a6494b3", null ],
     [ "CreateInputSequenceFbs", "namespacesteamrot.html#adca43a1c914ba2fe18a56791c943790c", null ],
     [ "CreateInputSequenceFbsDirect", "namespacesteamrot.html#a757fe0bd63b44399c39fa0ddb9a705fb", null ],
-    [ "CreateJointFbs", "namespacesteamrot.html#a61e6fa478019e418cf183f2cf084bb9a", null ],
-    [ "CreateJointFbsDirect", "namespacesteamrot.html#a50548f19963944931697a0bde3e8938e", null ],
+    [ "CreateJointFbs", "namespacesteamrot.html#af2a0c8bcadd42456b465f1b7868ce9ba", null ],
+    [ "CreateJointFbsDirect", "namespacesteamrot.html#ae4f0e1f622610bbe029d14ff4c4c9e93", null ],
     [ "CreateKeyboardInputDataFbs", "namespacesteamrot.html#ab9bd5d68c68aaf8aa6fda6611ebadfb9", null ],
-    [ "CreateLogicConfigCollectionFbs", "namespacesteamrot.html#a82be4ffce2a603eb4cc96d0da34d5af8", null ],
+    [ "CreateLogicConfigCollectionFbs", "namespacesteamrot.html#aa39748451591b45fac61577048ded9fb", null ],
     [ "CreateLogicConfigFbs", "namespacesteamrot.html#ae4a7f50f767a291f2abd396ace45ecb0", null ],
     [ "CreateLogicConfigFbsDirect", "namespacesteamrot.html#a7e2282b2a8c96b70749b86d182c29858", null ],
     [ "CreateLogicPayloadFbs", "namespacesteamrot.html#a9c503a3c389533356fe8497cec341ae8", null ],
@@ -667,7 +674,7 @@ var namespacesteamrot =
     [ "CreateSimulationDataFbs", "namespacesteamrot.html#a784a58f3a0dae499de0f68206310af21", null ],
     [ "CreateSimulationDataFbsDirect", "namespacesteamrot.html#af8e0c874ddd83dbf67c89e2afde34872", null ],
     [ "CreateSimulationStepFbs", "namespacesteamrot.html#a7926c45eaf8fe14307cb87e36453ac87", null ],
-    [ "CreateSocketConfigFbs", "namespacesteamrot.html#a714ff8ecd1dc051a8bddd3a61d6c0b20", null ],
+    [ "CreateSocketConfigFbs", "namespacesteamrot.html#af03e393c8881896c9ce4312565431ddb", null ],
     [ "CreateStyleDataFbs", "namespacesteamrot.html#ade49859c323bacd8c4ac472901daac61", null ],
     [ "CreateSubscriberFbs", "namespacesteamrot.html#a120770e9422db5fd6b97e09d6ae1571c", null ],
     [ "CreateSystemPayloadFbs", "namespacesteamrot.html#acc7320ca5640fd88130add5fd7533bcb", null ],
@@ -752,7 +759,7 @@ var namespacesteamrot =
     [ "EnumValuesEventPayloadFbs", "namespacesteamrot.html#ac580498c64f0dea5458382347478f0d8", null ],
     [ "EnumValuesEventTypeFbs", "namespacesteamrot.html#a080601c30a380bcd5ea7a868ec326df1", null ],
     [ "EnumValuesGhostActionFbs", "namespacesteamrot.html#aaf221455192a2faae8b8456bd4f3d254", null ],
-    [ "EnumValuesInputActionFbs", "namespacesteamrot.html#ac7131fe03f1e3d0f5a4e0c3b83ba9e6c", null ],
+    [ "EnumValuesInputActionFbs", "namespacesteamrot.html#aa585c47458c0f16590ece352e7144961", null ],
     [ "EnumValuesInputEventDataFbs", "namespacesteamrot.html#a1cfba7f803371b416b1d0dde1cb0647d", null ],
     [ "EnumValuesInputTypeFbs", "namespacesteamrot.html#a4ee5828946e0c7d6dbdc702267dfaab1", null ],
     [ "EnumValuesKeyboardInputFbs", "namespacesteamrot.html#a7d74c8f52f297df0063dd9d59185629e", null ],
@@ -917,7 +924,6 @@ var namespacesteamrot =
     [ "VerifyUserInterfaceFbsBuffer", "namespacesteamrot.html#abdd3e70c78f094abe1da27f4bf675e39", null ],
     [ "VerifyUserPreferencesDataFbsBuffer", "namespacesteamrot.html#a8226d28aa8344b852663a98453209b00", null ],
     [ "ComponentRegisterSize", "namespacesteamrot.html#a1754276c51344a1d12d0521f126739b4", null ],
-    [ "k_socket_deg_to_rad", "namespacesteamrot.html#a7176a8d64c294ca5896576ba09b7d038", null ],
     [ "kCompositeSlots", "namespacesteamrot.html#aab7befdb7dedf8757b3afaf393e41546", null ],
     [ "kKeyboardBits", "namespacesteamrot.html#a202c36566b846094556177463d48d149", null ],
     [ "kMouseBits", "namespacesteamrot.html#a4088cd8f9cd281f14cdb5495a4e61212", null ],

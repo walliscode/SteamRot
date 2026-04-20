@@ -14,7 +14,7 @@ var classsteamrot_1_1Scene =
     [ "sAction", "classsteamrot_1_1Scene.html#a21fe0088bcbe96f7ced2c4457869079d", null ],
     [ "sCollision", "classsteamrot_1_1Scene.html#ad2248f59d210bf534c07558cab69fdb5", null ],
     [ "SetActive", "classsteamrot_1_1Scene.html#ae0ab42360ae976a9d1a78881abdb9622", null ],
-    [ "sMovement", "classsteamrot_1_1Scene.html#abcf3ea77834115d22a718b15127df3e4", null ],
+    [ "sPositioning", "classsteamrot_1_1Scene.html#a995f123db43b973e1eef0c30a57cc135", null ],
     [ "sRender", "classsteamrot_1_1Scene.html#a0675f96fe53a51ed3cd4873e9678b20a", null ],
     [ "SceneFactory", "classsteamrot_1_1Scene.html#aace72bb27f976f9bf22d4ef1f887c0a6", null ],
     [ "m_scene_config", "classsteamrot_1_1Scene.html#a248bbc2bede40f38c92769e8e7e21b55", null ],

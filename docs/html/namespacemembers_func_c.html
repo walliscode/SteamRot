@@ -94,6 +94,8 @@ $(function(){initNavTree('namespacemembers_func_c.html','',''); });
 <h3 class="doxsection"><a id="index_c" name="index_c"></a>- c -</h3><ul>
 <li>CalculateAvailableSize()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a66664f357131c4de880753100e44cadd">steamrot::logic::positioning::ui</a></li>
 <li>CalculateStartPosition()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a707c2155eab26b303eb652e86df6dfab">steamrot::logic::positioning::ui</a></li>
+<li>check_collisions_between_ghost_and_scaffold()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1collision_1_1grimoire__machina.html#aed2551c3cd66e4ee2c666653123ef2c9">steamrot::logic::collision::grimoire_machina</a></li>
+<li>check_socket_collisions()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1collision_1_1grimoire__machina.html#a0db6c94502147e2b500563803ff72764">steamrot::logic::collision::grimoire_machina</a></li>
 <li>CheckMouseOver()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1collision_1_1mouse.html#a7534ccba8941677f4b31ce271fd23178">steamrot::logic::collision::mouse</a></li>
 <li>CheckMouseOverAllCUserInterfaceComponents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1collision_1_1mouse.html#a7559d729558ba508c3c379058ef6a888">steamrot::logic::collision::mouse</a></li>
 <li>ChildDataFbs::element_as&lt; steamrot::ButtonDataFbs &gt;()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a862754d359192ed0475ba84fcb7968eb">steamrot</a></li>
@@ -111,7 +113,7 @@ $(function(){initNavTree('namespacemembers_func_c.html','',''); });
 <li>CollectInputEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events_1_1convert.html#a07da592bc86fa2d839a734916e234d0a">steamrot::events::convert</a></li>
 <li>CollectScrollDelta()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events_1_1convert.html#aa969d0f691dc4b41edd0f49c1c016a5f">steamrot::events::convert</a></li>
 <li>CollectSystemEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events_1_1convert.html#acd83d888000cdb468b3e8cd01e2ab9d5">steamrot::events::convert</a></li>
-<li>ComputeSocketLocalPos()&#160;:&#160;<a class="el" href="namespacesteamrot.html#adb45f8ad2ece5d309911565e32d95f62">steamrot</a></li>
+<li>compute_socket_local_positions_even_spread()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a89d803047dab52faba33f961c58902d1">steamrot::logic::positioning::grimoire_machina</a></li>
 <li>ConfigureAssetConfig()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1data_1_1configure.html#a35084838f114444c571f0272c4c09bbb">steamrot::data::configure</a></li>
 <li>ConfigureBaseStyle()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1data_1_1configure.html#aa802b1b0c50fc0a2dd0129c2ffdd984e">steamrot::data::configure</a></li>
 <li>ConfigureBaseUIElement()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1data_1_1configure.html#a2e54633f52383eedd92df3646377f6fa">steamrot::data::configure</a></li>
@@ -209,8 +211,8 @@ $(function(){initNavTree('namespacemembers_func_c.html','',''); });
 <li>CreateEventPacketFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ac8aa54e8c2360c116fed0faf28bea3d6">steamrot</a></li>
 <li>CreateFontDataFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ab76e896ea1205e30e829a92575f5fccc">steamrot</a></li>
 <li>CreateFontDataFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#afd7af7b3859c6e651d6d50505c72c4ad">steamrot</a></li>
-<li>CreateFragmentFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c2b0f5b789af03d96859dbd22a6dee5">steamrot</a></li>
-<li>CreateFragmentFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ac7e856455f9cf626d7c71ad9f019c39c">steamrot</a></li>
+<li>CreateFragmentFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ae358da4de4ea138a14b70cf89c9e05ed">steamrot</a></li>
+<li>CreateFragmentFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a7d63f365e12807c0c3b4a171e97dc682">steamrot</a></li>
 <li>CreateGhostEventPacket()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events.html#a81f1a3ec689f95dff7f9cdcc372d03a1">steamrot::events</a></li>
 <li>CreateGhostPayloadFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a0f1ee7e34011d67b0278b6c287b543fd">steamrot</a></li>
 <li>CreateGrimoireMachinaDataFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a1bc62c5f76e6af9d6c64b0e19502f7bb">steamrot</a></li>
@@ -225,10 +227,10 @@ $(function(){initNavTree('namespacemembers_func_c.html','',''); });
 <li>CreateInputPayloadFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a69c5f53f2639c6775de0dd681a6494b3">steamrot</a></li>
 <li>CreateInputSequenceFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#adca43a1c914ba2fe18a56791c943790c">steamrot</a></li>
 <li>CreateInputSequenceFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a757fe0bd63b44399c39fa0ddb9a705fb">steamrot</a></li>
-<li>CreateJointFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a61e6fa478019e418cf183f2cf084bb9a">steamrot</a></li>
-<li>CreateJointFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a50548f19963944931697a0bde3e8938e">steamrot</a></li>
+<li>CreateJointFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#af2a0c8bcadd42456b465f1b7868ce9ba">steamrot</a></li>
+<li>CreateJointFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ae4f0e1f622610bbe029d14ff4c4c9e93">steamrot</a></li>
 <li>CreateKeyboardInputDataFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ab9bd5d68c68aaf8aa6fda6611ebadfb9">steamrot</a></li>
-<li>CreateLogicConfigCollectionFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a82be4ffce2a603eb4cc96d0da34d5af8">steamrot</a></li>
+<li>CreateLogicConfigCollectionFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#aa39748451591b45fac61577048ded9fb">steamrot</a></li>
 <li>CreateLogicConfigFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ae4a7f50f767a291f2abd396ace45ecb0">steamrot</a></li>
 <li>CreateLogicConfigFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a7e2282b2a8c96b70749b86d182c29858">steamrot</a></li>
 <li>CreateLogicEventPacket()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events.html#af2007a02c081c883ea2f35288587fe2b">steamrot::events</a></li>
@@ -258,7 +260,7 @@ $(function(){initNavTree('namespacemembers_func_c.html','',''); });
 <li>CreateSimulationDataFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a784a58f3a0dae499de0f68206310af21">steamrot</a></li>
 <li>CreateSimulationDataFbsDirect()&#160;:&#160;<a class="el" href="namespacesteamrot.html#af8e0c874ddd83dbf67c89e2afde34872">steamrot</a></li>
 <li>CreateSimulationStepFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a7926c45eaf8fe14307cb87e36453ac87">steamrot</a></li>
-<li>CreateSocketConfigFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a714ff8ecd1dc051a8bddd3a61d6c0b20">steamrot</a></li>
+<li>CreateSocketConfigFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#af03e393c8881896c9ce4312565431ddb">steamrot</a></li>
 <li>CreateStyleDataFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#ade49859c323bacd8c4ac472901daac61">steamrot</a></li>
 <li>CreateSubscriberFbs()&#160;:&#160;<a class="el" href="namespacesteamrot.html#a120770e9422db5fd6b97e09d6ae1571c">steamrot</a></li>
 <li>CreateSystemEventPacket()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1events.html#ab2430091b569fa72eaeba3d8c5b6287d">steamrot::events</a></li>

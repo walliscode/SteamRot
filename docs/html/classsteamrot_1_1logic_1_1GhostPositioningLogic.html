@@ -93,7 +93,7 @@ $(function(){initNavTree('classsteamrot_1_1logic_1_1GhostPositioningLogic.html',
 </div><!--header-->
 <div class="contents">
 
-<p>Updates the position of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> to track the current mouse position.  
+<p>Updates the position and rotation of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> to track the current mouse position and respond to rotation input.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="GhostPositioningLogic_8h_source.html">GhostPositioningLogic.h</a>&gt;</code></p>
@@ -110,7 +110,7 @@ Inheritance diagram for steamrot::logic::GhostPositioningLogic:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad9ff73e1493dda5dd16abb96a75cc959" id="r_ad9ff73e1493dda5dd16abb96a75cc959"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad9ff73e1493dda5dd16abb96a75cc959">GhostPositioningLogic</a> (const <a class="el" href="structsteamrot_1_1SceneContext.html">SceneContext</a> &amp;scene_context)</td></tr>
-<tr class="memdesc:ad9ff73e1493dda5dd16abb96a75cc959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for the <a class="el" href="classsteamrot_1_1logic_1_1GhostPositioningLogic.html" title="Updates the position of MrGhost to track the current mouse position.">GhostPositioningLogic</a> class.  <br /></td></tr>
+<tr class="memdesc:ad9ff73e1493dda5dd16abb96a75cc959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for the <a class="el" href="classsteamrot_1_1logic_1_1GhostPositioningLogic.html" title="Updates the position and rotation of MrGhost to track the current mouse position and respond to rotat...">GhostPositioningLogic</a> class.  <br /></td></tr>
 <tr class="memitem:a8f7740c56aa7cef4ac3bb21ce9b175b9" id="r_a8f7740c56aa7cef4ac3bb21ce9b175b9"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995e">LogicType</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8f7740c56aa7cef4ac3bb21ce9b175b9">GetLogicType</a> () const override</td></tr>
 <tr class="memdesc:a8f7740c56aa7cef4ac3bb21ce9b175b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the <a class="el" href="namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995e">LogicType</a> enum value corresponding to this <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a>.  <br /></td></tr>
 <tr class="inherit_header pub_methods_classsteamrot_1_1logic_1_1Logic"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classsteamrot_1_1logic_1_1Logic')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="classsteamrot_1_1logic_1_1Logic.html">steamrot::logic::Logic</a></td></tr>
@@ -134,8 +134,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memdesc:a7c558e7d422d3e31dbd833b023ac7722 inherit pro_attribs_classsteamrot_1_1logic_1_1Logic"><td class="mdescLeft">&#160;</td><td class="mdescRight">A vector of shared pointers to <a class="el" href="structsteamrot_1_1Subscriber.html" title="For registering with the EventHandler.">Subscriber</a> objects.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Updates the position of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> to track the current mouse position. </p>
-<p>Each tick this <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> writes the current mouse cursor position (m_scene_context.mouse_position) into <a class="el" href="structsteamrot_1_1MrGhost.html#ac745f2e36cfcb1598e4521e3908389a0" title="The current position of the ghost item, updated each tick to track the mouse cursor position.">MrGhost::m_position</a> so that other <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> classes can use it to render or place the ghost item at the cursor. </p>
+<div class="textblock"><p>Updates the position and rotation of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> to track the current mouse position and respond to rotation input. </p>
+<p>Each tick this <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> processes active subscribers: if a ROTATE_GHOST input event has been captured, it increments <a class="el" href="structsteamrot_1_1MrGhost.html#a396dd1837be153f247ac92bc094be2ca" title="The accumulated global rotation of the ghost, in degrees.">MrGhost::m_rotation_degrees</a> by 90 degrees. It then writes the current mouse cursor position into <a class="el" href="structsteamrot_1_1MrGhost.html#ac745f2e36cfcb1598e4521e3908389a0" title="The current world-space position of the ghost, updated each tick to track the mouse cursor position.">MrGhost::m_position</a> and rebuilds the instance transform (including both translation and the accumulated rotation) so that other <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> classes can render the ghost item at the correct world position and orientation. </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad9ff73e1493dda5dd16abb96a75cc959" name="ad9ff73e1493dda5dd16abb96a75cc959"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad9ff73e1493dda5dd16abb96a75cc959">&#9670;&#160;</a></span>GhostPositioningLogic()</h2>
@@ -152,7 +152,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Constructor for the <a class="el" href="classsteamrot_1_1logic_1_1GhostPositioningLogic.html" title="Updates the position of MrGhost to track the current mouse position.">GhostPositioningLogic</a> class. </p>
+<p>Constructor for the <a class="el" href="classsteamrot_1_1logic_1_1GhostPositioningLogic.html" title="Updates the position and rotation of MrGhost to track the current mouse position and respond to rotat...">GhostPositioningLogic</a> class. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">scene_context</td><td>Reference to a <a class="el" href="structsteamrot_1_1SceneContext.html" title="Lightweight reference container for scene and game core objects.">SceneContext</a> struct instance to be used by the logic </td></tr>

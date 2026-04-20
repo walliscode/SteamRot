@@ -8,12 +8,21 @@
 /////////////////////////////////////////////////
 #include "action_camera.h"
 #include "EventPayload.h"
-#include "positioning_camera.h"
 
 namespace steamrot::logic::action::camera {
 
 /////////////////////////////////////////////////
-void ProcessSubscribers(
+void apply_zoom(CameraState &camera_state, float scroll_delta) {
+  camera_state.m_zoom_level *= (1.0f - scroll_delta * CameraState::kZoomStep);
+  camera_state.m_zoom_level = std::clamp(
+      camera_state.m_zoom_level, CameraState::kMinZoom, CameraState::kMaxZoom);
+}
+
+/////////////////////////////////////////////////
+void reset_zoom(CameraState &camera_state) { camera_state.m_zoom_level = 1.0f; }
+
+/////////////////////////////////////////////////
+void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     CameraState &camera_state) {
   for (const auto &subscriber : subscribers) {
@@ -28,7 +37,19 @@ void ProcessSubscribers(
     if (!camera_payload)
       continue;
 
-    positioning::camera::ApplyZoom(camera_state, camera_payload->scroll_delta);
+    switch (camera_payload->action) {
+
+    case CameraPayload::CameraAction::SCROLL:
+      apply_zoom(camera_state, camera_payload->scroll_delta);
+      break;
+
+    case CameraPayload::CameraAction::RESET_ZOOM:
+      reset_zoom(camera_state);
+      break;
+
+    default:
+      break;
+    }
   }
 }
 

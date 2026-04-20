@@ -1,7 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"classsteamrot_1_1EntityManager.html#af295b934c6a00a5267eefddd163bf0b7":[8,0,1,25,0],
-"classsteamrot_1_1EntityManager.html#afec44bf43e4f74113e0ef8b43a045ef6":[7,0,1,32,5],
 "classsteamrot_1_1EntityManager.html#afec44bf43e4f74113e0ef8b43a045ef6":[8,0,1,25,5],
 "classsteamrot_1_1EventHandler.html":[7,0,1,35],
 "classsteamrot_1_1EventHandler.html":[8,0,1,28],
@@ -249,5 +247,7 @@ var NAVTREEINDEX2 =
 "classsteamrot_1_1ILogicConfigCollectionProvider.html#a31316cc85865d9fe4e1d06c7f4d2a291":[8,0,1,198,0],
 "classsteamrot_1_1ILogicConfigCollectionProvider.html#a80c7c20e901704c08e483f4ad8b73eb3":[7,0,1,205,1],
 "classsteamrot_1_1ILogicConfigCollectionProvider.html#a80c7c20e901704c08e483f4ad8b73eb3":[8,0,1,198,1],
-"classsteamrot_1_1ISaveDataProvider.html":[7,0,1,206]
+"classsteamrot_1_1ISaveDataProvider.html":[7,0,1,206],
+"classsteamrot_1_1ISaveDataProvider.html":[8,0,1,199],
+"classsteamrot_1_1ISaveDataProvider.html#a55f1cbd25f1b874a3021cfd12b47f19e":[7,0,1,206,2]
 };

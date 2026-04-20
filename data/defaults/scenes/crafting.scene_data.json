@@ -304,6 +304,16 @@
                             "c_ui_state_name": "new_construct_menu_off",
                             "action": "TOGGLE"
                           }
+                        },
+                        {
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "type": "CAMERA",
+                          "payload_type": "CameraPayloadFbs",
+                          "payload": {
+                            "action": "RESET_ZOOM"
+                          }
                         }
                       ],
                       "children_active": false,

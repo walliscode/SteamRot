@@ -1,16 +1,13 @@
 var render__grimoire__machina_8h =
 [
-    [ "steamrot::logic::render::grimoire_machina::DrawEmptyActiveMachinaForm", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a0a53c4153de2d752ac8dd7f57a79f959", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawFragmentInstance", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#ac0a65d56499008a15c77f411a0729414", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawFragmentInstanceSockets", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a2f093c5bfc9e4db1facb398bca3ecdb8", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawFragmentView", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a4f7a8901060bfd81e90df84da36c2159", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawFragmentView", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a6e32cb472d53cf02e164bd3b581a5946", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawJointInstance", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a32803c6c5c97fbda00b741f9e6895309", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawJointInstanceSockets", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a97cc3c40f39adfd42d8d7ce0a25da753", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawJointView", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a8efd49ef572652a9c67dccb9f5f04af4", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawJointView", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#aa27dabb667e0ad7c291a7560f0a9832c", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawNoMachinaFormIndicator", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a759142dbec79ae41e4867d51c8dccf5d", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawScaffoldOrPlaceholder", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a865eb1d91a7dba64062197dcfa53b21a", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawSocket", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#ad40ae6140c5abe378e7f03e80e300665", null ],
-    [ "steamrot::logic::render::grimoire_machina::DrawView", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a769b2e477f08937a4a6aeb846ae689af", null ]
+    [ "steamrot::logic::render::grimoire_machina::draw_empty_active_machina_form", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a4976e41eafb7e1c89076e2409b0cc5eb", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_fragment_instance", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a0e43c574e2dcdd780bebfa0d64f96e9f", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_fragment_instance_sockets", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a75520ce8a48fbcd8bf9cbedb468d94d4", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_joint_instance", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a43232522a750f0bd4eb0f8e20d1c56a6", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_joint_instance_sockets", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a12bd3f0498785c9df5de9c3d58c40796", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_no_machina_form_indicator", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a2f3eb527f1e1a4c3e042c3ed85d3d50f", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_socket", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a77b3ee42d01319ab97b0f311bb99caaa", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_view", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a2e76fc516ee56ebf94a2a6f173fcf936", null ],
+    [ "steamrot::logic::render::grimoire_machina::draw_view", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#a1c6365111ee46f6200699f13f5678733", null ],
+    [ "steamrot::logic::render::grimoire_machina::render_machina_form", "namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html#aab098d24bbbc14ac791e51bc5a5265fe", null ]
 ];

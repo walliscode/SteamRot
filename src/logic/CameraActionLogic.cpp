@@ -1,20 +1,24 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of the CameraPositioningLogic class.
+/// @brief Implementation of the CameraActionLogic class.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "CameraPositioningLogic.h"
+#include "CameraActionLogic.h"
+#include "action_camera.h"
 
 namespace steamrot::logic {
 
 /////////////////////////////////////////////////
-CameraPositioningLogic::CameraPositioningLogic(const SceneContext scene_context)
+CameraActionLogic::CameraActionLogic(const SceneContext scene_context)
     : Logic(scene_context) {}
 
 /////////////////////////////////////////////////
-void CameraPositioningLogic::ProcessLogic() {}
+void CameraActionLogic::ProcessLogic() {
 
+  action::camera::process_subscribers(m_subscribers,
+                                      m_scene_context.camera_state);
+}
 } // namespace steamrot::logic

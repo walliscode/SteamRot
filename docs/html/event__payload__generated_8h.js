@@ -38,6 +38,7 @@ var event__payload__generated_8h =
     [ "steamrot::InputActionFbs", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244", [
       [ "steamrot::InputActionFbs_SELECT", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a", null ],
       [ "steamrot::InputActionFbs_TOGGLE_SOCKET_VISIBILITY", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a2c7ae3f50fed353a004b9ee61508cd0f", null ],
+      [ "steamrot::InputActionFbs_ROTATE_GHOST", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a5efa720ad2e658ca9f6b84c9290da47f", null ],
       [ "steamrot::InputActionFbs_MIN", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244a48b79a756fd9590cf7825d6215ba4e06", null ],
       [ "steamrot::InputActionFbs_MAX", "namespacesteamrot.html#a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519", null ]
     ] ],
@@ -87,7 +88,7 @@ var event__payload__generated_8h =
     [ "steamrot::EnumNameUIActionFbs", "namespacesteamrot.html#a007dd5bf2dcf6813aeff4034e7c9365b", null ],
     [ "steamrot::EnumValuesEventPayloadFbs", "namespacesteamrot.html#ac580498c64f0dea5458382347478f0d8", null ],
     [ "steamrot::EnumValuesGhostActionFbs", "namespacesteamrot.html#aaf221455192a2faae8b8456bd4f3d254", null ],
-    [ "steamrot::EnumValuesInputActionFbs", "namespacesteamrot.html#ac7131fe03f1e3d0f5a4e0c3b83ba9e6c", null ],
+    [ "steamrot::EnumValuesInputActionFbs", "namespacesteamrot.html#aa585c47458c0f16590ece352e7144961", null ],
     [ "steamrot::EnumValuesLogicToggleFbs", "namespacesteamrot.html#a555017dfcb2f8b42499dff7a824095f8", null ],
     [ "steamrot::EnumValuesSceneActionFbs", "namespacesteamrot.html#a319d641fa35a4d2cf57dd06c436942f1", null ],
     [ "steamrot::EnumValuesSystemActionFbs", "namespacesteamrot.html#a9af3c8f88a0ccbb1735fea44f991ec41", null ],

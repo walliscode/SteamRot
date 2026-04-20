@@ -67,7 +67,7 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
                     const CameraState &camera_state,
                     const sf::RenderTexture &scene_texture) {
   world_mouse_position =
-      steamrot::logic::positioning::camera::MapToWorldCoords(
+      steamrot::logic::positioning::camera::map_to_world_coords(
           camera_state, mouse_position, scene_texture);
   mr_ghost.m_position = world_mouse_position;
 
@@ -86,7 +86,8 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
           if (!instance.joint)
             return;
           const sf::FloatRect bounds =
-              instance.joint->positioning_views[ViewDirection::Front].getBounds();
+              instance.joint->positioning_views[ViewDirection::Front]
+                  .getBounds();
           instance.transform = ComputeInstanceTransform(
               bounds, world_mouse_position, mr_ghost.m_rotation_degrees);
         }

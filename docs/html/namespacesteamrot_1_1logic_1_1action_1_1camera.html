@@ -98,22 +98,57 @@ $(function(){initNavTree('namespacesteamrot_1_1logic_1_1action_1_1camera.html','
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0f93dae6aba9724d302371aa1ba7520b" id="r_a0f93dae6aba9724d302371aa1ba7520b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0f93dae6aba9724d302371aa1ba7520b">ProcessSubscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, <a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;camera_state)</td></tr>
-<tr class="memdesc:a0f93dae6aba9724d302371aa1ba7520b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active subscribers and apply their camera scroll deltas.  <br /></td></tr>
+<tr class="memitem:ab2178c2daeef0a485704a309da32fd30" id="r_ab2178c2daeef0a485704a309da32fd30"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab2178c2daeef0a485704a309da32fd30">apply_zoom</a> (<a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;camera_state, float scroll_delta)</td></tr>
+<tr class="memdesc:ab2178c2daeef0a485704a309da32fd30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a mouse-scroll delta to the camera zoom level.  <br /></td></tr>
+<tr class="memitem:abb0ba3c92238fabe9b78127f9e6de47f" id="r_abb0ba3c92238fabe9b78127f9e6de47f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#abb0ba3c92238fabe9b78127f9e6de47f">reset_zoom</a> (<a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;camera_state)</td></tr>
+<tr class="memdesc:abb0ba3c92238fabe9b78127f9e6de47f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the camera zoom level to the default value.  <br /></td></tr>
+<tr class="memitem:a55433c113c8bf617e912a5580f9e89c3" id="r_a55433c113c8bf617e912a5580f9e89c3"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a55433c113c8bf617e912a5580f9e89c3">process_subscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, <a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;camera_state)</td></tr>
+<tr class="memdesc:a55433c113c8bf617e912a5580f9e89c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active subscribers and apply their camera scroll deltas.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Headers. </p>
 <p>Preprocessor Directives.</p>
 <p>Headers </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a0f93dae6aba9724d302371aa1ba7520b" name="a0f93dae6aba9724d302371aa1ba7520b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f93dae6aba9724d302371aa1ba7520b">&#9670;&#160;</a></span>ProcessSubscribers()</h2>
+<a id="ab2178c2daeef0a485704a309da32fd30" name="ab2178c2daeef0a485704a309da32fd30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2178c2daeef0a485704a309da32fd30">&#9670;&#160;</a></span>apply_zoom()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void steamrot::logic::action::camera::ProcessSubscribers </td>
+          <td class="memname">void steamrot::logic::action::camera::apply_zoom </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>camera_state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>scroll_delta</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Apply a mouse-scroll delta to the camera zoom level. </p>
+<p>Positive delta (scroll up) zooms in; negative (scroll down) zooms out. The result is clamped to [<a class="el" href="structsteamrot_1_1CameraState.html#a0ace702c90ffdcc5246f70acf9f89f7e" title="Minimum allowed zoom level (zoomed fully in).">CameraState::kMinZoom</a>, <a class="el" href="structsteamrot_1_1CameraState.html#a5860dbdb38cd46708b1802be27a1db64" title="Maximum allowed zoom level (zoomed fully out).">CameraState::kMaxZoom</a>].</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">camera_state</td><td>Camera state whose zoom level will be mutated. </td></tr>
+    <tr><td class="paramname">scroll_delta</td><td>Raw scroll delta from the SFML mouse-wheel event. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a55433c113c8bf617e912a5580f9e89c3" name="a55433c113c8bf617e912a5580f9e89c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55433c113c8bf617e912a5580f9e89c3">&#9670;&#160;</a></span>process_subscribers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void steamrot::logic::action::camera::process_subscribers </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>subscribers</em></span>, </td>
         </tr>
@@ -126,11 +161,36 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Process all active subscribers and apply their camera scroll deltas. </p>
-<p>Iterates the subscriber list, skips inactive entries, and for each active subscriber extracts a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> and applies its scroll_delta to <code class="param">camera_state</code> via <a class="el" href="namespacesteamrot_1_1logic_1_1movement_1_1camera.html#ab0deea267351f4d79b119b3dfd35c422" title="Apply a mouse-scroll delta to the camera zoom level.">movement::camera::ApplyZoom</a>.</p>
+<p>Iterates the subscriber list, skips inactive entries, and for each active subscriber extracts a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> and applies its scroll_delta to <code class="param">camera_state</code> via positioning::camera::ApplyZoom.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">subscribers</td><td>Subscribers owned by the <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> instance. </td></tr>
     <tr><td class="paramname">camera_state</td><td><a class="el" href="structsteamrot_1_1CameraState.html" title="Holds the per-scene camera/view state.">CameraState</a> instance to mutate. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abb0ba3c92238fabe9b78127f9e6de47f" name="abb0ba3c92238fabe9b78127f9e6de47f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb0ba3c92238fabe9b78127f9e6de47f">&#9670;&#160;</a></span>reset_zoom()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void steamrot::logic::action::camera::reset_zoom </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>camera_state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reset the camera zoom level to the default value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">camera_state</td><td>Camera state whose zoom level will be reset to the default value. </td></tr>
   </table>
   </dd>
 </dl>

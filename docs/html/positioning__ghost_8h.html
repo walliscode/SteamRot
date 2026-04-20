@@ -96,9 +96,13 @@ $(function(){initNavTree('positioning__ghost_8h.html','',''); });
 <p>Declaration of free functions for positioning MrGhost.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="CameraState_8h_source.html">CameraState.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="EventPayload_8h_source.html">EventPayload.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="MrGhost_8h_source.html">MrGhost.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Subscriber_8h_source.html">Subscriber.h</a>&quot;</code><br />
 <code>#include &lt;SFML/Graphics/RenderTexture.hpp&gt;</code><br />
 <code>#include &lt;SFML/System/Vector2.hpp&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
 </div>
 <p><a href="positioning__ghost_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -115,7 +119,11 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a39d9b2cbcc8cb4da2d31fecf0d04062e" id="r_a39d9b2cbcc8cb4da2d31fecf0d04062e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#a39d9b2cbcc8cb4da2d31fecf0d04062e">steamrot::logic::positioning::ghost::UpdatePosition</a> (<a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost, sf::Vector2f &amp;world_mouse_position, const sf::Vector2i &amp;mouse_position, const <a class="el" href="structsteamrot_1_1CameraState.html">CameraState</a> &amp;camera_state, const sf::RenderTexture &amp;scene_texture)</td></tr>
-<tr class="memdesc:a39d9b2cbcc8cb4da2d31fecf0d04062e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the world-space position of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> to match the current mouse cursor, and cache the result in world_mouse_position.  <br /></td></tr>
+<tr class="memdesc:a39d9b2cbcc8cb4da2d31fecf0d04062e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the world-space position of <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> to match the current mouse cursor, and cache the result in world_mouse_position.  <br /></td></tr>
+<tr class="memitem:addb5eef6fcc84c4d05ed512cc022d9e4" id="r_addb5eef6fcc84c4d05ed512cc022d9e4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#addb5eef6fcc84c4d05ed512cc022d9e4">steamrot::logic::positioning::ghost::RotateGhost</a> (<a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
+<tr class="memdesc:addb5eef6fcc84c4d05ed512cc022d9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate the ghost selection by 90 degrees.  <br /></td></tr>
+<tr class="memitem:abec836af744c8cc9b01b655946d4b7f2" id="r_abec836af744c8cc9b01b655946d4b7f2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#abec836af744c8cc9b01b655946d4b7f2">steamrot::logic::positioning::ghost::ProcessRotateSubscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
+<tr class="memdesc:abec836af744c8cc9b01b655946d4b7f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active ROTATE_GHOST subscribers and rotate the ghost.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declaration of free functions for positioning MrGhost. </p>

@@ -1,10 +1,19 @@
 var namespacesteamrot_1_1logic_1_1positioning =
 [
+    [ "camera", "namespacesteamrot_1_1logic_1_1positioning_1_1camera.html", [
+      [ "get_world_view", "namespacesteamrot_1_1logic_1_1positioning_1_1camera.html#ab6ea3c0d37dc87624d437b720b9c5302", null ],
+      [ "map_to_world_coords", "namespacesteamrot_1_1logic_1_1positioning_1_1camera.html#a59c658c319c9f0945bd2f0b21559e04f", null ]
+    ] ],
     [ "ghost", "namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html", [
+      [ "ProcessRotateSubscribers", "namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#abec836af744c8cc9b01b655946d4b7f2", null ],
+      [ "RotateGhost", "namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#addb5eef6fcc84c4d05ed512cc022d9e4", null ],
       [ "UpdatePosition", "namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#a39d9b2cbcc8cb4da2d31fecf0d04062e", null ]
     ] ],
     [ "grimoire_machina", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html", [
-      [ "position_first_part_of_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a1c77342034c2ea85a5c315f027860bfe", null ]
+      [ "compute_socket_local_positions_even_spread", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a89d803047dab52faba33f961c58902d1", null ],
+      [ "initialize_joint_socket_positions", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a445dd43b82a91cb930333938ec788083", null ],
+      [ "position_first_part_of_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#ac226c81d26533da2162bd3e88bf8bf7f", null ],
+      [ "position_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a5037acd78b5bc3215919831342543522", null ]
     ] ],
     [ "ui", "namespacesteamrot_1_1logic_1_1positioning_1_1ui.html", [
       [ "ApplyMinMaxSizing", "namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a55319ffea4be8dc715faab58cb65a6f8", null ],

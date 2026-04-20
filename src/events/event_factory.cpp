@@ -97,6 +97,16 @@ CreateCameraEventPacket(uint8_t lifetime, float scroll_delta) {
 }
 
 /////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime,
+                        const CameraPayload::CameraAction action) {
+  EventContext context{lifetime};
+  CameraPayload payload(action);
+  EventPacket packet{context, EventType::CAMERA, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   // Initialize random number generator
   std::random_device rd;
@@ -135,7 +145,7 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
       }
     }
     std::uniform_int_distribution<size_t> action_dist(0,
-                                                       valid_actions.size() - 1);
+                                                      valid_actions.size() - 1);
     const auto random_action = valid_actions[action_dist(gen)];
     return CreateInputEventPacket(lifetime, random_action);
   }
@@ -162,8 +172,8 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
         valid_toggles.push_back(toggle);
       }
     }
-    std::uniform_int_distribution<size_t> toggle_dist(
-        0, valid_toggles.size() - 1);
+    std::uniform_int_distribution<size_t> toggle_dist(0,
+                                                      valid_toggles.size() - 1);
     const auto random_toggle = valid_toggles[toggle_dist(gen)];
     return CreateLogicEventPacket(lifetime, random_toggle);
   }
@@ -179,7 +189,7 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
       }
     }
     std::uniform_int_distribution<size_t> action_dist(0,
-                                                       valid_actions.size() - 1);
+                                                      valid_actions.size() - 1);
     const auto random_action = valid_actions[action_dist(gen)];
 
     // Get all SceneType values and filter out UNKNOWN
@@ -215,7 +225,7 @@ std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
       }
     }
     std::uniform_int_distribution<size_t> action_dist(0,
-                                                       valid_actions.size() - 1);
+                                                      valid_actions.size() - 1);
     const auto random_action = valid_actions[action_dist(gen)];
     return CreateSystemEventPacket(lifetime, random_action);
   }

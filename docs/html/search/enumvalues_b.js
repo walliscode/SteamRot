@@ -8,6 +8,5 @@ var searchData=
   ['mouseinputfbs_5fmin_5',['MouseInputFbs_MIN',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86afeb3441ae4618c1b224a9f0d8014f2ba',1,'steamrot']]],
   ['mouseinputfbs_5fright_5fclick_6',['MouseInputFbs_RIGHT_CLICK',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86a28a6ed240228cff28247790fdcc93206',1,'steamrot']]],
   ['mouseinputfbs_5fscroll_5fdown_7',['MouseInputFbs_SCROLL_DOWN',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86a8d8c2850a5353000f70326ad2197ead8',1,'steamrot']]],
-  ['mouseinputfbs_5fscroll_5fup_8',['MouseInputFbs_SCROLL_UP',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86a8648eb47847477c833b590751ea4bafd',1,'steamrot']]],
-  ['movement_9',['Movement',['../namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a',1,'steamrot']]]
+  ['mouseinputfbs_5fscroll_5fup_8',['MouseInputFbs_SCROLL_UP',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86a8648eb47847477c833b590751ea4bafd',1,'steamrot']]]
 ];

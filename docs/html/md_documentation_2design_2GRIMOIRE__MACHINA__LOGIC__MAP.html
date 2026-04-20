@@ -130,7 +130,7 @@ Overview</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Action  </td><td class="markdownTableBodyNone"><span class="tt">GrimoireMachinaActionLogic</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="action__grimoire__machina_8h.html" title="Declaration of free functions for process actions related to the GrimoireMachina.">action_grimoire_machina.h</a>/cpp</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html" title="Headers.">steamrot::logic::action::grimoire_machina</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Positioning  </td><td class="markdownTableBodyNone"><span class="tt">GrimoireMachinaPositioningLogic</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">positioning_grimoire_machina.h</a>/cpp</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html" title="Preprocessor Directives.">steamrot::logic::positioning::grimoire_machina</a></span>  </td></tr>
+<td class="markdownTableBodyNone">Positioning  </td><td class="markdownTableBodyNone"><span class="tt">GrimoireMachinaPositioningLogic</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">positioning_grimoire_machina.h</a>/cpp</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html" title="Headers.">steamrot::logic::positioning::grimoire_machina</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Render  </td><td class="markdownTableBodyNone"><span class="tt">GrimoireMachinaRenderLogic</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="render__grimoire__machina_8h.html" title="Declaration of the free functions related to the rendering of the grimoire machina.">render_grimoire_machina.h</a>/cpp</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1render_1_1grimoire__machina.html" title="Headers.">steamrot::logic::render::grimoire_machina</a></span>  </td></tr>
 </table>
@@ -176,7 +176,7 @@ Action — GrimoireMachinaActionLogic</h2>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md56"></a>
 Positioning — GrimoireMachinaPositioningLogic</h2>
 <p><b>Files</b>: <span class="tt"><a class="el" href="GrimoireMachinaPositioningLogic_8h.html" title="Declaration of the GrimoireMachinaPositioningLogic class.">src/logic/GrimoireMachinaPositioningLogic.h</a>/cpp</span></p>
-<p><b>Position in CRAFTING scene</b>: 2nd in the Movement group (after <span class="tt">UIPositioningLogic</span>, before <span class="tt">GhostPositioningLogic</span>).</p>
+<p><b>Position in CRAFTING scene</b>: 2nd in the Positioning group (after <span class="tt">UIPositioningLogic</span>, before <span class="tt">GhostPositioningLogic</span>).</p>
 <p><b>What it does</b>: <b>Intentionally empty.</b> The crafting canvas uses an infinite world-space coordinate system driven by the camera. There is no fixed viewport or canvas boundary that requires per-tick position recalculation for scaffold parts. The class is retained to preserve <span class="tt">LogicFactory</span> and <span class="tt">LogicType</span> enum compatibility for future use.</p>
 <p><b>Why retained</b>: When socket-based snapping or layout-assist features are added, this class and the companion <span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">positioning_grimoire_machina.h</a>/cpp</span> module are the correct insertion points.</p>
 <hr  />
@@ -215,11 +215,11 @@ Collision — <span class="tt">collision_mouse</span></h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Function  </th><th class="markdownTableHeadNone">Signature  </th><th class="markdownTableHeadNone">Responsibility  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, sf::Vector2f world_pos, SocketState &amp;)</span>  </td><td class="markdownTableBodyNone">Sets <span class="tt">is_mouse_over</span> on a single <span class="tt">SocketState</span> based on distance from the mouse to the socket's world centre. Hit radius matches the visual draw radius.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, sf::Vector2f world_pos, <a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> &amp;)</span>  </td><td class="markdownTableBodyNone">Sets <span class="tt">is_mouse_over</span> on a single <span class="tt"><a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a></span> based on distance from the mouse to the socket's world centre. Hit radius matches the visual draw radius.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, FragmentInstance &amp;)</span>  </td><td class="markdownTableBodyNone">Iterates all sockets of a <span class="tt">FragmentInstance</span>. For each socket, applies the instance's transform to the local socket position to get world space, then calls the <span class="tt">SocketState</span> overload.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, FragmentInstance &amp;)</span>  </td><td class="markdownTableBodyNone">Iterates all sockets of a <span class="tt">FragmentInstance</span>. For each socket, applies the instance's transform to the local socket position to get world space, then calls the <span class="tt"><a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a></span> overload.  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, JointInstance &amp;)</span>  </td><td class="markdownTableBodyNone">Like the <span class="tt">FragmentInstance</span> overload but uses <span class="tt">ComputeSocketLocalPos</span> to account for <span class="tt">joint_instance.current_rotation</span> before transforming to world space.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">CheckMouseOver</span>  </td><td class="markdownTableBodyNone"><span class="tt">(sf::Vector2f world_mouse, JointInstance &amp;)</span>  </td><td class="markdownTableBodyNone">Like the <span class="tt">FragmentInstance</span> overload but reads <span class="tt">socket_local_positions[i]</span> directly instead of recomputing per-frame, then transforms to world space.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">ProcessScaffoldCollisions</span>  </td><td class="markdownTableBodyNone"><span class="tt">(MachinaFormScaffold &amp;, sf::Vector2f world_mouse)</span>  </td><td class="markdownTableBodyNone">Top-level entry point. Iterates all <span class="tt">JointInstance</span>s then all <span class="tt">FragmentInstance</span>s in the scaffold and calls the appropriate <span class="tt">CheckMouseOver</span> overload for each.  </td></tr>
 </table>
@@ -254,8 +254,19 @@ Action — <span class="tt">action_grimoire_machina</span></h2>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="autotoc_md65"></a>
 Positioning — <span class="tt">positioning_grimoire_machina</span></h2>
-<p><b>Files</b>: <span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">src/logic/positioning_grimoire_machina.h</a>/cpp</span> <b>Namespace</b>: <span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html" title="Preprocessor Directives.">steamrot::logic::positioning::grimoire_machina</a></span></p>
-<p>Currently empty. Reserved for future positioning logic such as socket-snap assistance, layout-constraint resolution, or piece-alignment helpers.</p>
+<p><b>Files</b>: <span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">src/logic/positioning_grimoire_machina.h</a>/cpp</span> <b>Namespace</b>: <span class="tt"><a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html" title="Headers.">steamrot::logic::positioning::grimoire_machina</a></span></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Function  </th><th class="markdownTableHeadNone">Signature  </th><th class="markdownTableHeadNone">Responsibility  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">compute_socket_local_pos</span>  </td><td class="markdownTableBodyNone"><span class="tt">(const SocketConfig&amp;, size_t socket_index, float ring_rotation = 0.f) → sf::Vector2f</span>  </td><td class="markdownTableBodyNone">Computes the local-space position of a single socket. Uses SFML angle utilities for degree-to-radian conversion. Fixed anchor sockets sit at <span class="tt">fixed_socket_angle</span>; remaining sockets are distributed evenly across the layout arc and optionally offset by <span class="tt">ring_rotation</span>.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">initialize_joint_socket_positions</span>  </td><td class="markdownTableBodyNone"><span class="tt">(JointInstance &amp;)</span>  </td><td class="markdownTableBodyNone">Fills all <span class="tt">socket_local_positions</span> entries by calling <span class="tt">compute_socket_local_pos</span> at zero ring rotation. Called by positioning functions after the instance transform is established.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">position_first_part_of_machina_form_scaffold</span>  </td><td class="markdownTableBodyNone"><span class="tt">(PartMap &amp;)</span>  </td><td class="markdownTableBodyNone">Translates the transform of the part at key 0 so its anchor (fragment bounding-box centre or joint origin) maps to world-space <span class="tt">(0, 0)</span>. For <span class="tt">JointInstance</span>s also calls <span class="tt">initialize_joint_socket_positions</span>.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">position_machina_form_scaffold</span>  </td><td class="markdownTableBodyNone"><span class="tt">(PartMap &amp;)</span>  </td><td class="markdownTableBodyNone">Top-level entry point. Currently delegates to <span class="tt">position_first_part_of_machina_form_scaffold</span>.  </td></tr>
+</table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="autotoc_md67"></a>
 Render — <span class="tt">render_grimoire_machina</span></h2>
@@ -272,7 +283,7 @@ Render — <span class="tt">render_grimoire_machina</span></h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">DrawFragmentInstanceSockets</span>  </td><td class="markdownTableBodyNone">Iterates all sockets of a <span class="tt">FragmentInstance</span>, applies the instance's transform to the local socket position, and calls <span class="tt">DrawSocket</span> for each.  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">DrawJointInstanceSockets</span>  </td><td class="markdownTableBodyNone">Like <span class="tt">DrawFragmentInstanceSockets</span> but uses <span class="tt">ComputeSocketLocalPos</span> to resolve the rotation-aware local position before transforming to world space.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">DrawJointInstanceSockets</span>  </td><td class="markdownTableBodyNone">Like <span class="tt">DrawFragmentInstanceSockets</span> but reads <span class="tt">socket_local_positions[i]</span> directly and transforms to world space.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">DrawFragmentInstance</span>  </td><td class="markdownTableBodyNone">Sets <span class="tt">RenderStates</span> from the instance's stored transform, draws the fragment's <span class="tt">Front</span> view geometry, and optionally draws all socket indicators.  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -282,11 +293,11 @@ Render — <span class="tt">render_grimoire_machina</span></h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">DrawView</span>  </td><td class="markdownTableBodyNone">Draws a single vertex array from a <span class="tt">Views</span> object selected by <span class="tt">ViewDirection</span>.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">DrawFragmentView</span> (no states)  </td><td class="markdownTableBodyNone">Draws a fragment's movement view for the given direction at its stored world positions. Used when no transform is needed.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">DrawFragmentView</span> (no states)  </td><td class="markdownTableBodyNone">Draws a fragment's positioning view for the given direction at its stored world positions. Used when no transform is needed.  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">DrawFragmentView</span> (with states)  </td><td class="markdownTableBodyNone">Like above but applies <span class="tt">sf::RenderStates</span> (e.g. a translation transform). Used by <span class="tt">GhostRenderLogic</span> to position ghost geometry at the cursor.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">DrawJointView</span> (no states)  </td><td class="markdownTableBodyNone">Draws a joint's movement view for the given direction at its stored world positions.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">DrawJointView</span> (no states)  </td><td class="markdownTableBodyNone">Draws a joint's positioning view for the given direction at its stored world positions.  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">DrawJointView</span> (with states)  </td><td class="markdownTableBodyNone">Like above but applies <span class="tt">sf::RenderStates</span>. Used by <span class="tt">GhostRenderLogic</span>.  </td></tr>
 </table>
@@ -307,11 +318,11 @@ Data Types Referenced</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Joint</span> / <span class="tt">JointInstance</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="Joint_8h.html" title="Declaration of the Joint struct. No implementation is needed.">src/types/entity/Joint.h</a></span>  </td><td class="markdownTableBodyNone">Same pattern as Fragment/FragmentInstance. <span class="tt">JointInstance</span> additionally carries <span class="tt">current_rotation</span> and a <span class="tt">socket_config</span>.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">SocketState</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="MachinaFormScaffold_8h.html" title="Declarartion of the MachinFormScaffold struct. No implementation is needed.">src/types/entity/MachinaFormScaffold.h</a></span>  </td><td class="markdownTableBodyNone">Runtime hover state for a single socket (<span class="tt">is_mouse_over</span>).  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a></span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="MachinaFormScaffold_8h.html" title="Declarartion of the MachinFormScaffold struct. No implementation is needed.">src/types/entity/MachinaFormScaffold.h</a></span>  </td><td class="markdownTableBodyNone">Runtime hover state for a single socket (<span class="tt">is_mouse_over</span>).  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Views</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="ViewDirection_8h.html" title="Declaration of the ViewDirection enum class and ViewTable template.">src/types/entity/ViewDirection.h</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">std::map&lt;ViewDirection, sf::VertexArray&gt;</span> — one static shape per direction.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">MrGhost</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="MrGhost_8h.html" title="Declaration of the MrGhost struct and its selection tag types.">src/types/core/MrGhost.h</a></span>  </td><td class="markdownTableBodyNone">Holds <span class="tt">m_selection</span> (<span class="tt">std::variant&lt;std::monostate, FragmentTag, JointTag&gt;</span>) and <span class="tt">m_position</span>. Lives in <span class="tt">SceneResources::mr_ghost</span>, exposed via <span class="tt">SceneContext</span>.  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">MrGhost</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="MrGhost_8h.html" title="Declaration of the MrGhost struct.">src/types/core/MrGhost.h</a></span>  </td><td class="markdownTableBodyNone">Holds <span class="tt">m_selection</span> (<span class="tt">std::variant&lt;std::monostate, FragmentTag, JointTag&gt;</span>) and <span class="tt">m_position</span>. Lives in <span class="tt">SceneResources::mr_ghost</span>, exposed via <span class="tt">SceneContext</span>.  </td></tr>
 </table>
 <hr  />
 <h1 class="doxsection"><a class="anchor" id="autotoc_md71"></a>
@@ -333,7 +344,7 @@ Execution Order in the CRAFTING Scene</h1>
 <div class="line">  2. GrimoireMachinaRenderLogic      ← draws scaffold to world-space texture</div>
 <div class="line">  3. GhostRenderLogic</div>
 <div class="line"> </div>
-<div class="line">Movement group</div>
+<div class="line">Positioning group</div>
 <div class="line">  1. UIPositioningLogic</div>
 <div class="line">  2. GrimoireMachinaPositioningLogic ← empty; reserved for future positioning</div>
 <div class="line">  3. GhostPositioningLogic</div>
@@ -348,7 +359,7 @@ Gaps and TODOs</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="action__grimoire__machina_8cpp.html" title="Implementation of free functions for process actions related to the GrimoireMachina.">action_grimoire_machina.cpp</a> :: PlaceGhostOnScaffold</span>  </td><td class="markdownTableBodyNone">Socket-proximity collision for subsequent pieces is not yet implemented. <span class="tt">PlaceGhostOnScaffold</span> silently does nothing for non-first placements. Tracked by <span class="tt">// TODO:</span> comment.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="render__grimoire__machina_8cpp.html" title="Implementation of the free functions related to the rendering of the grimoire.">render_grimoire_machina.cpp</a> :: DrawEmptyActiveMachinaForm</span>  </td><td class="markdownTableBodyNone">Function body is empty. Intended to draw a visual indicator for an active but empty <span class="tt">MachinaForm</span> blueprint (distinct from the scaffold-absent placeholder).  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="render__grimoire__machina_8cpp.html" title="Implementation of the free functions related to the rendering of the grimoire machina.">render_grimoire_machina.cpp</a> :: DrawEmptyActiveMachinaForm</span>  </td><td class="markdownTableBodyNone">Function body is empty. Intended to draw a visual indicator for an active but empty <span class="tt">MachinaForm</span> blueprint (distinct from the scaffold-absent placeholder).  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="positioning__grimoire__machina_8h.html" title="Declaration of free functions for positioning grimoire machina.">positioning_grimoire_machina.h</a>/cpp</span>  </td><td class="markdownTableBodyNone">Empty module. Future home for socket-snapping, layout-constraint resolution, or piece-alignment helpers.  </td></tr>
 </table>
