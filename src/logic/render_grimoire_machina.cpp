@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
+#include "MachinaFormScaffold.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -84,7 +85,7 @@ void draw_fragment_instance_sockets(sf::RenderTexture &texture,
   for (size_t i = 0; i < fragment_instance.sockets.size(); ++i) {
     const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
         fragment_instance.sockets[i].local_position);
-    draw_socket(texture, world_pos, fragment_instance.sockets[i].state);
+    draw_socket(texture, world_pos, fragment_instance.sockets[i]);
   }
 }
 
@@ -96,13 +97,13 @@ void draw_joint_instance_sockets(sf::RenderTexture &texture,
     // draw
     const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
         joint_instance.sockets[i].local_position);
-    draw_socket(texture, world_pos, joint_instance.sockets[i].state);
+    draw_socket(texture, world_pos, joint_instance.sockets[i]);
   }
 }
 
 /////////////////////////////////////////////////
 void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
-                 const SocketState &socket_state) {
+                 const SocketData &socket_data) {
   static constexpr float k_radius = 2.f;
   static constexpr int k_point_count = 10;
   static const sf::Color k_base_color{sf::Color::White};
@@ -111,8 +112,7 @@ void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
   sf::CircleShape circle(k_radius, k_point_count);
   circle.setOrigin({k_radius, k_radius});
   circle.setPosition(world_pos);
-  circle.setFillColor(socket_state.is_mouse_over ? k_hover_color
-                                                 : k_base_color);
+  circle.setFillColor(socket_data.is_mouse_over ? k_hover_color : k_base_color);
   texture.draw(circle);
 }
 

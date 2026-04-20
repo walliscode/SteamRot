@@ -18,6 +18,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -34,22 +35,11 @@ namespace steamrot {
 /// definition. This keeps the transform as the single source of truth for all
 /// positional elements.
 /////////////////////////////////////////////////
-struct SocketState {
-  enum class State {
-    Available, ///< Socket exists and can connect
-    Connected, ///< Socket is currently connected
-    Blocked    ///< Socket exists but can't be used (e.g., edge of canvas)
-  };
 
-  /////////////////////////////////////////////////
-  /// @brief Connection state of this socket.
-  /////////////////////////////////////////////////
-  State state{State::Available};
-
-  /////////////////////////////////////////////////
-  /// @brief Whether the mouse is currently hovering over this socket.
-  /////////////////////////////////////////////////
-  bool is_mouse_over{false};
+enum class SocketState {
+  Available, ///< Socket exists and can connect
+  Connected, ///< Socket is currently connected
+  Blocked    ///< Socket exists but can't be used (e.g., edge of canvas)
 };
 
 /////////////////////////////////////////////////
@@ -82,7 +72,31 @@ struct SocketData {
   /////////////////////////////////////////////////
   /// @brief Mutable runtime state of this socket (connection status, hover).
   /////////////////////////////////////////////////
-  SocketState state{};
+  SocketState state{SocketState::Available};
+
+  /////////////////////////////////////////////////
+  /// @brief Boolean flag set to true if the mouse is currently hovering over
+  /// this socket.
+  /////////////////////////////////////////////////
+  bool is_mouse_over{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Boolean flag set to true if another socket is within a
+  /// pre_determined radius
+  /////////////////////////////////////////////////
+  bool is_another_socket_near{false};
+
+  /////////////////////////////////////////////////
+  /// @brief Boolean flag set to true if this socket is within the snap radius
+  /// of another
+  /////////////////////////////////////////////////
+  bool is_ready_to_connect{false};
+
+  /////////////////////////////////////////////////
+  /// @brief if is_another_socket_near is true, this holds the distance to the
+  /// nearest socket
+  /////////////////////////////////////////////////
+  std::optional<float> distance_to_nearest_socket{std::nullopt};
 };
 
 /////////////////////////////////////////////////
@@ -186,7 +200,8 @@ struct FragmentInstance : public PartInstance {
   /// definition, copying the local position and default-constructing the
   /// SocketState. No further resizing or position assignment is needed.
   ///
-  /// @param fragment_ptr      Pointer to the Fragment definition. May be nullptr.
+  /// @param fragment_ptr      Pointer to the Fragment definition. May be
+  /// nullptr.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
   FragmentInstance(Fragment *fragment_ptr,

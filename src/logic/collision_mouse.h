@@ -76,10 +76,10 @@ bool AnyMouseOver(const UIElement &element);
 /// @param world_mouse World-space mouse position
 /// (SceneContext::world_mouse_position).
 /// @param world_pos   World-space centre of the socket.
-/// @param socket_state SocketState whose is_mouse_over flag is updated.
+/// @param socket_data  SocketState to update with the result of the check.
 /////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketState &socket_state);
+                    SocketData &socket_data);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over any socket on a FragmentInstance

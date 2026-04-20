@@ -122,7 +122,7 @@ void draw_joint_instance_sockets(sf::RenderTexture &texture,
 /// @param socket_state Runtime state of the socket (hover, connection status).
 /////////////////////////////////////////////////
 void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
-                 const SocketState &socket_state);
+                 const SocketData &socket_data);
 
 /////////////////////////////////////////////////
 /// @brief Draw the given view of a Views object.

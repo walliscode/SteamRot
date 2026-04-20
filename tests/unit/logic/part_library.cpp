@@ -103,6 +103,17 @@ TestPartLibrary TestPartLibrary::Create() {
     lib.fragments.emplace("fragment_two_sockets", std::move(f));
   }
 
+  // "fragment_three_sockets": white 20×20 square + sockets at (0,10), (10,10) and (20,10)
+  {
+    Fragment f;
+    f.name = "fragment_three_sockets";
+    f.movement_views.insert_or_assign(
+        steamrot::ViewDirection::Front,
+        MakeFilledSquare(0.f, 0.f, sf::Color::White));
+    f.sockets = {{0.f, 10.f}, {10.f, 10.f}, {20.f, 10.f}};
+    lib.fragments.emplace("fragment_three_sockets", std::move(f));
+  }
+
   // ── Joints ───────────────────────────────────────────────────────────── //
 
   // "joint_no_socket": blue triangle in Front view, no sockets configured
@@ -134,6 +145,17 @@ TestPartLibrary TestPartLibrary::Create() {
     j.socket_config.rotation_arc_min = 0.f;
     j.socket_config.rotation_arc_max = 360.f;
     lib.joints.emplace("joint_two_sockets", std::move(j));
+  }
+
+  // "joint_three_sockets": 3 sockets at radius 15, full rotation arc
+  {
+    Joint j;
+    j.name = "joint_three_sockets";
+    j.socket_config.socket_count = 3;
+    j.socket_config.radius = 15.f;
+    j.socket_config.rotation_arc_min = 0.f;
+    j.socket_config.rotation_arc_max = 360.f;
+    lib.joints.emplace("joint_three_sockets", std::move(j));
   }
 
   return lib;

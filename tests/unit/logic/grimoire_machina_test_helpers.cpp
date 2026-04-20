@@ -9,11 +9,13 @@
 /////////////////////////////////////////////////
 #include "grimoire_machina_test_helpers.h"
 #include "ViewDirection.h"
+#include "positioning_grimoire_machina.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <memory>
 
 namespace {
 
@@ -229,6 +231,34 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   joint.socket_config.has_fixed_socket = false;
   grimoire.m_all_joints.insert({name, std::move(joint)});
   return grimoire;
+}
+
+/////////////////////////////////////////////////
+PartMapFragmentFixture MakePartMapWithSingleFragmentInstance() {
+  PartMapFragmentFixture fixture;
+  fixture.fragment =
+      std::make_unique<steamrot::Fragment>(MakeFragmentWithOriginTriangle());
+
+  steamrot::FragmentInstance instance{fixture.fragment.get()};
+  instance.id = 0;
+  fixture.parts.emplace(0, std::move(instance));
+
+  return fixture;
+}
+
+/////////////////////////////////////////////////
+PartMapJointFixture MakePartMapWithSingleJointInstance() {
+  PartMapJointFixture fixture;
+  fixture.joint =
+      std::make_unique<steamrot::Joint>(MakeJointWithOriginTriangle());
+
+  steamrot::JointInstance instance{fixture.joint.get()};
+  instance.id = 0;
+  steamrot::logic::positioning::grimoire_machina::initialize_joint_socket_positions(
+      instance);
+  fixture.parts.emplace(0, std::move(instance));
+
+  return fixture;
 }
 
 } // namespace steamrot::tests
