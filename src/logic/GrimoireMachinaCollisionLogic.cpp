@@ -7,7 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GrimoireMachinaCollisionLogic.h"
+#include "collision_grimoire_machina.h"
 #include "collision_mouse.h"
+#include <variant>
 
 namespace steamrot::logic {
 
@@ -31,6 +33,14 @@ void GrimoireMachinaCollisionLogic::ProcessLogic() {
   if (active_scaffold_form) {
     collision::mouse::ProcessScaffoldCollisions(
         *active_scaffold_form, m_scene_context.world_mouse_position);
+
+    // Check for collisions between the active ghost item and the active
+    // scaffold
+    if (!std::holds_alternative<std::monostate>(
+            m_scene_context.mr_ghost.m_instance)) {
+      collision::grimoire_machina::check_collisions_between_ghost_and_scaffold(
+          *active_scaffold_form, m_scene_context.mr_ghost);
+    }
   }
 }
 
