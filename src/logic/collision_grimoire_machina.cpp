@@ -34,7 +34,7 @@ void reset_socket(SocketData &socket) {
 /////////////////////////////////////////////////
 void apply_if_better(SocketData &socket, float distance, bool ready) {
   if (socket.distance_to_nearest_socket.has_value() &&
-      distance >= *socket.distance_to_nearest_socket) {
+      distance >= socket.distance_to_nearest_socket.value()) {
     return; // a closer candidate was already recorded
   }
   socket.is_another_socket_near = true;

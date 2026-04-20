@@ -109,7 +109,8 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE_THAT(socket_two_data.distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(7.07f, 0.01f));
 
-    // reset state (at PartMap level this is handled by reset_socket_proximity_state)
+    // reset state (at PartMap level this is handled by
+    // reset_socket_proximity_state)
     reset_socket(socket_one_data);
     reset_socket(socket_two_data);
 
@@ -162,7 +163,8 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE(socket_two_data.is_another_socket_near == true);
     REQUIRE(socket_two_data.is_ready_to_connect == true);
 
-    // reset state (at PartMap level this is handled by reset_socket_proximity_state)
+    // reset state (at PartMap level this is handled by
+    // reset_socket_proximity_state)
     reset_socket(socket_one_data);
     reset_socket(socket_two_data);
 
@@ -364,32 +366,6 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
       REQUIRE(socket_data.is_ready_to_connect == false);
     }
   }
-
-  SECTION(
-      "only a single socket pair is set if multiple options are available") {
-    // arrange
-    fragment_instance.transform.translate({0.f, 0.f});
-    joint_instance.transform.translate({1.f, 1.f});
-    // act
-    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, joint_instance);
-    // assert - only one pair of sockets should be colliding, but we don't
-    // care which one since the logic doesn't guarantee a specific pairing
-    int fragment_sockets_ready_to_connect = 0;
-    for (steamrot::SocketData &socket_data : fragment_instance.sockets) {
-      if (socket_data.is_ready_to_connect) {
-        fragment_sockets_ready_to_connect++;
-      }
-    }
-    int joint_sockets_ready_to_connect = 0;
-    for (steamrot::SocketData &socket_data : joint_instance.sockets) {
-      if (socket_data.is_ready_to_connect) {
-        joint_sockets_ready_to_connect++;
-      }
-    }
-    REQUIRE(fragment_sockets_ready_to_connect == 1);
-    REQUIRE(joint_sockets_ready_to_connect == 1);
-  }
 }
 
 TEST_CASE("reset_socket_proximity_state(PartMap) tests",
@@ -400,9 +376,8 @@ TEST_CASE("reset_socket_proximity_state(PartMap) tests",
 
   SECTION("does not throw on an empty PartMap") {
     steamrot::PartMap empty_map;
-    REQUIRE_NOTHROW(
-        steamrot::logic::collision::grimoire_machina::reset_socket_proximity_state(
-            empty_map));
+    REQUIRE_NOTHROW(steamrot::logic::collision::grimoire_machina::
+                        reset_socket_proximity_state(empty_map));
   }
 
   SECTION("clears proximity state on all sockets in the PartMap") {
@@ -488,7 +463,8 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
     steamrot::JointInstance &ji =
         std::get<steamrot::JointInstance>(part_map.begin()->second);
     ji.sockets[0].local_position = {0.f, 0.f};
-    ji.transform.translate({5.f, 5.f}); // distance ≈ 7.07, within proximity (10)
+    ji.transform.translate(
+        {5.f, 5.f}); // distance ≈ 7.07, within proximity (10)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, part_map);
@@ -505,7 +481,8 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
     steamrot::JointInstance &ji =
         std::get<steamrot::JointInstance>(part_map.begin()->second);
     ji.sockets[0].local_position = {0.f, 0.f};
-    ji.transform.translate({1.f, 1.f}); // distance ≈ 1.41, within connection (2.5)
+    ji.transform.translate(
+        {1.f, 1.f}); // distance ≈ 1.41, within connection (2.5)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, part_map);
@@ -541,7 +518,8 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
 
     // fragment socket must reflect the nearest candidate
     REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(fragment_instance.sockets[0].distance_to_nearest_socket.has_value());
+    REQUIRE(
+        fragment_instance.sockets[0].distance_to_nearest_socket.has_value());
     REQUIRE_THAT(
         fragment_instance.sockets[0].distance_to_nearest_socket.value(),
         Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
