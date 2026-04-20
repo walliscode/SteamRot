@@ -80,4 +80,20 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 void check_socket_collisions(FragmentInstance &fragment_instance,
                              PartMap &part_map);
 
+/////////////////////////////////////////////////
+/// @brief Check for collisions between a JointInstance's sockets and every
+///        FragmentInstance in the PartMap, keeping only the most-proximal
+///        candidate per socket.
+///
+/// Resets all proximity state on both the @p joint_instance sockets and all
+/// PartMap sockets before iterating, so that each call produces a clean result
+/// independent of any prior state. Only Joint–Fragment pairs are evaluated;
+/// Joint–Joint collisions are not checked here.
+///
+/// @param joint_instance JointInstance whose sockets are tested.
+/// @param part_map       PartMap containing the candidate FragmentInstances.
+/////////////////////////////////////////////////
+void check_socket_collisions(JointInstance &joint_instance,
+                             PartMap &part_map);
+
 } // namespace steamrot::logic::collision::grimoire_machina

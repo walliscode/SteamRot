@@ -110,4 +110,20 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
   }
 }
 
+/////////////////////////////////////////////////
+void check_socket_collisions(JointInstance &joint_instance,
+                             PartMap &part_map) {
+  // Reset state on both sides before each pass so that stale state from the
+  // previous tick does not bleed through.
+  for (SocketData &s : joint_instance.sockets)
+    reset_socket(s);
+  reset_socket_proximity_state(part_map);
+
+  for (auto &[id, variant] : part_map) {
+    if (auto *fragment_instance = std::get_if<FragmentInstance>(&variant)) {
+      check_socket_collisions(*fragment_instance, joint_instance);
+    }
+  }
+}
+
 } // namespace steamrot::logic::collision::grimoire_machina

@@ -43,14 +43,16 @@ namespace steamrot::tests {
 /// following named parts:
 ///
 /// Fragments:
-///   "fragment_no_socket"   — green triangle in Front view, no sockets
-///   "fragment_one_socket"  — green origin triangle + one socket at (5, 5)
-///   "fragment_two_sockets" — white 20×20 square + sockets at (0, 10) and (20, 10)
+///   "fragment_no_socket"     — green triangle in Front view, no sockets
+///   "fragment_one_socket"    — green origin triangle + one socket at (5, 5)
+///   "fragment_two_sockets"   — white 20×20 square + sockets at (0, 10) and (20, 10)
+///   "fragment_three_sockets" — white 20×20 square + sockets at (0, 10), (10, 10) and (20, 10)
 ///
 /// Joints:
-///   "joint_no_socket"    — blue triangle in Front view, no sockets
-///   "joint_one_socket"   — 1 socket at radius 10, full rotation arc
-///   "joint_two_sockets"  — 2 sockets at radius 15, full rotation arc
+///   "joint_no_socket"      — blue triangle in Front view, no sockets
+///   "joint_one_socket"     — 1 socket at radius 10, full rotation arc
+///   "joint_two_sockets"    — 2 sockets at radius 15, full rotation arc
+///   "joint_three_sockets"  — 3 sockets at radius 15, full rotation arc
 /////////////////////////////////////////////////
 struct TestPartLibrary {
   /////////////////////////////////////////////////
