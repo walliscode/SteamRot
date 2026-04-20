@@ -104,16 +104,43 @@ void draw_joint_instance_sockets(sf::RenderTexture &texture,
 /////////////////////////////////////////////////
 void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
                  const SocketData &socket_data) {
-  static constexpr float k_radius = 2.f;
+  static constexpr float k_outer_radius = 2.f;
+  static constexpr float k_inner_radius = 1.f;
   static constexpr int k_point_count = 10;
-  static const sf::Color k_base_color{sf::Color::White};
-  static const sf::Color k_hover_color{sf::Color::Blue};
 
-  sf::CircleShape circle(k_radius, k_point_count);
-  circle.setOrigin({k_radius, k_radius});
-  circle.setPosition(world_pos);
-  circle.setFillColor(socket_data.is_mouse_over ? k_hover_color : k_base_color);
-  texture.draw(circle);
+  // Outer white circle drawn for every visible socket state.
+  sf::CircleShape outer(k_outer_radius, k_point_count);
+  outer.setOrigin({k_outer_radius, k_outer_radius});
+  outer.setPosition(world_pos);
+
+  if (socket_data.is_ready_to_connect) {
+    // Ready to connect: white outer + green inner circle.
+    outer.setFillColor(sf::Color::White);
+    texture.draw(outer);
+
+    sf::CircleShape inner(k_inner_radius, k_point_count);
+    inner.setOrigin({k_inner_radius, k_inner_radius});
+    inner.setPosition(world_pos);
+    inner.setFillColor(sf::Color::Green);
+    texture.draw(inner);
+  } else if (socket_data.is_another_socket_near) {
+    // Near but not ready: white outer + blue inner circle whose brightness
+    // scales with proximity (proximity_scale 0 = dim, 255 = full blue).
+    outer.setFillColor(sf::Color::White);
+    texture.draw(outer);
+
+    const uint8_t brightness = socket_data.proximity_scale.value_or(0);
+    sf::CircleShape inner(k_inner_radius, k_point_count);
+    inner.setOrigin({k_inner_radius, k_inner_radius});
+    inner.setPosition(world_pos);
+    inner.setFillColor(sf::Color{0, 0, brightness});
+    texture.draw(inner);
+  } else {
+    // Default: white outer, or blue outer when the mouse hovers.
+    outer.setFillColor(socket_data.is_mouse_over ? sf::Color::Blue
+                                                 : sf::Color::White);
+    texture.draw(outer);
+  }
 }
 
 /////////////////////////////////////////////////

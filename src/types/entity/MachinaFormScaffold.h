@@ -97,6 +97,17 @@ struct SocketData {
   /// nearest socket
   /////////////////////////////////////////////////
   std::optional<float> distance_to_nearest_socket{std::nullopt};
+
+  /////////////////////////////////////////////////
+  /// @brief Proximity brightness scale in the range [0, 255].
+  ///
+  /// Set when @c is_another_socket_near is true. The value maps the distance
+  /// to the nearest socket onto a [0, 255] range: 255 at the connection
+  /// threshold (closest) and 0 at the outer proximity threshold (furthest
+  /// within range). Reset to @c std::nullopt by the collision system whenever
+  /// @c is_another_socket_near is false.
+  /////////////////////////////////////////////////
+  std::optional<uint8_t> proximity_scale{std::nullopt};
 };
 
 /////////////////////////////////////////////////
