@@ -46,8 +46,7 @@ uint8_t compute_proximity_scale(float distance) {
   static_assert(range > 0.f,
                 "proximity threshold must be strictly greater than connection "
                 "threshold");
-  const float t =
-      (k_proximity_distance_threshold - distance) / range;
+  const float t = (k_proximity_distance_threshold - distance) / range;
   const float clamped = std::clamp(t, 0.f, 1.f);
   return static_cast<uint8_t>(clamped * 255.f);
 }
@@ -137,8 +136,7 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 }
 
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance,
-                             PartMap &part_map) {
+void check_socket_collisions(JointInstance &joint_instance, PartMap &part_map) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
   for (SocketData &s : joint_instance.sockets)
@@ -152,4 +150,22 @@ void check_socket_collisions(JointInstance &joint_instance,
   }
 }
 
+/////////////////////////////////////////////////
+void check_collisions_between_ghost_and_scaffold(
+    MachinaFormScaffold &scaffold_form, MrGhost &mr_ghost) {
+
+  // guard statement for monostate
+  if (std::holds_alternative<std::monostate>(mr_ghost.m_instance)) {
+    return; // no active ghost item, nothing to check
+  }
+
+  // Check for collisions between the active ghost item and the active scaffold.
+  if (auto *fragment_instance =
+          std::get_if<FragmentInstance>(&mr_ghost.m_instance)) {
+    check_socket_collisions(*fragment_instance, scaffold_form.parts);
+  } else if (auto *joint_instance =
+                 std::get_if<JointInstance>(&mr_ghost.m_instance)) {
+    check_socket_collisions(*joint_instance, scaffold_form.parts);
+  }
+}
 } // namespace steamrot::logic::collision::grimoire_machina

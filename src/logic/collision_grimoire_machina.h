@@ -14,6 +14,7 @@
 /////////////////////////////////////////////////
 
 #include "MachinaFormScaffold.h"
+#include "MrGhost.h"
 #include <SFML/Graphics/Transform.hpp>
 namespace steamrot::logic::collision::grimoire_machina {
 
@@ -93,7 +94,17 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 /// @param joint_instance JointInstance whose sockets are tested.
 /// @param part_map       PartMap containing the candidate FragmentInstances.
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance,
-                             PartMap &part_map);
+void check_socket_collisions(JointInstance &joint_instance, PartMap &part_map);
+
+/////////////////////////////////////////////////
+/// @brief wrapper function to check for collisions between the active ghost
+/// item and the active MachinaFormScaffold, if both are present.
+///
+/// @param scaffold_form MachinaFormScaffold to check against.
+/// @param mr_ghost MrGhost containing the active ghost item to check against
+/// the scaffold
+/////////////////////////////////////////////////
+void check_collisions_between_ghost_and_scaffold(
+    MachinaFormScaffold &scaffold_form, MrGhost &mr_ghost);
 
 } // namespace steamrot::logic::collision::grimoire_machina
