@@ -23,6 +23,9 @@ ConfigureInputAction(InputPayload::InputAction &action,
   case InputActionFbs_TOGGLE_SOCKET_VISIBILITY:
     action = InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY;
     break;
+  case InputActionFbs_ROTATE_GHOST:
+    action = InputPayload::InputAction::ROTATE_GHOST;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,

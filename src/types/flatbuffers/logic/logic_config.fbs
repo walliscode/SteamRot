@@ -18,6 +18,7 @@ test_logic: LogicConfigFbs;
 grimoire_machina_action_logic: LogicConfigFbs;
 ghost_action_logic: LogicConfigFbs;
 camera_action_logic: LogicConfigFbs;
+ghost_positioning_logic: LogicConfigFbs;
 
 }
 

@@ -31,7 +31,7 @@ struct InputPayload {
   /// Any user input events are converted to this format for ease of use in the
   /// EventHandler
   /////////////////////////////////////////////////
-  enum class InputAction { NONE, SELECT, TOGGLE_SOCKET_VISIBILITY } action;
+  enum class InputAction { NONE, SELECT, TOGGLE_SOCKET_VISIBILITY, ROTATE_GHOST } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for InputPayload, sets action to NONE

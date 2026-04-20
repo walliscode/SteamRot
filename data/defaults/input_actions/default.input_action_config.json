@@ -7,6 +7,10 @@
     {
       "keyboard_pressed": ["S"],
       "action": "TOGGLE_SOCKET_VISIBILITY"
+    },
+    {
+      "keyboard_pressed": ["R"],
+      "action": "ROTATE_GHOST"
     }
   ]
 }

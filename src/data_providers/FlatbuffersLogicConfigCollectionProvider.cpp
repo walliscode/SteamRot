@@ -76,6 +76,17 @@ FlatbuffersLogicConfigCollectionProvider::ConfigureLogicConfigCollection(
     logic_config_collection[steamrot::LogicType::CameraMovement] = logic_config;
   }
 
+  if (collection->ghost_positioning_logic()) {
+    LogicConfig logic_config;
+    auto configure_result = data::configure::ConfigureLogicConfig(
+        logic_config, collection->ghost_positioning_logic());
+    if (!configure_result) {
+      return std::unexpected(configure_result.error());
+    }
+    logic_config_collection[steamrot::LogicType::GhostPositioning] =
+        logic_config;
+  }
+
   return std::monostate{};
 }
 } // namespace steamrot

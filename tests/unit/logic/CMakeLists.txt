@@ -13,6 +13,7 @@ state_ui.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp
 positioning_grimoire_machina.test.cpp
+positioning_ghost.test.cpp
 render_grimoire_machina.test.cpp
 render_ghost.test.cpp
 GhostRenderLogic.test.cpp
