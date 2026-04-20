@@ -188,6 +188,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
   SECTION("proximity_scale is set and non-zero when sockets are within "
           "proximity threshold but not ready to connect") {
     // arrange: distance ≈ 7.07 (within proximity 10, outside connection 2.5)
+    // Expected scale: (10.0 - 7.07) / (10.0 - 2.5) * 255 ≈ 99
     sf::Transform socket_one_transform = sf::Transform::Identity;
     socket_one_transform.translate({0.f, 0.f});
     sf::Transform socket_two_transform = sf::Transform::Identity;
@@ -196,12 +197,18 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         socket_one_data, socket_one_transform, socket_two_data,
         socket_two_transform);
-    // assert: proximity_scale should be set and > 0 (not at the far edge)
+    // assert: proximity_scale should be set and match the expected value
     REQUIRE(socket_one_data.proximity_scale.has_value());
     REQUIRE(socket_one_data.proximity_scale.value() > 0);
     REQUIRE(socket_one_data.proximity_scale.value() < 255);
+    // distance ≈ 7.07 → scale ≈ 99 (allow ±2 for floating-point rounding)
+    REQUIRE(socket_one_data.proximity_scale.value() >= 97);
+    REQUIRE(socket_one_data.proximity_scale.value() <= 101);
     REQUIRE(socket_two_data.proximity_scale.has_value());
     REQUIRE(socket_two_data.proximity_scale.value() > 0);
+    REQUIRE(socket_two_data.proximity_scale.value() < 255);
+    REQUIRE(socket_two_data.proximity_scale.value() >= 97);
+    REQUIRE(socket_two_data.proximity_scale.value() <= 101);
   }
 
   SECTION("proximity_scale is 255 when sockets are within connection threshold") {

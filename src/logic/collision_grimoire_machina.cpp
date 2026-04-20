@@ -43,6 +43,9 @@ void reset_socket(SocketData &socket) {
 uint8_t compute_proximity_scale(float distance) {
   constexpr float range =
       k_proximity_distance_threshold - k_connection_distance_threshold;
+  static_assert(range > 0.f,
+                "proximity threshold must be strictly greater than connection "
+                "threshold");
   const float t =
       (k_proximity_distance_threshold - distance) / range;
   const float clamped = std::clamp(t, 0.f, 1.f);
