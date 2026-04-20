@@ -8,12 +8,16 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision_grimoire_machina.h"
+#include <algorithm>
 #include <cmath>
 #include <variant>
 
 namespace steamrot::logic::collision::grimoire_machina {
 
 namespace {
+
+static constexpr float k_proximity_distance_threshold = 10.f;
+static constexpr float k_connection_distance_threshold = 2.5f;
 
 /////////////////////////////////////////////////
 /// @brief Reset proximity state on a single SocketData.
@@ -22,6 +26,27 @@ void reset_socket(SocketData &socket) {
   socket.is_another_socket_near = false;
   socket.is_ready_to_connect = false;
   socket.distance_to_nearest_socket = std::nullopt;
+  socket.proximity_scale = std::nullopt;
+}
+
+/////////////////////////////////////////////////
+/// @brief Compute the proximity brightness scale [0, 255] from a distance.
+///
+/// Maps @p distance from the range
+/// [@c k_connection_distance_threshold, @c k_proximity_distance_threshold]
+/// onto [255, 0]: 255 when at or inside the connection threshold, 0 when at
+/// the outer proximity boundary.
+///
+/// @param distance World-space distance to the candidate partner socket.
+/// @return Scale value in [0, 255].
+/////////////////////////////////////////////////
+uint8_t compute_proximity_scale(float distance) {
+  constexpr float range =
+      k_proximity_distance_threshold - k_connection_distance_threshold;
+  const float t =
+      (k_proximity_distance_threshold - distance) / range;
+  const float clamped = std::clamp(t, 0.f, 1.f);
+  return static_cast<uint8_t>(clamped * 255.f);
 }
 
 /////////////////////////////////////////////////
@@ -40,6 +65,7 @@ void apply_if_better(SocketData &socket, float distance, bool ready) {
   socket.is_another_socket_near = true;
   socket.is_ready_to_connect = ready;
   socket.distance_to_nearest_socket = distance;
+  socket.proximity_scale = compute_proximity_scale(distance);
 }
 
 } // namespace
@@ -63,9 +89,6 @@ void check_socket_collisions(SocketData &socket_data,
                              SocketData &other_socket_data,
                              const sf::Transform &other_socket_transform) {
 
-  static constexpr float proximity_distance_threshold = 10.f;
-  static constexpr float connection_distance_threshold = 2.5f;
-
   const sf::Vector2f socket_world_pos =
       socket_transform.transformPoint(socket_data.local_position);
   const sf::Vector2f other_socket_world_pos =
@@ -75,10 +98,10 @@ void check_socket_collisions(SocketData &socket_data,
       std::hypot(socket_world_pos.x - other_socket_world_pos.x,
                  socket_world_pos.y - other_socket_world_pos.y);
 
-  if (distance > proximity_distance_threshold)
+  if (distance > k_proximity_distance_threshold)
     return; // outside both thresholds — no update
 
-  const bool ready = distance <= connection_distance_threshold;
+  const bool ready = distance <= k_connection_distance_threshold;
   apply_if_better(socket_data, distance, ready);
   apply_if_better(other_socket_data, distance, ready);
 }

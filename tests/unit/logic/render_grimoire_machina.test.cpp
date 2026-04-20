@@ -173,6 +173,44 @@ TEST_CASE("draw_socket produces yellow pixels at world_pos when hovered",
   REQUIRE(image.getPixel({50, 50}) == sf::Color::Blue);
 }
 
+TEST_CASE("draw_socket produces white outer and green inner when "
+          "is_ready_to_connect is true",
+          "[unit][render_grimoire_machina]") {
+  sf::RenderTexture texture{{100, 100}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  socket_data.is_another_socket_near = true;
+  socket_data.is_ready_to_connect = true;
+  socket_data.proximity_scale = uint8_t{255};
+  steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
+                                                         socket_data);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+  // Center pixel (50,50) is covered by the green inner circle.
+  REQUIRE(image.getPixel({50, 50}) == sf::Color::Green);
+}
+
+TEST_CASE("draw_socket produces white outer and blue inner when "
+          "is_another_socket_near is true and not ready",
+          "[unit][render_grimoire_machina]") {
+  sf::RenderTexture texture{{100, 100}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  socket_data.is_another_socket_near = true;
+  socket_data.is_ready_to_connect = false;
+  socket_data.proximity_scale = uint8_t{200};
+  steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
+                                                         socket_data);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+  // Center pixel (50,50) is covered by the blue inner circle (brightness 200).
+  REQUIRE(image.getPixel({50, 50}) == sf::Color{0, 0, 200});
+}
+
 /////////////////////////////////////////////////
 /// draw_fragment_instance_sockets tests
 /////////////////////////////////////////////////

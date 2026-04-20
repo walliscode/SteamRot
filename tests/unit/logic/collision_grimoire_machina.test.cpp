@@ -24,6 +24,7 @@ void reset_socket(steamrot::SocketData &s) {
   s.is_another_socket_near = false;
   s.is_ready_to_connect = false;
   s.distance_to_nearest_socket = std::nullopt;
+  s.proximity_scale = std::nullopt;
 }
 
 } // namespace
@@ -52,6 +53,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE(socket_one_data.is_ready_to_connect == false);
     REQUIRE(socket_one_data.local_position == sf::Vector2f{0.f, 0.f});
     REQUIRE(socket_one_data.distance_to_nearest_socket == std::nullopt);
+    REQUIRE(socket_one_data.proximity_scale == std::nullopt);
 
     REQUIRE(socket_two_data.state == steamrot::SocketState::Available);
     REQUIRE(socket_two_data.is_mouse_over == false);
@@ -60,6 +62,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE_THAT(socket_two_data.local_position,
                  steamrot::tests::EqualsVector2f({0.f, 0.f}));
     REQUIRE(socket_two_data.distance_to_nearest_socket == std::nullopt);
+    REQUIRE(socket_two_data.proximity_scale == std::nullopt);
   }
 
   SECTION("is_another_socket_near is true when sockets are within proximity "
@@ -180,6 +183,82 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE(socket_one_data.is_ready_to_connect == false);
     REQUIRE(socket_two_data.is_another_socket_near == false);
     REQUIRE(socket_two_data.is_ready_to_connect == false);
+  }
+
+  SECTION("proximity_scale is set and non-zero when sockets are within "
+          "proximity threshold but not ready to connect") {
+    // arrange: distance ≈ 7.07 (within proximity 10, outside connection 2.5)
+    sf::Transform socket_one_transform = sf::Transform::Identity;
+    socket_one_transform.translate({0.f, 0.f});
+    sf::Transform socket_two_transform = sf::Transform::Identity;
+    socket_two_transform.translate({5.f, 5.f});
+    // act
+    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
+        socket_one_data, socket_one_transform, socket_two_data,
+        socket_two_transform);
+    // assert: proximity_scale should be set and > 0 (not at the far edge)
+    REQUIRE(socket_one_data.proximity_scale.has_value());
+    REQUIRE(socket_one_data.proximity_scale.value() > 0);
+    REQUIRE(socket_one_data.proximity_scale.value() < 255);
+    REQUIRE(socket_two_data.proximity_scale.has_value());
+    REQUIRE(socket_two_data.proximity_scale.value() > 0);
+  }
+
+  SECTION("proximity_scale is 255 when sockets are within connection threshold") {
+    // arrange: distance ≈ 1.41 (within connection threshold 2.5)
+    sf::Transform socket_one_transform = sf::Transform::Identity;
+    socket_one_transform.translate({0.f, 0.f});
+    sf::Transform socket_two_transform = sf::Transform::Identity;
+    socket_two_transform.translate({1.f, 1.f});
+    // act
+    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
+        socket_one_data, socket_one_transform, socket_two_data,
+        socket_two_transform);
+    // assert: at or inside connection threshold → scale clamped to 255
+    REQUIRE(socket_one_data.proximity_scale.has_value());
+    REQUIRE(socket_one_data.proximity_scale.value() == 255);
+    REQUIRE(socket_two_data.proximity_scale.has_value());
+    REQUIRE(socket_two_data.proximity_scale.value() == 255);
+  }
+
+  SECTION("proximity_scale is nullopt when sockets are far apart") {
+    // arrange: far outside proximity threshold
+    sf::Transform socket_one_transform = sf::Transform::Identity;
+    socket_one_transform.translate({0.f, 0.f});
+    sf::Transform socket_two_transform = sf::Transform::Identity;
+    socket_two_transform.translate({100.f, 100.f});
+    // act
+    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
+        socket_one_data, socket_one_transform, socket_two_data,
+        socket_two_transform);
+    // assert
+    REQUIRE(socket_one_data.proximity_scale == std::nullopt);
+    REQUIRE(socket_two_data.proximity_scale == std::nullopt);
+  }
+
+  SECTION("proximity_scale is reset to nullopt after sockets move out of range") {
+    // first tick: sockets near
+    sf::Transform socket_one_transform = sf::Transform::Identity;
+    socket_one_transform.translate({0.f, 0.f});
+    sf::Transform socket_two_transform = sf::Transform::Identity;
+    socket_two_transform.translate({5.f, 5.f});
+    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
+        socket_one_data, socket_one_transform, socket_two_data,
+        socket_two_transform);
+    REQUIRE(socket_one_data.proximity_scale.has_value());
+
+    // reset state between ticks (simulates per-tick reset in PartMap logic)
+    reset_socket(socket_one_data);
+    reset_socket(socket_two_data);
+
+    // second tick: sockets far apart
+    socket_one_transform.translate({-100.f, -100.f});
+    socket_two_transform.translate({100.f, 100.f});
+    steamrot::logic::collision::grimoire_machina::check_socket_collisions(
+        socket_one_data, socket_one_transform, socket_two_data,
+        socket_two_transform);
+    REQUIRE(socket_one_data.proximity_scale == std::nullopt);
+    REQUIRE(socket_two_data.proximity_scale == std::nullopt);
   }
 }
 
@@ -510,6 +589,7 @@ TEST_CASE("reset_socket_proximity_state(PartMap) tests",
           s.is_another_socket_near = true;
           s.is_ready_to_connect = true;
           s.distance_to_nearest_socket = 3.f;
+          s.proximity_scale = uint8_t{200};
         }
       };
       if (auto *fi = std::get_if<steamrot::FragmentInstance>(&variant))
@@ -529,6 +609,7 @@ TEST_CASE("reset_socket_proximity_state(PartMap) tests",
           REQUIRE(s.is_another_socket_near == false);
           REQUIRE(s.is_ready_to_connect == false);
           REQUIRE(s.distance_to_nearest_socket == std::nullopt);
+          REQUIRE(s.proximity_scale == std::nullopt);
         }
       };
       if (const auto *fi = std::get_if<steamrot::FragmentInstance>(&variant))
