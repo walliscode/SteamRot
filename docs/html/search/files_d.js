@@ -42,11 +42,10 @@ var searchData=
   ['sfmleventconverter_2eh_39',['SFMLEventConverter.h',['../SFMLEventConverter_8h.html',1,'']]],
   ['simulation_5fdata_5fgenerated_2eh_40',['simulation_data_generated.h',['../simulation__data__generated_8h.html',1,'']]],
   ['simulationdata_2eh_41',['SimulationData.h',['../SimulationData_8h.html',1,'']]],
-  ['socketconfigutils_2eh_42',['SocketConfigUtils.h',['../SocketConfigUtils_8h.html',1,'']]],
-  ['spacingandsizing_2eh_43',['SpacingAndSizing.h',['../SpacingAndSizing_8h.html',1,'']]],
-  ['state_5fui_2ecpp_44',['state_ui.cpp',['../state__ui_8cpp.html',1,'']]],
-  ['state_5fui_2eh_45',['state_ui.h',['../state__ui_8h.html',1,'']]],
-  ['style_2eh_46',['Style.h',['../Style_8h.html',1,'']]],
-  ['subscriber_2eh_47',['Subscriber.h',['../Subscriber_8h.html',1,'']]],
-  ['subscriber_5fgenerated_2eh_48',['subscriber_generated.h',['../subscriber__generated_8h.html',1,'']]]
+  ['spacingandsizing_2eh_42',['SpacingAndSizing.h',['../SpacingAndSizing_8h.html',1,'']]],
+  ['state_5fui_2ecpp_43',['state_ui.cpp',['../state__ui_8cpp.html',1,'']]],
+  ['state_5fui_2eh_44',['state_ui.h',['../state__ui_8h.html',1,'']]],
+  ['style_2eh_45',['Style.h',['../Style_8h.html',1,'']]],
+  ['subscriber_2eh_46',['Subscriber.h',['../Subscriber_8h.html',1,'']]],
+  ['subscriber_5fgenerated_2eh_47',['subscriber_generated.h',['../subscriber__generated_8h.html',1,'']]]
 ];

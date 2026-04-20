@@ -103,7 +103,7 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae268b09555bab394471dbb6059e32a90" id="r_ae268b09555bab394471dbb6059e32a90"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae268b09555bab394471dbb6059e32a90">add_name</a> (::flatbuffers::Offset&lt;::flatbuffers::String &gt; name)</td></tr>
 <tr class="memitem:a7b96b1c431ebb03d33e6f1cd098da9d7" id="r_a7b96b1c431ebb03d33e6f1cd098da9d7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7b96b1c431ebb03d33e6f1cd098da9d7">add_sockets</a> (::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; &gt; &gt; sockets)</td></tr>
-<tr class="memitem:a80144607f37b086dcf866a08d36d910e" id="r_a80144607f37b086dcf866a08d36d910e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a80144607f37b086dcf866a08d36d910e">add_movement_views</a> (::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; movement_views)</td></tr>
+<tr class="memitem:a77c95ea879dff597f6c6db8be7f137bd" id="r_a77c95ea879dff597f6c6db8be7f137bd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a77c95ea879dff597f6c6db8be7f137bd">add_positioning_views</a> (::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; positioning_views)</td></tr>
 <tr class="memitem:aefb6244019a30dfff16090662b0623f2" id="r_aefb6244019a30dfff16090662b0623f2"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#aefb6244019a30dfff16090662b0623f2">FragmentFbsBuilder</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb)</td></tr>
 <tr class="memitem:a3cc63a6754d5d3940ebc2e610fd671b7" id="r_a3cc63a6754d5d3940ebc2e610fd671b7"><td class="memItemLeft">::flatbuffers::Offset&lt; FragmentFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a3cc63a6754d5d3940ebc2e610fd671b7">Finish</a> ()</td></tr>
 </table><table class="memberdecls">
@@ -154,31 +154,6 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a80144607f37b086dcf866a08d36d910e" name="a80144607f37b086dcf866a08d36d910e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80144607f37b086dcf866a08d36d910e">&#9670;&#160;</a></span>add_movement_views()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void steamrot::FragmentFbsBuilder::add_movement_views </td>
-          <td>(</td>
-          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>movement_views</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ae268b09555bab394471dbb6059e32a90" name="ae268b09555bab394471dbb6059e32a90"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae268b09555bab394471dbb6059e32a90">&#9670;&#160;</a></span>add_name()</h2>
 
@@ -192,6 +167,31 @@ Public Attributes</h2></td></tr>
           <td class="memname">void steamrot::FragmentFbsBuilder::add_name </td>
           <td>(</td>
           <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::String &gt;</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a77c95ea879dff597f6c6db8be7f137bd" name="a77c95ea879dff597f6c6db8be7f137bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77c95ea879dff597f6c6db8be7f137bd">&#9670;&#160;</a></span>add_positioning_views()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void steamrot::FragmentFbsBuilder::add_positioning_views </td>
+          <td>(</td>
+          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>positioning_views</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>

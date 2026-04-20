@@ -98,6 +98,14 @@ $(function(){initNavTree('structsteamrot_1_1CameraPayload.html','','structsteamr
 
 <p><code>#include &lt;<a class="el" href="EventPayload_8h_source.html">EventPayload.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ab5e8821a67078dc48cece7a71ebefe36" id="r_ab5e8821a67078dc48cece7a71ebefe36"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> { <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">NONE</a>
+, <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">SCROLL</a>
+, <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">RESET_ZOOM</a>
+ }</td></tr>
+<tr class="memdesc:ab5e8821a67078dc48cece7a71ebefe36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum discriminating between different types of camera-related actions.  <a href="#ab5e8821a67078dc48cece7a71ebefe36">More...</a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4493500342f37ff87b88e756a49ddba1" id="r_a4493500342f37ff87b88e756a49ddba1"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a> ()=default</td></tr>
@@ -107,13 +115,44 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:af7d4a3ada75dc14245a90ba12d5ba1fb" id="r_af7d4a3ada75dc14245a90ba12d5ba1fb"><td class="memItemLeft">enum <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a>&#160;</td><td class="memItemRight"><a class="el" href="#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a></td></tr>
 <tr class="memitem:afdff114ef2cc30eef68bc576c2f9253d" id="r_afdff114ef2cc30eef68bc576c2f9253d"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a> {0.0f}</td></tr>
 <tr class="memdesc:afdff114ef2cc30eef68bc576c2f9253d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw scroll delta from SFML this tick.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Event payload carrying a mouse-scroll delta for camera zoom. </p>
-<p>Emitted each tick that a mouse-wheel event is detected by <a class="el" href="classsteamrot_1_1SFMLEventConverter.html">SFMLEventConverter</a> and consumed by CameraMovementLogic to update the scene <a class="el" href="structsteamrot_1_1CameraState.html" title="Holds the per-scene camera/view state.">CameraState</a>. </p>
-</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p>Emitted each tick that a mouse-wheel event is detected by <a class="el" href="classsteamrot_1_1SFMLEventConverter.html">SFMLEventConverter</a> and consumed by CameraPositioningLogic to update the scene <a class="el" href="structsteamrot_1_1CameraState.html" title="Holds the per-scene camera/view state.">CameraState</a>. </p>
+</div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Member Enumeration Documentation</h2>
+<a id="ab5e8821a67078dc48cece7a71ebefe36" name="ab5e8821a67078dc48cece7a71ebefe36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5e8821a67078dc48cece7a71ebefe36">&#9670;&#160;</a></span>CameraAction</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel strong">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Enum discriminating between different types of camera-related actions. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693" name="ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693"></a>NONE&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25" name="ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25"></a>SCROLL&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06" name="ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06"></a>RESET_ZOOM&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4493500342f37ff87b88e756a49ddba1" name="a4493500342f37ff87b88e756a49ddba1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4493500342f37ff87b88e756a49ddba1">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[1/2]</span></h2>
 
@@ -175,6 +214,20 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="af7d4a3ada75dc14245a90ba12d5ba1fb" name="af7d4a3ada75dc14245a90ba12d5ba1fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7d4a3ada75dc14245a90ba12d5ba1fb">&#9670;&#160;</a></span>NONE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a> steamrot::CameraPayload::NONE</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="afdff114ef2cc30eef68bc576c2f9253d" name="afdff114ef2cc30eef68bc576c2f9253d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afdff114ef2cc30eef68bc576c2f9253d">&#9670;&#160;</a></span>scroll_delta</h2>
 

@@ -109,36 +109,30 @@ Inheritance diagram for steamrot::JointInstance:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3a3623ff5c313a0a3f2ca8e370b0926c" id="r_a3a3623ff5c313a0a3f2ca8e370b0926c"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a3a3623ff5c313a0a3f2ca8e370b0926c">JointInstance</a> (<a class="el" href="structsteamrot_1_1Joint.html">Joint</a> &amp;joint_ref, sf::Transform initial_transform=sf::Transform::Identity)</td></tr>
-<tr class="memdesc:a3a3623ff5c313a0a3f2ca8e370b0926c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> from a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition.  <br /></td></tr>
+<tr class="memitem:a5499c147ae29887d53340c66639a8d98" id="r_a5499c147ae29887d53340c66639a8d98"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a5499c147ae29887d53340c66639a8d98">JointInstance</a> (<a class="el" href="structsteamrot_1_1Joint.html">Joint</a> *joint_ptr, sf::Transform initial_transform=sf::Transform::Identity)</td></tr>
+<tr class="memdesc:a5499c147ae29887d53340c66639a8d98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> from a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition.  <br /></td></tr>
 <tr class="inherit_header pub_methods_structsteamrot_1_1PartInstance"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structsteamrot_1_1PartInstance')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="structsteamrot_1_1PartInstance.html">steamrot::PartInstance</a></td></tr>
 <tr class="memitem:a84ea0d934cd0ab1fee4bd78c03e08db2 inherit pub_methods_structsteamrot_1_1PartInstance" id="r_a84ea0d934cd0ab1fee4bd78c03e08db2"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html#a84ea0d934cd0ab1fee4bd78c03e08db2">PartInstance</a> (sf::Transform initial_transform=sf::Transform::Identity)</td></tr>
 <tr class="memdesc:a84ea0d934cd0ab1fee4bd78c03e08db2 inherit pub_methods_structsteamrot_1_1PartInstance"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> with the given world-space transform.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ac3a0f2317137b16b3877cc1d031cd10b" id="r_ac3a0f2317137b16b3877cc1d031cd10b"><td class="memItemLeft"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#ac3a0f2317137b16b3877cc1d031cd10b">joint</a></td></tr>
-<tr class="memdesc:ac3a0f2317137b16b3877cc1d031cd10b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition being referenced.  <br /></td></tr>
-<tr class="memitem:acc0fd64745ac7c64e8e4cf96444c7997" id="r_acc0fd64745ac7c64e8e4cf96444c7997"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#acc0fd64745ac7c64e8e4cf96444c7997">current_rotation</a> {0.f}</td></tr>
-<tr class="memdesc:acc0fd64745ac7c64e8e4cf96444c7997"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current rotation angle (degrees) of the socket ring around the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s local origin.  <br /></td></tr>
-<tr class="memitem:a959dce12b8a79b4928aa56c6f011e8c5" id="r_a959dce12b8a79b4928aa56c6f011e8c5"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a959dce12b8a79b4928aa56c6f011e8c5">rotation_min</a> {-180.f}</td></tr>
-<tr class="memdesc:a959dce12b8a79b4928aa56c6f011e8c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum allowed rotation angle (degrees, hard stop).  <br /></td></tr>
-<tr class="memitem:ac486d4221232b0ad47b4a67323eedd9f" id="r_ac486d4221232b0ad47b4a67323eedd9f"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#ac486d4221232b0ad47b4a67323eedd9f">rotation_max</a> {180.f}</td></tr>
-<tr class="memdesc:ac486d4221232b0ad47b4a67323eedd9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum allowed rotation angle (degrees, hard stop).  <br /></td></tr>
+<tr class="memitem:a7d7b5626e46f66f587be9d0e6d1a144c" id="r_a7d7b5626e46f66f587be9d0e6d1a144c"><td class="memItemLeft"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a7d7b5626e46f66f587be9d0e6d1a144c">joint</a> {nullptr}</td></tr>
+<tr class="memdesc:a7d7b5626e46f66f587be9d0e6d1a144c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition being referenced.  <br /></td></tr>
+<tr class="memitem:af7acd8e99f874f59a8deb942912c7c8c" id="r_af7acd8e99f874f59a8deb942912c7c8c"><td class="memItemLeft">std::vector&lt; <a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#af7acd8e99f874f59a8deb942912c7c8c">sockets</a></td></tr>
+<tr class="memdesc:af7acd8e99f874f59a8deb942912c7c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-socket data (local position + mutable state) for this <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> instance.  <br /></td></tr>
 <tr class="inherit_header pub_attribs_structsteamrot_1_1PartInstance"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_attribs_structsteamrot_1_1PartInstance')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Attributes inherited from <a class="el" href="structsteamrot_1_1PartInstance.html">steamrot::PartInstance</a></td></tr>
 <tr class="memitem:ac8eb9800ffa360090517b7b423f02d93 inherit pub_attribs_structsteamrot_1_1PartInstance" id="r_ac8eb9800ffa360090517b7b423f02d93"><td class="memItemLeft">uint32_t&#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html#ac8eb9800ffa360090517b7b423f02d93">id</a> {0}</td></tr>
 <tr class="memdesc:ac8eb9800ffa360090517b7b423f02d93 inherit pub_attribs_structsteamrot_1_1PartInstance"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stable ID assigned by <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> when this instance is added. Unique across both joints and fragments.  <br /></td></tr>
 <tr class="memitem:ad7c0584a80d2532428fdbe21c107e1fc inherit pub_attribs_structsteamrot_1_1PartInstance" id="r_ad7c0584a80d2532428fdbe21c107e1fc"><td class="memItemLeft">sf::Transform&#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html#ad7c0584a80d2532428fdbe21c107e1fc">transform</a> {sf::Transform::Identity}</td></tr>
 <tr class="memdesc:ad7c0584a80d2532428fdbe21c107e1fc inherit pub_attribs_structsteamrot_1_1PartInstance"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single transform that positions this instance on the canvas.  <br /></td></tr>
-<tr class="memitem:a20a2f32a5717084f796f2d3971134f8f inherit pub_attribs_structsteamrot_1_1PartInstance" id="r_a20a2f32a5717084f796f2d3971134f8f"><td class="memItemLeft">std::vector&lt; <a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html#a20a2f32a5717084f796f2d3971134f8f">socket_states</a></td></tr>
-<tr class="memdesc:a20a2f32a5717084f796f2d3971134f8f inherit pub_attribs_structsteamrot_1_1PartInstance"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-socket runtime state (connection status, hover).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A placed instance of a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> on the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>. </p>
-<p>Derives from <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> and adds Joint-specific runtime state. World positions for sockets are derived on demand via: ComputeSocketLocalPos(joint.socket_config, i, current_rotation) followed by transform.transformPoint(local_pos) </p>
+<p>Derives from <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> and adds Joint-specific runtime state. The <code>sockets</code> vector is sized to <code>joint_ptr-&gt;socket_config.socket_count</code> at construction, with all positions zero-initialised. Call <code>initialize_joint_socket_positions()</code> to populate the positions using the even-spread algorithm before the instance is rendered or hit-tested. World-space position of socket i is obtained via: transform.transformPoint(sockets[i].local_position) </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3a3623ff5c313a0a3f2ca8e370b0926c" name="a3a3623ff5c313a0a3f2ca8e370b0926c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a3623ff5c313a0a3f2ca8e370b0926c">&#9670;&#160;</a></span>JointInstance()</h2>
+<a id="a5499c147ae29887d53340c66639a8d98" name="a5499c147ae29887d53340c66639a8d98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5499c147ae29887d53340c66639a8d98">&#9670;&#160;</a></span>JointInstance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -149,7 +143,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="memname">steamrot::JointInstance::JointInstance </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>joint_ref</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a> *</td>          <td class="paramname"><span class="paramname"><em>joint_ptr</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -165,10 +159,10 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> from a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition. </p>
-<p>Initialises socket_states with one default-constructed <a class="el" href="structsteamrot_1_1SocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> per socket described by the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s <a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a>.</p>
+<p>Allocates one <code><a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a></code> per socket declared in the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s <a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a> (positions are zero-initialised). Call <code>initialize_joint_socket_positions()</code> afterwards to compute the even-spread positions from the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s <a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">joint_ref</td><td><a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition to reference. </td></tr>
+    <tr><td class="paramname">joint_ptr</td><td>Pointer to the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition. May be nullptr. </td></tr>
     <tr><td class="paramname">initial_transform</td><td>Transform placing this instance in world space. </td></tr>
   </table>
   </dd>
@@ -177,67 +171,36 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="acc0fd64745ac7c64e8e4cf96444c7997" name="acc0fd64745ac7c64e8e4cf96444c7997"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc0fd64745ac7c64e8e4cf96444c7997">&#9670;&#160;</a></span>current_rotation</h2>
+<a id="a7d7b5626e46f66f587be9d0e6d1a144c" name="a7d7b5626e46f66f587be9d0e6d1a144c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d7b5626e46f66f587be9d0e6d1a144c">&#9670;&#160;</a></span>joint</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float steamrot::JointInstance::current_rotation {0.f}</td>
+          <td class="memname"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a>* steamrot::JointInstance::joint {nullptr}</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Current rotation angle (degrees) of the socket ring around the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s local origin. </p>
+<p>Pointer to the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition being referenced. </p>
 
 </div>
 </div>
-<a id="ac3a0f2317137b16b3877cc1d031cd10b" name="ac3a0f2317137b16b3877cc1d031cd10b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3a0f2317137b16b3877cc1d031cd10b">&#9670;&#160;</a></span>joint</h2>
+<a id="af7acd8e99f874f59a8deb942912c7c8c" name="af7acd8e99f874f59a8deb942912c7c8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7acd8e99f874f59a8deb942912c7c8c">&#9670;&#160;</a></span>sockets</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a>&amp; steamrot::JointInstance::joint</td>
+          <td class="memname">std::vector&lt;<a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a>&gt; steamrot::JointInstance::sockets</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p><a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> definition being referenced. </p>
-
-</div>
-</div>
-<a id="ac486d4221232b0ad47b4a67323eedd9f" name="ac486d4221232b0ad47b4a67323eedd9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac486d4221232b0ad47b4a67323eedd9f">&#9670;&#160;</a></span>rotation_max</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">float steamrot::JointInstance::rotation_max {180.f}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Maximum allowed rotation angle (degrees, hard stop). </p>
-
-</div>
-</div>
-<a id="a959dce12b8a79b4928aa56c6f011e8c5" name="a959dce12b8a79b4928aa56c6f011e8c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a959dce12b8a79b4928aa56c6f011e8c5">&#9670;&#160;</a></span>rotation_min</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">float steamrot::JointInstance::rotation_min {-180.f}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Minimum allowed rotation angle (degrees, hard stop). </p>
+<p>Per-socket data (local position + mutable state) for this <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> instance. </p>
+<p>Sized at construction; positions are zero-initialised. Call <code>initialize_joint_socket_positions()</code> to populate positions via the even-spread algorithm. Positioning Logic may subsequently update <code>sockets</code>[i].local_position to reposition individual sockets (e.g. to apply socket ring rotation). Apply the instance's transform to <code>sockets</code>[i].local_position to obtain the world-space position of socket <code>i</code>. </p>
 
 </div>
 </div>

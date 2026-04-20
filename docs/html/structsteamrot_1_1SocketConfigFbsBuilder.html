@@ -103,11 +103,11 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae075261b86143e482022c7b7ceec1892" id="r_ae075261b86143e482022c7b7ceec1892"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae075261b86143e482022c7b7ceec1892">add_socket_count</a> (int32_t socket_count)</td></tr>
 <tr class="memitem:ab6bd15a66304a1819ca77b6325914eec" id="r_ab6bd15a66304a1819ca77b6325914eec"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab6bd15a66304a1819ca77b6325914eec">add_radius</a> (float radius)</td></tr>
-<tr class="memitem:a3523ea532cd59014738cd71bf17c5704" id="r_a3523ea532cd59014738cd71bf17c5704"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3523ea532cd59014738cd71bf17c5704">add_arc_min</a> (float arc_min)</td></tr>
-<tr class="memitem:a2816e58824576842a9a0266490f73360" id="r_a2816e58824576842a9a0266490f73360"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2816e58824576842a9a0266490f73360">add_arc_max</a> (float arc_max)</td></tr>
 <tr class="memitem:a9a070f0c97efe14f4ed7ccd8ce5ef503" id="r_a9a070f0c97efe14f4ed7ccd8ce5ef503"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9a070f0c97efe14f4ed7ccd8ce5ef503">add_min_gap</a> (float min_gap)</td></tr>
 <tr class="memitem:a7015b3e608e5b5219b535fe33974ee96" id="r_a7015b3e608e5b5219b535fe33974ee96"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7015b3e608e5b5219b535fe33974ee96">add_fixed_socket_angle</a> (float fixed_socket_angle)</td></tr>
 <tr class="memitem:a349db0446c0e5aa97e8e57bf1b194db8" id="r_a349db0446c0e5aa97e8e57bf1b194db8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a349db0446c0e5aa97e8e57bf1b194db8">add_has_fixed_socket</a> (bool has_fixed_socket)</td></tr>
+<tr class="memitem:a44485e15e2430c3b11f86124a93745db" id="r_a44485e15e2430c3b11f86124a93745db"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a44485e15e2430c3b11f86124a93745db">add_rotation_arc_min</a> (float rotation_arc_min)</td></tr>
+<tr class="memitem:a3faf0036e136d3e2a1e48f15ac218e99" id="r_a3faf0036e136d3e2a1e48f15ac218e99"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3faf0036e136d3e2a1e48f15ac218e99">add_rotation_arc_max</a> (float rotation_arc_max)</td></tr>
 <tr class="memitem:a64aeb21662bf24047ce6702db779da0f" id="r_a64aeb21662bf24047ce6702db779da0f"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a64aeb21662bf24047ce6702db779da0f">SocketConfigFbsBuilder</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb)</td></tr>
 <tr class="memitem:affc3997b62d1c0d90c40077219368e94" id="r_affc3997b62d1c0d90c40077219368e94"><td class="memItemLeft">::flatbuffers::Offset&lt; SocketConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#affc3997b62d1c0d90c40077219368e94">Finish</a> ()</td></tr>
 </table><table class="memberdecls">
@@ -158,56 +158,6 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a2816e58824576842a9a0266490f73360" name="a2816e58824576842a9a0266490f73360"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2816e58824576842a9a0266490f73360">&#9670;&#160;</a></span>add_arc_max()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void steamrot::SocketConfigFbsBuilder::add_arc_max </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>arc_max</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3523ea532cd59014738cd71bf17c5704" name="a3523ea532cd59014738cd71bf17c5704"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3523ea532cd59014738cd71bf17c5704">&#9670;&#160;</a></span>add_arc_min()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void steamrot::SocketConfigFbsBuilder::add_arc_min </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>arc_min</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a7015b3e608e5b5219b535fe33974ee96" name="a7015b3e608e5b5219b535fe33974ee96"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7015b3e608e5b5219b535fe33974ee96">&#9670;&#160;</a></span>add_fixed_socket_angle()</h2>
 
@@ -296,6 +246,56 @@ Public Attributes</h2></td></tr>
           <td class="memname">void steamrot::SocketConfigFbsBuilder::add_radius </td>
           <td>(</td>
           <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>radius</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3faf0036e136d3e2a1e48f15ac218e99" name="a3faf0036e136d3e2a1e48f15ac218e99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3faf0036e136d3e2a1e48f15ac218e99">&#9670;&#160;</a></span>add_rotation_arc_max()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void steamrot::SocketConfigFbsBuilder::add_rotation_arc_max </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>rotation_arc_max</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a44485e15e2430c3b11f86124a93745db" name="a44485e15e2430c3b11f86124a93745db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44485e15e2430c3b11f86124a93745db">&#9670;&#160;</a></span>add_rotation_arc_min()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void steamrot::SocketConfigFbsBuilder::add_rotation_arc_min </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>rotation_arc_min</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>

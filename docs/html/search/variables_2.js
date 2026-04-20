@@ -6,6 +6,5 @@ var searchData=
   ['captured_5fpayload_3',['captured_payload',['../structsteamrot_1_1Subscriber.html#a66e2a3259e6fbb239e447428150133d7',1,'steamrot::Subscriber']]],
   ['componentregistersize_4',['ComponentRegisterSize',['../namespacesteamrot.html#a1754276c51344a1d12d0521f126739b4',1,'steamrot']]],
   ['connections_5',['connections',['../structsteamrot_1_1MachinaFormScaffold.html#acedd1d92f9c70e2edf2c34d194646171',1,'steamrot::MachinaFormScaffold']]],
-  ['context_6',['context',['../structsteamrot_1_1EventPacket.html#ae76b4621256470a4b625b700271b27e7',1,'steamrot::EventPacket']]],
-  ['current_5frotation_7',['current_rotation',['../structsteamrot_1_1JointInstance.html#acc0fd64745ac7c64e8e4cf96444c7997',1,'steamrot::JointInstance']]]
+  ['context_6',['context',['../structsteamrot_1_1EventPacket.html#ae76b4621256470a4b625b700271b27e7',1,'steamrot::EventPacket']]]
 ];

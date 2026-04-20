@@ -93,23 +93,41 @@ $(function(){initNavTree('structsteamrot_1_1MrGhost.html','','structsteamrot_1_1
 </div><!--header-->
 <div class="contents">
 
-<p>Per-scene POD state object tracking the current ghost selection.  
+<p>Per-scene state object tracking the current ghost item.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="MrGhost_8h_source.html">MrGhost.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a3853f18385bff9a6a693d8c1bbdad0cc" id="r_a3853f18385bff9a6a693d8c1bbdad0cc"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3853f18385bff9a6a693d8c1bbdad0cc">m_selection</a> {std::monostate{}}</td></tr>
-<tr class="memdesc:a3853f18385bff9a6a693d8c1bbdad0cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The currently selected item, or std::monostate if nothing is selected.  <br /></td></tr>
+<tr class="memitem:af8544a0621c3aca76572a71c98bd210b" id="r_af8544a0621c3aca76572a71c98bd210b"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#a229897ac32baf73be6d5cfa35241f63e">GhostInstance</a>&#160;</td><td class="memItemRight"><a class="el" href="#af8544a0621c3aca76572a71c98bd210b">m_instance</a> {std::monostate{}}</td></tr>
+<tr class="memdesc:af8544a0621c3aca76572a71c98bd210b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The currently active ghost instance, or std::monostate if nothing is selected.  <br /></td></tr>
 <tr class="memitem:ac745f2e36cfcb1598e4521e3908389a0" id="r_ac745f2e36cfcb1598e4521e3908389a0"><td class="memItemLeft">sf::Vector2f&#160;</td><td class="memItemRight"><a class="el" href="#ac745f2e36cfcb1598e4521e3908389a0">m_position</a> {}</td></tr>
-<tr class="memdesc:ac745f2e36cfcb1598e4521e3908389a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current position of the ghost item, updated each tick to track the mouse cursor position.  <br /></td></tr>
+<tr class="memdesc:ac745f2e36cfcb1598e4521e3908389a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current world-space position of the ghost, updated each tick to track the mouse cursor position.  <br /></td></tr>
+<tr class="memitem:a396dd1837be153f247ac92bc094be2ca" id="r_a396dd1837be153f247ac92bc094be2ca"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a396dd1837be153f247ac92bc094be2ca">m_rotation_degrees</a> {0.f}</td></tr>
+<tr class="memdesc:a396dd1837be153f247ac92bc094be2ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">The accumulated global rotation of the ghost, in degrees.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Per-scene POD state object tracking the current ghost selection. </p>
-<p><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> holds the type and identity of the item most recently selected from a menu, dropdown, or blueprint list. It does not reference live instances — only the category and key of the selection.</p>
-<p>A single instance lives in <a class="el" href="structsteamrot_1_1SceneResources.html" title="Scene-level resources struct containing long-lived objects.">SceneResources</a> for each <a class="el" href="classsteamrot_1_1Scene.html" title="Abstract base class for all Scenes in the game.">Scene</a>. Logic classes access it via the <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>&amp; reference in <a class="el" href="structsteamrot_1_1SceneContext.html" title="Lightweight reference container for scene and game core objects.">SceneContext</a>. </p>
+<div class="textblock"><p>Per-scene state object tracking the current ghost item. </p>
+<p><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> holds the active ghost instance (<a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>) together with the raw world-space cursor position. The instance's transform is kept up-to-date by GhostPositioningLogic each tick.</p>
+<p>A single instance lives in <a class="el" href="structsteamrot_1_1SceneResources.html" title="Scene-level resources struct containing long-lived objects.">SceneResources</a> for each <a class="el" href="classsteamrot_1_1Scene.html" title="Abstract base class for all Scenes in the game.">Scene</a>. Logic classes access it via the <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>&amp; reference in <a class="el" href="structsteamrot_1_1SceneContext.html" title="Lightweight reference container for scene and game core objects.">SceneContext</a>. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="af8544a0621c3aca76572a71c98bd210b" name="af8544a0621c3aca76572a71c98bd210b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8544a0621c3aca76572a71c98bd210b">&#9670;&#160;</a></span>m_instance</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacesteamrot.html#a229897ac32baf73be6d5cfa35241f63e">GhostInstance</a> steamrot::MrGhost::m_instance {std::monostate{}}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The currently active ghost instance, or std::monostate if nothing is selected. </p>
+
+</div>
+</div>
 <a id="ac745f2e36cfcb1598e4521e3908389a0" name="ac745f2e36cfcb1598e4521e3908389a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac745f2e36cfcb1598e4521e3908389a0">&#9670;&#160;</a></span>m_position</h2>
 
@@ -122,23 +140,24 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The current position of the ghost item, updated each tick to track the mouse cursor position. </p>
+<p>The current world-space position of the ghost, updated each tick to track the mouse cursor position. </p>
 
 </div>
 </div>
-<a id="a3853f18385bff9a6a693d8c1bbdad0cc" name="a3853f18385bff9a6a693d8c1bbdad0cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3853f18385bff9a6a693d8c1bbdad0cc">&#9670;&#160;</a></span>m_selection</h2>
+<a id="a396dd1837be153f247ac92bc094be2ca" name="a396dd1837be153f247ac92bc094be2ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a396dd1837be153f247ac92bc094be2ca">&#9670;&#160;</a></span>m_rotation_degrees</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> steamrot::MrGhost::m_selection {std::monostate{}}</td>
+          <td class="memname">float steamrot::MrGhost::m_rotation_degrees {0.f}</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The currently selected item, or std::monostate if nothing is selected. </p>
+<p>The accumulated global rotation of the ghost, in degrees. </p>
+<p>Incremented by 90 degrees each time the user presses the R key. Applied by GhostPositioningLogic each tick when building the instance transform. </p>
 
 </div>
 </div>

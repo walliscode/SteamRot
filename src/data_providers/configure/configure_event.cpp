@@ -201,9 +201,9 @@ ConfigureGhostPayload(GhostPayload &ghost_payload,
                       const GhostPayloadFbs *ghost_payload_data) {
   // check for null data
   if (!ghost_payload_data) {
-    return std::unexpected(FailInfo{
-        FailMode::FlatbuffersDataNotFound,
-        "GhostPayloadFbs data is null, cannot populate GhostPayload"});
+    return std::unexpected(
+        FailInfo{FailMode::FlatbuffersDataNotFound,
+                 "GhostPayloadFbs data is null, cannot populate GhostPayload"});
   }
 
   // populate action enum
@@ -237,11 +237,21 @@ ConfigureCameraPayload(CameraPayload &camera_payload,
         "CameraPayloadFbs data is null, cannot populate CameraPayload"});
   }
 
-  // CameraPayloadFbs has no fields: a default-constructed CameraPayload{}
-  // (scroll_delta = 0) is the correct filter value.  The EventHandler matches
-  // CAMERA subscribers by payload type only, so no field values need to be
-  // copied from the FlatBuffers data.
-  (void)camera_payload;
+  switch (camera_payload_data->action()) {
+  case CameraActionFbs_NONE:
+    camera_payload.action = CameraPayload::CameraAction::NONE;
+    break;
+  case CameraActionFbs_SCROLL:
+    camera_payload.action = CameraPayload::CameraAction::SCROLL;
+    break;
+  case CameraActionFbs_RESET_ZOOM:
+    camera_payload.action = CameraPayload::CameraAction::RESET_ZOOM;
+    break;
+  default:
+    return std::unexpected(
+        FailInfo{FailMode::NonExistentEnumValue,
+                 "Unknown CameraActionFbs value in flatbuffers data"});
+  }
   return std::monostate{};
 }
 

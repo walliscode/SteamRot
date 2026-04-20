@@ -64,7 +64,7 @@
       {
         "event_type": "CAMERA",
         "filter_payload_type": "CameraPayloadFbs",
-        "filter_payload": {}
+        "filter_payload": { "action": "RESET_ZOOM" }
       }
     ]
   }

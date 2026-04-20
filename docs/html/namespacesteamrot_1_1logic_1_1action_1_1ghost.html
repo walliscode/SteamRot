@@ -98,14 +98,14 @@ $(function(){initNavTree('namespacesteamrot_1_1logic_1_1action_1_1ghost.html',''
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a322e46fbe904ed3bbbba7c0c1b900f65" id="r_a322e46fbe904ed3bbbba7c0c1b900f65"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a322e46fbe904ed3bbbba7c0c1b900f65">SelectGhostItem</a> (<a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost, const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;selection)</td></tr>
-<tr class="memdesc:a322e46fbe904ed3bbbba7c0c1b900f65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a ghost selection to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>.  <br /></td></tr>
+<tr class="memitem:a5822cc57ac5658382ad1fb3d1f1142ab" id="r_a5822cc57ac5658382ad1fb3d1f1142ab"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5822cc57ac5658382ad1fb3d1f1142ab">SelectGhostItem</a> (<a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost, const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;selection, <a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;asset_manager)</td></tr>
+<tr class="memdesc:a5822cc57ac5658382ad1fb3d1f1142ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resolve a <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag to an instance and apply it to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>.  <br /></td></tr>
 <tr class="memitem:a62b0b9e3d2bca8faae553a0801c3aa2c" id="r_a62b0b9e3d2bca8faae553a0801c3aa2c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a62b0b9e3d2bca8faae553a0801c3aa2c">ClearGhostSelection</a> (<a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
-<tr class="memdesc:a62b0b9e3d2bca8faae553a0801c3aa2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the current <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant representing the currently selected item in MrGhost.">GhostSelection</a> on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>.  <br /></td></tr>
-<tr class="memitem:ae86fd50ebd8cbf8b279b8bcd03923c83" id="r_ae86fd50ebd8cbf8b279b8bcd03923c83"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae86fd50ebd8cbf8b279b8bcd03923c83">ProcessSubscriber</a> (<a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &amp;subscriber, <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
-<tr class="memdesc:ae86fd50ebd8cbf8b279b8bcd03923c83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dispatch a single active GHOST subscriber to the correct action free function.  <br /></td></tr>
-<tr class="memitem:a4303dafc773ba717052ec26ab548f060" id="r_a4303dafc773ba717052ec26ab548f060"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4303dafc773ba717052ec26ab548f060">ProcessSubscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
-<tr class="memdesc:a4303dafc773ba717052ec26ab548f060"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active subscribers and apply their ghost actions to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>.  <br /></td></tr>
+<tr class="memdesc:a62b0b9e3d2bca8faae553a0801c3aa2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the current ghost instance on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>.  <br /></td></tr>
+<tr class="memitem:ae031af741b30b8f45f640bac41d958b7" id="r_ae031af741b30b8f45f640bac41d958b7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae031af741b30b8f45f640bac41d958b7">ProcessSubscriber</a> (<a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &amp;subscriber, <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost, <a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;asset_manager)</td></tr>
+<tr class="memdesc:ae031af741b30b8f45f640bac41d958b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dispatch a single active GHOST subscriber to the correct action free function.  <br /></td></tr>
+<tr class="memitem:af0e42ef5acc2f4b398cbb586e97053a5" id="r_af0e42ef5acc2f4b398cbb586e97053a5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af0e42ef5acc2f4b398cbb586e97053a5">ProcessSubscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost, <a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;asset_manager)</td></tr>
+<tr class="memdesc:af0e42ef5acc2f4b398cbb586e97053a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active subscribers and apply their ghost actions to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Headers. </p>
@@ -127,19 +127,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Clear the current <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant representing the currently selected item in MrGhost.">GhostSelection</a> on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>. </p>
-<p>Sets mr_ghost.m_selection to std::monostate, indicating no active selection. Callers are responsible for choosing this function when the relevant <a class="el" href="structsteamrot_1_1GhostPayload.html#abc819b3dbb65d3a18b48232988cfa46c" title="Discriminates between selecting and clearing the ghost state.">GhostPayload::GhostAction</a> is CLEAR or NONE.</p>
+<p>Clear the current ghost instance on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>. </p>
+<p>Sets mr_ghost.m_instance to std::monostate, indicating no active selection. Callers are responsible for choosing this function when the relevant <a class="el" href="structsteamrot_1_1GhostPayload.html#abc819b3dbb65d3a18b48232988cfa46c" title="Discriminates between selecting and clearing the ghost state.">GhostPayload::GhostAction</a> is CLEAR or NONE.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> instance whose selection will be cleared. </td></tr>
+    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> instance whose selection will be cleared. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ae86fd50ebd8cbf8b279b8bcd03923c83" name="ae86fd50ebd8cbf8b279b8bcd03923c83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae86fd50ebd8cbf8b279b8bcd03923c83">&#9670;&#160;</a></span>ProcessSubscriber()</h2>
+<a id="ae031af741b30b8f45f640bac41d958b7" name="ae031af741b30b8f45f640bac41d958b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae031af741b30b8f45f640bac41d958b7">&#9670;&#160;</a></span>ProcessSubscriber()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -152,7 +152,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mr_ghost</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mr_ghost</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>asset_manager</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -162,15 +167,16 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">subscriber</td><td>Active subscriber whose captured_payload holds the action. </td></tr>
-    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> instance to mutate. </td></tr>
+    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> instance to mutate. </td></tr>
+    <tr><td class="paramname">asset_manager</td><td><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> used to resolve a SELECT tag. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a4303dafc773ba717052ec26ab548f060" name="a4303dafc773ba717052ec26ab548f060"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4303dafc773ba717052ec26ab548f060">&#9670;&#160;</a></span>ProcessSubscribers()</h2>
+<a id="af0e42ef5acc2f4b398cbb586e97053a5" name="af0e42ef5acc2f4b398cbb586e97053a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0e42ef5acc2f4b398cbb586e97053a5">&#9670;&#160;</a></span>ProcessSubscribers()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,25 +189,31 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mr_ghost</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mr_ghost</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>asset_manager</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Process all active subscribers and apply their ghost actions to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>. </p>
-<p>Iterates the subscriber list, skips inactive entries, and dispatches each active subscriber to <a class="el" href="#ae86fd50ebd8cbf8b279b8bcd03923c83" title="ProcessSubscriber">ProcessSubscriber</a>.</p>
+<p>Process all active subscribers and apply their ghost actions to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>. </p>
+<p>Iterates the subscriber list, skips inactive entries, and dispatches each active subscriber to <a class="el" href="#ae031af741b30b8f45f640bac41d958b7" title="ProcessSubscriber">ProcessSubscriber</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">subscribers</td><td>Subscribers owned by the <a class="el" href="classsteamrot_1_1logic_1_1Logic.html" title="Abstract base class for all logic processing in the game.">Logic</a> instance. </td></tr>
-    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> instance to mutate. </td></tr>
+    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> instance to mutate. </td></tr>
+    <tr><td class="paramname">asset_manager</td><td><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> used to resolve SELECT tags. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a322e46fbe904ed3bbbba7c0c1b900f65" name="a322e46fbe904ed3bbbba7c0c1b900f65"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a322e46fbe904ed3bbbba7c0c1b900f65">&#9670;&#160;</a></span>SelectGhostItem()</h2>
+<a id="a5822cc57ac5658382ad1fb3d1f1142ab" name="a5822cc57ac5658382ad1fb3d1f1142ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5822cc57ac5658382ad1fb3d1f1142ab">&#9670;&#160;</a></span>SelectGhostItem()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -214,17 +226,23 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>selection</em></span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>selection</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>asset_manager</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Apply a ghost selection to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>. </p>
-<p>Sets mr_ghost.m_selection to the provided <code class="param">selection</code> value. Callers are responsible for choosing this function when the relevant <a class="el" href="structsteamrot_1_1GhostPayload.html#abc819b3dbb65d3a18b48232988cfa46c" title="Discriminates between selecting and clearing the ghost state.">GhostPayload::GhostAction</a> is SELECT.</p>
+<p>Resolve a <a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag to an instance and apply it to <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a>. </p>
+<p>Looks up the <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> identified by <code class="param">selection</code> in <code class="param">asset_manager</code>, constructs the corresponding <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> or <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a>, and stores it in mr_ghost.m_instance. If the tag cannot be resolved (e.g. <a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a> is unavailable or the key is missing), mr_ghost is left unchanged.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> instance to update. </td></tr>
-    <tr><td class="paramname">selection</td><td><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant representing the currently selected item in MrGhost.">GhostSelection</a> variant describing the chosen item. </td></tr>
+    <tr><td class="paramname">mr_ghost</td><td><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> instance to update. </td></tr>
+    <tr><td class="paramname">selection</td><td><a class="el" href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d" title="Variant carrying a lightweight selection tag for a ghost item.">GhostSelection</a> tag identifying the chosen item. </td></tr>
+    <tr><td class="paramname">asset_manager</td><td><a class="el" href="classsteamrot_1_1AssetManager.html">AssetManager</a> used to resolve the tag to a <a class="el" href="structsteamrot_1_1Part.html" title="Base struct for Fragment and Joint, wrapping common data shared by both part types.">Part</a> definition. </td></tr>
   </table>
   </dd>
 </dl>

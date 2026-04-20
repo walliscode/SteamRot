@@ -114,6 +114,17 @@ std::expected<EventPacket, FailInfo>
 CreateCameraEventPacket(uint8_t lifetime, float scroll_delta);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a CameraPayload carrying a CameraAction.
+///
+/// @param lifetime The lifetime of the event in ticks.
+/// @param action CameraAction enum value specifying the camera action to
+/// perform.
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime,
+                        const CameraPayload::CameraAction action);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket();

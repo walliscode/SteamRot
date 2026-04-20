@@ -147,7 +147,7 @@ var hierarchy =
     [ "steamrot::KeyboardInputDataFbsBuilder", "structsteamrot_1_1KeyboardInputDataFbsBuilder.html", null ],
     [ "Logger", "classLogger.html", null ],
     [ "steamrot::logic::Logic", "classsteamrot_1_1logic_1_1Logic.html", [
-      [ "steamrot::logic::CameraMovementLogic", "classsteamrot_1_1logic_1_1CameraMovementLogic.html", null ],
+      [ "steamrot::logic::CameraPositioningLogic", "classsteamrot_1_1logic_1_1CameraPositioningLogic.html", null ],
       [ "steamrot::logic::GhostActionLogic", "classsteamrot_1_1logic_1_1GhostActionLogic.html", null ],
       [ "steamrot::logic::GhostPositioningLogic", "classsteamrot_1_1logic_1_1GhostPositioningLogic.html", null ],
       [ "steamrot::logic::GhostRenderLogic", "classsteamrot_1_1logic_1_1GhostRenderLogic.html", null ],
@@ -224,7 +224,8 @@ var hierarchy =
     [ "steamrot::SimulationStepFbsBuilder", "structsteamrot_1_1SimulationStepFbsBuilder.html", null ],
     [ "steamrot::SocketConfig", "structsteamrot_1_1SocketConfig.html", null ],
     [ "steamrot::SocketConfigFbsBuilder", "structsteamrot_1_1SocketConfigFbsBuilder.html", null ],
-    [ "steamrot::SocketState", "structsteamrot_1_1SocketState.html", null ],
+    [ "steamrot::SocketData", "structsteamrot_1_1SocketData.html", null ],
+    [ "SocketState", "structSocketState.html", null ],
     [ "Style", "structStyle.html", [
       [ "ButtonStyle", "structButtonStyle.html", null ],
       [ "DropDownButtonStyle", "structDropDownButtonStyle.html", null ],

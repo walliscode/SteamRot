@@ -204,11 +204,11 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds the per-scene camera/view state.  <a href="structsteamrot_1_1CameraState.html#details">More...</a><br /></td></tr>
 <tr class="memitem:FailInfo" id="r_FailInfo"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a></td></tr>
 <tr class="memitem:FragmentTag" id="r_FragmentTag"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1FragmentTag.html">FragmentTag</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag identifying a selected <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> type by key.  <a href="structsteamrot_1_1FragmentTag.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lightweight tag identifying a <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> by name.  <a href="structsteamrot_1_1FragmentTag.html#details">More...</a><br /></td></tr>
 <tr class="memitem:JointTag" id="r_JointTag"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1JointTag.html">JointTag</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tag identifying a selected <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> type by key.  <a href="structsteamrot_1_1JointTag.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lightweight tag identifying a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> by name.  <a href="structsteamrot_1_1JointTag.html#details">More...</a><br /></td></tr>
 <tr class="memitem:MrGhost" id="r_MrGhost"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-scene POD state object tracking the current ghost selection.  <a href="structsteamrot_1_1MrGhost.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-scene state object tracking the current ghost item.  <a href="structsteamrot_1_1MrGhost.html#details">More...</a><br /></td></tr>
 <tr class="memitem:DisplayConfig" id="r_DisplayConfig"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1DisplayConfig.html">DisplayConfig</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Display configuration settings.  <a href="structsteamrot_1_1DisplayConfig.html#details">More...</a><br /></td></tr>
 <tr class="memitem:UserPreferencesConfig" id="r_UserPreferencesConfig"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1UserPreferencesConfig.html">UserPreferencesConfig</a></td></tr>
@@ -233,8 +233,8 @@ Classes</h2></td></tr>
 <tr class="memitem:Joint" id="r_Joint"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1Joint.html">Joint</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains the data for a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>.  <a href="structsteamrot_1_1Joint.html#details">More...</a><br /></td></tr>
 <tr class="memitem:MachinaForm" id="r_MachinaForm"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1MachinaForm.html">MachinaForm</a></td></tr>
-<tr class="memitem:SocketState" id="r_SocketState"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runtime state of a single socket on a placed <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> instance.  <a href="structsteamrot_1_1SocketState.html#details">More...</a><br /></td></tr>
+<tr class="memitem:SocketData" id="r_SocketData"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bundles the local position and mutable runtime state for a single socket on a placed part instance.  <a href="structsteamrot_1_1SocketData.html#details">More...</a><br /></td></tr>
 <tr class="memitem:PartInstance" id="r_PartInstance"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html">PartInstance</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common base for all placed instances on the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <a href="structsteamrot_1_1PartInstance.html#details">More...</a><br /></td></tr>
 <tr class="memitem:JointInstance" id="r_JointInstance"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a></td></tr>
@@ -262,7 +262,7 @@ Classes</h2></td></tr>
 <tr class="memitem:SystemPayload" id="r_SystemPayload"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1SystemPayload.html">SystemPayload</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Any event information concerned with processing system level events, such as quitting the game.  <a href="structsteamrot_1_1SystemPayload.html#details">More...</a><br /></td></tr>
 <tr class="memitem:GhostPayload" id="r_GhostPayload"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1GhostPayload.html">GhostPayload</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> selection changes.  <a href="structsteamrot_1_1GhostPayload.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event payload for <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> selection changes.  <a href="structsteamrot_1_1GhostPayload.html#details">More...</a><br /></td></tr>
 <tr class="memitem:CameraPayload" id="r_CameraPayload"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1CameraPayload.html">CameraPayload</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event payload carrying a mouse-scroll delta for camera zoom.  <a href="structsteamrot_1_1CameraPayload.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Subscriber" id="r_Subscriber"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a></td></tr>
@@ -444,12 +444,16 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aa33879dc691e5c5409bdbeff670cef1e" id="r_aa33879dc691e5c5409bdbeff670cef1e"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#aa33879dc691e5c5409bdbeff670cef1e">EntityMemoryPool</a></td></tr>
 <tr class="memdesc:aa33879dc691e5c5409bdbeff670cef1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">typedef for <a class="el" href="#aa33879dc691e5c5409bdbeff670cef1e" title="typedef for EntityMemoryPool">EntityMemoryPool</a>  <br /></td></tr>
 <tr class="memitem:a492d0f6e26c9eed5a949733e85fd359d" id="r_a492d0f6e26c9eed5a949733e85fd359d"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a492d0f6e26c9eed5a949733e85fd359d">GhostSelection</a> = std::variant&lt;std::monostate, <a class="el" href="structsteamrot_1_1FragmentTag.html">FragmentTag</a>, <a class="el" href="structsteamrot_1_1JointTag.html">JointTag</a>&gt;</td></tr>
-<tr class="memdesc:a492d0f6e26c9eed5a949733e85fd359d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variant representing the currently selected item in <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>.  <br /></td></tr>
+<tr class="memdesc:a492d0f6e26c9eed5a949733e85fd359d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variant carrying a lightweight selection tag for a ghost item.  <br /></td></tr>
+<tr class="memitem:a229897ac32baf73be6d5cfa35241f63e" id="r_a229897ac32baf73be6d5cfa35241f63e"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a229897ac32baf73be6d5cfa35241f63e">GhostInstance</a></td></tr>
+<tr class="memdesc:a229897ac32baf73be6d5cfa35241f63e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variant representing the currently active ghost instance.  <br /></td></tr>
 <tr class="memitem:ac63afcf635ef357d447afe8e06a4c2f9" id="r_ac63afcf635ef357d447afe8e06a4c2f9"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#ac63afcf635ef357d447afe8e06a4c2f9">EntityTransportVariant</a></td></tr>
+<tr class="memitem:a2d79be77cf3265cb98c2911a4c1911a8" id="r_a2d79be77cf3265cb98c2911a4c1911a8"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a></td></tr>
+<tr class="memdesc:a2d79be77cf3265cb98c2911a4c1911a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">using helpers ///  <br /></td></tr>
 <tr class="memitem:a7cc60055c6f67b80ad932c96835b2227" id="r_a7cc60055c6f67b80ad932c96835b2227"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a7cc60055c6f67b80ad932c96835b2227">Views</a> = <a class="el" href="structsteamrot_1_1ViewTable.html">ViewTable</a>&lt;sf::VertexArray&gt;</td></tr>
 <tr class="memitem:a13198124134bef533e0e1efd953d4403" id="r_a13198124134bef533e0e1efd953d4403"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a13198124134bef533e0e1efd953d4403">CompositeView</a> = std::array&lt;sf::VertexArray, <a class="el" href="#aab7befdb7dedf8757b3afaf393e41546">kCompositeSlots</a>&gt;</td></tr>
 <tr class="memitem:a6059c4ecfc53e5112231e7c4519c8468" id="r_a6059c4ecfc53e5112231e7c4519c8468"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a6059c4ecfc53e5112231e7c4519c8468">CompositeViews</a> = <a class="el" href="structsteamrot_1_1ViewTable.html">ViewTable</a>&lt;<a class="el" href="#a13198124134bef533e0e1efd953d4403">CompositeView</a>&gt;</td></tr>
-<tr class="memitem:a44eac92bcfde0a28526e41a9fd5b9e1e" id="r_a44eac92bcfde0a28526e41a9fd5b9e1e"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a44eac92bcfde0a28526e41a9fd5b9e1e">EventPayload</a></td></tr>
+<tr class="memitem:ad914e32cf23ef3bd00656a0a0744417d" id="r_ad914e32cf23ef3bd00656a0a0744417d"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#ad914e32cf23ef3bd00656a0a0744417d">EventPayload</a></td></tr>
 <tr class="memitem:af33d736d39c814827131608029cf38a1" id="r_af33d736d39c814827131608029cf38a1"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#af33d736d39c814827131608029cf38a1">InputActionRegistry</a></td></tr>
 <tr class="memdesc:af33d736d39c814827131608029cf38a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps unique input patterns to the InputAction they produce.  <br /></td></tr>
 <tr class="memitem:a2237087557d8af08abdcd7b14b1a2a41" id="r_a2237087557d8af08abdcd7b14b1a2a41"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="#a2237087557d8af08abdcd7b14b1a2a41">LogicConfigCollection</a> = std::unordered_map&lt;<a class="el" href="#a7719fe793bc1e817cb91cddf21a5995e">LogicType</a>, <a class="el" href="structsteamrot_1_1LogicConfig.html">LogicConfig</a>&gt;</td></tr>
@@ -496,6 +500,10 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a8ea71d456c3f953d0ed805c971f59143afe155956e8f33e5cffa82cc86a36afbd">MissingData</a>
 <br />
  }</td></tr>
+<tr class="memitem:ae5029d8abb2c43f7bf14bf38c4ff08a1" id="r_ae5029d8abb2c43f7bf14bf38c4ff08a1"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ae5029d8abb2c43f7bf14bf38c4ff08a1">SocketState</a> { <a class="el" href="#ae5029d8abb2c43f7bf14bf38c4ff08a1a78945de8de090e90045d299651a68a9b">Available</a>
+, <a class="el" href="#ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7">Connected</a>
+, <a class="el" href="#ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2">Blocked</a>
+ }</td></tr>
 <tr class="memitem:aa9ecd7df59f699a33a2bd8678f690270" id="r_aa9ecd7df59f699a33a2bd8678f690270"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270">ViewDirection</a> : std::uint8_t { <a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270a5835bab1ade0060909e31a06af2e2cde">Front</a> = 0
 , <a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270a0557fa923dcee4d0f86b1409f5c2167f">Back</a> = 1
 , <a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270ae93f994f01c537c4e2f7d8528c3eb5e9">Count</a>
@@ -538,10 +546,14 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="memdesc:a46ba42c1810100d54486de67d2c9978d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event type enumeration (fine-grained event types).  <a href="#a46ba42c1810100d54486de67d2c9978d">More...</a><br /></td></tr>
-<tr class="memitem:a492ab0d6b7c7d5dec5b87cd43f328244" id="r_a492ab0d6b7c7d5dec5b87cd43f328244"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a> : int8_t { <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a">InputActionFbs_SELECT</a> = 0
+<tr class="memitem:a492ab0d6b7c7d5dec5b87cd43f328244" id="r_a492ab0d6b7c7d5dec5b87cd43f328244"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a> : int8_t { <br />
+&#160;&#160;<a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a">InputActionFbs_SELECT</a> = 0
 , <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244a2c7ae3f50fed353a004b9ee61508cd0f">InputActionFbs_TOGGLE_SOCKET_VISIBILITY</a> = 1
+, <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244a5efa720ad2e658ca9f6b84c9290da47f">InputActionFbs_ROTATE_GHOST</a> = 2
 , <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244a48b79a756fd9590cf7825d6215ba4e06">InputActionFbs_MIN</a> = InputActionFbs_SELECT
-, <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519">InputActionFbs_MAX</a> = InputActionFbs_TOGGLE_SOCKET_VISIBILITY
+, <br />
+&#160;&#160;<a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519">InputActionFbs_MAX</a> = InputActionFbs_ROTATE_GHOST
+<br />
  }</td></tr>
 <tr class="memdesc:a492ab0d6b7c7d5dec5b87cd43f328244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input action types.  <a href="#a492ab0d6b7c7d5dec5b87cd43f328244">More...</a><br /></td></tr>
 <tr class="memitem:aa949fda62d36d3f69d06265d8f5df73a" id="r_aa949fda62d36d3f69d06265d8f5df73a"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#aa949fda62d36d3f69d06265d8f5df73a">UIActionFbs</a> : int8_t { <a class="el" href="#aa949fda62d36d3f69d06265d8f5df73aa955a99dcbcafe58e3bfff7faf84a496c">UIActionFbs_TOGGLE</a> = 0
@@ -745,13 +757,13 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8">GhostPositioning</a>
 , <a class="el" href="#a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d">GhostRender</a>
 , <br />
-&#160;&#160;<a class="el" href="#a7719fe793bc1e817cb91cddf21a5995ea8b0c2c10f7c8647391a4a1fc7cd4181f">CameraMovement</a>
+&#160;&#160;<a class="el" href="#a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0">CameraPositioning</a>
 <br />
  }</td></tr>
 <tr class="memitem:a5b672c57ca4f22f000f8da0d41482db9" id="r_a5b672c57ca4f22f000f8da0d41482db9"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9">LogicGrouping</a> { <a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9a15fb6ccbd11ebebcea2b48dc477f3561">Collision</a>
 , <a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9a5e520da5341f2fec6d3bbfe7ef357922">Render</a>
 , <a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9a004bf6c9a40003140292e97330236c53">Action</a>
-, <a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a">Movement</a>
+, <a class="el" href="#a5b672c57ca4f22f000f8da0d41482db9aa52fce78b8f3903d4789878f2635a977">Positioning</a>
  }</td></tr>
 <tr class="memitem:a24c82489204f0b4f5d11ec18a7b1bcbb" id="r_a24c82489204f0b4f5d11ec18a7b1bcbb"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#a24c82489204f0b4f5d11ec18a7b1bcbb">SceneType</a> { <br />
 &#160;&#160;<a class="el" href="#a24c82489204f0b4f5d11ec18a7b1bcbba696b031073e74bf2cb98e5ef201d4aa3">UNKNOWN</a> = 0
@@ -805,7 +817,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:afb4479f36b67201f6d132780ab869108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go over all events in the event bus and decrement their lifetimes.  <br /></td></tr>
 <tr class="memitem:adc85ea96f88f3f81af75c6d6e60f0c0a" id="r_adc85ea96f88f3f81af75c6d6e60f0c0a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adc85ea96f88f3f81af75c6d6e60f0c0a">RemoveDeadEvents</a> (<a class="el" href="#a7830fcc34149a0e2188eb23bebd2ba82">EventBus</a> &amp;event_bus)</td></tr>
 <tr class="memdesc:adc85ea96f88f3f81af75c6d6e60f0c0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove all events with a lifetimve of 0 from the event bus.  <br /></td></tr>
-<tr class="memitem:a79b3e046166462ea80655344e4258e11" id="r_a79b3e046166462ea80655344e4258e11"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a79b3e046166462ea80655344e4258e11">UpdateSubscriber</a> (std::weak_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &amp;subscriber, const <a class="el" href="#a44eac92bcfde0a28526e41a9fd5b9e1e">EventPayload</a> &amp;event_payload)</td></tr>
+<tr class="memitem:a79b3e046166462ea80655344e4258e11" id="r_a79b3e046166462ea80655344e4258e11"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a79b3e046166462ea80655344e4258e11">UpdateSubscriber</a> (std::weak_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &amp;subscriber, const <a class="el" href="#ad914e32cf23ef3bd00656a0a0744417d">EventPayload</a> &amp;event_payload)</td></tr>
 <tr class="memdesc:a79b3e046166462ea80655344e4258e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update releveant informtion for a subscriber object.  <br /></td></tr>
 <tr class="memitem:acfcad2bed02cdabbff1fc7e84b8b000b" id="r_acfcad2bed02cdabbff1fc7e84b8b000b"><td class="memItemLeft">std::expected&lt; std::monostate, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#acfcad2bed02cdabbff1fc7e84b8b000b">CleanExpiredSubscribers</a> (std::unordered_map&lt; <a class="el" href="#ac88f3bda138e187719062f9972ef4bcd">EventType</a>, std::vector&lt; std::weak_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &gt; &amp;subscriber_register)</td></tr>
 <tr class="memdesc:acfcad2bed02cdabbff1fc7e84b8b000b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the subscriber register and remove any expired subscribers.  <br /></td></tr>
@@ -815,8 +827,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ac491c9d59d2a5e18e753bdb8fc6ed58d" id="r_ac491c9d59d2a5e18e753bdb8fc6ed58d"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
 <tr class="memitem:ac491c9d59d2a5e18e753bdb8fc6ed58d template"><td class="memItemLeft">std::ostream &amp;&#160;</td><td class="memItemRight"><a class="el" href="#ac491c9d59d2a5e18e753bdb8fc6ed58d">operator&lt;&lt;</a> (std::ostream &amp;os, const std::tuple&lt; Args... &gt; &amp;)</td></tr>
 <tr class="memdesc:ac491c9d59d2a5e18e753bdb8fc6ed58d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to print a tuple to an ostream.  <br /></td></tr>
-<tr class="memitem:adb45f8ad2ece5d309911565e32d95f62" id="r_adb45f8ad2ece5d309911565e32d95f62"><td class="memItemLeft">sf::Vector2f&#160;</td><td class="memItemRight"><a class="el" href="#adb45f8ad2ece5d309911565e32d95f62">ComputeSocketLocalPos</a> (const <a class="el" href="structsteamrot_1_1SocketConfig.html">SocketConfig</a> &amp;config, size_t socket_index, float current_rotation)</td></tr>
-<tr class="memdesc:adb45f8ad2ece5d309911565e32d95f62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the local-space position of a single socket on a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>.  <br /></td></tr>
 <tr class="memitem:a14ef645978b4e8e1d0e12ab20795b425" id="r_a14ef645978b4e8e1d0e12ab20795b425"><td class="memItemLeft">constexpr std::size_t&#160;</td><td class="memItemRight"><a class="el" href="#a14ef645978b4e8e1d0e12ab20795b425">to_index</a> (<a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270">ViewDirection</a> d)</td></tr>
 <tr class="memdesc:a14ef645978b4e8e1d0e12ab20795b425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="#aa9ecd7df59f699a33a2bd8678f690270">ViewDirection</a> to an array index.  <br /></td></tr>
 <tr class="memitem:ac40a0600e35c71b93e65911f8a3cb410" id="r_ac40a0600e35c71b93e65911f8a3cb410"><td class="memTemplParams" colspan="2">template&lt;class T&gt; </td></tr>
@@ -899,7 +909,7 @@ Functions</h2></td></tr>
 <tr class="memitem:aa487d94219b6dfe52e07358edf21aaa4" id="r_aa487d94219b6dfe52e07358edf21aaa4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aa487d94219b6dfe52e07358edf21aaa4">VerifySizePrefixedEventPacketFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
 <tr class="memitem:ac9db3ac9ebc8dd3438407123ae818026" id="r_ac9db3ac9ebc8dd3438407123ae818026"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac9db3ac9ebc8dd3438407123ae818026">FinishEventPacketFbsBuffer</a> (::flatbuffers::FlatBufferBuilder &amp;fbb, ::flatbuffers::Offset&lt; steamrot::EventPacketFbs &gt; root)</td></tr>
 <tr class="memitem:ab11b104f764f50b458c94eddffed00cd" id="r_ab11b104f764f50b458c94eddffed00cd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab11b104f764f50b458c94eddffed00cd">FinishSizePrefixedEventPacketFbsBuffer</a> (::flatbuffers::FlatBufferBuilder &amp;fbb, ::flatbuffers::Offset&lt; steamrot::EventPacketFbs &gt; root)</td></tr>
-<tr class="memitem:ac7131fe03f1e3d0f5a4e0c3b83ba9e6c" id="r_ac7131fe03f1e3d0f5a4e0c3b83ba9e6c"><td class="memItemLeft">const <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="#ac7131fe03f1e3d0f5a4e0c3b83ba9e6c">EnumValuesInputActionFbs</a> ())[2]</td></tr>
+<tr class="memitem:aa585c47458c0f16590ece352e7144961" id="r_aa585c47458c0f16590ece352e7144961"><td class="memItemLeft">const <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="#aa585c47458c0f16590ece352e7144961">EnumValuesInputActionFbs</a> ())[3]</td></tr>
 <tr class="memitem:adaa39407daa56e809dc33ee5b4326873" id="r_adaa39407daa56e809dc33ee5b4326873"><td class="memItemLeft">const char *const *&#160;</td><td class="memItemRight"><a class="el" href="#adaa39407daa56e809dc33ee5b4326873">EnumNamesInputActionFbs</a> ()</td></tr>
 <tr class="memitem:a8738ea81404a8234d40b319d758c7805" id="r_a8738ea81404a8234d40b319d758c7805"><td class="memItemLeft">const char *&#160;</td><td class="memItemRight"><a class="el" href="#a8738ea81404a8234d40b319d758c7805">EnumNameInputActionFbs</a> (<a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a> e)</td></tr>
 <tr class="memitem:a2ba60d0f9f896629e1720a66a4835eab" id="r_a2ba60d0f9f896629e1720a66a4835eab"><td class="memItemLeft">const <a class="el" href="#aa949fda62d36d3f69d06265d8f5df73a">UIActionFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="#a2ba60d0f9f896629e1720a66a4835eab">EnumValuesUIActionFbs</a> ())[1]</td></tr>
@@ -931,8 +941,8 @@ Functions</h2></td></tr>
 <tr class="memitem:acc7320ca5640fd88130add5fd7533bcb" id="r_acc7320ca5640fd88130add5fd7533bcb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SystemPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#acc7320ca5640fd88130add5fd7533bcb">CreateSystemPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="#a301c46aa6c0f1242c09744523d5f40a0">steamrot::SystemActionFbs</a> action=<a class="el" href="#a301c46aa6c0f1242c09744523d5f40a0a3b745bc18ec27ca212b7addf105d2006">steamrot::SystemActionFbs_QUIT</a>)</td></tr>
 <tr class="memitem:a0f1ee7e34011d67b0278b6c287b543fd" id="r_a0f1ee7e34011d67b0278b6c287b543fd"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; GhostPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a0f1ee7e34011d67b0278b6c287b543fd">CreateGhostPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="#abe025cf9d35988eb24c8d565bfbdfcf8">steamrot::GhostActionFbs</a> action=<a class="el" href="#abe025cf9d35988eb24c8d565bfbdfcf8a566b48acac606c01297a31b8172d81bf">steamrot::GhostActionFbs_NONE</a>)</td></tr>
 <tr class="memitem:aa644219cb74704ddd6fdc7abf0536b60" id="r_aa644219cb74704ddd6fdc7abf0536b60"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; CameraPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#aa644219cb74704ddd6fdc7abf0536b60">CreateCameraPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb)</td></tr>
-<tr class="memitem:a8c2b0f5b789af03d96859dbd22a6dee5" id="r_a8c2b0f5b789af03d96859dbd22a6dee5"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; FragmentFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a8c2b0f5b789af03d96859dbd22a6dee5">CreateFragmentFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; &gt; &gt; sockets=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; movement_views=0)</td></tr>
-<tr class="memitem:ac7e856455f9cf626d7c71ad9f019c39c" id="r_ac7e856455f9cf626d7c71ad9f019c39c"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; FragmentFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ac7e856455f9cf626d7c71ad9f019c39c">CreateFragmentFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; &gt; *sockets=nullptr, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *movement_views=nullptr)</td></tr>
+<tr class="memitem:ae358da4de4ea138a14b70cf89c9e05ed" id="r_ae358da4de4ea138a14b70cf89c9e05ed"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; FragmentFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ae358da4de4ea138a14b70cf89c9e05ed">CreateFragmentFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; &gt; &gt; sockets=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; positioning_views=0)</td></tr>
+<tr class="memitem:a7d63f365e12807c0c3b4a171e97dc682" id="r_a7d63f365e12807c0c3b4a171e97dc682"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; FragmentFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a7d63f365e12807c0c3b4a171e97dc682">CreateFragmentFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; &gt; *sockets=nullptr, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *positioning_views=nullptr)</td></tr>
 <tr class="memitem:a2f462da00c78e1c308f50f7080e158b2" id="r_a2f462da00c78e1c308f50f7080e158b2"><td class="memItemLeft">const steamrot::FragmentFbs *&#160;</td><td class="memItemRight"><a class="el" href="#a2f462da00c78e1c308f50f7080e158b2">GetFragmentFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:af1e94ae3f4c89f09e2f65288a115540f" id="r_af1e94ae3f4c89f09e2f65288a115540f"><td class="memItemLeft">const steamrot::FragmentFbs *&#160;</td><td class="memItemRight"><a class="el" href="#af1e94ae3f4c89f09e2f65288a115540f">GetSizePrefixedFragmentFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:a3d5a1e628f8bd5b13e65b1bf2736ca1f" id="r_a3d5a1e628f8bd5b13e65b1bf2736ca1f"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a3d5a1e628f8bd5b13e65b1bf2736ca1f">VerifyFragmentFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
@@ -969,9 +979,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aedc4c9486ad4c4ab4e63b2432020a194" id="r_aedc4c9486ad4c4ab4e63b2432020a194"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; InputEventFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#aedc4c9486ad4c4ab4e63b2432020a194">CreateInputEventFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="#a6da95f6f3f45b9f1969ebef3226ea1f4">steamrot::InputTypeFbs</a> input_type=<a class="el" href="#a6da95f6f3f45b9f1969ebef3226ea1f4a5ad58fb1064f29c962002a07386a641f">steamrot::InputTypeFbs_MouseMove</a>, <a class="el" href="#a932e7e1354242ea745c22a0dbacf5cd9">steamrot::InputEventDataFbs</a> input_data_type=<a class="el" href="#a932e7e1354242ea745c22a0dbacf5cd9a965678a415929e89c3b9d9b526eb7d48">steamrot::InputEventDataFbs_NONE</a>, ::flatbuffers::Offset&lt; void &gt; input_data=0, const char *description=nullptr)</td></tr>
 <tr class="memitem:adca43a1c914ba2fe18a56791c943790c" id="r_adca43a1c914ba2fe18a56791c943790c"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; InputSequenceFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#adca43a1c914ba2fe18a56791c943790c">CreateInputSequenceFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::InputEventFbs &gt; &gt; &gt; inputs=0, uint32_t tick=0)</td></tr>
 <tr class="memitem:a757fe0bd63b44399c39fa0ddb9a705fb" id="r_a757fe0bd63b44399c39fa0ddb9a705fb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; InputSequenceFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a757fe0bd63b44399c39fa0ddb9a705fb">CreateInputSequenceFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::InputEventFbs &gt; &gt; *inputs=nullptr, uint32_t tick=0)</td></tr>
-<tr class="memitem:a714ff8ecd1dc051a8bddd3a61d6c0b20" id="r_a714ff8ecd1dc051a8bddd3a61d6c0b20"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SocketConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a714ff8ecd1dc051a8bddd3a61d6c0b20">CreateSocketConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, int32_t socket_count=0, float radius=10.0f, float arc_min=0.0f, float arc_max=360.0f, float min_gap=0.0f, float fixed_socket_angle=0.0f, bool has_fixed_socket=false)</td></tr>
-<tr class="memitem:a61e6fa478019e418cf183f2cf084bb9a" id="r_a61e6fa478019e418cf183f2cf084bb9a"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a61e6fa478019e418cf183f2cf084bb9a">CreateJointFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; movement_views=0)</td></tr>
-<tr class="memitem:a50548f19963944931697a0bde3e8938e" id="r_a50548f19963944931697a0bde3e8938e"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a50548f19963944931697a0bde3e8938e">CreateJointFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *movement_views=nullptr)</td></tr>
+<tr class="memitem:af03e393c8881896c9ce4312565431ddb" id="r_af03e393c8881896c9ce4312565431ddb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SocketConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#af03e393c8881896c9ce4312565431ddb">CreateSocketConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, int32_t socket_count=0, float radius=10.0f, float min_gap=0.0f, float fixed_socket_angle=0.0f, bool has_fixed_socket=false, float rotation_arc_min=0.0f, float rotation_arc_max=360.0f)</td></tr>
+<tr class="memitem:af2a0c8bcadd42456b465f1b7868ce9ba" id="r_af2a0c8bcadd42456b465f1b7868ce9ba"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#af2a0c8bcadd42456b465f1b7868ce9ba">CreateJointFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; positioning_views=0)</td></tr>
+<tr class="memitem:ae4f0e1f622610bbe029d14ff4c4c9e93" id="r_ae4f0e1f622610bbe029d14ff4c4c9e93"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ae4f0e1f622610bbe029d14ff4c4c9e93">CreateJointFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *positioning_views=nullptr)</td></tr>
 <tr class="memitem:aba3be28f50cea4b825428d3ba623ae19" id="r_aba3be28f50cea4b825428d3ba623ae19"><td class="memItemLeft">const steamrot::JointFbs *&#160;</td><td class="memItemRight"><a class="el" href="#aba3be28f50cea4b825428d3ba623ae19">GetJointFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:a49e6ee1deaf567c3966e534abd737a42" id="r_a49e6ee1deaf567c3966e534abd737a42"><td class="memItemLeft">const steamrot::JointFbs *&#160;</td><td class="memItemRight"><a class="el" href="#a49e6ee1deaf567c3966e534abd737a42">GetSizePrefixedJointFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:a8786ac19244f768fc1d43d30ce2fc57d" id="r_a8786ac19244f768fc1d43d30ce2fc57d"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a8786ac19244f768fc1d43d30ce2fc57d">VerifyJointFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
@@ -980,7 +990,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a40c0825e5d1e3516ab71ae8ba0222f90" id="r_a40c0825e5d1e3516ab71ae8ba0222f90"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a40c0825e5d1e3516ab71ae8ba0222f90">FinishSizePrefixedJointFbsBuffer</a> (::flatbuffers::FlatBufferBuilder &amp;fbb, ::flatbuffers::Offset&lt; steamrot::JointFbs &gt; root)</td></tr>
 <tr class="memitem:ae4a7f50f767a291f2abd396ace45ecb0" id="r_ae4a7f50f767a291f2abd396ace45ecb0"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ae4a7f50f767a291f2abd396ace45ecb0">CreateLogicConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::SubscriberFbs &gt; &gt; &gt; subscriptions=0)</td></tr>
 <tr class="memitem:a7e2282b2a8c96b70749b86d182c29858" id="r_a7e2282b2a8c96b70749b86d182c29858"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a7e2282b2a8c96b70749b86d182c29858">CreateLogicConfigFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::SubscriberFbs &gt; &gt; *subscriptions=nullptr)</td></tr>
-<tr class="memitem:a82be4ffce2a603eb4cc96d0da34d5af8" id="r_a82be4ffce2a603eb4cc96d0da34d5af8"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigCollectionFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a82be4ffce2a603eb4cc96d0da34d5af8">CreateLogicConfigCollectionFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; test_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; grimoire_machina_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; camera_action_logic=0)</td></tr>
+<tr class="memitem:aa39748451591b45fac61577048ded9fb" id="r_aa39748451591b45fac61577048ded9fb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigCollectionFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="#aa39748451591b45fac61577048ded9fb">CreateLogicConfigCollectionFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; test_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; grimoire_machina_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; camera_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_positioning_logic=0)</td></tr>
 <tr class="memitem:ab3b33b54d5d2da0d3dd7413f5911f06d" id="r_ab3b33b54d5d2da0d3dd7413f5911f06d"><td class="memItemLeft">const steamrot::LogicConfigCollectionFbs *&#160;</td><td class="memItemRight"><a class="el" href="#ab3b33b54d5d2da0d3dd7413f5911f06d">GetLogicConfigCollectionFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:af177d617b98ce0cbf19effb65c0f2381" id="r_af177d617b98ce0cbf19effb65c0f2381"><td class="memItemLeft">const steamrot::LogicConfigCollectionFbs *&#160;</td><td class="memItemRight"><a class="el" href="#af177d617b98ce0cbf19effb65c0f2381">GetSizePrefixedLogicConfigCollectionFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:ab2ec4faf7f9074171e8814d61036bdbd" id="r_ab2ec4faf7f9074171e8814d61036bdbd"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ab2ec4faf7f9074171e8814d61036bdbd">VerifyLogicConfigCollectionFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
@@ -1193,8 +1203,6 @@ Variables</h2></td></tr>
 <tr class="memitem:acebd8dc4174c45484227cd95e706bb6d" id="r_acebd8dc4174c45484227cd95e706bb6d"><td class="memTemplParams" colspan="2">template&lt;typename T, typename Tuple&gt; </td></tr>
 <tr class="memitem:acebd8dc4174c45484227cd95e706bb6d template"><td class="memItemLeft">constexpr size_t&#160;</td><td class="memItemRight"><a class="el" href="#acebd8dc4174c45484227cd95e706bb6d">TupleTypeIndex</a> = <a class="el" href="structsteamrot_1_1IndexOf.html">IndexOf</a>&lt;T, Tuple&gt;::value</td></tr>
 <tr class="memdesc:acebd8dc4174c45484227cd95e706bb6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">helper type alias for getting the index of a type in a tuple  <br /></td></tr>
-<tr class="memitem:a7176a8d64c294ca5896576ba09b7d038" id="r_a7176a8d64c294ca5896576ba09b7d038"><td class="memItemLeft">constexpr float&#160;</td><td class="memItemRight"><a class="el" href="#a7176a8d64c294ca5896576ba09b7d038">k_socket_deg_to_rad</a></td></tr>
-<tr class="memdesc:a7176a8d64c294ca5896576ba09b7d038"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees-to-radians conversion factor used by socket computations.  <br /></td></tr>
 <tr class="memitem:aab7befdb7dedf8757b3afaf393e41546" id="r_aab7befdb7dedf8757b3afaf393e41546"><td class="memItemLeft">constexpr std::size_t&#160;</td><td class="memItemRight"><a class="el" href="#aab7befdb7dedf8757b3afaf393e41546">kCompositeSlots</a> = 8</td></tr>
 <tr class="memitem:a202c36566b846094556177463d48d149" id="r_a202c36566b846094556177463d48d149"><td class="memItemLeft">constexpr size_t&#160;</td><td class="memItemRight"><a class="el" href="#a202c36566b846094556177463d48d149">kKeyboardBits</a> = sf::Keyboard::KeyCount * 2</td></tr>
 <tr class="memitem:a4088cd8f9cd281f14cdb5495a4e61212" id="r_a4088cd8f9cd281f14cdb5495a4e61212"><td class="memItemLeft">constexpr size_t&#160;</td><td class="memItemRight"><a class="el" href="#a4088cd8f9cd281f14cdb5495a4e61212">kMouseBits</a> = sf::Mouse::ButtonCount * 2</td></tr>
@@ -1335,28 +1343,47 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a44eac92bcfde0a28526e41a9fd5b9e1e" name="a44eac92bcfde0a28526e41a9fd5b9e1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44eac92bcfde0a28526e41a9fd5b9e1e">&#9670;&#160;</a></span>EventPayload</h2>
+<a id="ad914e32cf23ef3bd00656a0a0744417d" name="ad914e32cf23ef3bd00656a0a0744417d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad914e32cf23ef3bd00656a0a0744417d">&#9670;&#160;</a></span>EventPayload</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="#a44eac92bcfde0a28526e41a9fd5b9e1e">steamrot::EventPayload</a></td>
+          <td class="memname">using <a class="el" href="#ad914e32cf23ef3bd00656a0a0744417d">steamrot::EventPayload</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">std::variant&lt;std::monostate, <a class="code hl_class" href="structsteamrot_1_1InputPayload.html">InputPayload</a>, <a class="code hl_class" href="structsteamrot_1_1UIPayload.html">UIPayload</a>,</div>
-<div class="line">                                 <a class="code hl_class" href="structsteamrot_1_1LogicPayload.html">LogicPayload</a>, <a class="code hl_class" href="structsteamrot_1_1ScenePayload.html">ScenePayload</a>, <a class="code hl_class" href="structsteamrot_1_1SystemPayload.html">SystemPayload</a>,</div>
-<div class="line">                                 <a class="code hl_class" href="structsteamrot_1_1GhostPayload.html">GhostPayload</a>, <a class="code hl_class" href="structsteamrot_1_1CameraPayload.html">CameraPayload</a>&gt;</div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></div><div class="ttdoc">Event payload carrying a mouse-scroll delta for camera zoom.</div><div class="ttdef"><b>Definition</b> EventPayload.h:259</div></div>
-<div class="ttc" id="astructsteamrot_1_1GhostPayload_html"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html">steamrot::GhostPayload</a></div><div class="ttdoc">Event payload for MrGhost selection changes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:214</div></div>
+<b>Initial value:</b><div class="fragment"><div class="line"> </div>
+<div class="line">std::variant&lt;std::monostate, <a class="code hl_class" href="structsteamrot_1_1InputPayload.html">InputPayload</a>, <a class="code hl_class" href="structsteamrot_1_1UIPayload.html">UIPayload</a>, <a class="code hl_class" href="structsteamrot_1_1LogicPayload.html">LogicPayload</a>,</div>
+<div class="line">             <a class="code hl_class" href="structsteamrot_1_1ScenePayload.html">ScenePayload</a>, <a class="code hl_class" href="structsteamrot_1_1SystemPayload.html">SystemPayload</a>, <a class="code hl_class" href="structsteamrot_1_1GhostPayload.html">GhostPayload</a>, <a class="code hl_class" href="structsteamrot_1_1CameraPayload.html">CameraPayload</a>&gt;</div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></div><div class="ttdoc">Event payload carrying a mouse-scroll delta for camera zoom.</div><div class="ttdef"><b>Definition</b> EventPayload.h:268</div></div>
+<div class="ttc" id="astructsteamrot_1_1GhostPayload_html"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html">steamrot::GhostPayload</a></div><div class="ttdoc">Event payload for MrGhost selection changes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:222</div></div>
 <div class="ttc" id="astructsteamrot_1_1InputPayload_html"><div class="ttname"><a href="structsteamrot_1_1InputPayload.html">steamrot::InputPayload</a></div><div class="ttdoc">Any event information concenred with user input.</div><div class="ttdef"><b>Definition</b> EventPayload.h:26</div></div>
-<div class="ttc" id="astructsteamrot_1_1LogicPayload_html"><div class="ttname"><a href="structsteamrot_1_1LogicPayload.html">steamrot::LogicPayload</a></div><div class="ttdoc">Any event information concerned with passing information to the logic classes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:93</div></div>
-<div class="ttc" id="astructsteamrot_1_1ScenePayload_html"><div class="ttname"><a href="structsteamrot_1_1ScenePayload.html">steamrot::ScenePayload</a></div><div class="ttdoc">Any event information concerned with processing whole Scenes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:133</div></div>
-<div class="ttc" id="astructsteamrot_1_1SystemPayload_html"><div class="ttname"><a href="structsteamrot_1_1SystemPayload.html">steamrot::SystemPayload</a></div><div class="ttdoc">Any event information concerned with processing system level events, such as quitting the game.</div><div class="ttdef"><b>Definition</b> EventPayload.h:185</div></div>
-<div class="ttc" id="astructsteamrot_1_1UIPayload_html"><div class="ttname"><a href="structsteamrot_1_1UIPayload.html">steamrot::UIPayload</a></div><div class="ttdoc">Any event information concerned with user interfaces.</div><div class="ttdef"><b>Definition</b> EventPayload.h:54</div></div>
+<div class="ttc" id="astructsteamrot_1_1LogicPayload_html"><div class="ttname"><a href="structsteamrot_1_1LogicPayload.html">steamrot::LogicPayload</a></div><div class="ttdoc">Any event information concerned with passing information to the logic classes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:98</div></div>
+<div class="ttc" id="astructsteamrot_1_1ScenePayload_html"><div class="ttname"><a href="structsteamrot_1_1ScenePayload.html">steamrot::ScenePayload</a></div><div class="ttdoc">Any event information concerned with processing whole Scenes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:138</div></div>
+<div class="ttc" id="astructsteamrot_1_1SystemPayload_html"><div class="ttname"><a href="structsteamrot_1_1SystemPayload.html">steamrot::SystemPayload</a></div><div class="ttdoc">Any event information concerned with processing system level events, such as quitting the game.</div><div class="ttdef"><b>Definition</b> EventPayload.h:190</div></div>
+<div class="ttc" id="astructsteamrot_1_1UIPayload_html"><div class="ttname"><a href="structsteamrot_1_1UIPayload.html">steamrot::UIPayload</a></div><div class="ttdoc">Any event information concerned with user interfaces.</div><div class="ttdef"><b>Definition</b> EventPayload.h:59</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a229897ac32baf73be6d5cfa35241f63e" name="a229897ac32baf73be6d5cfa35241f63e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a229897ac32baf73be6d5cfa35241f63e">&#9670;&#160;</a></span>GhostInstance</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a229897ac32baf73be6d5cfa35241f63e">steamrot::GhostInstance</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line"> </div>
+<div class="line">std::variant&lt;std::monostate, FragmentInstance, JointInstance&gt;</div>
+</div><!-- fragment -->
+<p>Variant representing the currently active ghost instance. </p>
+<p>std::monostate indicates no active selection. <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> and <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> carry a pointer to the underlying <a class="el" href="structsteamrot_1_1Part.html" title="Base struct for Fragment and Joint, wrapping common data shared by both part types.">Part</a> definition together with the transform updated each tick by positioning logic. </p>
+
 </div>
 </div>
 <a id="a492d0f6e26c9eed5a949733e85fd359d" name="a492d0f6e26c9eed5a949733e85fd359d"></a>
@@ -1371,8 +1398,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Variant representing the currently selected item in <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a>. </p>
-<p>std::monostate indicates no active selection. Additional tag types can be appended to this variant as new selectable categories are introduced without changing any existing code. </p>
+<p>Variant carrying a lightweight selection tag for a ghost item. </p>
+<p>Transported in <a class="el" href="structsteamrot_1_1GhostPayload.html" title="Event payload for MrGhost selection changes.">GhostPayload</a> and stored on <a class="el" href="structsteamrot_1_1DropDownItemElement.html">DropDownItemElement</a>. std::monostate indicates no active selection or a CLEAR action. Resolved to a <a class="el" href="#a229897ac32baf73be6d5cfa35241f63e" title="Variant representing the currently active ghost instance.">GhostInstance</a> by action_ghost::SelectGhostItem. </p>
 
 </div>
 </div>
@@ -1406,6 +1433,24 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d79be77cf3265cb98c2911a4c1911a8" name="a2d79be77cf3265cb98c2911a4c1911a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d79be77cf3265cb98c2911a4c1911a8">&#9670;&#160;</a></span>PartMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a2d79be77cf3265cb98c2911a4c1911a8">steamrot::PartMap</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line"> </div>
+<div class="line">std::map&lt;uint32_t, std::variant&lt;JointInstance, FragmentInstance&gt;&gt;</div>
+</div><!-- fragment -->
+<p>using helpers /// </p>
 
 </div>
 </div>
@@ -1703,6 +1748,7 @@ Variables</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a" name="a492ab0d6b7c7d5dec5b87cd43f328244a7ebc7b9885252ae344a2cf6f5c3c1e4a"></a>InputActionFbs_SELECT&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a492ab0d6b7c7d5dec5b87cd43f328244a2c7ae3f50fed353a004b9ee61508cd0f" name="a492ab0d6b7c7d5dec5b87cd43f328244a2c7ae3f50fed353a004b9ee61508cd0f"></a>InputActionFbs_TOGGLE_SOCKET_VISIBILITY&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a492ab0d6b7c7d5dec5b87cd43f328244a5efa720ad2e658ca9f6b84c9290da47f" name="a492ab0d6b7c7d5dec5b87cd43f328244a5efa720ad2e658ca9f6b84c9290da47f"></a>InputActionFbs_ROTATE_GHOST&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a492ab0d6b7c7d5dec5b87cd43f328244a48b79a756fd9590cf7825d6215ba4e06" name="a492ab0d6b7c7d5dec5b87cd43f328244a48b79a756fd9590cf7825d6215ba4e06"></a>InputActionFbs_MIN&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519" name="a492ab0d6b7c7d5dec5b87cd43f328244ab4b0a129c27fb84ff1402e3d101fe519"></a>InputActionFbs_MAX&#160;</td><td class="fielddoc"></td></tr>
 </table>
@@ -1941,7 +1987,7 @@ Variables</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5b672c57ca4f22f000f8da0d41482db9a15fb6ccbd11ebebcea2b48dc477f3561" name="a5b672c57ca4f22f000f8da0d41482db9a15fb6ccbd11ebebcea2b48dc477f3561"></a>Collision&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a5b672c57ca4f22f000f8da0d41482db9a5e520da5341f2fec6d3bbfe7ef357922" name="a5b672c57ca4f22f000f8da0d41482db9a5e520da5341f2fec6d3bbfe7ef357922"></a>Render&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a5b672c57ca4f22f000f8da0d41482db9a004bf6c9a40003140292e97330236c53" name="a5b672c57ca4f22f000f8da0d41482db9a004bf6c9a40003140292e97330236c53"></a>Action&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a" name="a5b672c57ca4f22f000f8da0d41482db9a4642e767f9251fa40afadbc963f80b7a"></a>Movement&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a5b672c57ca4f22f000f8da0d41482db9aa52fce78b8f3903d4789878f2635a977" name="a5b672c57ca4f22f000f8da0d41482db9aa52fce78b8f3903d4789878f2635a977"></a>Positioning&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -2004,7 +2050,7 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="a7719fe793bc1e817cb91cddf21a5995eafb6543864473a5074c83f653d16f78d3" name="a7719fe793bc1e817cb91cddf21a5995eafb6543864473a5074c83f653d16f78d3"></a>GhostAction&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8" name="a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8"></a>GhostPositioning&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d" name="a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d"></a>GhostRender&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a7719fe793bc1e817cb91cddf21a5995ea8b0c2c10f7c8647391a4a1fc7cd4181f" name="a7719fe793bc1e817cb91cddf21a5995ea8b0c2c10f7c8647391a4a1fc7cd4181f"></a>CameraMovement&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0" name="a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0"></a>CameraPositioning&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -2103,6 +2149,36 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="a8fbb96fab930780c3d8e52527b6d9b4ba233eac7221b7d22ea3c6422e355e7789" name="a8fbb96fab930780c3d8e52527b6d9b4ba233eac7221b7d22ea3c6422e355e7789"></a>SceneTypeFbs_CRAFTING&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8fbb96fab930780c3d8e52527b6d9b4ba1bed5756d5697b4a5b5cff3b04c84176" name="a8fbb96fab930780c3d8e52527b6d9b4ba1bed5756d5697b4a5b5cff3b04c84176"></a>SceneTypeFbs_MIN&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a8fbb96fab930780c3d8e52527b6d9b4ba92dfc51020f2169ae9bf2de54d88c8c1" name="a8fbb96fab930780c3d8e52527b6d9b4ba92dfc51020f2169ae9bf2de54d88c8c1"></a>SceneTypeFbs_MAX&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="ae5029d8abb2c43f7bf14bf38c4ff08a1" name="ae5029d8abb2c43f7bf14bf38c4ff08a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5029d8abb2c43f7bf14bf38c4ff08a1">&#9670;&#160;</a></span>SocketState</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="#ae5029d8abb2c43f7bf14bf38c4ff08a1">steamrot::SocketState</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel strong">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae5029d8abb2c43f7bf14bf38c4ff08a1a78945de8de090e90045d299651a68a9b" name="ae5029d8abb2c43f7bf14bf38c4ff08a1a78945de8de090e90045d299651a68a9b"></a>Available&#160;</td><td class="fielddoc"><p>Socket exists and can connect. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7" name="ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7"></a>Connected&#160;</td><td class="fielddoc"><p>Socket is currently connected. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2" name="ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2"></a>Blocked&#160;</td><td class="fielddoc"><p>Socket exists but can't be used (e.g., edge of canvas). </p>
+</td></tr>
 </table>
 
 </div>
@@ -2556,54 +2632,6 @@ template&lt;class T&gt; </div>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="adb45f8ad2ece5d309911565e32d95f62" name="adb45f8ad2ece5d309911565e32d95f62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb45f8ad2ece5d309911565e32d95f62">&#9670;&#160;</a></span>ComputeSocketLocalPos()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">sf::Vector2f steamrot::ComputeSocketLocalPos </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structsteamrot_1_1SocketConfig.html">SocketConfig</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>config</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>socket_index</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>current_rotation</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Compute the local-space position of a single socket on a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>. </p>
-<p>Fixed anchor sockets (socket index 0 when <a class="el" href="structsteamrot_1_1SocketConfig.html#a0dac261ce25de18e8c79ba0cb5d2ce51" title="Whether socket index 0 is a fixed anchor that does not rotate.">SocketConfig::has_fixed_socket</a> is true) are placed at <a class="el" href="structsteamrot_1_1SocketConfig.html#a4399c82baeaef1e11727d2b80727e4f2" title="Angle (degrees) of the fixed anchor socket (socket index 0).">SocketConfig::fixed_socket_angle</a> and are not affected by <code class="param">current_rotation</code>. All other sockets are distributed evenly within the arc [arc_min, arc_max] and rotated by <code class="param">current_rotation</code>.</p>
-<p>When the arc spans exactly 360 degrees, sockets are distributed with equal spacing and no duplicate at the wrap-around point.</p>
-<p>Angles are in degrees; the resulting position uses SFML's coordinate system (y increases downward).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">config</td><td><a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a> describing the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s socket layout. </td></tr>
-    <tr><td class="paramname">socket_index</td><td>Index of the socket to compute (0-based). </td></tr>
-    <tr><td class="paramname">current_rotation</td><td>Current rotation of the socket ring in degrees. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Local-space position of the requested socket. </dd></dl>
 
 </div>
 </div>
@@ -3935,8 +3963,8 @@ template&lt;class T&gt; </div>
 
 </div>
 </div>
-<a id="a8c2b0f5b789af03d96859dbd22a6dee5" name="a8c2b0f5b789af03d96859dbd22a6dee5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c2b0f5b789af03d96859dbd22a6dee5">&#9670;&#160;</a></span>CreateFragmentFbs()</h2>
+<a id="ae358da4de4ea138a14b70cf89c9e05ed" name="ae358da4de4ea138a14b70cf89c9e05ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae358da4de4ea138a14b70cf89c9e05ed">&#9670;&#160;</a></span>CreateFragmentFbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3959,15 +3987,15 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>movement_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>positioning_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ac7e856455f9cf626d7c71ad9f019c39c" name="ac7e856455f9cf626d7c71ad9f019c39c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7e856455f9cf626d7c71ad9f019c39c">&#9670;&#160;</a></span>CreateFragmentFbsDirect()</h2>
+<a id="a7d63f365e12807c0c3b4a171e97dc682" name="a7d63f365e12807c0c3b4a171e97dc682"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d63f365e12807c0c3b4a171e97dc682">&#9670;&#160;</a></span>CreateFragmentFbsDirect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3990,7 +4018,7 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *</td>          <td class="paramname"><span class="paramname"><em>movement_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
+          <td class="paramtype">const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *</td>          <td class="paramname"><span class="paramname"><em>positioning_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -4339,8 +4367,8 @@ template&lt;class T&gt; </div>
 
 </div>
 </div>
-<a id="a61e6fa478019e418cf183f2cf084bb9a" name="a61e6fa478019e418cf183f2cf084bb9a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61e6fa478019e418cf183f2cf084bb9a">&#9670;&#160;</a></span>CreateJointFbs()</h2>
+<a id="af2a0c8bcadd42456b465f1b7868ce9ba" name="af2a0c8bcadd42456b465f1b7868ce9ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2a0c8bcadd42456b465f1b7868ce9ba">&#9670;&#160;</a></span>CreateJointFbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4368,15 +4396,15 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>movement_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+          <td class="paramtype">::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt;</td>          <td class="paramname"><span class="paramname"><em>positioning_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a50548f19963944931697a0bde3e8938e" name="a50548f19963944931697a0bde3e8938e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50548f19963944931697a0bde3e8938e">&#9670;&#160;</a></span>CreateJointFbsDirect()</h2>
+<a id="ae4f0e1f622610bbe029d14ff4c4c9e93" name="ae4f0e1f622610bbe029d14ff4c4c9e93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4f0e1f622610bbe029d14ff4c4c9e93">&#9670;&#160;</a></span>CreateJointFbsDirect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4404,7 +4432,7 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *</td>          <td class="paramname"><span class="paramname"><em>movement_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
+          <td class="paramtype">const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *</td>          <td class="paramname"><span class="paramname"><em>positioning_views</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -4447,8 +4475,8 @@ template&lt;class T&gt; </div>
 
 </div>
 </div>
-<a id="a82be4ffce2a603eb4cc96d0da34d5af8" name="a82be4ffce2a603eb4cc96d0da34d5af8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82be4ffce2a603eb4cc96d0da34d5af8">&#9670;&#160;</a></span>CreateLogicConfigCollectionFbs()</h2>
+<a id="aa39748451591b45fac61577048ded9fb" name="aa39748451591b45fac61577048ded9fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa39748451591b45fac61577048ded9fb">&#9670;&#160;</a></span>CreateLogicConfigCollectionFbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4476,7 +4504,12 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt;</td>          <td class="paramname"><span class="paramname"><em>camera_action_logic</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+          <td class="paramtype">::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt;</td>          <td class="paramname"><span class="paramname"><em>camera_action_logic</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt;</td>          <td class="paramname"><span class="paramname"><em>ghost_positioning_logic</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -5125,8 +5158,8 @@ template&lt;class T&gt; </div>
 
 </div>
 </div>
-<a id="a714ff8ecd1dc051a8bddd3a61d6c0b20" name="a714ff8ecd1dc051a8bddd3a61d6c0b20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a714ff8ecd1dc051a8bddd3a61d6c0b20">&#9670;&#160;</a></span>CreateSocketConfigFbs()</h2>
+<a id="af03e393c8881896c9ce4312565431ddb" name="af03e393c8881896c9ce4312565431ddb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af03e393c8881896c9ce4312565431ddb">&#9670;&#160;</a></span>CreateSocketConfigFbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -5149,16 +5182,6 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>arc_min</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0f</span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>arc_max</em></span><span class="paramdefsep"> = </span><span class="paramdefval">360.0f</span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>min_gap</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0f</span>, </td>
         </tr>
         <tr>
@@ -5169,7 +5192,17 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>has_fixed_socket</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>has_fixed_socket</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>rotation_arc_min</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0.0f</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>rotation_arc_max</em></span><span class="paramdefsep"> = </span><span class="paramdefval">360.0f</span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -7625,8 +7658,8 @@ template&lt;class T&gt; </div>
 
 </div>
 </div>
-<a id="ac7131fe03f1e3d0f5a4e0c3b83ba9e6c" name="ac7131fe03f1e3d0f5a4e0c3b83ba9e6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7131fe03f1e3d0f5a4e0c3b83ba9e6c">&#9670;&#160;</a></span>EnumValuesInputActionFbs()</h2>
+<a id="aa585c47458c0f16590ece352e7144961" name="aa585c47458c0f16590ece352e7144961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa585c47458c0f16590ece352e7144961">&#9670;&#160;</a></span>EnumValuesInputActionFbs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7638,7 +7671,7 @@ template&lt;class T&gt; </div>
           <td class="memname">const <a class="el" href="#a492ab0d6b7c7d5dec5b87cd43f328244">InputActionFbs</a>(&amp; steamrot::EnumValuesInputActionFbs </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td>)[2]</td>
+          <td>)[3]</td>
         </tr>
       </table>
   </td>
@@ -10762,7 +10795,7 @@ template&lt;&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="#a44eac92bcfde0a28526e41a9fd5b9e1e">EventPayload</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>event_payload</em></span>&#160;)</td>
+          <td class="paramtype">const <a class="el" href="#ad914e32cf23ef3bd00656a0a0744417d">EventPayload</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>event_payload</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -12005,32 +12038,6 @@ template&lt;&gt; </div>
 <div class="line">std::tuple_size&lt;ComponentRegister&gt;::value</div>
 </div><!-- fragment -->
 <p>size of the component register </p>
-
-</div>
-</div>
-<a id="a7176a8d64c294ca5896576ba09b7d038" name="a7176a8d64c294ca5896576ba09b7d038"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7176a8d64c294ca5896576ba09b7d038">&#9670;&#160;</a></span>k_socket_deg_to_rad</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">float steamrot::k_socket_deg_to_rad</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel constexpr">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                                       =</div>
-<div class="line">std::numbers::pi_v&lt;float&gt; / 180.f</div>
-</div><!-- fragment -->
-<p>Degrees-to-radians conversion factor used by socket computations. </p>
 
 </div>
 </div>

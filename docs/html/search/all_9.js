@@ -11,7 +11,7 @@ var searchData=
   ['belong_20to_20different_20spaces_20—_20keep_20them_20separate_8',['3. Different Systems Belong to Different Spaces — Keep Them Separate',['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md15',1,'']]],
   ['best_20ally_9',['1. Types Are Your Best Ally',['../md_documentation_2concepts_2COORDINATE__SPACES.html#autotoc_md13',1,'']]],
   ['best_20practices_10',['Best Practices',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md163',1,'Best Practices'],['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md208',1,'Best Practices']]],
-  ['blocked_11',['Blocked',['../structsteamrot_1_1SocketState.html#accd82e5957a5b9cea964343776d90b9fa4ecc0d90eec1cea3e9db96583a1bb9c2',1,'steamrot::SocketState']]],
+  ['blocked_11',['Blocked',['../namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2',1,'steamrot']]],
   ['border_5fcolor_12',['border_color',['../structStyle.html#a2b55c96a6de1551a9ee7a696dce8e9a4',1,'Style::border_color'],['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#aedbc5f2f4312e7de1b1ce00034eaa72c',1,'steamrot::FLATBUFFERS_FINAL_CLASS::border_color()']]],
   ['border_5fthickness_13',['border_thickness',['../structStyle.html#aaa076b601c4701d08173963155d7c9c1',1,'Style::border_thickness'],['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ac9981b8a269defc35aef9c01b8f30daf',1,'steamrot::FLATBUFFERS_FINAL_CLASS::border_thickness()']]],
   ['both_20match_20wrong_20action_20fires_14',['Two patterns both match, wrong action fires',['../md_documentation_2workflows_2SFML__EVENT__CONVERSION.html#autotoc_md214',1,'']]],

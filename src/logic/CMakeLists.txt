@@ -18,6 +18,7 @@ add_library(logic
   GhostRenderLogic.cpp
 
   CameraPositioningLogic.cpp
+  CameraActionLogic.cpp
 
   action_ui.cpp
   state_ui.cpp

@@ -106,8 +106,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:a14172b4fdc33ae0d0fa4cd63af303e49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if any element in the tree (element or any descendant) has is_mouse_over set to true.  <br /></td></tr>
 <tr class="memitem:a7534ccba8941677f4b31ce271fd23178" id="r_a7534ccba8941677f4b31ce271fd23178"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7534ccba8941677f4b31ce271fd23178">CheckMouseOver</a> (const sf::Vector2i &amp;mouse_position, UIElement &amp;element)</td></tr>
 <tr class="memdesc:a7534ccba8941677f4b31ce271fd23178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the mouse is over a UIElement or any of its nested children, and sets each element's is_mouse_over accordingly.  <br /></td></tr>
-<tr class="memitem:a65e1660c562d2b2f5276a499eaae6684" id="r_a65e1660c562d2b2f5276a499eaae6684"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a65e1660c562d2b2f5276a499eaae6684">CheckMouseOver</a> (sf::Vector2f world_mouse, sf::Vector2f world_pos, <a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a> &amp;socket_state)</td></tr>
-<tr class="memdesc:a65e1660c562d2b2f5276a499eaae6684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets is_mouse_over on a <a class="el" href="structsteamrot_1_1SocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> based on whether the mouse is within the socket's hit radius of the given world position.  <br /></td></tr>
+<tr class="memitem:aee6a677cbd6d93adca3563ef820d1f3e" id="r_aee6a677cbd6d93adca3563ef820d1f3e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aee6a677cbd6d93adca3563ef820d1f3e">CheckMouseOver</a> (sf::Vector2f world_mouse, sf::Vector2f world_pos, <a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a> &amp;socket_data)</td></tr>
+<tr class="memdesc:aee6a677cbd6d93adca3563ef820d1f3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets is_mouse_over on a <a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> based on whether the mouse is within the socket's hit radius of the given world position.  <br /></td></tr>
 <tr class="memitem:a974b729d30468c81b54c3f9ff62d84ce" id="r_a974b729d30468c81b54c3f9ff62d84ce"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a974b729d30468c81b54c3f9ff62d84ce">CheckMouseOver</a> (sf::Vector2f world_mouse, <a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a> &amp;fragment_instance)</td></tr>
 <tr class="memdesc:a974b729d30468c81b54c3f9ff62d84ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the mouse is over any socket on a <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> and sets each socket's is_mouse_over accordingly.  <br /></td></tr>
 <tr class="memitem:aef1334df8a15cd4d7171b148c29d28c1" id="r_aef1334df8a15cd4d7171b148c29d28c1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aef1334df8a15cd4d7171b148c29d28c1">CheckMouseOver</a> (sf::Vector2f world_mouse, <a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a> &amp;joint_instance)</td></tr>
@@ -239,8 +239,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a65e1660c562d2b2f5276a499eaae6684" name="a65e1660c562d2b2f5276a499eaae6684"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65e1660c562d2b2f5276a499eaae6684">&#9670;&#160;</a></span>CheckMouseOver() <span class="overload">[4/4]</span></h2>
+<a id="aee6a677cbd6d93adca3563ef820d1f3e" name="aee6a677cbd6d93adca3563ef820d1f3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee6a677cbd6d93adca3563ef820d1f3e">&#9670;&#160;</a></span>CheckMouseOver() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -258,18 +258,18 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>socket_state</em></span>&#160;)</td>
+          <td class="paramtype"><a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>socket_data</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Sets is_mouse_over on a <a class="el" href="structsteamrot_1_1SocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> based on whether the mouse is within the socket's hit radius of the given world position. </p>
+<p>Sets is_mouse_over on a <a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> based on whether the mouse is within the socket's hit radius of the given world position. </p>
 <p>The hit radius matches the visual radius used when drawing sockets so that click/hover detection is pixel-accurate relative to what the user sees.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">world_mouse</td><td>World-space mouse position (<a class="el" href="structsteamrot_1_1SceneContext.html#a366dc8e53c246c9593fe5f2e4bf315c7" title="World-space mouse position for the current tick.">SceneContext::world_mouse_position</a>). </td></tr>
     <tr><td class="paramname">world_pos</td><td>World-space centre of the socket. </td></tr>
-    <tr><td class="paramname">socket_state</td><td><a class="el" href="structsteamrot_1_1SocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> whose is_mouse_over flag is updated. </td></tr>
+    <tr><td class="paramname">socket_data</td><td><a class="el" href="structSocketState.html" title="Runtime state of a single socket on a placed Fragment or Joint instance.">SocketState</a> to update with the result of the check. </td></tr>
   </table>
   </dd>
 </dl>

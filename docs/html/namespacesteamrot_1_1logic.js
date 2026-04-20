@@ -2,11 +2,10 @@ var namespacesteamrot_1_1logic =
 [
     [ "action", "namespacesteamrot_1_1logic_1_1action.html", "namespacesteamrot_1_1logic_1_1action" ],
     [ "collision", "namespacesteamrot_1_1logic_1_1collision.html", "namespacesteamrot_1_1logic_1_1collision" ],
-    [ "movement", "namespacesteamrot_1_1logic_1_1movement.html", "namespacesteamrot_1_1logic_1_1movement" ],
     [ "positioning", "namespacesteamrot_1_1logic_1_1positioning.html", "namespacesteamrot_1_1logic_1_1positioning" ],
     [ "render", "namespacesteamrot_1_1logic_1_1render.html", "namespacesteamrot_1_1logic_1_1render" ],
     [ "state", "namespacesteamrot_1_1logic_1_1state.html", "namespacesteamrot_1_1logic_1_1state" ],
-    [ "CameraMovementLogic", "classsteamrot_1_1logic_1_1CameraMovementLogic.html", "classsteamrot_1_1logic_1_1CameraMovementLogic" ],
+    [ "CameraPositioningLogic", "classsteamrot_1_1logic_1_1CameraPositioningLogic.html", "classsteamrot_1_1logic_1_1CameraPositioningLogic" ],
     [ "GhostActionLogic", "classsteamrot_1_1logic_1_1GhostActionLogic.html", "classsteamrot_1_1logic_1_1GhostActionLogic" ],
     [ "GhostPositioningLogic", "classsteamrot_1_1logic_1_1GhostPositioningLogic.html", "classsteamrot_1_1logic_1_1GhostPositioningLogic" ],
     [ "GhostRenderLogic", "classsteamrot_1_1logic_1_1GhostRenderLogic.html", "classsteamrot_1_1logic_1_1GhostRenderLogic" ],

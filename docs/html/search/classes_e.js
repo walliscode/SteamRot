@@ -37,11 +37,12 @@ var searchData=
   ['simulationstepfbsbuilder_34',['SimulationStepFbsBuilder',['../structsteamrot_1_1SimulationStepFbsBuilder.html',1,'steamrot']]],
   ['socketconfig_35',['SocketConfig',['../structsteamrot_1_1SocketConfig.html',1,'steamrot']]],
   ['socketconfigfbsbuilder_36',['SocketConfigFbsBuilder',['../structsteamrot_1_1SocketConfigFbsBuilder.html',1,'steamrot']]],
-  ['socketstate_37',['SocketState',['../structsteamrot_1_1SocketState.html',1,'steamrot']]],
-  ['style_38',['Style',['../structStyle.html',1,'']]],
-  ['styledatafbsbuilder_39',['StyleDataFbsBuilder',['../structsteamrot_1_1StyleDataFbsBuilder.html',1,'steamrot']]],
-  ['subscriber_40',['Subscriber',['../structsteamrot_1_1Subscriber.html',1,'steamrot']]],
-  ['subscriberfbsbuilder_41',['SubscriberFbsBuilder',['../structsteamrot_1_1SubscriberFbsBuilder.html',1,'steamrot']]],
-  ['systempayload_42',['SystemPayload',['../structsteamrot_1_1SystemPayload.html',1,'steamrot']]],
-  ['systempayloadfbsbuilder_43',['SystemPayloadFbsBuilder',['../structsteamrot_1_1SystemPayloadFbsBuilder.html',1,'steamrot']]]
+  ['socketdata_37',['SocketData',['../structsteamrot_1_1SocketData.html',1,'steamrot']]],
+  ['socketstate_38',['SocketState',['../structSocketState.html',1,'']]],
+  ['style_39',['Style',['../structStyle.html',1,'']]],
+  ['styledatafbsbuilder_40',['StyleDataFbsBuilder',['../structsteamrot_1_1StyleDataFbsBuilder.html',1,'steamrot']]],
+  ['subscriber_41',['Subscriber',['../structsteamrot_1_1Subscriber.html',1,'steamrot']]],
+  ['subscriberfbsbuilder_42',['SubscriberFbsBuilder',['../structsteamrot_1_1SubscriberFbsBuilder.html',1,'steamrot']]],
+  ['systempayload_43',['SystemPayload',['../structsteamrot_1_1SystemPayload.html',1,'steamrot']]],
+  ['systempayloadfbsbuilder_44',['SystemPayloadFbsBuilder',['../structsteamrot_1_1SystemPayloadFbsBuilder.html',1,'steamrot']]]
 ];

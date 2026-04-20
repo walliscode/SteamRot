@@ -119,12 +119,10 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:ac8eb9800ffa360090517b7b423f02d93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stable ID assigned by <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> when this instance is added. Unique across both joints and fragments.  <br /></td></tr>
 <tr class="memitem:ad7c0584a80d2532428fdbe21c107e1fc" id="r_ad7c0584a80d2532428fdbe21c107e1fc"><td class="memItemLeft">sf::Transform&#160;</td><td class="memItemRight"><a class="el" href="#ad7c0584a80d2532428fdbe21c107e1fc">transform</a> {sf::Transform::Identity}</td></tr>
 <tr class="memdesc:ad7c0584a80d2532428fdbe21c107e1fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single transform that positions this instance on the canvas.  <br /></td></tr>
-<tr class="memitem:a20a2f32a5717084f796f2d3971134f8f" id="r_a20a2f32a5717084f796f2d3971134f8f"><td class="memItemLeft">std::vector&lt; <a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a20a2f32a5717084f796f2d3971134f8f">socket_states</a></td></tr>
-<tr class="memdesc:a20a2f32a5717084f796f2d3971134f8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-socket runtime state (connection status, hover).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Common base for all placed instances on the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>. </p>
-<p>Holds the stable unique ID, the world-space transform, and the per-socket runtime state that are shared by every placed part. Derive from this struct rather than duplicating these fields in <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> and <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a>. </p>
+<p>Holds the stable unique ID and the world-space transform shared by every placed part. Socket data (position + state) is held in the concrete subtype's <code>sockets</code> vector, which is fully initialised at construction. </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a84ea0d934cd0ab1fee4bd78c03e08db2" name="a84ea0d934cd0ab1fee4bd78c03e08db2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a84ea0d934cd0ab1fee4bd78c03e08db2">&#9670;&#160;</a></span>PartInstance()</h2>
@@ -173,22 +171,6 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Stable ID assigned by <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> when this instance is added. Unique across both joints and fragments. </p>
-
-</div>
-</div>
-<a id="a20a2f32a5717084f796f2d3971134f8f" name="a20a2f32a5717084f796f2d3971134f8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20a2f32a5717084f796f2d3971134f8f">&#9670;&#160;</a></span>socket_states</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="structsteamrot_1_1SocketState.html">SocketState</a>&gt; steamrot::PartInstance::socket_states</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Per-socket runtime state (connection status, hover). </p>
 
 </div>
 </div>

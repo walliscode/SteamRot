@@ -1,8 +1,6 @@
 var structsteamrot_1_1JointInstance =
 [
-    [ "JointInstance", "structsteamrot_1_1JointInstance.html#a3a3623ff5c313a0a3f2ca8e370b0926c", null ],
-    [ "current_rotation", "structsteamrot_1_1JointInstance.html#acc0fd64745ac7c64e8e4cf96444c7997", null ],
-    [ "joint", "structsteamrot_1_1JointInstance.html#ac3a0f2317137b16b3877cc1d031cd10b", null ],
-    [ "rotation_max", "structsteamrot_1_1JointInstance.html#ac486d4221232b0ad47b4a67323eedd9f", null ],
-    [ "rotation_min", "structsteamrot_1_1JointInstance.html#a959dce12b8a79b4928aa56c6f011e8c5", null ]
+    [ "JointInstance", "structsteamrot_1_1JointInstance.html#a5499c147ae29887d53340c66639a8d98", null ],
+    [ "joint", "structsteamrot_1_1JointInstance.html#a7d7b5626e46f66f587be9d0e6d1a144c", null ],
+    [ "sockets", "structsteamrot_1_1JointInstance.html#af7acd8e99f874f59a8deb942912c7c8c", null ]
 ];

@@ -4,6 +4,7 @@ var structsteamrot_1_1LogicConfigCollectionFbsBuilder =
     [ "LogicConfigCollectionFbsBuilder", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#a58e9728cfffc9b33d968acf86e47478d", null ],
     [ "add_camera_action_logic", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#ad25e2abd579e69954bda2fc7e8c7fdf4", null ],
     [ "add_ghost_action_logic", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#a6b94c70187b564b363bf2efb1170bb7d", null ],
+    [ "add_ghost_positioning_logic", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#ad721dda21b2df12d1d832a95f0d5ab66", null ],
     [ "add_grimoire_machina_action_logic", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#a858a5ac8c66ca813bcb28a968609586b", null ],
     [ "add_test_logic", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#ab1a1bff1ba3d9450a9c4e11e248f0dc7", null ],
     [ "Finish", "structsteamrot_1_1LogicConfigCollectionFbsBuilder.html#abf04e5c2440586f2845c650401f23c29", null ],

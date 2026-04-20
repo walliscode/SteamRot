@@ -98,8 +98,10 @@ $(function(){initNavTree('MachinaFormScaffold_8h.html','',''); });
 <div class="textblock"><code>#include &quot;<a class="el" href="Fragment_8h_source.html">Fragment.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Joint_8h_source.html">Joint.h</a>&quot;</code><br />
 <code>#include &lt;SFML/Graphics/Transform.hpp&gt;</code><br />
+<code>#include &lt;SFML/System/Vector2.hpp&gt;</code><br />
 <code>#include &lt;cstdint&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;variant&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
@@ -108,8 +110,8 @@ $(function(){initNavTree('MachinaFormScaffold_8h.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:steamrot_3A_3ASocketState" id="r_steamrot_3A_3ASocketState"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1SocketState.html">steamrot::SocketState</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runtime state of a single socket on a placed <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> instance.  <a href="structsteamrot_1_1SocketState.html#details">More...</a><br /></td></tr>
+<tr class="memitem:steamrot_3A_3ASocketData" id="r_steamrot_3A_3ASocketData"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1SocketData.html">steamrot::SocketData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bundles the local position and mutable runtime state for a single socket on a placed part instance.  <a href="structsteamrot_1_1SocketData.html#details">More...</a><br /></td></tr>
 <tr class="memitem:steamrot_3A_3APartInstance" id="r_steamrot_3A_3APartInstance"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1PartInstance.html">steamrot::PartInstance</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common base for all placed instances on the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <a href="structsteamrot_1_1PartInstance.html#details">More...</a><br /></td></tr>
 <tr class="memitem:steamrot_3A_3AJointInstance" id="r_steamrot_3A_3AJointInstance"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsteamrot_1_1JointInstance.html">steamrot::JointInstance</a></td></tr>
@@ -127,6 +129,18 @@ Classes</h2></td></tr>
 Namespaces</h2></td></tr>
 <tr class="memitem:steamrot" id="r_steamrot"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html">steamrot</a></td></tr>
 <tr class="memdesc:namespacesteamrot"><td class="mdescLeft">&#160;</td><td class="mdescRight">Headers. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a2d79be77cf3265cb98c2911a4c1911a8" id="r_a2d79be77cf3265cb98c2911a4c1911a8"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">steamrot::PartMap</a></td></tr>
+<tr class="memdesc:a2d79be77cf3265cb98c2911a4c1911a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">using helpers ///  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ae5029d8abb2c43f7bf14bf38c4ff08a1" id="r_ae5029d8abb2c43f7bf14bf38c4ff08a1"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1">steamrot::SocketState</a> { <a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a78945de8de090e90045d299651a68a9b">steamrot::Available</a>
+, <a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7">steamrot::Connected</a>
+, <a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a4ecc0d90eec1cea3e9db96583a1bb9c2">steamrot::Blocked</a>
+ }</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declarartion of the MachinFormScaffold struct. No implementation is needed. </p>

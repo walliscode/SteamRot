@@ -37,7 +37,19 @@ void process_subscribers(
     if (!camera_payload)
       continue;
 
-    apply_zoom(camera_state, camera_payload->scroll_delta);
+    switch (camera_payload->action) {
+
+    case CameraPayload::CameraAction::SCROLL:
+      apply_zoom(camera_state, camera_payload->scroll_delta);
+      break;
+
+    case CameraPayload::CameraAction::RESET_ZOOM:
+      reset_zoom(camera_state);
+      break;
+
+    default:
+      break;
+    }
   }
 }
 

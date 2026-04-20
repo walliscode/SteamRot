@@ -122,7 +122,7 @@ Overview</h1>
 <ul>
 <li>Inherit from the abstract <span class="tt">Logic</span> base class</li>
 <li>Process entities based on their component composition (archetypes)</li>
-<li>Are organized by <span class="tt">LogicGrouping</span> (Collision, Render, Action, Movement)</li>
+<li>Are organized by <span class="tt">LogicGrouping</span> (Collision, Render, Action, Positioning)</li>
 <li>Execute in a specific order within their grouping</li>
 <li>Are created and configured by the <span class="tt">LogicFactory</span> for each scene</li>
 </ul>
@@ -148,7 +148,7 @@ LogicGrouping Categories</h2>
 <ol type="1">
 <li><b>Collision</b> - Spatial interactions (UI collision, physics collision)</li>
 <li><b>Action</b> - Input processing and event triggering</li>
-<li><b>Movement</b> - Position and velocity updates</li>
+<li><b>Positioning</b> - Position and velocity updates</li>
 <li><b>Render</b> - Drawing to the render texture</li>
 </ol>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md116"></a>
@@ -164,7 +164,7 @@ Key Components</h2>
 <ul>
 <li><b><span class="tt">Logic</span></b> - Abstract base class all Logic inherits from</li>
 <li><b><span class="tt">LogicType</span></b> - Enum identifying each Logic class type</li>
-<li><b><span class="tt">LogicGrouping</span></b> - Category enum (Collision, Render, Action, Movement)</li>
+<li><b><span class="tt">LogicGrouping</span></b> - Category enum (Collision, Render, Action, Positioning)</li>
 <li><b><span class="tt">LogicFactory</span></b> - Factory that creates and configures Logic instances per scene</li>
 <li><b><span class="tt">SceneContext</span></b> - Struct containing all dependencies Logic needs (entities, assets, events, etc.)</li>
 </ul>
@@ -201,7 +201,7 @@ Step 1: Create the Logic Class Files</h2>
 <div class="line">} <span class="comment">// namespace steamrot</span></div>
 <div class="ttc" id="aLogicType_8h_html"><div class="ttname"><a href="LogicType_8h.html">LogicType.h</a></div><div class="ttdoc">An Enum class representing the different types of Logic class in the game.</div></div>
 <div class="ttc" id="aLogic_8h_html"><div class="ttname"><a href="Logic_8h.html">Logic.h</a></div><div class="ttdoc">Declaration of the abstract Logic class.</div></div>
-<div class="ttc" id="anamespacesteamrot_1_1logic_html"><div class="ttname"><a href="namespacesteamrot_1_1logic.html">steamrot::logic</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:13</div></div>
+<div class="ttc" id="anamespacesteamrot_1_1logic_html"><div class="ttname"><a href="namespacesteamrot_1_1logic.html">steamrot::logic</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:12</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md122"></a>
 1.2 Create Implementation File</h3>
 <p><b>Location</b>: <span class="tt">src/logic/YourLogicName.cpp</span></p>
@@ -751,8 +751,8 @@ Wrong Execution Order</h2>
 <p><b>Solutions</b>:</p>
 <ul>
 <li>✅ Check order in <span class="tt">Configure{Scene}Logics()</span> array - that's the execution order</li>
-<li>✅ Verify you're in the correct <span class="tt">LogicGrouping</span> (Collision, Action, Movement, Render)</li>
-<li>✅ Remember groupings execute in order: Collision → Action → Movement → Render</li>
+<li>✅ Verify you're in the correct <span class="tt">LogicGrouping</span> (Collision, Action, Positioning, Render)</li>
+<li>✅ Remember groupings execute in order: Collision → Action → Positioning → Render</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md173"></a>
 Test Failures: "dynamic_cast returned null"</h2>
@@ -862,7 +862,7 @@ Additional Resources</h1>
 <li><b>Example Logic Classes</b>:<ul>
 <li><span class="tt"><a class="el" href="UIActionLogic_8cpp.html" title="Implementation of the UIEventLogic class.">src/logic/UIActionLogic.cpp</a></span> - Action Logic example</li>
 <li><span class="tt"><a class="el" href="UIRenderLogic_8cpp.html">src/logic/UIRenderLogic.cpp</a></span> - Render Logic example</li>
-<li><span class="tt"><a class="el" href="GrimoireMachinaPositioningLogic_8cpp.html" title="Implementation of the GrimoireMachinaPositioningLogic class.">src/logic/GrimoireMachinaPositioningLogic.cpp</a></span> - Movement Logic example</li>
+<li><span class="tt"><a class="el" href="GrimoireMachinaPositioningLogic_8cpp.html" title="Implementation of the GrimoireMachinaPositioningLogic class.">src/logic/GrimoireMachinaPositioningLogic.cpp</a></span> - Positioning Logic example</li>
 <li><span class="tt"><a class="el" href="UICollisionLogic_8cpp.html">src/logic/UICollisionLogic.cpp</a></span> - Collision Logic example</li>
 </ul>
 </li>

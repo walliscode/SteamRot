@@ -268,18 +268,6 @@ struct GhostPayload {
 struct CameraPayload {
 
   /////////////////////////////////////////////////
-  /// @brief Default constructor.
-  /////////////////////////////////////////////////
-  CameraPayload() = default;
-
-  /////////////////////////////////////////////////
-  /// @brief Constructor taking a scroll delta.
-  ///
-  /// @param delta Raw scroll delta from the SFML mouse-wheel event.
-  /////////////////////////////////////////////////
-  explicit CameraPayload(float delta) : scroll_delta(delta) {}
-
-  /////////////////////////////////////////////////
   /// @brief Enum discriminating between different types of camera-related
   /// actions.
   /////////////////////////////////////////////////
@@ -288,6 +276,26 @@ struct CameraPayload {
     SCROLL,
     RESET_ZOOM
   } action{CameraAction::NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor.
+  /////////////////////////////////////////////////
+  CameraPayload() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking a CameraAction enum value.
+  ///
+  /// @param camera_action CameraAction enum value to set the action member to
+  /////////////////////////////////////////////////
+  CameraPayload(const CameraAction camera_action) : action(camera_action) {};
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor taking a scroll delta.
+  ///
+  /// @param delta Raw scroll delta from the SFML mouse-wheel event.
+  /////////////////////////////////////////////////
+  explicit CameraPayload(float delta)
+      : action(CameraAction::SCROLL), scroll_delta(delta) {}
 
   /////////////////////////////////////////////////
   /// @brief Raw scroll delta from SFML this tick.

@@ -113,7 +113,7 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:aa5f351430326420ea0c47411571d67d9" id="r_aa5f351430326420ea0c47411571d67d9"><td class="memItemLeft">sf::RenderTexture&#160;</td><td class="memItemRight"><a class="el" href="#aa5f351430326420ea0c47411571d67d9">scene_texture</a></td></tr>
 <tr class="memdesc:aa5f351430326420ea0c47411571d67d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render texture for the scene.  <br /></td></tr>
 <tr class="memitem:a7f2f152ebdc0c8177efccbb16291afe5" id="r_a7f2f152ebdc0c8177efccbb16291afe5"><td class="memItemLeft"><a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7f2f152ebdc0c8177efccbb16291afe5">mr_ghost</a> {}</td></tr>
-<tr class="memdesc:a7f2f152ebdc0c8177efccbb16291afe5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> state for the scene.  <br /></td></tr>
+<tr class="memdesc:a7f2f152ebdc0c8177efccbb16291afe5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> state for the scene.  <br /></td></tr>
 <tr class="memitem:ac93cdace6e5d27e2aa0bd0d12508ccf4" id="r_ac93cdace6e5d27e2aa0bd0d12508ccf4"><td class="memItemLeft">sf::Vector2f&#160;</td><td class="memItemRight"><a class="el" href="#ac93cdace6e5d27e2aa0bd0d12508ccf4">world_mouse_position</a> {0.f, 0.f}</td></tr>
 <tr class="memdesc:ac93cdace6e5d27e2aa0bd0d12508ccf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">World-space mouse position for the current tick.  <br /></td></tr>
 </table>
@@ -208,7 +208,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene POD state object tracking the current ghost selection.">MrGhost</a> state for the scene. </p>
+<p><a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> state for the scene. </p>
 <p>Tracks the currently selected item (type + key) from menus, dropdowns, blueprint lists, etc. A single instance lives here and is exposed to all Logic classes via <a class="el" href="structsteamrot_1_1SceneContext.html#adb7c2ddf330ed4300b6378e04bc05325" title="Reference to the MrGhost state for the scene.">SceneContext::mr_ghost</a>. </p>
 
 </div>
@@ -243,7 +243,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>World-space mouse position for the current tick. </p>
-<p>Computed once per tick in GhostPositioningLogic from the screen-space mouse_position via movement::camera::MapToWorldCoords. All world-space systems (ghost rendering, grimoire collision, piece placement) read from this value rather than performing the screen-to-world conversion themselves. </p>
+<p>Computed once per tick in GhostPositioningLogic from the screen-space mouse_position via positioning::camera::MapToWorldCoords. All world-space systems (ghost rendering, grimoire collision, piece placement) read from this value rather than performing the screen-to-world conversion themselves. </p>
 
 </div>
 </div>

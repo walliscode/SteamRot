@@ -128,11 +128,11 @@ Where the Conversion Happens</h1>
 </div><!-- fragment --><p>After <span class="tt">GhostPositioningLogic</span> runs, every subsequent Logic class in the same tick can read <span class="tt">scene_context.world_mouse_position</span> and receive the correct world-space cursor.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
 Execution Order</h2>
-<p><span class="tt">GhostPositioningLogic</span> is registered as a <b>Movement</b> logic in the crafting scene (via <span class="tt">LogicFactory</span>). The execution order within a tick is:</p>
-<div class="fragment"><div class="line">Collision → Render → Action → Movement</div>
-</div><!-- fragment --><p>This means world_mouse_position is computed during the Movement phase and is available for the <em>next</em> tick's Collision, Render, and Action phases. The value is initialised to <span class="tt">{0.f, 0.f}</span> at scene startup and updated every tick, so it is never stale beyond one tick.</p>
+<p><span class="tt">GhostPositioningLogic</span> is registered as a <b>Positioning</b> logic in the crafting scene (via <span class="tt">LogicFactory</span>). The execution order within a tick is:</p>
+<div class="fragment"><div class="line">Collision → Render → Action → Positioning</div>
+</div><!-- fragment --><p>This means world_mouse_position is computed during the Positioning phase and is available for the <em>next</em> tick's Collision, Render, and Action phases. The value is initialised to <span class="tt">{0.f, 0.f}</span> at scene startup and updated every tick, so it is never stale beyond one tick.</p>
 <blockquote class="doxtable">
-<p><b>Note</b>: If you add a new world-space Logic that runs in the same tick as <span class="tt">GhostPositioningLogic</span> and needs the current mouse position, make sure it runs <em>after</em> <span class="tt">GhostPositioningLogic</span> in the Movement phase — or reads from the pre-converted value produced in the previous tick (which is fine for a one-tick lag in most cases). </p>
+<p><b>Note</b>: If you add a new world-space Logic that runs in the same tick as <span class="tt">GhostPositioningLogic</span> and needs the current mouse position, make sure it runs <em>after</em> <span class="tt">GhostPositioningLogic</span> in the Positioning phase — or reads from the pre-converted value produced in the previous tick (which is fine for a one-tick lag in most cases). </p>
 </blockquote>
 <hr  />
 <h1 class="doxsection"><a class="anchor" id="autotoc_md27"></a>
@@ -211,8 +211,8 @@ Pitfalls to Avoid</h1>
 </div><!-- fragment --><p><span class="tt">CheckMouseOver(sf::Vector2i, UIElement&amp;)</span> takes a <span class="tt">Vector2i</span> for exactly this reason — it will not compile if you try to pass a <span class="tt">Vector2f</span>. Do not add an overload that accepts <span class="tt">sf::Vector2f</span> for UIElement checking.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md40"></a>
 ❌ Adding a new world-space Logic that reads <span class="tt">world_mouse_position</span> before <span class="tt">GhostPositioningLogic</span> has run</h2>
-<p>Because <span class="tt">GhostPositioningLogic</span> runs in the Movement phase, Logic classes that run in the same tick's Collision, Render, or Action phases will read the value from the <em>previous</em> tick. For most use cases a one-tick lag is imperceptible, but for precise placement or fine-grained collision, be aware of this ordering.</p>
-<p>If you need guaranteed same-tick conversion, place your Logic after <span class="tt">GhostPositioningLogic</span> in the Movement phase execution order (see <span class="tt"><a class="el" href="LogicFactory_8cpp.html" title="Implementation of the LogicFactory class.">LogicFactory.cpp</a></span>).</p>
+<p>Because <span class="tt">GhostPositioningLogic</span> runs in the Positioning phase, Logic classes that run in the same tick's Collision, Render, or Action phases will read the value from the <em>previous</em> tick. For most use cases a one-tick lag is imperceptible, but for precise placement or fine-grained collision, be aware of this ordering.</p>
+<p>If you need guaranteed same-tick conversion, place your Logic after <span class="tt">GhostPositioningLogic</span> in the Positioning phase execution order (see <span class="tt"><a class="el" href="LogicFactory_8cpp.html" title="Implementation of the LogicFactory class.">LogicFactory.cpp</a></span>).</p>
 <hr  />
 <h1 class="doxsection"><a class="anchor" id="autotoc_md42"></a>
 Rules for Adding New World-Space Logic</h1>

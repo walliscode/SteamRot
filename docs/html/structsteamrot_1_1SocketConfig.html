@@ -98,61 +98,61 @@ $(function(){initNavTree('structsteamrot_1_1SocketConfig.html','','structsteamro
 
 <p><code>#include &lt;<a class="el" href="Joint_8h_source.html">Joint.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a396d698709cbe71085519d4502cbb1e3" id="r_a396d698709cbe71085519d4502cbb1e3"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a396d698709cbe71085519d4502cbb1e3">SocketConfig</a> ()=default</td></tr>
+<tr class="memdesc:a396d698709cbe71085519d4502cbb1e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa2826c2c8029c000253cd06946df3fd5" id="r_aa2826c2c8029c000253cd06946df3fd5"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#aa2826c2c8029c000253cd06946df3fd5">socket_count</a> {0}</td></tr>
-<tr class="memdesc:aa2826c2c8029c000253cd06946df3fd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of sockets including the fixed anchor (if present).  <br /></td></tr>
+<tr class="memitem:afc85a9668264c26f3ff912fd3626a07d" id="r_afc85a9668264c26f3ff912fd3626a07d"><td class="memItemLeft">uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#afc85a9668264c26f3ff912fd3626a07d">socket_count</a> {0}</td></tr>
+<tr class="memdesc:afc85a9668264c26f3ff912fd3626a07d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of sockets including the fixed anchor (if present).  <br /></td></tr>
 <tr class="memitem:a7bff766fe78f27f6e720527bee244e77" id="r_a7bff766fe78f27f6e720527bee244e77"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a7bff766fe78f27f6e720527bee244e77">radius</a> {10.f}</td></tr>
 <tr class="memdesc:a7bff766fe78f27f6e720527bee244e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distance of all sockets from the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s local origin.  <br /></td></tr>
-<tr class="memitem:af1b8243c67cc9da184e4265a86ce39ab" id="r_af1b8243c67cc9da184e4265a86ce39ab"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#af1b8243c67cc9da184e4265a86ce39ab">arc_min</a> {0.f}</td></tr>
-<tr class="memdesc:af1b8243c67cc9da184e4265a86ce39ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start angle (degrees) of the socket distribution arc.  <br /></td></tr>
-<tr class="memitem:a8092f5080c0f0163372e3073aac7e797" id="r_a8092f5080c0f0163372e3073aac7e797"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a8092f5080c0f0163372e3073aac7e797">arc_max</a> {360.f}</td></tr>
-<tr class="memdesc:a8092f5080c0f0163372e3073aac7e797"><td class="mdescLeft">&#160;</td><td class="mdescRight">End angle (degrees) of the socket distribution arc.  <br /></td></tr>
 <tr class="memitem:ae3310fdc08c76331173fe08b618330f0" id="r_ae3310fdc08c76331173fe08b618330f0"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#ae3310fdc08c76331173fe08b618330f0">min_gap</a> {0.f}</td></tr>
 <tr class="memdesc:ae3310fdc08c76331173fe08b618330f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum angular separation (degrees) between adjacent rotatable sockets.  <br /></td></tr>
 <tr class="memitem:a4399c82baeaef1e11727d2b80727e4f2" id="r_a4399c82baeaef1e11727d2b80727e4f2"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a4399c82baeaef1e11727d2b80727e4f2">fixed_socket_angle</a> {0.f}</td></tr>
 <tr class="memdesc:a4399c82baeaef1e11727d2b80727e4f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Angle (degrees) of the fixed anchor socket (socket index 0).  <br /></td></tr>
 <tr class="memitem:a0dac261ce25de18e8c79ba0cb5d2ce51" id="r_a0dac261ce25de18e8c79ba0cb5d2ce51"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a0dac261ce25de18e8c79ba0cb5d2ce51">has_fixed_socket</a> {false}</td></tr>
 <tr class="memdesc:a0dac261ce25de18e8c79ba0cb5d2ce51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether socket index 0 is a fixed anchor that does not rotate.  <br /></td></tr>
+<tr class="memitem:abcc4116a9e2383508a0003cdab7284bc" id="r_abcc4116a9e2383508a0003cdab7284bc"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#abcc4116a9e2383508a0003cdab7284bc">rotation_arc_min</a> {0.f}</td></tr>
+<tr class="memdesc:abcc4116a9e2383508a0003cdab7284bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum rotation angle (degrees, 0–360) representing the mechanical lower limit of the socket ring. Used by positioning Logic to clamp the ring's rotation. World-space orientation of the joint is encoded in the instance transform, not in this value.  <br /></td></tr>
+<tr class="memitem:a8e3e02cf44b8fb5620f412c82c27cb50" id="r_a8e3e02cf44b8fb5620f412c82c27cb50"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a8e3e02cf44b8fb5620f412c82c27cb50">rotation_arc_max</a> {360.f}</td></tr>
+<tr class="memdesc:a8e3e02cf44b8fb5620f412c82c27cb50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum rotation angle (degrees, 0–360) representing the mechanical upper limit of the socket ring. Used by positioning Logic to clamp the ring's rotation. World-space orientation of the joint is encoded in the instance transform, not in this value.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Procedural description of a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s socket layout. </p>
 <p>Sockets are distributed evenly within the arc [arc_min, arc_max] at the given radius from the <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>'s local origin. When arc_max - arc_min equals 360 degrees (a full circle), sockets are placed at equal angular intervals with no duplicate at the wrap-around point.</p>
 <p>An optional fixed anchor socket (socket index 0 when has_fixed_socket is true) sits at fixed_socket_angle and is excluded from current_rotation. Remaining sockets rotate with the ring. </p>
-</div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a8092f5080c0f0163372e3073aac7e797" name="a8092f5080c0f0163372e3073aac7e797"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8092f5080c0f0163372e3073aac7e797">&#9670;&#160;</a></span>arc_max</h2>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a396d698709cbe71085519d4502cbb1e3" name="a396d698709cbe71085519d4502cbb1e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a396d698709cbe71085519d4502cbb1e3">&#9670;&#160;</a></span>SocketConfig()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">float steamrot::SocketConfig::arc_max {360.f}</td>
+          <td class="memname">steamrot::SocketConfig::SocketConfig </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>End angle (degrees) of the socket distribution arc. </p>
-<p>When arc_max - arc_min == 360, sockets are distributed over a full circle without duplicating the start/end position. </p>
+<p>Default constructor. </p>
 
 </div>
 </div>
-<a id="af1b8243c67cc9da184e4265a86ce39ab" name="af1b8243c67cc9da184e4265a86ce39ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1b8243c67cc9da184e4265a86ce39ab">&#9670;&#160;</a></span>arc_min</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">float steamrot::SocketConfig::arc_min {0.f}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Start angle (degrees) of the socket distribution arc. </p>
-
-</div>
-</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a4399c82baeaef1e11727d2b80727e4f2" name="a4399c82baeaef1e11727d2b80727e4f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4399c82baeaef1e11727d2b80727e4f2">&#9670;&#160;</a></span>fixed_socket_angle</h2>
 
@@ -218,14 +218,46 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa2826c2c8029c000253cd06946df3fd5" name="aa2826c2c8029c000253cd06946df3fd5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2826c2c8029c000253cd06946df3fd5">&#9670;&#160;</a></span>socket_count</h2>
+<a id="a8e3e02cf44b8fb5620f412c82c27cb50" name="a8e3e02cf44b8fb5620f412c82c27cb50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e3e02cf44b8fb5620f412c82c27cb50">&#9670;&#160;</a></span>rotation_arc_max</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int steamrot::SocketConfig::socket_count {0}</td>
+          <td class="memname">float steamrot::SocketConfig::rotation_arc_max {360.f}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Maximum rotation angle (degrees, 0–360) representing the mechanical upper limit of the socket ring. Used by positioning Logic to clamp the ring's rotation. World-space orientation of the joint is encoded in the instance transform, not in this value. </p>
+
+</div>
+</div>
+<a id="abcc4116a9e2383508a0003cdab7284bc" name="abcc4116a9e2383508a0003cdab7284bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcc4116a9e2383508a0003cdab7284bc">&#9670;&#160;</a></span>rotation_arc_min</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float steamrot::SocketConfig::rotation_arc_min {0.f}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Minimum rotation angle (degrees, 0–360) representing the mechanical lower limit of the socket ring. Used by positioning Logic to clamp the ring's rotation. World-space orientation of the joint is encoded in the instance transform, not in this value. </p>
+
+</div>
+</div>
+<a id="afc85a9668264c26f3ff912fd3626a07d" name="afc85a9668264c26f3ff912fd3626a07d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc85a9668264c26f3ff912fd3626a07d">&#9670;&#160;</a></span>socket_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t steamrot::SocketConfig::socket_count {0}</td>
         </tr>
       </table>
 </div><div class="memdoc">

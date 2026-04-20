@@ -113,7 +113,7 @@ Namespaces</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:ae4a7f50f767a291f2abd396ace45ecb0" id="r_ae4a7f50f767a291f2abd396ace45ecb0"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ae4a7f50f767a291f2abd396ace45ecb0">steamrot::CreateLogicConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::SubscriberFbs &gt; &gt; &gt; subscriptions=0)</td></tr>
 <tr class="memitem:a7e2282b2a8c96b70749b86d182c29858" id="r_a7e2282b2a8c96b70749b86d182c29858"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a7e2282b2a8c96b70749b86d182c29858">steamrot::CreateLogicConfigFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::SubscriberFbs &gt; &gt; *subscriptions=nullptr)</td></tr>
-<tr class="memitem:a82be4ffce2a603eb4cc96d0da34d5af8" id="r_a82be4ffce2a603eb4cc96d0da34d5af8"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigCollectionFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a82be4ffce2a603eb4cc96d0da34d5af8">steamrot::CreateLogicConfigCollectionFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; test_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; grimoire_machina_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; camera_action_logic=0)</td></tr>
+<tr class="memitem:aa39748451591b45fac61577048ded9fb" id="r_aa39748451591b45fac61577048ded9fb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; LogicConfigCollectionFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#aa39748451591b45fac61577048ded9fb">steamrot::CreateLogicConfigCollectionFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; test_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; grimoire_machina_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; camera_action_logic=0, ::flatbuffers::Offset&lt; steamrot::LogicConfigFbs &gt; ghost_positioning_logic=0)</td></tr>
 <tr class="memitem:ab3b33b54d5d2da0d3dd7413f5911f06d" id="r_ab3b33b54d5d2da0d3dd7413f5911f06d"><td class="memItemLeft">const steamrot::LogicConfigCollectionFbs *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ab3b33b54d5d2da0d3dd7413f5911f06d">steamrot::GetLogicConfigCollectionFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:af177d617b98ce0cbf19effb65c0f2381" id="r_af177d617b98ce0cbf19effb65c0f2381"><td class="memItemLeft">const steamrot::LogicConfigCollectionFbs *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#af177d617b98ce0cbf19effb65c0f2381">steamrot::GetSizePrefixedLogicConfigCollectionFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:ab2ec4faf7f9074171e8814d61036bdbd" id="r_ab2ec4faf7f9074171e8814d61036bdbd"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ab2ec4faf7f9074171e8814d61036bdbd">steamrot::VerifyLogicConfigCollectionFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
@@ -126,8 +126,23 @@ Variables</h2></td></tr>
 <tr class="memitem:a421673111b3cc034ce9dfcd947b4d85c" id="r_a421673111b3cc034ce9dfcd947b4d85c"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a421673111b3cc034ce9dfcd947b4d85c">VT_TEST_LOGIC</a> = 4</td></tr>
 <tr class="memitem:a12b267cb362f0e202fcc485bf3a38bbc" id="r_a12b267cb362f0e202fcc485bf3a38bbc"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a12b267cb362f0e202fcc485bf3a38bbc">VT_GRIMOIRE_MACHINA_ACTION_LOGIC</a> = 6</td></tr>
 <tr class="memitem:afbf342dc7e516f76a318bf3b15763cb3" id="r_afbf342dc7e516f76a318bf3b15763cb3"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#afbf342dc7e516f76a318bf3b15763cb3">VT_GHOST_ACTION_LOGIC</a> = 8</td></tr>
+<tr class="memitem:a72025c3d06b6a8466567f3ba742a80ce" id="r_a72025c3d06b6a8466567f3ba742a80ce"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a72025c3d06b6a8466567f3ba742a80ce">VT_CAMERA_ACTION_LOGIC</a> = 10</td></tr>
 </table>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a72025c3d06b6a8466567f3ba742a80ce" name="a72025c3d06b6a8466567f3ba742a80ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72025c3d06b6a8466567f3ba742a80ce">&#9670;&#160;</a></span>VT_CAMERA_ACTION_LOGIC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VT_CAMERA_ACTION_LOGIC = 10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="afbf342dc7e516f76a318bf3b15763cb3" name="afbf342dc7e516f76a318bf3b15763cb3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afbf342dc7e516f76a318bf3b15763cb3">&#9670;&#160;</a></span>VT_GHOST_ACTION_LOGIC</h2>
 

@@ -104,8 +104,8 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a89dcd02cf35c419660c3a01a77562b05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Name transferred to the <a class="el" href="structsteamrot_1_1MachinaForm.html">MachinaForm</a> on commit.  <br /></td></tr>
 <tr class="memitem:afa25849f2dd67e94b869f9bb27dc32ba" id="r_afa25849f2dd67e94b869f9bb27dc32ba"><td class="memItemLeft">uint32_t&#160;</td><td class="memItemRight"><a class="el" href="#afa25849f2dd67e94b869f9bb27dc32ba">next_id</a> {0}</td></tr>
 <tr class="memdesc:afa25849f2dd67e94b869f9bb27dc32ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monotonically increasing counter used to assign stable IDs to newly added FragmentInstances and JointInstances.  <br /></td></tr>
-<tr class="memitem:a978d40cec52a0d5b47f136c346a27103" id="r_a978d40cec52a0d5b47f136c346a27103"><td class="memItemLeft">std::map&lt; uint32_t, std::variant&lt; <a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a>, <a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a> &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a978d40cec52a0d5b47f136c346a27103">parts</a></td></tr>
-<tr class="memdesc:a978d40cec52a0d5b47f136c346a27103"><td class="mdescLeft">&#160;</td><td class="mdescRight">All placed parts (JointInstances and FragmentInstances) keyed by their stable IDs.  <br /></td></tr>
+<tr class="memitem:a2914a2d3d662f095b3444ec263483e70" id="r_a2914a2d3d662f095b3444ec263483e70"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2914a2d3d662f095b3444ec263483e70">parts</a></td></tr>
+<tr class="memdesc:a2914a2d3d662f095b3444ec263483e70"><td class="mdescLeft">&#160;</td><td class="mdescRight">All placed parts (JointInstances and FragmentInstances) keyed by their stable IDs.  <br /></td></tr>
 <tr class="memitem:acedd1d92f9c70e2edf2c34d194646171" id="r_acedd1d92f9c70e2edf2c34d194646171"><td class="memItemLeft">std::vector&lt; <a class="el" href="structsteamrot_1_1Connection.html">Connection</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#acedd1d92f9c70e2edf2c34d194646171">connections</a></td></tr>
 <tr class="memdesc:acedd1d92f9c70e2edf2c34d194646171"><td class="mdescLeft">&#160;</td><td class="mdescRight">All connections between sockets on the scaffold.  <br /></td></tr>
 <tr class="memitem:a4c7bbca8e3213aea837f3523fef9c8d1" id="r_a4c7bbca8e3213aea837f3523fef9c8d1"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a4c7bbca8e3213aea837f3523fef9c8d1">are_sockets_visible</a> {false}</td></tr>
@@ -113,6 +113,7 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains all data necessary to create a <a class="el" href="structsteamrot_1_1MachinaForm.html">MachinaForm</a>. </p>
+<p>3struct <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> </p>
 <p>This is designed to be an "unbaked" editor workspace. When committed to a <a class="el" href="structsteamrot_1_1MachinaForm.html">MachinaForm</a>, the scaffold data will be processed into efficient runtime formats by the <a class="el" href="structsteamrot_1_1MachinaForm.html">MachinaForm</a>'s own systems. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a4c7bbca8e3213aea837f3523fef9c8d1" name="a4c7bbca8e3213aea837f3523fef9c8d1"></a>
@@ -179,14 +180,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a978d40cec52a0d5b47f136c346a27103" name="a978d40cec52a0d5b47f136c346a27103"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a978d40cec52a0d5b47f136c346a27103">&#9670;&#160;</a></span>parts</h2>
+<a id="a2914a2d3d662f095b3444ec263483e70" name="a2914a2d3d662f095b3444ec263483e70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2914a2d3d662f095b3444ec263483e70">&#9670;&#160;</a></span>parts</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt;uint32_t, std::variant&lt;<a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a>, <a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a>&gt; &gt; steamrot::MachinaFormScaffold::parts</td>
+          <td class="memname"><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> steamrot::MachinaFormScaffold::parts</td>
         </tr>
       </table>
 </div><div class="memdoc">

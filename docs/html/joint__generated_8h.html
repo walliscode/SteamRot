@@ -112,9 +112,9 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a714ff8ecd1dc051a8bddd3a61d6c0b20" id="r_a714ff8ecd1dc051a8bddd3a61d6c0b20"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SocketConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a714ff8ecd1dc051a8bddd3a61d6c0b20">steamrot::CreateSocketConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, int32_t socket_count=0, float radius=10.0f, float arc_min=0.0f, float arc_max=360.0f, float min_gap=0.0f, float fixed_socket_angle=0.0f, bool has_fixed_socket=false)</td></tr>
-<tr class="memitem:a61e6fa478019e418cf183f2cf084bb9a" id="r_a61e6fa478019e418cf183f2cf084bb9a"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a61e6fa478019e418cf183f2cf084bb9a">steamrot::CreateJointFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; movement_views=0)</td></tr>
-<tr class="memitem:a50548f19963944931697a0bde3e8938e" id="r_a50548f19963944931697a0bde3e8938e"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a50548f19963944931697a0bde3e8938e">steamrot::CreateJointFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *movement_views=nullptr)</td></tr>
+<tr class="memitem:af03e393c8881896c9ce4312565431ddb" id="r_af03e393c8881896c9ce4312565431ddb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SocketConfigFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#af03e393c8881896c9ce4312565431ddb">steamrot::CreateSocketConfigFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, int32_t socket_count=0, float radius=10.0f, float min_gap=0.0f, float fixed_socket_angle=0.0f, bool has_fixed_socket=false, float rotation_arc_min=0.0f, float rotation_arc_max=360.0f)</td></tr>
+<tr class="memitem:af2a0c8bcadd42456b465f1b7868ce9ba" id="r_af2a0c8bcadd42456b465f1b7868ce9ba"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#af2a0c8bcadd42456b465f1b7868ce9ba">steamrot::CreateJointFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, ::flatbuffers::Offset&lt;::flatbuffers::String &gt; name=0, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, ::flatbuffers::Offset&lt;::flatbuffers::Vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; &gt; positioning_views=0)</td></tr>
+<tr class="memitem:ae4f0e1f622610bbe029d14ff4c4c9e93" id="r_ae4f0e1f622610bbe029d14ff4c4c9e93"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; JointFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ae4f0e1f622610bbe029d14ff4c4c9e93">steamrot::CreateJointFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, const char *name=nullptr, ::flatbuffers::Offset&lt; steamrot::Vector2fDataFbs &gt; origin=0, ::flatbuffers::Offset&lt; steamrot::SocketConfigFbs &gt; socket_config=0, const std::vector&lt;::flatbuffers::Offset&lt; steamrot::ViewFbs &gt; &gt; *positioning_views=nullptr)</td></tr>
 <tr class="memitem:aba3be28f50cea4b825428d3ba623ae19" id="r_aba3be28f50cea4b825428d3ba623ae19"><td class="memItemLeft">const steamrot::JointFbs *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#aba3be28f50cea4b825428d3ba623ae19">steamrot::GetJointFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:a49e6ee1deaf567c3966e534abd737a42" id="r_a49e6ee1deaf567c3966e534abd737a42"><td class="memItemLeft">const steamrot::JointFbs *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a49e6ee1deaf567c3966e534abd737a42">steamrot::GetSizePrefixedJointFbs</a> (const void *buf)</td></tr>
 <tr class="memitem:a8786ac19244f768fc1d43d30ce2fc57d" id="r_a8786ac19244f768fc1d43d30ce2fc57d"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a8786ac19244f768fc1d43d30ce2fc57d">steamrot::VerifyJointFbsBuffer</a> (::flatbuffers::Verifier &amp;verifier)</td></tr>
@@ -126,43 +126,15 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:aae451a62901bd778505cd2506041cd21" id="r_aae451a62901bd778505cd2506041cd21"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#aae451a62901bd778505cd2506041cd21">VT_SOCKET_COUNT</a> = 4</td></tr>
 <tr class="memitem:a13dc6497463c49ec810873d262c71fe4" id="r_a13dc6497463c49ec810873d262c71fe4"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a13dc6497463c49ec810873d262c71fe4">VT_RADIUS</a> = 6</td></tr>
-<tr class="memitem:abbad00a9df10324de2c51b4eeaf520dc" id="r_abbad00a9df10324de2c51b4eeaf520dc"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#abbad00a9df10324de2c51b4eeaf520dc">VT_ARC_MIN</a> = 8</td></tr>
-<tr class="memitem:a2a3a8db35655463a90fcf867c61c0239" id="r_a2a3a8db35655463a90fcf867c61c0239"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a2a3a8db35655463a90fcf867c61c0239">VT_ARC_MAX</a> = 10</td></tr>
-<tr class="memitem:a62d35137ff4056d570889ce7ae0b5e95" id="r_a62d35137ff4056d570889ce7ae0b5e95"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a62d35137ff4056d570889ce7ae0b5e95">VT_MIN_GAP</a> = 12</td></tr>
-<tr class="memitem:a0103860c0263a93463a79b235903d084" id="r_a0103860c0263a93463a79b235903d084"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0103860c0263a93463a79b235903d084">VT_FIXED_SOCKET_ANGLE</a> = 14</td></tr>
+<tr class="memitem:a62d35137ff4056d570889ce7ae0b5e95" id="r_a62d35137ff4056d570889ce7ae0b5e95"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a62d35137ff4056d570889ce7ae0b5e95">VT_MIN_GAP</a> = 8</td></tr>
+<tr class="memitem:a0103860c0263a93463a79b235903d084" id="r_a0103860c0263a93463a79b235903d084"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0103860c0263a93463a79b235903d084">VT_FIXED_SOCKET_ANGLE</a> = 10</td></tr>
+<tr class="memitem:a0262dc1c4532e9a3fda18ae42c272491" id="r_a0262dc1c4532e9a3fda18ae42c272491"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0262dc1c4532e9a3fda18ae42c272491">VT_HAS_FIXED_SOCKET</a> = 12</td></tr>
+<tr class="memitem:a4c037826b94b01cc3c4cdf43844ea242" id="r_a4c037826b94b01cc3c4cdf43844ea242"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a4c037826b94b01cc3c4cdf43844ea242">VT_ROTATION_ARC_MIN</a> = 14</td></tr>
 <tr class="memitem:ad17bb8bd997e6ac35eddbf626077375f" id="r_ad17bb8bd997e6ac35eddbf626077375f"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad17bb8bd997e6ac35eddbf626077375f">VT_NAME</a> = 4</td></tr>
 <tr class="memitem:a32b24a8657eb95afdb01b82513b21c59" id="r_a32b24a8657eb95afdb01b82513b21c59"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a32b24a8657eb95afdb01b82513b21c59">VT_ORIGIN</a> = 6</td></tr>
 <tr class="memitem:ab87b3f9cc1f3c3fad04acbc0c0bd65dd" id="r_ab87b3f9cc1f3c3fad04acbc0c0bd65dd"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ab87b3f9cc1f3c3fad04acbc0c0bd65dd">VT_SOCKET_CONFIG</a> = 8</td></tr>
 </table>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a2a3a8db35655463a90fcf867c61c0239" name="a2a3a8db35655463a90fcf867c61c0239"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a3a8db35655463a90fcf867c61c0239">&#9670;&#160;</a></span>VT_ARC_MAX</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VT_ARC_MAX = 10</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abbad00a9df10324de2c51b4eeaf520dc" name="abbad00a9df10324de2c51b4eeaf520dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbad00a9df10324de2c51b4eeaf520dc">&#9670;&#160;</a></span>VT_ARC_MIN</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VT_ARC_MIN = 8</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a0103860c0263a93463a79b235903d084" name="a0103860c0263a93463a79b235903d084"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0103860c0263a93463a79b235903d084">&#9670;&#160;</a></span>VT_FIXED_SOCKET_ANGLE</h2>
 
@@ -170,7 +142,21 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VT_FIXED_SOCKET_ANGLE = 14</td>
+          <td class="memname">VT_FIXED_SOCKET_ANGLE = 10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0262dc1c4532e9a3fda18ae42c272491" name="a0262dc1c4532e9a3fda18ae42c272491"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0262dc1c4532e9a3fda18ae42c272491">&#9670;&#160;</a></span>VT_HAS_FIXED_SOCKET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VT_HAS_FIXED_SOCKET = 12</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -184,7 +170,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VT_MIN_GAP = 12</td>
+          <td class="memname">VT_MIN_GAP = 8</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -227,6 +213,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">VT_RADIUS = 6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c037826b94b01cc3c4cdf43844ea242" name="a4c037826b94b01cc3c4cdf43844ea242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c037826b94b01cc3c4cdf43844ea242">&#9670;&#160;</a></span>VT_ROTATION_ARC_MIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VT_ROTATION_ARC_MIN = 14</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -5,9 +5,10 @@ var searchData=
   ['data_5fpopulation_5ffunction_2',['data_population_function',['../structsteamrot_1_1DropDownListElement.html#ab6ce5b32db8353fddfe760bc1470bebd',1,'steamrot::DropDownListElement']]],
   ['description_3',['description',['../structsteamrot_1_1SimulationData.html#a78ad2fc9feddb13af9522d7f42fc1584',1,'steamrot::SimulationData']]],
   ['display_4',['display',['../structsteamrot_1_1EngineConfig.html#a2ae66d73c0a51ad1fae200e14cfab70d',1,'steamrot::EngineConfig']]],
-  ['drop_5fdown_5fbutton_5fstyle_5',['drop_down_button_style',['../structsteamrot_1_1UIStyle.html#adf23b0aeeaf7357b06d1068af2b4276a',1,'steamrot::UIStyle']]],
-  ['drop_5fdown_5fcontainer_5fstyle_6',['drop_down_container_style',['../structsteamrot_1_1UIStyle.html#a4c777c3a0f8c722eba92fa3b0e8f74c8',1,'steamrot::UIStyle']]],
-  ['drop_5fdown_5fitem_5fstyle_7',['drop_down_item_style',['../structsteamrot_1_1UIStyle.html#a5c38939300200d268b8c05714d4db9cb',1,'steamrot::UIStyle']]],
-  ['drop_5fdown_5flist_5fstyle_8',['drop_down_list_style',['../structsteamrot_1_1UIStyle.html#ad7216c0cc5831fd631f246d4f560e016',1,'steamrot::UIStyle']]],
-  ['drop_5fsymbol_5fratio_9',['drop_symbol_ratio',['../structDropDownContainerStyle.html#a1a8e0023eba0eff8a5904822ebbcde3f',1,'DropDownContainerStyle']]]
+  ['distance_5fto_5fnearest_5fsocket_5',['distance_to_nearest_socket',['../structsteamrot_1_1SocketData.html#a7ae06fa178bb3f6dfb7eb3ca6d9bf2c6',1,'steamrot::SocketData']]],
+  ['drop_5fdown_5fbutton_5fstyle_6',['drop_down_button_style',['../structsteamrot_1_1UIStyle.html#adf23b0aeeaf7357b06d1068af2b4276a',1,'steamrot::UIStyle']]],
+  ['drop_5fdown_5fcontainer_5fstyle_7',['drop_down_container_style',['../structsteamrot_1_1UIStyle.html#a4c777c3a0f8c722eba92fa3b0e8f74c8',1,'steamrot::UIStyle']]],
+  ['drop_5fdown_5fitem_5fstyle_8',['drop_down_item_style',['../structsteamrot_1_1UIStyle.html#a5c38939300200d268b8c05714d4db9cb',1,'steamrot::UIStyle']]],
+  ['drop_5fdown_5flist_5fstyle_9',['drop_down_list_style',['../structsteamrot_1_1UIStyle.html#ad7216c0cc5831fd631f246d4f560e016',1,'steamrot::UIStyle']]],
+  ['drop_5fsymbol_5fratio_10',['drop_symbol_ratio',['../structDropDownContainerStyle.html#a1a8e0023eba0eff8a5904822ebbcde3f',1,'DropDownContainerStyle']]]
 ];
