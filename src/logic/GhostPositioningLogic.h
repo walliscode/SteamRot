@@ -17,11 +17,15 @@ namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 /// @class GhostPositioningLogic
-/// @brief Updates the position of MrGhost to track the current mouse position.
+/// @brief Updates the position and rotation of MrGhost to track the current
+/// mouse position and respond to rotation input.
 ///
-/// Each tick this Logic writes the current mouse cursor position
-/// (m_scene_context.mouse_position) into MrGhost::m_position so that other
-/// Logic classes can use it to render or place the ghost item at the cursor.
+/// Each tick this Logic processes active subscribers: if a ROTATE_GHOST input
+/// event has been captured, it increments MrGhost::m_rotation_degrees by 90
+/// degrees. It then writes the current mouse cursor position into
+/// MrGhost::m_position and rebuilds the instance transform (including both
+/// translation and the accumulated rotation) so that other Logic classes can
+/// render the ghost item at the correct world position and orientation.
 /////////////////////////////////////////////////
 class GhostPositioningLogic : public Logic {
 

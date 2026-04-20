@@ -49,6 +49,16 @@
     ]
   },
 
+  "ghost_positioning_logic": {
+    "subscriptions": [
+      {
+        "event_type": "USER_INPUT",
+        "filter_payload_type": "InputPayloadFbs",
+        "filter_payload": { "action": "ROTATE_GHOST" }
+      }
+    ]
+  },
+
   "camera_action_logic": {
     "subscriptions": [
       {

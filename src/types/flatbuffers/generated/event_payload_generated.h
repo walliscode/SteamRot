@@ -44,29 +44,32 @@ struct CameraPayloadFbsBuilder;
 enum InputActionFbs : int8_t {
   InputActionFbs_SELECT = 0,
   InputActionFbs_TOGGLE_SOCKET_VISIBILITY = 1,
+  InputActionFbs_ROTATE_GHOST = 2,
   InputActionFbs_MIN = InputActionFbs_SELECT,
-  InputActionFbs_MAX = InputActionFbs_TOGGLE_SOCKET_VISIBILITY
+  InputActionFbs_MAX = InputActionFbs_ROTATE_GHOST
 };
 
-inline const InputActionFbs (&EnumValuesInputActionFbs())[2] {
+inline const InputActionFbs (&EnumValuesInputActionFbs())[3] {
   static const InputActionFbs values[] = {
     InputActionFbs_SELECT,
-    InputActionFbs_TOGGLE_SOCKET_VISIBILITY
+    InputActionFbs_TOGGLE_SOCKET_VISIBILITY,
+    InputActionFbs_ROTATE_GHOST
   };
   return values;
 }
 
 inline const char * const *EnumNamesInputActionFbs() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "SELECT",
     "TOGGLE_SOCKET_VISIBILITY",
+    "ROTATE_GHOST",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameInputActionFbs(InputActionFbs e) {
-  if (::flatbuffers::IsOutRange(e, InputActionFbs_SELECT, InputActionFbs_TOGGLE_SOCKET_VISIBILITY)) return "";
+  if (::flatbuffers::IsOutRange(e, InputActionFbs_SELECT, InputActionFbs_ROTATE_GHOST)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesInputActionFbs()[index];
 }

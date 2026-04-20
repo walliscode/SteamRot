@@ -29,6 +29,16 @@ TEST_CASE("ConfigureInputAction maps InputActionFbs_SELECT to SELECT",
   REQUIRE(action == steamrot::InputPayload::InputAction::SELECT);
 }
 
+TEST_CASE("ConfigureInputAction maps InputActionFbs_ROTATE_GHOST to ROTATE_GHOST",
+          "[unit][configure_input_action]") {
+  steamrot::InputPayload::InputAction action{
+      steamrot::InputPayload::InputAction::NONE};
+  auto result =
+      ConfigureInputAction(action, steamrot::InputActionFbs_ROTATE_GHOST);
+  REQUIRE(result.has_value());
+  REQUIRE(action == steamrot::InputPayload::InputAction::ROTATE_GHOST);
+}
+
 TEST_CASE("ConfigureInputAction fails for unknown enum value",
           "[unit][configure_input_action]") {
   steamrot::InputPayload::InputAction action{

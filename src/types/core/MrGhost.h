@@ -84,6 +84,15 @@ struct MrGhost {
   /// to track the mouse cursor position.
   /////////////////////////////////////////////////
   sf::Vector2f m_position{};
+
+  /////////////////////////////////////////////////
+  /// @brief The accumulated global rotation of the ghost, in degrees.
+  ///
+  /// Incremented by 90 degrees each time the user presses the R key.
+  /// Applied by GhostPositioningLogic each tick when building the instance
+  /// transform.
+  /////////////////////////////////////////////////
+  float m_rotation_degrees{0.f};
 };
 
 } // namespace steamrot
