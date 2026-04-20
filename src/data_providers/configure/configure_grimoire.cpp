@@ -51,10 +51,10 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
                                     "Fragment sockets are missing"});
   }
 
-  // Configure movement_views
-  if (!fragment_fbs->movement_views()->empty()) {
-    const auto *views_fbs = fragment_fbs->movement_views();
-    fragment.movement_views.clear();
+  // Configure positioning_views
+  if (!fragment_fbs->positioning_views()->empty()) {
+    const auto *views_fbs = fragment_fbs->positioning_views();
+    fragment.positioning_views.clear();
 
     for (const auto *view_fbs : *views_fbs) {
       if (!view_fbs) {
@@ -76,7 +76,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
       default:
         return std::unexpected(
             FailInfo{FailMode::FlatbuffersDataNotFound,
-                     "Unknown view direction in Fragment movement_views"});
+                     "Unknown view direction in Fragment positioning_views"});
       }
 
       // Process triangles for this view
@@ -136,12 +136,12 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
         }
       }
 
-      fragment.movement_views.insert_or_assign(direction,
+      fragment.positioning_views.insert_or_assign(direction,
                                                std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Fragment movement_views are missing"});
+                                    "Fragment positioning_views are missing"});
   }
 
   return std::monostate{};
@@ -197,10 +197,10 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
   joint.socket_config.rotation_arc_min = sc->rotation_arc_min();
   joint.socket_config.rotation_arc_max = sc->rotation_arc_max();
 
-  // Configure movement_views
-  if (!joint_fbs->movement_views()->empty()) {
-    const auto *views_fbs = joint_fbs->movement_views();
-    joint.movement_views.clear();
+  // Configure positioning_views
+  if (!joint_fbs->positioning_views()->empty()) {
+    const auto *views_fbs = joint_fbs->positioning_views();
+    joint.positioning_views.clear();
 
     for (const auto *view_fbs : *views_fbs) {
       if (!view_fbs) {
@@ -222,7 +222,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
       default:
         return std::unexpected(
             FailInfo{FailMode::FlatbuffersDataNotFound,
-                     "Unknown view direction in Joint movement_views"});
+                     "Unknown view direction in Joint positioning_views"});
       }
 
       // Process triangles for this view
@@ -282,11 +282,11 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
         }
       }
 
-      joint.movement_views.insert_or_assign(direction, std::move(vertex_array));
+      joint.positioning_views.insert_or_assign(direction, std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
-                                    "Joint movement_views are missing"});
+                                    "Joint positioning_views are missing"});
   }
 
   return std::monostate{};

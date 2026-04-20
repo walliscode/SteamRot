@@ -87,7 +87,7 @@ struct SocketConfig {
 /// @struct Joint
 /// @brief Contains the data for a Joint.
 ///
-/// Inherits common part data (name, movement_views) from Part.
+/// Inherits common part data (name, positioning_views) from Part.
 /// Sockets are described procedurally via a SocketConfig rather than as
 /// explicit positions, allowing them to rotate around the Joint's centre.
 /////////////////////////////////////////////////

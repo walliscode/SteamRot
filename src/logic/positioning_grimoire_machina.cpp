@@ -83,13 +83,13 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
           std::get_if<FragmentInstance>(&it->second)) {
 
     // if views is empty, return early
-    if (fragment_instance->fragment->movement_views.empty())
+    if (fragment_instance->fragment->positioning_views.empty())
       return;
 
     // working off the FRONT view only, get the center of the bounding box of
     // the FRONT view's vertex array
     const sf::VertexArray &va =
-        fragment_instance->fragment->movement_views[ViewDirection::Front];
+        fragment_instance->fragment->positioning_views[ViewDirection::Front];
     // get centre using built in sfml functions
     sf::Vector2f center = va.getBounds().getCenter();
 
@@ -103,7 +103,7 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
 
   if (JointInstance *joint_instance = std::get_if<JointInstance>(&it->second)) {
     // if views is empty, return early
-    if (joint_instance->joint->movement_views.empty())
+    if (joint_instance->joint->positioning_views.empty())
       return;
 
     // reset the transform of the joint instance to identity

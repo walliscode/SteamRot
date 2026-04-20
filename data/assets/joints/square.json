@@ -10,7 +10,7 @@
     "has_fixed_socket": false,
     "fixed_socket_angle": 0.0
   },
-  "movement_views": [
+  "positioning_views": [
     {
       "direction": "FRONT",
       "triangles": [

@@ -34,7 +34,7 @@ struct Part {
   /////////////////////////////////////////////////
   /// @brief Vertex array per view direction for this part's static shape.
   /////////////////////////////////////////////////
-  Views movement_views;
+  Views positioning_views;
 };
 
 } // namespace steamrot

@@ -77,7 +77,7 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     Fragment f;
     f.name = "fragment_no_socket";
-    f.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+    f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                       MakeGreenOriginTriangle());
     lib.fragments.emplace("fragment_no_socket", std::move(f));
   }
@@ -86,7 +86,7 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     Fragment f;
     f.name = "fragment_one_socket";
-    f.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+    f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                       MakeGreenOriginTriangle());
     f.sockets = {{5.f, 5.f}};
     lib.fragments.emplace("fragment_one_socket", std::move(f));
@@ -96,7 +96,7 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     Fragment f;
     f.name = "fragment_two_sockets";
-    f.movement_views.insert_or_assign(
+    f.positioning_views.insert_or_assign(
         steamrot::ViewDirection::Front,
         MakeFilledSquare(0.f, 0.f, sf::Color::White));
     f.sockets = {{0.f, 10.f}, {20.f, 10.f}};
@@ -107,7 +107,7 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     Fragment f;
     f.name = "fragment_three_sockets";
-    f.movement_views.insert_or_assign(
+    f.positioning_views.insert_or_assign(
         steamrot::ViewDirection::Front,
         MakeFilledSquare(0.f, 0.f, sf::Color::White));
     f.sockets = {{0.f, 10.f}, {10.f, 10.f}, {20.f, 10.f}};
@@ -120,7 +120,7 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     Joint j;
     j.name = "joint_no_socket";
-    j.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+    j.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                       MakeBlueOriginTriangle());
     lib.joints.emplace("joint_no_socket", std::move(j));
   }

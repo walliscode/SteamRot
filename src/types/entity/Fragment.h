@@ -21,7 +21,7 @@ namespace steamrot {
 /// @struct Fragment
 /// @brief Contains the data for a Fragment.
 ///
-/// Inherits common part data (name, movement_views) from Part.
+/// Inherits common part data (name, positioning_views) from Part.
 /// Stores explicit local socket positions in the part's own coordinate space.
 /////////////////////////////////////////////////
 struct Fragment : Part {

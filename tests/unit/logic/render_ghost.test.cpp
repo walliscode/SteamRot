@@ -43,7 +43,7 @@ sf::VertexArray MakeFilledSquare(float x, float y, sf::Color color) {
 steamrot::Fragment MakeEmptyFragment(const std::string &name) {
   steamrot::Fragment fragment;
   fragment.name = name;
-  // movement_views is empty by default
+  // positioning_views is empty by default
   return fragment;
 }
 
@@ -54,7 +54,7 @@ steamrot::Fragment MakeEmptyFragment(const std::string &name) {
 steamrot::Fragment MakePopulatedFragment(const std::string &name) {
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(
+  fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   return fragment;
@@ -76,7 +76,7 @@ steamrot::Joint MakeEmptyJoint(const std::string &name) {
 steamrot::Joint MakePopulatedJoint(const std::string &name) {
   steamrot::Joint joint;
   joint.name = name;
-  joint.movement_views.insert_or_assign(
+  joint.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   return joint;

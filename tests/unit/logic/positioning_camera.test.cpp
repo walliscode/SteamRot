@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Unit tests for the movement_camera free functions.
+/// @brief Unit tests for the positioning_camera free functions.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "movement_camera.h"
+#include "positioning_camera.h"
 #include "CameraState.h"
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
@@ -15,52 +15,52 @@
 // ApplyZoom
 /////////////////////////////////////////////////
 
-TEST_CASE("movement_camera::ApplyZoom: positive delta decreases zoom level",
-          "[unit][movement_camera]") {
+TEST_CASE("positioning_camera::ApplyZoom: positive delta decreases zoom level",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   const float initial_zoom = camera_state.m_zoom_level;
 
-  steamrot::logic::movement::camera::ApplyZoom(camera_state, 1.0f);
+  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 1.0f);
 
   REQUIRE(camera_state.m_zoom_level < initial_zoom);
 }
 
-TEST_CASE("movement_camera::ApplyZoom: negative delta increases zoom level",
-          "[unit][movement_camera]") {
+TEST_CASE("positioning_camera::ApplyZoom: negative delta increases zoom level",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   const float initial_zoom = camera_state.m_zoom_level;
 
-  steamrot::logic::movement::camera::ApplyZoom(camera_state, -1.0f);
+  steamrot::logic::positioning::camera::ApplyZoom(camera_state, -1.0f);
 
   REQUIRE(camera_state.m_zoom_level > initial_zoom);
 }
 
-TEST_CASE("movement_camera::ApplyZoom: zero delta leaves zoom level unchanged",
-          "[unit][movement_camera]") {
+TEST_CASE("positioning_camera::ApplyZoom: zero delta leaves zoom level unchanged",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   const float initial_zoom = camera_state.m_zoom_level;
 
-  steamrot::logic::movement::camera::ApplyZoom(camera_state, 0.0f);
+  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 0.0f);
 
   REQUIRE(camera_state.m_zoom_level == initial_zoom);
 }
 
-TEST_CASE("movement_camera::ApplyZoom: clamps zoom to kMinZoom",
-          "[unit][movement_camera]") {
+TEST_CASE("positioning_camera::ApplyZoom: clamps zoom to kMinZoom",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
 
   // Large positive delta should zoom in past the minimum
-  steamrot::logic::movement::camera::ApplyZoom(camera_state, 1000.0f);
+  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 1000.0f);
 
   REQUIRE(camera_state.m_zoom_level == steamrot::CameraState::kMinZoom);
 }
 
-TEST_CASE("movement_camera::ApplyZoom: clamps zoom to kMaxZoom",
-          "[unit][movement_camera]") {
+TEST_CASE("positioning_camera::ApplyZoom: clamps zoom to kMaxZoom",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
 
   // Large negative delta should zoom out past the maximum
-  steamrot::logic::movement::camera::ApplyZoom(camera_state, -1000.0f);
+  steamrot::logic::positioning::camera::ApplyZoom(camera_state, -1000.0f);
 
   REQUIRE(camera_state.m_zoom_level == steamrot::CameraState::kMaxZoom);
 }
@@ -70,38 +70,38 @@ TEST_CASE("movement_camera::ApplyZoom: clamps zoom to kMaxZoom",
 /////////////////////////////////////////////////
 
 TEST_CASE(
-    "movement_camera::GetWorldView: default camera centres view on origin",
-    "[unit][movement_camera]") {
+    "positioning_camera::GetWorldView: default camera centres view on origin",
+    "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   sf::RenderTexture texture;
   texture.resize({800u, 600u});
 
   const sf::View view =
-      steamrot::logic::movement::camera::GetWorldView(camera_state, texture);
+      steamrot::logic::positioning::camera::GetWorldView(camera_state, texture);
 
   REQUIRE(view.getCenter().x == 0.f);
   REQUIRE(view.getCenter().y == 0.f);
 }
 
 TEST_CASE(
-    "movement_camera::GetWorldView: non-default position shifts view centre",
-    "[unit][movement_camera]") {
+    "positioning_camera::GetWorldView: non-default position shifts view centre",
+    "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   camera_state.m_position = {100.f, 200.f};
   sf::RenderTexture texture;
   texture.resize({800u, 600u});
 
   const sf::View view =
-      steamrot::logic::movement::camera::GetWorldView(camera_state, texture);
+      steamrot::logic::positioning::camera::GetWorldView(camera_state, texture);
 
   REQUIRE(view.getCenter().x == 100.f);
   REQUIRE(view.getCenter().y == 200.f);
 }
 
 TEST_CASE(
-    "movement_camera::MapToWorldCoords: default camera maps screen centre to "
+    "positioning_camera::MapToWorldCoords: default camera maps screen centre to "
     "world origin",
-    "[unit][movement_camera]") {
+    "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   sf::RenderTexture texture;
   constexpr unsigned int w = 800u;
@@ -109,7 +109,7 @@ TEST_CASE(
   texture.resize({w, h});
 
   const sf::Vector2f world_pos =
-      steamrot::logic::movement::camera::MapToWorldCoords(
+      steamrot::logic::positioning::camera::MapToWorldCoords(
           camera_state, {static_cast<int>(w / 2), static_cast<int>(h / 2)},
           texture);
 

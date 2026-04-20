@@ -29,7 +29,7 @@ Logic classes are the heart of the game's behavior system. They:
 
 - Inherit from the abstract `Logic` base class
 - Process entities based on their component composition (archetypes)
-- Are organized by `LogicGrouping` (Collision, Render, Action, Movement)
+- Are organized by `LogicGrouping` (Collision, Render, Action, Positioning)
 - Execute in a specific order within their grouping
 - Are created and configured by the `LogicFactory` for each scene
 
@@ -61,7 +61,7 @@ Logic classes are organized into four groupings that execute in this order:
 
 1. **Collision** - Spatial interactions (UI collision, physics collision)
 2. **Action** - Input processing and event triggering
-3. **Movement** - Position and velocity updates
+3. **Positioning** - Position and velocity updates
 4. **Render** - Drawing to the render texture
 
 ### Execution Order
@@ -77,7 +77,7 @@ Within each scene:
 
 - **`Logic`** - Abstract base class all Logic inherits from
 - **`LogicType`** - Enum identifying each Logic class type
-- **`LogicGrouping`** - Category enum (Collision, Render, Action, Movement)
+- **`LogicGrouping`** - Category enum (Collision, Render, Action, Positioning)
 - **`LogicFactory`** - Factory that creates and configures Logic instances per
   scene
 - **`SceneContext`** - Struct containing all dependencies Logic needs (entities,
@@ -829,9 +829,9 @@ void YourLogic::ProcessLogic() {
 
 - ✅ Check order in `Configure{Scene}Logics()` array - that's the execution
   order
-- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action, Movement,
+- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action, Positioning,
   Render)
-- ✅ Remember groupings execute in order: Collision → Action → Movement → Render
+- ✅ Remember groupings execute in order: Collision → Action → Positioning → Render
 
 ### Test Failures: "dynamic_cast returned null"
 
@@ -914,7 +914,7 @@ When adding a new Logic class, complete these steps:
 - **Example Logic Classes**:
   - `src/logic/UIActionLogic.cpp` - Action Logic example
   - `src/logic/UIRenderLogic.cpp` - Render Logic example
-  - `src/logic/GrimoireMachinaPositioningLogic.cpp` - Movement Logic example
+  - `src/logic/GrimoireMachinaPositioningLogic.cpp` - Positioning Logic example
   - `src/logic/UICollisionLogic.cpp` - Collision Logic example
 - **Architecture Documentation**: `documentation/architecture/LOGIC_SYSTEM.md`
 - **Testing Guide**: `documentation/testing/TESTING_OVERVIEW.md`

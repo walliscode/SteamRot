@@ -68,10 +68,10 @@ public:
   virtual ~Scene() = default;
 
   /////////////////////////////////////////////////
-  /// \brief function container for all movement related logic
+  /// \brief function container for all positioning related logic
   ///
   /////////////////////////////////////////////////
-  virtual void sMovement() = 0;
+  virtual void sPositioning() = 0;
 
   /////////////////////////////////////////////////
   /// @brief Function container for all collision related logic.

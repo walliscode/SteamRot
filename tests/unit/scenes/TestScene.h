@@ -23,9 +23,9 @@ private:
   void sRender() override;
 
   /////////////////////////////////////////////////
-  /// @brief Call movement Logic for TitleScene
+  /// @brief Call positioning Logic for TitleScene
   /////////////////////////////////////////////////
-  void sMovement() override;
+  void sPositioning() override;
 
   /////////////////////////////////////////////////
   /// @brief Call collision Logic for TitleScene

@@ -104,7 +104,7 @@ The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
   - `events/` - Event handling system
   - `logger/` - Logging utilities
   - `scenes/` - Scene management
-  - `systems/` - Game systems (movement, rendering, etc.)
+  - `systems/` - Game systems (positioning, rendering, etc.)
   - `logic/` - Game logic classes
   - `user_interface/` - UI element definitions
   - `flatbuffers_headers/` - Generated FlatBuffers headers
@@ -396,7 +396,7 @@ add_executable(test_components
 
 ### Adding Logic Classes
 
-Logic classes implement game system behaviors (collision, rendering, actions, movement).
+Logic classes implement game system behaviors (collision, rendering, actions, positioning).
 
 **Complete Examples**: See `documentation/examples/` for full example files (ExampleLogic.h, ExampleLogic.cpp, ExampleLogic.test.cpp) demonstrating all patterns.
 
@@ -684,7 +684,7 @@ m_logic_context.event_handler.AddEvent(event_packet);
 - **Collision**: Spatial interactions (UI collision, physics)
 - **Render**: Drawing to render texture (UI, entities)
 - **Action**: Input processing and event triggering
-- **Movement**: Position updates (player, AI)
+- **Positioning**: Position updates (player, AI)
 
 #### Testing Best Practices
 

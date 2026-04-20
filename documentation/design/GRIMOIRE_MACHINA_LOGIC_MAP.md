@@ -113,7 +113,7 @@ GrimoireMachinaActionLogic::ProcessLogic()
 
 **Files**: `src/logic/GrimoireMachinaPositioningLogic.h/cpp`
 
-**Position in CRAFTING scene**: 2nd in the Movement group (after
+**Position in CRAFTING scene**: 2nd in the Positioning group (after
 `UIPositioningLogic`, before `GhostPositioningLogic`).
 
 **What it does**: **Intentionally empty.** The crafting canvas uses an infinite
@@ -233,9 +233,9 @@ GrimoireMachina-specific surface area is:
 | `DrawJointInstance` | Same as `DrawFragmentInstance` for joints. |
 | `DrawScaffoldOrPlaceholder` | Checks whether `m_scaffold_form` is set. If not, calls `DrawNoMachinaFormIndicator`. If set, iterates all joints then all fragments and calls the appropriate `Draw*Instance` function for each. |
 | `DrawView` | Draws a single vertex array from a `Views` object selected by `ViewDirection`. |
-| `DrawFragmentView` (no states) | Draws a fragment's movement view for the given direction at its stored world positions. Used when no transform is needed. |
+| `DrawFragmentView` (no states) | Draws a fragment's positioning view for the given direction at its stored world positions. Used when no transform is needed. |
 | `DrawFragmentView` (with states) | Like above but applies `sf::RenderStates` (e.g. a translation transform). Used by `GhostRenderLogic` to position ghost geometry at the cursor. |
-| `DrawJointView` (no states) | Draws a joint's movement view for the given direction at its stored world positions. |
+| `DrawJointView` (no states) | Draws a joint's positioning view for the given direction at its stored world positions. |
 | `DrawJointView` (with states) | Like above but applies `sf::RenderStates`. Used by `GhostRenderLogic`. |
 
 ---
@@ -276,7 +276,7 @@ Render group
   2. GrimoireMachinaRenderLogic      ← draws scaffold to world-space texture
   3. GhostRenderLogic
 
-Movement group
+Positioning group
   1. UIPositioningLogic
   2. GrimoireMachinaPositioningLogic ← empty; reserved for future positioning
   3. GhostPositioningLogic

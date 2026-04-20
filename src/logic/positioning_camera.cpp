@@ -1,16 +1,16 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of free functions for camera movement and view
+/// @brief Implementation of free functions for camera positioning and view
 /// computation.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "movement_camera.h"
+#include "positioning_camera.h"
 #include <algorithm>
 
-namespace steamrot::logic::movement::camera {
+namespace steamrot::logic::positioning::camera {
 
 /////////////////////////////////////////////////
 void ApplyZoom(CameraState &camera_state, float scroll_delta) {
@@ -37,4 +37,4 @@ sf::Vector2f MapToWorldCoords(const CameraState &camera_state,
                                   GetWorldView(camera_state, texture));
 }
 
-} // namespace steamrot::logic::movement::camera
+} // namespace steamrot::logic::positioning::camera

@@ -27,7 +27,7 @@ namespace steamrot::logic::positioning::ghost {
 /// mouse cursor, and cache the result in world_mouse_position.
 ///
 /// Converts the screen-space mouse position to world-space coordinates using
-/// movement::camera::MapToWorldCoords (the single authoritative conversion), writes
+/// positioning::camera::MapToWorldCoords (the single authoritative conversion), writes
 /// the result into both @p world_mouse_position and @p mr_ghost.m_position,
 /// and should be called once per tick before any world-space system consumes
 /// either value. The stored @p mr_ghost.m_rotation_degrees is applied to

@@ -49,21 +49,21 @@ world-space cursor.
 
 ### Execution Order
 
-`GhostPositioningLogic` is registered as a **Movement** logic in the crafting
+`GhostPositioningLogic` is registered as a **Positioning** logic in the crafting
 scene (via `LogicFactory`). The execution order within a tick is:
 
 ```
-Collision → Render → Action → Movement
+Collision → Render → Action → Positioning
 ```
 
-This means world_mouse_position is computed during the Movement phase and is
+This means world_mouse_position is computed during the Positioning phase and is
 available for the *next* tick's Collision, Render, and Action phases. The value
 is initialised to `{0.f, 0.f}` at scene startup and updated every tick, so it
 is never stale beyond one tick.
 
 > **Note**: If you add a new world-space Logic that runs in the same tick as
 > `GhostPositioningLogic` and needs the current mouse position, make sure it
-> runs *after* `GhostPositioningLogic` in the Movement phase — or reads from
+> runs *after* `GhostPositioningLogic` in the Positioning phase — or reads from
 > the pre-converted value produced in the previous tick (which is fine for
 > a one-tick lag in most cases).
 
@@ -206,13 +206,13 @@ overload that accepts `sf::Vector2f` for UIElement checking.
 
 ### ❌ Adding a new world-space Logic that reads `world_mouse_position` before `GhostPositioningLogic` has run
 
-Because `GhostPositioningLogic` runs in the Movement phase, Logic classes that
+Because `GhostPositioningLogic` runs in the Positioning phase, Logic classes that
 run in the same tick's Collision, Render, or Action phases will read the value
 from the *previous* tick. For most use cases a one-tick lag is imperceptible,
 but for precise placement or fine-grained collision, be aware of this ordering.
 
 If you need guaranteed same-tick conversion, place your Logic after
-`GhostPositioningLogic` in the Movement phase execution order
+`GhostPositioningLogic` in the Positioning phase execution order
 (see `LogicFactory.cpp`).
 
 ---

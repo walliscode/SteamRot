@@ -68,7 +68,7 @@ struct SceneResources {
   /// @brief World-space mouse position for the current tick.
   ///
   /// Computed once per tick in GhostPositioningLogic from the screen-space
-  /// mouse_position via movement::camera::MapToWorldCoords. All world-space
+  /// mouse_position via positioning::camera::MapToWorldCoords. All world-space
   /// systems (ghost rendering, grimoire collision, piece placement) read from
   /// this value rather than performing the screen-to-world conversion
   /// themselves.

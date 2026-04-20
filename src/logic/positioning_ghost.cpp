@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_ghost.h"
 #include "ViewDirection.h"
-#include "movement_camera.h"
+#include "positioning_camera.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cmath>
 
@@ -67,7 +67,7 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
                     const CameraState &camera_state,
                     const sf::RenderTexture &scene_texture) {
   world_mouse_position =
-      steamrot::logic::movement::camera::MapToWorldCoords(
+      steamrot::logic::positioning::camera::MapToWorldCoords(
           camera_state, mouse_position, scene_texture);
   mr_ghost.m_position = world_mouse_position;
 
@@ -78,7 +78,7 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
           if (!instance.fragment)
             return;
           const sf::FloatRect bounds =
-              instance.fragment->movement_views[ViewDirection::Front]
+              instance.fragment->positioning_views[ViewDirection::Front]
                   .getBounds();
           instance.transform = ComputeInstanceTransform(
               bounds, world_mouse_position, mr_ghost.m_rotation_degrees);
@@ -86,7 +86,7 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
           if (!instance.joint)
             return;
           const sf::FloatRect bounds =
-              instance.joint->movement_views[ViewDirection::Front].getBounds();
+              instance.joint->positioning_views[ViewDirection::Front].getBounds();
           instance.transform = ComputeInstanceTransform(
               bounds, world_mouse_position, mr_ghost.m_rotation_degrees);
         }

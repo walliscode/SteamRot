@@ -61,7 +61,7 @@ void draw_fragment_instance(sf::RenderTexture &texture,
                             const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = fragment_instance.transform;
-  draw_view(texture, fragment_instance.fragment->movement_views,
+  draw_view(texture, fragment_instance.fragment->positioning_views,
             ViewDirection::Front, states);
   if (draw_sockets)
     draw_fragment_instance_sockets(texture, fragment_instance);
@@ -73,7 +73,7 @@ void draw_joint_instance(sf::RenderTexture &texture,
                          const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
-  draw_view(texture, joint_instance.joint->movement_views, ViewDirection::Front,
+  draw_view(texture, joint_instance.joint->positioning_views, ViewDirection::Front,
             states);
   if (draw_sockets)
     draw_joint_instance_sockets(texture, joint_instance);

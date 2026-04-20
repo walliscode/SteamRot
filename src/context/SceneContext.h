@@ -117,7 +117,7 @@ struct SceneContext {
   /// @brief World-space mouse position for the current tick.
   ///
   /// Computed once per tick by GhostPositioningLogic via
-  /// movement::camera::MapToWorldCoords.  World-space systems (ghost rendering,
+  /// positioning::camera::MapToWorldCoords.  World-space systems (ghost rendering,
   /// grimoire collision, piece placement) read this value; screen-space
   /// systems (UI collision) use mouse_position instead.
   ///

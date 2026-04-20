@@ -17,7 +17,7 @@ namespace steamrot {
 /// @brief Holds the per-scene camera/view state.
 ///
 /// Pure data container. All view computation and zoom/pan mutations are
-/// performed by free functions in steamrot::logic::movement::camera.
+/// performed by free functions in steamrot::logic::positioning::camera.
 /////////////////////////////////////////////////
 struct CameraState {
 

@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////
 #include "action_camera.h"
 #include "EventPayload.h"
-#include "movement_camera.h"
+#include "positioning_camera.h"
 
 namespace steamrot::logic::action::camera {
 
@@ -28,7 +28,7 @@ void ProcessSubscribers(
     if (!camera_payload)
       continue;
 
-    movement::camera::ApplyZoom(camera_state, camera_payload->scroll_delta);
+    positioning::camera::ApplyZoom(camera_state, camera_payload->scroll_delta);
   }
 }
 

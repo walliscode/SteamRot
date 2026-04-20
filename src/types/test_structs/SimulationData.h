@@ -75,7 +75,7 @@ struct SimulationData {
   /// (as configured by LogicFactory) instead of the explicit steps list.
   ///
   /// This exactly mirrors the production GameEngine behaviour: each scene runs
-  /// sCollision, sAction, sMovement and sRender in the standard order using
+  /// sCollision, sAction, sPositioning and sRender in the standard order using
   /// the Logic objects that LogicFactory created for that scene type.
   /// The steps list is ignored when this flag is set.
   /////////////////////////////////////////////////
