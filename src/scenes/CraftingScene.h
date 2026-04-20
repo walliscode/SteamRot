@@ -41,9 +41,9 @@ public:
   void sAction() override;
 
   /////////////////////////////////////////////////
-  /// @brief Systems for dealing with movement in the CraftingScene
+  /// @brief Systems for dealing with positioning in the CraftingScene
   /////////////////////////////////////////////////
-  void sMovement() override;
+  void sPositioning() override;
 
   /////////////////////////////////////////////////
   /// @brief Systems for dealing with collision in the CraftingScene

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CameraMovementLogic.h"
+#include "CameraPositioningLogic.h"
 #include "EventPayload.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
@@ -105,15 +105,15 @@ TEST_CASE(
   REQUIRE(dynamic_cast<steamrot::logic::UIRenderLogic *>(
       render_logics[0].get())); // Placeholder check
 
-  ///// CHECKING MOVEMENT LOGICS /////
-  auto movement_it = logic_collection.find(steamrot::LogicGrouping::Movement);
-  if (movement_it == logic_collection.end()) {
+  ///// CHECKING POSITIONING LOGICS /////
+  auto positioning_it = logic_collection.find(steamrot::LogicGrouping::Positioning);
+  if (positioning_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Movement LogicType");
   }
-  const auto &movement_logics = movement_it->second;
-  REQUIRE(movement_logics.size() == 1);
+  const auto &positioning_logics = positioning_it->second;
+  REQUIRE(positioning_logics.size() == 1);
   REQUIRE(dynamic_cast<steamrot::logic::UIPositioningLogic *>(
-      movement_logics[0].get()));
+      positioning_logics[0].get()));
 }
 
 TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
@@ -175,21 +175,21 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   REQUIRE(dynamic_cast<steamrot::logic::GhostRenderLogic *>(
       render_logics[2].get()));
 
-  ///// CHECKING MOVEMENT LOGICS /////
-  auto movement_it = logic_collection.find(steamrot::LogicGrouping::Movement);
-  if (movement_it == logic_collection.end()) {
+  ///// CHECKING POSITIONING LOGICS /////
+  auto positioning_it = logic_collection.find(steamrot::LogicGrouping::Positioning);
+  if (positioning_it == logic_collection.end()) {
     FAIL("LogicCollection does not contain Movement LogicType");
   }
-  const auto &movement_logics = movement_it->second;
-  REQUIRE(movement_logics.size() == 4);
+  const auto &positioning_logics = positioning_it->second;
+  REQUIRE(positioning_logics.size() == 4);
   REQUIRE(dynamic_cast<steamrot::logic::UIPositioningLogic *>(
-      movement_logics[0].get()));
+      positioning_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
-      movement_logics[1].get()));
+      positioning_logics[1].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
-      movement_logics[2].get()));
-  REQUIRE(dynamic_cast<steamrot::logic::CameraMovementLogic *>(
-      movement_logics[3].get()));
+      positioning_logics[2].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::CameraPositioningLogic *>(
+      positioning_logics[3].get()));
 }
 
 TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "

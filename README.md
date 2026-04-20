@@ -40,7 +40,7 @@ ctest --preset Debug
 SteamRot/
 ├── src/              # Source code
 │   ├── components/   # Pure data container structs
-│   ├── logic/        # Game systems (movement, rendering, etc.)
+│   ├── logic/        # Game systems (positioning, rendering, etc.)
 │   ├── entity/       # Entity management
 │   ├── scenes/       # Scene management
 │   └── ...
@@ -64,7 +64,7 @@ SteamRot/
 
 - **PathProvider**: Provides absolute paths to data files, configured via CMake
 - **Entity-Component System**: Components are pure data; Logic classes handle behavior
-- **Logic System**: Scene-specific logic organized by type (Action, Render, Collision, Movement)
+- **Logic System**: Scene-specific logic organized by type (Action, Render, Collision, Positioning)
 - **Event System**: Event-driven communication between systems
 - **FlatBuffers**: Data serialization for entities, scenes, and configuration
 
@@ -189,7 +189,7 @@ ctest --preset Debug -L integration
 ### Logic Classes
 - Inherit from `Logic` abstract class
 - Process entities by archetype
-- Organized by `LogicType` (Action, Render, Collision, Movement)
+- Organized by `LogicType` (Action, Render, Collision, Positioning)
 - Created by `LogicFactory` per scene
 
 ### Archetypes

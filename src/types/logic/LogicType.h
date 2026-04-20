@@ -29,7 +29,7 @@ enum class LogicType {
   GhostAction,
   GhostPositioning,
   GhostRender,
-  CameraMovement,
+  CameraPositioning,
 };
 
 inline std::string EnumNameLogicType(LogicType logic_type) {
@@ -64,8 +64,8 @@ inline std::string EnumNameLogicType(LogicType logic_type) {
     return "GhostPositioning";
   case LogicType::GhostRender:
     return "GhostRender";
-  case LogicType::CameraMovement:
-    return "CameraMovement";
+  case LogicType::CameraPositioning:
+    return "CameraPositioning";
   default:
     return "INVALID_LOGIC_TYPE";
   }
@@ -75,7 +75,7 @@ enum class LogicGrouping {
   Collision,
   Render,
   Action,
-  Movement,
+  Positioning,
 };
 
 inline std::string EnumNameLogicGrouping(LogicGrouping logic_grouping) {
@@ -86,8 +86,8 @@ inline std::string EnumNameLogicGrouping(LogicGrouping logic_grouping) {
     return "Render";
   case LogicGrouping::Action:
     return "Action";
-  case LogicGrouping::Movement:
-    return "Movement";
+  case LogicGrouping::Positioning:
+    return "Positioning";
   default:
     return "INVALID_LOGIC_GROUPING";
   }

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "LogicFactory.h"
-#include "CameraMovementLogic.h"
+#include "CameraPositioningLogic.h"
 #include "FailInfo.h"
 #include "GhostActionLogic.h"
 #include "GhostPositioningLogic.h"
@@ -111,7 +111,7 @@ LogicCollection LogicFactory::CreateEmptyLogicCollection() {
   collection.emplace(LogicGrouping::Collision, LogicVector{});
   collection.emplace(LogicGrouping::Action, LogicVector{});
   collection.emplace(LogicGrouping::Render, LogicVector{});
-  collection.emplace(LogicGrouping::Movement, LogicVector{});
+  collection.emplace(LogicGrouping::Positioning, LogicVector{});
 
   return collection;
 };
@@ -164,9 +164,9 @@ LogicFactory::CreateLogicObject(LogicType logic_type) {
   case LogicType::GhostRender:
     logic_ptr = std::make_unique<logic::GhostRenderLogic>(m_scene_context);
     break;
-  case LogicType::CameraMovement:
+  case LogicType::CameraPositioning:
     logic_ptr =
-        std::make_unique<logic::CameraMovementLogic>(m_scene_context);
+        std::make_unique<logic::CameraPositioningLogic>(m_scene_context);
     break;
   default:
     return std::unexpected(
@@ -244,7 +244,7 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
   static constexpr std::array action_logic_types = {LogicType::UIAction,
                                                     LogicType::UIState};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
-  static constexpr std::array movement_logic_types = {
+  static constexpr std::array positioning_logic_types = {
       LogicType::UIPositioning};
 
   // Add Logics to collection using the helper function
@@ -272,12 +272,12 @@ LogicFactory::ConfigureTitleLogics(LogicCollection &logic_collection) {
     return std::unexpected(render_result.error());
   }
 
-  auto movement_result =
-      AddLogicsToCollection(logic_collection, LogicGrouping::Movement,
-                            std::vector<LogicType>(movement_logic_types.begin(),
-                                                   movement_logic_types.end()));
-  if (!movement_result) {
-    return std::unexpected(movement_result.error());
+  auto positioning_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Positioning,
+                            std::vector<LogicType>(positioning_logic_types.begin(),
+                                                   positioning_logic_types.end()));
+  if (!positioning_result) {
+    return std::unexpected(positioning_result.error());
   }
 
   return std::monostate();
@@ -303,9 +303,9 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::UIRender, LogicType::GrimoireMachinaRender,
       LogicType::GhostRender};
 
-  static constexpr std::array movement_logic_types = {
+  static constexpr std::array positioning_logic_types = {
       LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning,
-      LogicType::GhostPositioning, LogicType::CameraMovement};
+      LogicType::GhostPositioning, LogicType::CameraPositioning};
 
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(
@@ -332,12 +332,12 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
     return std::unexpected(render_result.error());
   }
 
-  auto movement_result =
-      AddLogicsToCollection(logic_collection, LogicGrouping::Movement,
-                            std::vector<LogicType>(movement_logic_types.begin(),
-                                                   movement_logic_types.end()));
-  if (!movement_result) {
-    return std::unexpected(movement_result.error());
+  auto positioning_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Positioning,
+                            std::vector<LogicType>(positioning_logic_types.begin(),
+                                                   positioning_logic_types.end()));
+  if (!positioning_result) {
+    return std::unexpected(positioning_result.error());
   }
 
   return std::monostate();
@@ -355,7 +355,7 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
   static constexpr std::array collision_logic_types = {LogicType::UICollision};
   static constexpr std::array action_logic_types = {LogicType::UIAction};
   static constexpr std::array render_logic_types = {LogicType::UIRender};
-  static constexpr std::array movement_logic_types = {
+  static constexpr std::array positioning_logic_types = {
       LogicType::UIPositioning};
 
   // Add Logics to collection using the helper function
@@ -383,12 +383,12 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
     return std::unexpected(render_result.error());
   }
 
-  auto movement_result =
-      AddLogicsToCollection(logic_collection, LogicGrouping::Movement,
-                            std::vector<LogicType>(movement_logic_types.begin(),
-                                                   movement_logic_types.end()));
-  if (!movement_result) {
-    return std::unexpected(movement_result.error());
+  auto positioning_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Positioning,
+                            std::vector<LogicType>(positioning_logic_types.begin(),
+                                                   positioning_logic_types.end()));
+  if (!positioning_result) {
+    return std::unexpected(positioning_result.error());
   }
 
   return std::monostate();

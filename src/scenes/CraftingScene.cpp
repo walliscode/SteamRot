@@ -26,11 +26,11 @@ void CraftingScene::sAction() {
 }
 
 /////////////////////////////////////////////////
-void CraftingScene::sMovement() {
-  // process movement logic
-  for (auto &movement_logic :
-       m_scene_resources.logic_map[LogicGrouping::Movement]) {
-    movement_logic->RunLogic();
+void CraftingScene::sPositioning() {
+  // process positioning logic
+  for (auto &positioning_logic :
+       m_scene_resources.logic_map[LogicGrouping::Positioning]) {
+    positioning_logic->RunLogic();
   }
 }
 

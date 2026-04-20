@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of free functions for camera movement and view
+/// @brief Declaration of free functions for camera positioning and view
 /// computation.
 /////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/System/Vector2.hpp>
 
-namespace steamrot::logic::movement::camera {
+namespace steamrot::logic::positioning::camera {
 
 /////////////////////////////////////////////////
 /// @brief Apply a mouse-scroll delta to the camera zoom level.
@@ -60,4 +60,4 @@ sf::Vector2f MapToWorldCoords(const CameraState &camera_state,
                                sf::Vector2i screen_pos,
                                const sf::RenderTexture &texture);
 
-} // namespace steamrot::logic::movement::camera
+} // namespace steamrot::logic::positioning::camera

@@ -263,7 +263,7 @@ TEST_CASE("ConfigureFragment returns unexpected when sockets are missing",
   REQUIRE(result.error().message == "Fragment sockets are missing");
 }
 
-TEST_CASE("ConfigureFragment configures movement_views successfully",
+TEST_CASE("ConfigureFragment configures positioning_views successfully",
           "[unit][ConfigureFragment]") {
   flatbuffers::FlatBufferBuilder builder;
   auto fragment_fbs_offset =
@@ -278,28 +278,28 @@ TEST_CASE("ConfigureFragment configures movement_views successfully",
       steamrot::data::configure::ConfigureFragment(fragment, fragment_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(fragment.movement_views.size() == 1);
-  REQUIRE(fragment.movement_views.count(steamrot::ViewDirection::Front) == 1);
+  REQUIRE(fragment.positioning_views.size() == 1);
+  REQUIRE(fragment.positioning_views.count(steamrot::ViewDirection::Front) == 1);
 
   const auto &vertex_array =
-      fragment.movement_views[steamrot::ViewDirection::Front];
+      fragment.positioning_views[steamrot::ViewDirection::Front];
   // 2 triangles * 3 vertices = 6 vertices
   REQUIRE(vertex_array.getVertexCount() == 6);
 }
 
 TEST_CASE(
-    "ConfigureFragment returns unexpected when movement_views are missing",
+    "ConfigureFragment returns unexpected when positioning_views are missing",
     "[unit][ConfigureFragment]") {
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_fragment");
   auto sockets_vector = CreateTestSockets(builder, 2);
 
-  // Create empty views vector to represent missing movement_views
+  // Create empty views vector to represent missing positioning_views
   auto empty_views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({});
 
-  // Create FragmentFbs without movement_views (empty vector)
+  // Create FragmentFbs without positioning_views (empty vector)
   auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
       builder, name_offset, sockets_vector, empty_views_vector);
 
@@ -312,7 +312,7 @@ TEST_CASE(
       steamrot::data::configure::ConfigureFragment(fragment, fragment_fbs);
 
   REQUIRE(!result.has_value());
-  REQUIRE(result.error().message == "Fragment movement_views are missing");
+  REQUIRE(result.error().message == "Fragment positioning_views are missing");
 }
 
 TEST_CASE(
@@ -476,7 +476,7 @@ TEST_CASE("ConfigureJoint returns unexpected when socket_count is not positive",
           "Joint socket_config socket_count must be positive");
 }
 
-TEST_CASE("ConfigureJoint configures movement_views successfully",
+TEST_CASE("ConfigureJoint configures positioning_views successfully",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
   auto joint_fbs_offset =
@@ -490,16 +490,16 @@ TEST_CASE("ConfigureJoint configures movement_views successfully",
   auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
 
   REQUIRE(result.has_value());
-  REQUIRE(joint.movement_views.size() == 1);
-  REQUIRE(joint.movement_views.count(steamrot::ViewDirection::Front) == 1);
+  REQUIRE(joint.positioning_views.size() == 1);
+  REQUIRE(joint.positioning_views.count(steamrot::ViewDirection::Front) == 1);
 
   const auto &vertex_array =
-      joint.movement_views[steamrot::ViewDirection::Front];
+      joint.positioning_views[steamrot::ViewDirection::Front];
   // 2 triangles * 3 vertices = 6 vertices
   REQUIRE(vertex_array.getVertexCount() == 6);
 }
 
-TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
+TEST_CASE("ConfigureJoint returns unexpected when positioning_views are missing",
           "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
 
@@ -507,11 +507,11 @@ TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
   auto origin_offset = steamrot::CreateVector2fDataFbs(builder, 0.f, 0.f);
   auto socket_config_offset = steamrot::CreateSocketConfigFbs(builder, 4);
 
-  // Create empty views vector to represent missing movement_views
+  // Create empty views vector to represent missing positioning_views
   auto empty_views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({});
 
-  // Create JointFbs without movement_views (empty vector)
+  // Create JointFbs without positioning_views (empty vector)
   auto joint_fbs_offset =
       steamrot::CreateJointFbs(builder, name_offset, origin_offset,
                                socket_config_offset, empty_views_vector);
@@ -519,10 +519,10 @@ TEST_CASE("ConfigureJoint returns unexpected when movement_views are missing",
   builder.Finish(joint_fbs_offset);
   auto joint_fbs =
       flatbuffers::GetRoot<steamrot::JointFbs>(builder.GetBufferPointer());
-  REQUIRE(joint_fbs->movement_views()->empty());
+  REQUIRE(joint_fbs->positioning_views()->empty());
   steamrot::Joint joint;
   auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
 
   REQUIRE(!result.has_value());
-  REQUIRE(result.error().message == "Joint movement_views are missing");
+  REQUIRE(result.error().message == "Joint positioning_views are missing");
 }

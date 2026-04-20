@@ -5,7 +5,7 @@
     { "x": 0, "y": 5 },
     { "x": 50, "y": 5 }
   ],
-  "movement_views": [
+  "positioning_views": [
     {
       "direction": "FRONT",
       "triangles": [

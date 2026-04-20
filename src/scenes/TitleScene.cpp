@@ -13,10 +13,10 @@ namespace steamrot {
 TitleScene::TitleScene(const GameContext &game_context) : Scene(game_context) {}
 
 /////////////////////////////////////////////////
-void TitleScene::sMovement() {
-  for (auto &movement_logic :
-       m_scene_resources.logic_map[LogicGrouping::Movement]) {
-    movement_logic->RunLogic();
+void TitleScene::sPositioning() {
+  for (auto &positioning_logic :
+       m_scene_resources.logic_map[LogicGrouping::Positioning]) {
+    positioning_logic->RunLogic();
   }
 }
 

@@ -61,7 +61,7 @@ steamrot::Fragment MakeFragmentWithFrontView(sf::Color colour) {
   va.append(sf::Vertex{sf::Vector2f{15.f, 25.f}, colour});
 
   steamrot::Fragment fragment;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+  fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                            std::move(va));
   return fragment;
 }
@@ -74,7 +74,7 @@ steamrot::Fragment MakeFragmentWithOriginTriangle(sf::Color colour) {
   va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, colour});
 
   steamrot::Fragment fragment;
-  fragment.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+  fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                            std::move(va));
   fragment.sockets = {{5.f, 5.f}};
   return fragment;
@@ -103,7 +103,7 @@ steamrot::Joint MakeJointWithFrontView(sf::Color colour) {
   va.append(sf::Vertex{sf::Vector2f{20.f, 30.f}, colour});
 
   steamrot::Joint joint;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+  joint.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                         std::move(va));
   return joint;
 }
@@ -116,7 +116,7 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour) {
   va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, colour});
 
   steamrot::Joint joint;
-  joint.movement_views.insert_or_assign(steamrot::ViewDirection::Front,
+  joint.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                         std::move(va));
   joint.socket_config.socket_count = 1;
   joint.socket_config.radius = 5.f;
@@ -158,7 +158,7 @@ MakeGrimoireWithPopulatedFragment(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(
+  fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
@@ -180,7 +180,7 @@ MakeGrimoireWithPopulatedJoint(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Joint joint;
   joint.name = name;
-  joint.movement_views.insert_or_assign(
+  joint.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   grimoire.m_all_joints.insert({name, std::move(joint)});
@@ -194,7 +194,7 @@ MakeGrimoireWithFragmentAndSocket(const std::string &name,
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(
+  fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   fragment.sockets.push_back(socket_local_pos);
@@ -209,7 +209,7 @@ MakeGrimoireWithFragmentAndSockets(const std::string &name,
   steamrot::GrimoireMachina grimoire;
   steamrot::Fragment fragment;
   fragment.name = name;
-  fragment.movement_views.insert_or_assign(
+  fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   fragment.sockets = std::move(socket_positions);
@@ -223,7 +223,7 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
   steamrot::GrimoireMachina grimoire;
   steamrot::Joint joint;
   joint.name = name;
-  joint.movement_views.insert_or_assign(
+  joint.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   joint.socket_config.socket_count = 1;

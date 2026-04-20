@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "GhostRenderLogic.h"
-#include "movement_camera.h"
+#include "positioning_camera.h"
 #include "render_ghost.h"
 
 namespace steamrot::logic {
@@ -21,8 +21,8 @@ void GhostRenderLogic::ProcessLogic() {
 
   // Apply the world (zoomed) view so the ghost is positioned in world space.
   m_scene_context.scene_texture.setView(
-      movement::camera::GetWorldView(m_scene_context.camera_state,
-                                     m_scene_context.scene_texture));
+      positioning::camera::GetWorldView(m_scene_context.camera_state,
+                                        m_scene_context.scene_texture));
 
   render::ghost::draw_ghost_item(m_scene_context.scene_texture,
                                  m_scene_context.mr_ghost);

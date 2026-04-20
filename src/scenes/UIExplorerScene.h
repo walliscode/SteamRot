@@ -218,7 +218,7 @@ private:
   UIExplorerScene(const GameContext &game_context);
 
   void sRender() override;
-  void sMovement() override;
+  void sPositioning() override;
   void sCollision() override;
   void sAction() override;
 };

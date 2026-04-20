@@ -73,7 +73,7 @@ FlatbuffersLogicConfigCollectionProvider::ConfigureLogicConfigCollection(
     if (!configure_result) {
       return std::unexpected(configure_result.error());
     }
-    logic_config_collection[steamrot::LogicType::CameraMovement] = logic_config;
+    logic_config_collection[steamrot::LogicType::CameraPositioning] = logic_config;
   }
 
   if (collection->ghost_positioning_logic()) {

@@ -89,7 +89,7 @@ TEST_CASE("draw_view selects the correct direction slot",
   REQUIRE(image_back.getPixel({15, 15}) == sf::Color::White);
 }
 
-TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
+TEST_CASE("draw_view with RenderStates draws Fragment positioning_views at "
           "transformed position",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -100,7 +100,7 @@ TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
   sf::RenderStates states;
   states.transform.translate({10.f, 10.f});
   steamrot::logic::render::grimoire_machina::draw_view(
-      texture, fragment.movement_views, steamrot::ViewDirection::Front, states);
+      texture, fragment.positioning_views, steamrot::ViewDirection::Front, states);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -109,7 +109,7 @@ TEST_CASE("draw_view with RenderStates draws Fragment movement_views at "
   REQUIRE(image.getPixel({25, 22}) == sf::Color::Green);
 }
 
-TEST_CASE("draw_view with RenderStates draws Joint movement_views at "
+TEST_CASE("draw_view with RenderStates draws Joint positioning_views at "
           "transformed position",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
@@ -120,7 +120,7 @@ TEST_CASE("draw_view with RenderStates draws Joint movement_views at "
   sf::RenderStates states;
   states.transform.translate({10.f, 10.f});
   steamrot::logic::render::grimoire_machina::draw_view(
-      texture, joint.movement_views, steamrot::ViewDirection::Front, states);
+      texture, joint.positioning_views, steamrot::ViewDirection::Front, states);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();

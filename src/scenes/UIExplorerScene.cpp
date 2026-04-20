@@ -193,8 +193,8 @@ sf::FloatRect UIExplorerScene::SelectorEntryRect(size_t entry_index) const {
 }
 
 /////////////////////////////////////////////////
-void UIExplorerScene::sMovement() {
-  // no movement logic
+void UIExplorerScene::sPositioning() {
+  // no positioning logic
 }
 
 /////////////////////////////////////////////////

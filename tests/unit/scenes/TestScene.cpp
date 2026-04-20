@@ -20,7 +20,7 @@ TestScene::TestScene(const GameContext &game_context) : Scene(game_context) {
 void TestScene::sRender() {}
 
 /////////////////////////////////////////////////
-void TestScene::sMovement() {}
+void TestScene::sPositioning() {}
 
 /////////////////////////////////////////////////
 void TestScene::sCollision() {}

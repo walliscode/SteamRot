@@ -293,7 +293,7 @@ SceneFactory::CreateUIExplorerScene() {
                                              logic::LogicVector{});
   scene->m_scene_resources.logic_map.emplace(LogicGrouping::Render,
                                              logic::LogicVector{});
-  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Movement,
+  scene->m_scene_resources.logic_map.emplace(LogicGrouping::Positioning,
                                              logic::LogicVector{});
 
   return scene;

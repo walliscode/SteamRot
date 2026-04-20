@@ -230,7 +230,7 @@ void SceneManager::UpdateScenes() {
 
     scene->sCollision();
     scene->sAction();
-    scene->sMovement();
+    scene->sPositioning();
     scene->sRender();
 
     // add further systems here
