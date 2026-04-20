@@ -18,6 +18,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -90,6 +91,12 @@ struct SocketData {
   /// of another
   /////////////////////////////////////////////////
   bool is_ready_to_connect{false};
+
+  /////////////////////////////////////////////////
+  /// @brief if is_another_socket_near is true, this holds the distance to the
+  /// nearest socket
+  /////////////////////////////////////////////////
+  std::optional<float> distance_to_nearest_socket{std::nullopt};
 };
 
 /////////////////////////////////////////////////

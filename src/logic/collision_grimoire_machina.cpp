@@ -40,6 +40,10 @@ void check_socket_collisions(SocketData &socket_data,
     other_socket_data.is_ready_to_connect = true;
     other_socket_data.is_another_socket_near = true;
 
+    // store the distance to the nearest socket
+    socket_data.distance_to_nearest_socket = distance_between_sockets;
+    other_socket_data.distance_to_nearest_socket = distance_between_sockets;
+
     // else if they are within the proximity threshold but not close enough to
     // connect
   } else if (distance_between_sockets <= proximity_distance_threshold) {
@@ -49,6 +53,9 @@ void check_socket_collisions(SocketData &socket_data,
     other_socket_data.is_another_socket_near = true;
     socket_data.is_ready_to_connect = false;
 
+    socket_data.distance_to_nearest_socket = distance_between_sockets;
+    other_socket_data.distance_to_nearest_socket = distance_between_sockets;
+
   } else {
     // reset proximity state if they are outside the threshold
     socket_data.is_another_socket_near = false;
@@ -57,6 +64,18 @@ void check_socket_collisions(SocketData &socket_data,
     other_socket_data.is_ready_to_connect = false;
   }
   return;
+}
+
+/////////////////////////////////////////////////
+void check_socket_collisions(FragmentInstance &fragment_instance,
+                             JointInstance &joint_instance) {
+  // cycle through all socket pairs and check for collisions
+  for (SocketData &fragment_socket_data : fragment_instance.sockets) {
+    for (SocketData &joint_socket_data : joint_instance.sockets) {
+      check_socket_collisions(fragment_socket_data, fragment_instance.transform,
+                              joint_socket_data, joint_instance.transform);
+    }
+  }
 }
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
