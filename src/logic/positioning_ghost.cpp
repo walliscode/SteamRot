@@ -20,9 +20,12 @@ namespace {
 /// @brief Compute the instance transform from a current mouse position and
 /// rotation.
 ///
-/// Translates the instance to align its bottom-right corner with
+/// Translates the instance so its local-space centre sits at
 /// @p world_mouse_position (offset by k_corner_offset), then rotates it
-/// around its own world-space centre by @p rotation_degrees.
+/// around that same local-space centre by @p rotation_degrees.
+/// Because the rotation centre is specified in the vertex-array's own
+/// coordinate space (before any translation), the part spins about itself
+/// and the world position of the centre remains invariant across zoom levels.
 ///
 /// @param bounds             Bounding box of the part's vertex array.
 /// @param world_mouse_pos    Target world-space cursor position.
@@ -33,15 +36,26 @@ sf::Transform ComputeInstanceTransform(const sf::FloatRect &bounds,
                                        const sf::Vector2f &world_mouse_pos,
                                        float rotation_degrees) {
   static constexpr float k_corner_offset = 5.f;
+
+  // Local-space centre of the vertex array.  The rotation is applied around
+  // this point so the part spins about its own centre regardless of zoom.
+  const sf::Vector2f local_center = bounds.position + bounds.size / 2.f;
+
+  // Translate so the part's centre sits at the mouse cursor (with a small
+  // offset).  The translation is computed in world space using the already
+  // zoom-corrected world_mouse_pos.
   const sf::Vector2f translation =
-      world_mouse_pos - bounds.position - bounds.size -
+      world_mouse_pos - local_center -
       sf::Vector2f{k_corner_offset, k_corner_offset};
-  const sf::Vector2f world_center =
-      bounds.position + bounds.size / 2.f + translation;
 
   sf::Transform transform = sf::Transform::Identity;
   transform.translate(translation);
-  transform.rotate(sf::degrees(rotation_degrees), world_center);
+  // Rotate around local_center, which is in the same coordinate space as
+  // the vertex-array vertices (pre-translation local space).  SFML applies
+  // the rotation before the translation, so the final world position of the
+  // part's centre is always (translation + local_center), i.e. world_mouse_pos
+  // minus the small offset, independent of rotation angle and zoom level.
+  transform.rotate(sf::degrees(rotation_degrees), local_center);
   return transform;
 }
 
