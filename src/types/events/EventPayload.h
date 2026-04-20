@@ -31,7 +31,12 @@ struct InputPayload {
   /// Any user input events are converted to this format for ease of use in the
   /// EventHandler
   /////////////////////////////////////////////////
-  enum class InputAction { NONE, SELECT, TOGGLE_SOCKET_VISIBILITY, ROTATE_GHOST } action;
+  enum class InputAction {
+    NONE,
+    SELECT,
+    TOGGLE_SOCKET_VISIBILITY,
+    ROTATE_GHOST
+  } action;
 
   /////////////////////////////////////////////////
   /// @brief Default constructor for InputPayload, sets action to NONE
@@ -263,13 +268,6 @@ struct GhostPayload {
 struct CameraPayload {
 
   /////////////////////////////////////////////////
-  /// @brief Raw scroll delta from SFML this tick.
-  ///
-  /// Positive = scroll up (zoom in); negative = scroll down (zoom out).
-  /////////////////////////////////////////////////
-  float scroll_delta{0.0f};
-
-  /////////////////////////////////////////////////
   /// @brief Default constructor.
   /////////////////////////////////////////////////
   CameraPayload() = default;
@@ -280,10 +278,27 @@ struct CameraPayload {
   /// @param delta Raw scroll delta from the SFML mouse-wheel event.
   /////////////////////////////////////////////////
   explicit CameraPayload(float delta) : scroll_delta(delta) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Enum discriminating between different types of camera-related
+  /// actions.
+  /////////////////////////////////////////////////
+  enum class CameraAction {
+    NONE,
+    SCROLL,
+    RESET_ZOOM
+  } action{CameraAction::NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Raw scroll delta from SFML this tick.
+  ///
+  /// Positive = scroll up (zoom in); negative = scroll down (zoom out).
+  /////////////////////////////////////////////////
+  float scroll_delta{0.0f};
 };
 
-using EventPayload = std::variant<std::monostate, InputPayload, UIPayload,
-                                  LogicPayload, ScenePayload, SystemPayload,
-                                  GhostPayload, CameraPayload>;
+using EventPayload =
+    std::variant<std::monostate, InputPayload, UIPayload, LogicPayload,
+                 ScenePayload, SystemPayload, GhostPayload, CameraPayload>;
 
 } // namespace steamrot

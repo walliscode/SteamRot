@@ -8,21 +8,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_camera.h"
-#include <algorithm>
 
 namespace steamrot::logic::positioning::camera {
 
 /////////////////////////////////////////////////
-void ApplyZoom(CameraState &camera_state, float scroll_delta) {
-  camera_state.m_zoom_level *= (1.0f - scroll_delta * CameraState::kZoomStep);
-  camera_state.m_zoom_level = std::clamp(camera_state.m_zoom_level,
-                                          CameraState::kMinZoom,
-                                          CameraState::kMaxZoom);
-}
-
-/////////////////////////////////////////////////
-sf::View GetWorldView(const CameraState &camera_state,
-                      const sf::RenderTexture &texture) {
+sf::View get_world_view(const CameraState &camera_state,
+                        const sf::RenderTexture &texture) {
   sf::View view = texture.getDefaultView();
   view.setCenter(camera_state.m_position);
   view.zoom(camera_state.m_zoom_level);
@@ -30,11 +21,11 @@ sf::View GetWorldView(const CameraState &camera_state,
 }
 
 /////////////////////////////////////////////////
-sf::Vector2f MapToWorldCoords(const CameraState &camera_state,
-                               sf::Vector2i screen_pos,
-                               const sf::RenderTexture &texture) {
+sf::Vector2f map_to_world_coords(const CameraState &camera_state,
+                                 sf::Vector2i screen_pos,
+                                 const sf::RenderTexture &texture) {
   return texture.mapPixelToCoords(screen_pos,
-                                  GetWorldView(camera_state, texture));
+                                  get_world_view(camera_state, texture));
 }
 
 } // namespace steamrot::logic::positioning::camera

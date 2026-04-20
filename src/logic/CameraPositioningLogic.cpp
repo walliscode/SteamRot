@@ -17,8 +17,8 @@ CameraPositioningLogic::CameraPositioningLogic(const SceneContext scene_context)
 
 /////////////////////////////////////////////////
 void CameraPositioningLogic::ProcessLogic() {
-  action::camera::ProcessSubscribers(m_subscribers,
-                                     m_scene_context.camera_state);
+  action::camera::process_subscribers(m_subscribers,
+                                      m_scene_context.camera_state);
 }
 
 } // namespace steamrot::logic

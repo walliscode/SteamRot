@@ -12,60 +12,6 @@
 #include <cmath>
 
 /////////////////////////////////////////////////
-// ApplyZoom
-/////////////////////////////////////////////////
-
-TEST_CASE("positioning_camera::ApplyZoom: positive delta decreases zoom level",
-          "[unit][positioning_camera]") {
-  steamrot::CameraState camera_state;
-  const float initial_zoom = camera_state.m_zoom_level;
-
-  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 1.0f);
-
-  REQUIRE(camera_state.m_zoom_level < initial_zoom);
-}
-
-TEST_CASE("positioning_camera::ApplyZoom: negative delta increases zoom level",
-          "[unit][positioning_camera]") {
-  steamrot::CameraState camera_state;
-  const float initial_zoom = camera_state.m_zoom_level;
-
-  steamrot::logic::positioning::camera::ApplyZoom(camera_state, -1.0f);
-
-  REQUIRE(camera_state.m_zoom_level > initial_zoom);
-}
-
-TEST_CASE("positioning_camera::ApplyZoom: zero delta leaves zoom level unchanged",
-          "[unit][positioning_camera]") {
-  steamrot::CameraState camera_state;
-  const float initial_zoom = camera_state.m_zoom_level;
-
-  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 0.0f);
-
-  REQUIRE(camera_state.m_zoom_level == initial_zoom);
-}
-
-TEST_CASE("positioning_camera::ApplyZoom: clamps zoom to kMinZoom",
-          "[unit][positioning_camera]") {
-  steamrot::CameraState camera_state;
-
-  // Large positive delta should zoom in past the minimum
-  steamrot::logic::positioning::camera::ApplyZoom(camera_state, 1000.0f);
-
-  REQUIRE(camera_state.m_zoom_level == steamrot::CameraState::kMinZoom);
-}
-
-TEST_CASE("positioning_camera::ApplyZoom: clamps zoom to kMaxZoom",
-          "[unit][positioning_camera]") {
-  steamrot::CameraState camera_state;
-
-  // Large negative delta should zoom out past the maximum
-  steamrot::logic::positioning::camera::ApplyZoom(camera_state, -1000.0f);
-
-  REQUIRE(camera_state.m_zoom_level == steamrot::CameraState::kMaxZoom);
-}
-
-/////////////////////////////////////////////////
 // GetWorldView / MapToWorldCoords
 /////////////////////////////////////////////////
 
@@ -74,10 +20,13 @@ TEST_CASE(
     "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   sf::RenderTexture texture;
-  texture.resize({800u, 600u});
+  auto resize_result = texture.resize({800u, 600u});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
 
-  const sf::View view =
-      steamrot::logic::positioning::camera::GetWorldView(camera_state, texture);
+  const sf::View view = steamrot::logic::positioning::camera::get_world_view(
+      camera_state, texture);
 
   REQUIRE(view.getCenter().x == 0.f);
   REQUIRE(view.getCenter().y == 0.f);
@@ -89,27 +38,35 @@ TEST_CASE(
   steamrot::CameraState camera_state;
   camera_state.m_position = {100.f, 200.f};
   sf::RenderTexture texture;
-  texture.resize({800u, 600u});
 
-  const sf::View view =
-      steamrot::logic::positioning::camera::GetWorldView(camera_state, texture);
+  auto resize_result = texture.resize({800u, 600u});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
+
+  const sf::View view = steamrot::logic::positioning::camera::get_world_view(
+      camera_state, texture);
 
   REQUIRE(view.getCenter().x == 100.f);
   REQUIRE(view.getCenter().y == 200.f);
 }
 
-TEST_CASE(
-    "positioning_camera::MapToWorldCoords: default camera maps screen centre to "
-    "world origin",
-    "[unit][positioning_camera]") {
+TEST_CASE("positioning_camera::MapToWorldCoords: default camera maps screen "
+          "centre to "
+          "world origin",
+          "[unit][positioning_camera]") {
   steamrot::CameraState camera_state;
   sf::RenderTexture texture;
   constexpr unsigned int w = 800u;
   constexpr unsigned int h = 600u;
-  texture.resize({w, h});
+
+  auto resize_result = texture.resize({800u, 600u});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
 
   const sf::Vector2f world_pos =
-      steamrot::logic::positioning::camera::MapToWorldCoords(
+      steamrot::logic::positioning::camera::map_to_world_coords(
           camera_state, {static_cast<int>(w / 2), static_cast<int>(h / 2)},
           texture);
 
