@@ -305,7 +305,11 @@ TEST_CASE(
 
   REQUIRE(camera_state.m_panning_up == false);
 }
-          "[unit][action_camera]") {
+
+TEST_CASE(
+    "action_camera::ProcessSubscribers: multiple active subscribers each apply "
+    "their scroll delta",
+    "[unit][action_camera]") {
   steamrot::CameraState camera_state;
 
   auto subscriber_a = std::make_shared<steamrot::Subscriber>();
