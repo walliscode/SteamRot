@@ -221,4 +221,116 @@ create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
                     Connection::Endpoint{joint_instance.id, socket_index_b}};
 }
 
+/////////////////////////////////////////////////
+bool check_socket_for_connection_readiness(const SocketData &socket) {
+
+  if (socket.state != SocketState::Available || !socket.is_ready_to_connect) {
+    return false;
+  } else {
+    return true;
+  }
+}
+/////////////////////////////////////////////////
+std::optional<size_t>
+check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost) {
+
+  // if the ghost selection is empty, return nullopt
+  if (std::holds_alternative<std::monostate>(mr_ghost.m_instance))
+    return std::nullopt;
+
+  // deal with FragmentInstance
+  if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
+    const FragmentInstance &ghost_fi =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
+
+    // if the ghost selection is a FragmentInstance with no fragment or no
+    // sockets, return nullopt
+    if (!ghost_fi.fragment || ghost_fi.sockets.empty())
+      return std::nullopt;
+
+    // find first socket that is ready for connection and return its index, if
+    // no sockets
+    auto it = std::find_if(ghost_fi.sockets.begin(), ghost_fi.sockets.end(),
+                           check_socket_for_connection_readiness);
+
+    // if no sockets are ready for connection, return nullopt
+    if (it == ghost_fi.sockets.end())
+      return std::nullopt;
+
+    // otherwise, return the index of the first socket that is ready for
+    // connection
+    return std::distance(ghost_fi.sockets.begin(), it);
+
+  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
+    const JointInstance &ghost_ji =
+        std::get<JointInstance>(mr_ghost.m_instance);
+
+    // if the ghost selection is a JointInstance with no joint or no sockets,
+    // return nullopt
+    if (!ghost_ji.joint || ghost_ji.sockets.empty())
+      return std::nullopt;
+
+    // find first socket that is ready for connection and return its index, if
+    // no sockets
+    auto it = std::find_if(ghost_ji.sockets.begin(), ghost_ji.sockets.end(),
+                           check_socket_for_connection_readiness);
+    // if no sockets are ready for connection, return nullopt
+    if (it == ghost_ji.sockets.end())
+      return std::nullopt;
+
+    // otherwise, return the index of the first socket that is ready for
+    // connection
+
+    return std::distance(ghost_ji.sockets.begin(), it);
+  }
+  return std::nullopt;
+}
+
+std::optional<std::pair<uint32_t, size_t>>
+check_PartMap_for_connection_readiness(const PartMap &part_map) {
+
+  // return false if empty
+  if (part_map.empty())
+    return std::nullopt;
+
+  // cycle through all parts in the PartMap and check their sockets
+  for (const auto &[id, part] : part_map) {
+
+    // check if the part is a FragmentInstance and if any of its sockets are
+    // ready
+    if (std::holds_alternative<FragmentInstance>(part)) {
+      const FragmentInstance &fi = std::get<FragmentInstance>(part);
+
+      // cycle throught the sockets and check
+      auto it = std::find_if(fi.sockets.begin(), fi.sockets.end(),
+                             check_socket_for_connection_readiness);
+
+      // if successful, return the part id and socket index of the first ready
+      // socket
+      if (it != fi.sockets.end()) {
+        size_t socket_index = std::distance(fi.sockets.begin(), it);
+        return std::make_pair(id, socket_index);
+      }
+
+      // check if the part is a JointInstance and if any of its sockets are
+      // ready
+    } else if (std::holds_alternative<JointInstance>(part)) {
+      const JointInstance &ji = std::get<JointInstance>(part);
+
+      // cycle throught the sockets and check
+      auto it = std::find_if(ji.sockets.begin(), ji.sockets.end(),
+                             check_socket_for_connection_readiness);
+
+      // if successful, return the part id and socket index of the first ready
+      // socket
+      if (it != ji.sockets.end()) {
+        size_t socket_index = std::distance(ji.sockets.begin(), it);
+        return std::make_pair(id, socket_index);
+      }
+    }
+  }
+
+  return std::nullopt;
+}
+
 } // namespace steamrot::logic::action::grimoire_machina

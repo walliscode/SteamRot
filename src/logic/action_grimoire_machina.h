@@ -104,6 +104,7 @@ void proces_user_input_events(Subscriber &subscriber,
 void place_first_piece(GrimoireMachina &grimoire_machina,
                        const MrGhost &mr_ghost);
 
+void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost);
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
 ///
@@ -154,4 +155,34 @@ std::expected<Connection, std::string>
 create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
                   JointInstance &joint_instance, size_t socket_index_b);
 
+/////////////////////////////////////////////////
+/// @brief Checks whether the given SocketData is in a state that allows it to
+/// be connected to another socket.
+///
+/// @param socket SocketData to check for connection readiness.
+/// @return Boolean indicating whether the socket is ready to be connected
+/// (true) or not (false).
+/////////////////////////////////////////////////
+bool check_socket_for_connection_readiness(const SocketData &socket);
+
+/////////////////////////////////////////////////
+/// @brief Checks whether any of the selections on MrGhost are ready to be
+/// connected to the active MachinaFormScaffold
+///
+/// @param mr_ghost MrGhost instance living on the Scene
+/////////////////////////////////////////////////
+std::optional<size_t>
+check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
+
+/////////////////////////////////////////////////
+/// @brief Checks whether any of the sockets on the active MachinaFormScaffold
+/// are ready to be connected to. Returns the part ID and socket index of the
+/// first ready socket, or std::nullopt if no sockets are ready.
+///
+///
+/// @param part_map PartMap to check
+/////////////////////////////////////////////////
+std::optional<std::pair<uint32_t, size_t>>
+check_PartMap_for_connection_readiness(const PartMap &part_map);
+;
 } // namespace steamrot::logic::action::grimoire_machina
