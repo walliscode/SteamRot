@@ -15,6 +15,7 @@
 #include "TitleScene.h"
 #include "UIExplorerScene.h"
 #include "entity_memory.h"
+#include "positioning_camera.h"
 #include "uuid.h"
 #include <SFML/System/Vector2.hpp>
 #include <format>
@@ -118,6 +119,12 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   auto resources_result = ConfigureSceneResources(scene, scene_data);
   if (!resources_result.has_value())
     return std::unexpected(resources_result.error());
+
+  // Configure initial camera position (must run after SceneResources so texture
+  // size is available)
+  auto camera_result = ConfigureCameraState(scene, scene_data);
+  if (!camera_result.has_value())
+    return std::unexpected(camera_result.error());
 
   // Configure SceneConfig
   auto config_result = ConfigureSceneConfig(scene, scene_data);
@@ -330,6 +337,19 @@ SceneFactory::ValidateUIStyles(Scene &scene) const {
                       ui_component.m_style_name, i)});
     }
   }
+
+  return std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+SceneFactory::ConfigureCameraState(Scene &scene, const SceneData &scene_data) {
+  const sf::Vector2u texture_size =
+      scene.m_scene_resources.scene_texture.getSize();
+
+  scene.m_scene_state.camera_state.m_position =
+      logic::positioning::camera::get_scene_world_origin(
+          scene_data.scene_info.type, texture_size);
 
   return std::monostate{};
 }

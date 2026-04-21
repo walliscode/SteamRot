@@ -28,4 +28,19 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                   get_world_view(camera_state, texture));
 }
 
+/////////////////////////////////////////////////
+sf::Vector2f get_scene_world_origin(SceneType scene_type,
+                                    sf::Vector2u texture_size) {
+  switch (scene_type) {
+  case SceneType::CRAFTING: {
+    const float usable_width =
+        static_cast<float>(texture_size.x) - kCraftingUIToolbarWidth;
+    return {kCraftingUIToolbarWidth + usable_width / 2.f,
+            static_cast<float>(texture_size.y) / 2.f};
+  }
+  default:
+    return {0.f, 0.f};
+  }
+}
+
 } // namespace steamrot::logic::positioning::camera

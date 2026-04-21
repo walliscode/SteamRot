@@ -13,11 +13,21 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CameraState.h"
+#include "SceneType.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::camera {
+
+/////////////////////////////////////////////////
+/// @brief Width (in pixels) of the CraftingScene UI toolbar on the left side
+///        of the render texture.
+///
+/// Used by get_scene_world_origin() to compute the centre of the usable world
+/// area once the toolbar is excluded.
+/////////////////////////////////////////////////
+inline constexpr float kCraftingUIToolbarWidth = 180.f;
 
 /////////////////////////////////////////////////
 /// @brief Build a world-space view for the given render texture.
@@ -48,5 +58,25 @@ sf::View get_world_view(const CameraState &camera_state,
 sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                  sf::Vector2i screen_pos,
                                  const sf::RenderTexture &texture);
+
+/////////////////////////////////////////////////
+/// @brief Compute the initial world-space camera centre for a given scene.
+///
+/// Each scene may expose its world origin at a different screen position.
+/// Calling this function places world {0, 0} at the visual centre of the
+/// usable area for that scene type.
+///
+/// - Most scenes return {0, 0} so the world origin is centred on the full
+///   render texture.
+/// - SceneType::CRAFTING returns the centre of the area to the right of the
+///   left-side UI toolbar (width = kCraftingUIToolbarWidth).
+///
+/// @param scene_type   The type of the scene being initialised.
+/// @param texture_size Size of the scene render texture in pixels.
+/// @return World-space position that should be assigned to
+///         CameraState::m_position on scene creation.
+/////////////////////////////////////////////////
+sf::Vector2f get_scene_world_origin(SceneType scene_type,
+                                    sf::Vector2u texture_size);
 
 } // namespace steamrot::logic::positioning::camera

@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_camera.h"
 #include "CameraState.h"
+#include "SceneType.h"
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
 
@@ -73,4 +74,64 @@ TEST_CASE("positioning_camera::MapToWorldCoords: default camera maps screen "
   // Screen centre should map to world (0, 0) when camera is at origin
   REQUIRE(std::abs(world_pos.x) < 0.01f);
   REQUIRE(std::abs(world_pos.y) < 0.01f);
+}
+
+/////////////////////////////////////////////////
+// get_scene_world_origin
+/////////////////////////////////////////////////
+
+TEST_CASE(
+    "positioning_camera::get_scene_world_origin: TITLE scene returns origin",
+    "[unit][positioning_camera]") {
+  const sf::Vector2f result =
+      steamrot::logic::positioning::camera::get_scene_world_origin(
+          steamrot::SceneType::TITLE, {800u, 600u});
+  REQUIRE(result.x == 0.f);
+  REQUIRE(result.y == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::get_scene_world_origin: TEST scene returns origin",
+    "[unit][positioning_camera]") {
+  const sf::Vector2f result =
+      steamrot::logic::positioning::camera::get_scene_world_origin(
+          steamrot::SceneType::TEST, {800u, 600u});
+  REQUIRE(result.x == 0.f);
+  REQUIRE(result.y == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::get_scene_world_origin: UNKNOWN scene returns origin",
+    "[unit][positioning_camera]") {
+  const sf::Vector2f result =
+      steamrot::logic::positioning::camera::get_scene_world_origin(
+          steamrot::SceneType::UNKNOWN, {800u, 600u});
+  REQUIRE(result.x == 0.f);
+  REQUIRE(result.y == 0.f);
+}
+
+TEST_CASE("positioning_camera::get_scene_world_origin: CRAFTING scene centres "
+          "on usable area (800x600 texture)",
+          "[unit][positioning_camera]") {
+  // Toolbar width = 180, texture = 800x600
+  // Expected x = 180 + (800 - 180) / 2 = 490
+  // Expected y = 600 / 2 = 300
+  const sf::Vector2f result =
+      steamrot::logic::positioning::camera::get_scene_world_origin(
+          steamrot::SceneType::CRAFTING, {800u, 600u});
+  REQUIRE(result.x == 490.f);
+  REQUIRE(result.y == 300.f);
+}
+
+TEST_CASE("positioning_camera::get_scene_world_origin: CRAFTING scene centres "
+          "correctly with a different texture size",
+          "[unit][positioning_camera]") {
+  // Toolbar width = 180, texture = 1280x720
+  // Expected x = 180 + (1280 - 180) / 2 = 180 + 550 = 730
+  // Expected y = 720 / 2 = 360
+  const sf::Vector2f result =
+      steamrot::logic::positioning::camera::get_scene_world_origin(
+          steamrot::SceneType::CRAFTING, {1280u, 720u});
+  REQUIRE(result.x == 730.f);
+  REQUIRE(result.y == 360.f);
 }
