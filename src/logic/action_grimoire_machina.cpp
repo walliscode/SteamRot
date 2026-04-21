@@ -128,6 +128,76 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 }
 
 /////////////////////////////////////////////////
+void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
+
+  if (scaffold.parts.empty())
+    return;
+
+  auto ghost_socket_index = check_MrGhost_for_connection_readiness(mr_ghost);
+  if (!ghost_socket_index.has_value())
+    return;
+
+  auto partmap_result = check_PartMap_for_connection_readiness(scaffold.parts);
+  if (!partmap_result.has_value())
+    return;
+
+  const uint32_t partmap_part_id = partmap_result.value().first;
+  const size_t partmap_socket_idx = partmap_result.value().second;
+
+  if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
+    const FragmentInstance &ghost_fi =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
+    if (!ghost_fi.fragment)
+      return;
+
+    if (!std::holds_alternative<JointInstance>(
+            scaffold.parts.at(partmap_part_id)))
+      return;
+
+    FragmentInstance instance{ghost_fi};
+    const uint32_t new_id = scaffold.next_id++;
+    instance.id = new_id;
+    scaffold.parts.emplace(new_id, std::move(instance));
+
+    FragmentInstance &placed_fi =
+        std::get<FragmentInstance>(scaffold.parts.at(new_id));
+    JointInstance &existing_ji =
+        std::get<JointInstance>(scaffold.parts.at(partmap_part_id));
+
+    auto connection_result = create_connection(
+        placed_fi, ghost_socket_index.value(), existing_ji, partmap_socket_idx);
+    if (connection_result.has_value())
+      scaffold.connections.push_back(connection_result.value());
+
+  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
+    const JointInstance &ghost_ji =
+        std::get<JointInstance>(mr_ghost.m_instance);
+    if (!ghost_ji.joint)
+      return;
+
+    if (!std::holds_alternative<FragmentInstance>(
+            scaffold.parts.at(partmap_part_id)))
+      return;
+
+    JointInstance instance{ghost_ji};
+    const uint32_t new_id = scaffold.next_id++;
+    instance.id = new_id;
+    scaffold.parts.emplace(new_id, std::move(instance));
+
+    JointInstance &placed_ji =
+        std::get<JointInstance>(scaffold.parts.at(new_id));
+    FragmentInstance &existing_fi =
+        std::get<FragmentInstance>(scaffold.parts.at(partmap_part_id));
+
+    auto connection_result =
+        create_connection(existing_fi, partmap_socket_idx, placed_ji,
+                          ghost_socket_index.value());
+    if (connection_result.has_value())
+      scaffold.connections.push_back(connection_result.value());
+  }
+}
+
+/////////////////////////////////////////////////
 void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
                              const MrGhost &mr_ghost) {
 
@@ -140,8 +210,7 @@ void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
     return;
   }
 
-  // [TODO:] Socket-proximity collision detection will determine whether the
-  // new piece can connect to an existing open socket on the scaffold.
+  place_next_piece(*scaffold, mr_ghost);
 }
 
 /////////////////////////////////////////////////

@@ -104,7 +104,33 @@ void proces_user_input_events(Subscriber &subscriber,
 void place_first_piece(GrimoireMachina &grimoire_machina,
                        const MrGhost &mr_ghost);
 
+/////////////////////////////////////////////////
+/// @brief Place the current ghost item onto the scaffold as the next piece,
+/// creating a Connection when both the ghost and the scaffold have sockets
+/// ready to connect.
+///
+/// Calls @ref check_MrGhost_for_connection_readiness and
+/// @ref check_PartMap_for_connection_readiness. If both return a value the
+/// ghost instance is copied into @p scaffold (with a new stable ID) and a
+/// Connection between the two ready sockets is created via
+/// @ref create_connection and appended to @p scaffold.connections.
+///
+/// By convention connections are only between a FragmentInstance and a
+/// JointInstance. Does nothing if the ghost and the PartMap part have the same
+/// type (both Fragment or both Joint).
+///
+/// Does nothing if:
+///   - @p scaffold.parts is empty (use @ref place_first_piece instead),
+///   - the ghost instance is monostate or its part pointer is null,
+///   - either readiness check returns @c std::nullopt, or
+///   - the ghost type and the ready PartMap part type are the same.
+///
+/// @param scaffold  The active MachinaFormScaffold to place the piece on.
+/// @param mr_ghost  Current ghost state carrying the instance and its
+///                  transform.
+/////////////////////////////////////////////////
 void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost);
+
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
 ///
