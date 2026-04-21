@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_camera.h"
+#include "CUserInterface.h"
 
 namespace steamrot::logic::positioning::camera {
 
@@ -29,13 +30,32 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
 }
 
 /////////////////////////////////////////////////
+float get_left_ui_toolbar_width(const EntityMemoryPool &pool) {
+  const size_t pool_size = entity::memory::GetMemoryPoolSize(pool);
+  float max_width = 0.f;
+  for (size_t i = 0; i < pool_size; ++i) {
+    const CUserInterface &ui =
+        entity::memory::GetComponent<CUserInterface>(i, pool);
+    if (!ui.m_active || !ui.m_root_element)
+      continue;
+    if (ui.m_root_element->position.x == 0.f &&
+        ui.m_root_element->size.x > 0.f) {
+      max_width = std::max(max_width, ui.m_root_element->size.x);
+    }
+  }
+  return max_width;
+}
+
+/////////////////////////////////////////////////
 sf::Vector2f get_scene_world_origin(SceneType scene_type,
-                                    sf::Vector2u texture_size) {
+                                    sf::Vector2u texture_size,
+                                    const EntityMemoryPool &pool) {
   switch (scene_type) {
   case SceneType::CRAFTING: {
+    const float toolbar_width = get_left_ui_toolbar_width(pool);
     const float usable_width =
-        static_cast<float>(texture_size.x) - kCraftingUIToolbarWidth;
-    return {kCraftingUIToolbarWidth + usable_width / 2.f,
+        static_cast<float>(texture_size.x) - toolbar_width;
+    return {toolbar_width + usable_width / 2.f,
             static_cast<float>(texture_size.y) / 2.f};
   }
   default:

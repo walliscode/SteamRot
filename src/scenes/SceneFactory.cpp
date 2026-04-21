@@ -120,12 +120,6 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   if (!resources_result.has_value())
     return std::unexpected(resources_result.error());
 
-  // Configure initial camera position (must run after SceneResources so texture
-  // size is available)
-  auto camera_result = ConfigureCameraState(scene, scene_data);
-  if (!camera_result.has_value())
-    return std::unexpected(camera_result.error());
-
   // Configure SceneConfig
   auto config_result = ConfigureSceneConfig(scene, scene_data);
   if (!config_result.has_value())
@@ -135,6 +129,12 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   auto import_result = ConfigureEntities(scene, scene_data);
   if (!import_result.has_value())
     return std::unexpected(import_result.error());
+
+  // Configure initial camera position (must run after ConfigureEntities so that
+  // the UI toolbar width can be read from the entity pool)
+  auto camera_result = ConfigureCameraState(scene, scene_data);
+  if (!camera_result.has_value())
+    return std::unexpected(camera_result.error());
 
   // Validate that all CUserInterface style names exist in the AssetManager
   auto validate_result = ValidateUIStyles(scene);
@@ -349,7 +349,8 @@ SceneFactory::ConfigureCameraState(Scene &scene, const SceneData &scene_data) {
 
   scene.m_scene_state.camera_state.m_position =
       logic::positioning::camera::get_scene_world_origin(
-          scene_data.scene_info.type, texture_size);
+          scene_data.scene_info.type, texture_size,
+          scene.m_scene_resources.entity_manager.GetEntityMemoryPool());
 
   return std::monostate{};
 }

@@ -14,20 +14,13 @@
 /////////////////////////////////////////////////
 #include "CameraState.h"
 #include "SceneType.h"
+#include "containers.h"
+#include "entity_memory.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::camera {
-
-/////////////////////////////////////////////////
-/// @brief Width (in pixels) of the CraftingScene UI toolbar on the left side
-///        of the render texture.
-///
-/// Used by get_scene_world_origin() to compute the centre of the usable world
-/// area once the toolbar is excluded.
-/////////////////////////////////////////////////
-inline constexpr float kCraftingUIToolbarWidth = 180.f;
 
 /////////////////////////////////////////////////
 /// @brief Build a world-space view for the given render texture.
@@ -60,6 +53,20 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                  const sf::RenderTexture &texture);
 
 /////////////////////////////////////////////////
+/// @brief Compute the width of the leftmost UI panel strip from the entity
+///        pool.
+///
+/// Iterates every active CUserInterface component and returns the maximum
+/// root-element width among those whose root element is anchored at
+/// position.x == 0.  Returns 0 when no such panel exists (e.g. scenes with no
+/// left-side toolbar).
+///
+/// @param pool EntityMemoryPool whose CUserInterface components are inspected.
+/// @return Width in pixels of the widest left-anchored UI panel, or 0.
+/////////////////////////////////////////////////
+float get_left_ui_toolbar_width(const EntityMemoryPool &pool);
+
+/////////////////////////////////////////////////
 /// @brief Compute the initial world-space camera centre for a given scene.
 ///
 /// Each scene may expose its world origin at a different screen position.
@@ -69,14 +76,16 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
 /// - Most scenes return {0, 0} so the world origin is centred on the full
 ///   render texture.
 /// - SceneType::CRAFTING returns the centre of the area to the right of the
-///   left-side UI toolbar (width = kCraftingUIToolbarWidth).
+///   left-side UI toolbar, whose width is computed dynamically from @p pool.
 ///
 /// @param scene_type   The type of the scene being initialised.
 /// @param texture_size Size of the scene render texture in pixels.
+/// @param pool         Entity pool from which the toolbar width is derived.
 /// @return World-space position that should be assigned to
 ///         CameraState::m_position on scene creation.
 /////////////////////////////////////////////////
 sf::Vector2f get_scene_world_origin(SceneType scene_type,
-                                    sf::Vector2u texture_size);
+                                    sf::Vector2u texture_size,
+                                    const EntityMemoryPool &pool);
 
 } // namespace steamrot::logic::positioning::camera
