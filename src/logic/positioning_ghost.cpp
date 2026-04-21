@@ -65,10 +65,12 @@ sf::Transform ComputeInstanceTransform(const sf::FloatRect &bounds,
 void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
                     const sf::Vector2i &mouse_position,
                     const CameraState &camera_state,
-                    const sf::RenderTexture &scene_texture) {
+                    const sf::RenderTexture &scene_texture,
+                    SceneType scene_type,
+                    const EntityMemoryPool &pool) {
   world_mouse_position =
       steamrot::logic::positioning::camera::map_to_world_coords(
-          camera_state, mouse_position, scene_texture);
+          camera_state, mouse_position, scene_texture, scene_type, pool);
   mr_ghost.m_position = world_mouse_position;
 
   std::visit(

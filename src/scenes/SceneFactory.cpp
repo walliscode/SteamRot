@@ -15,7 +15,6 @@
 #include "TitleScene.h"
 #include "UIExplorerScene.h"
 #include "entity_memory.h"
-#include "positioning_camera.h"
 #include "uuid.h"
 #include <SFML/System/Vector2.hpp>
 #include <format>
@@ -130,12 +129,6 @@ SceneFactory::ConfigureScene(Scene &scene, const SceneData &scene_data) {
   if (!import_result.has_value())
     return std::unexpected(import_result.error());
 
-  // Configure initial camera position (must run after ConfigureEntities so that
-  // the UI toolbar width can be read from the entity pool)
-  auto camera_result = ConfigureCameraState(scene, scene_data);
-  if (!camera_result.has_value())
-    return std::unexpected(camera_result.error());
-
   // Validate that all CUserInterface style names exist in the AssetManager
   auto validate_result = ValidateUIStyles(scene);
   if (!validate_result.has_value())
@@ -166,6 +159,7 @@ SceneFactory::ConfigureSceneInfo(Scene &scene, const SceneData &scene_data) {
   }
 
   scene.GetSceneInfo().type = scene_data.scene_info.type;
+  scene.m_scene_state.scene_type = scene_data.scene_info.type;
   return std::monostate{};
 }
 
@@ -280,6 +274,7 @@ SceneFactory::CreateUIExplorerScene() {
   // Step 2: Assign a new UUID and set the scene type
   scene->GetSceneInfo().id = uuids::uuid_system_generator{}();
   scene->GetSceneInfo().type = SceneType::UI_EXPLORER;
+  scene->m_scene_state.scene_type = SceneType::UI_EXPLORER;
 
   // Step 3: Create a 1280×720 render texture
   static constexpr uint32_t kWidth = 1280u;
@@ -337,20 +332,6 @@ SceneFactory::ValidateUIStyles(Scene &scene) const {
                       ui_component.m_style_name, i)});
     }
   }
-
-  return std::monostate{};
-}
-
-/////////////////////////////////////////////////
-std::expected<std::monostate, FailInfo>
-SceneFactory::ConfigureCameraState(Scene &scene, const SceneData &scene_data) {
-  const sf::Vector2u texture_size =
-      scene.m_scene_resources.scene_texture.getSize();
-
-  scene.m_scene_state.camera_state.m_position =
-      logic::positioning::camera::get_scene_world_origin(
-          scene_data.scene_info.type, texture_size,
-          scene.m_scene_resources.entity_manager.GetEntityMemoryPool());
 
   return std::monostate{};
 }

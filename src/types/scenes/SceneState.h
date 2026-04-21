@@ -9,6 +9,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CameraState.h"
+#include "SceneType.h"
 
 namespace steamrot {
 
@@ -49,6 +50,14 @@ struct SceneState {
   /// exposed to all Logic classes via SceneContext::camera_state.
   /////////////////////////////////////////////////
   CameraState camera_state{};
+
+  /////////////////////////////////////////////////
+  /// @brief Type of the scene.
+  ///
+  /// Used by camera positioning functions to apply scene-specific view
+  /// offsets (e.g. accounting for a left-side UI toolbar in CRAFTING).
+  /////////////////////////////////////////////////
+  SceneType scene_type{SceneType::UNKNOWN};
 };
 
 } // namespace steamrot

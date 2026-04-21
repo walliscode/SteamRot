@@ -22,7 +22,8 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
 
   // Apply the world (zoomed) view before drawing world-space geometry.
   m_scene_context.scene_texture.setView(positioning::camera::get_world_view(
-      m_scene_context.camera_state, m_scene_context.scene_texture));
+      m_scene_context.camera_state, m_scene_context.scene_texture,
+      m_scene_context.scene_state.scene_type, m_scene_context.scene_entities));
 
   // --- Asset section ---
   auto grimoire_result = m_scene_context.asset_manager.GetGrimoireMachina();

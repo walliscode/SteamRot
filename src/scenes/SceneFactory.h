@@ -133,22 +133,6 @@ public:
   std::expected<std::monostate, FailInfo> ConfigureLogicMap(Scene &scene);
 
   /////////////////////////////////////////////////
-  /// @brief Set the initial camera position for the scene.
-  ///
-  /// Calls positioning::camera::get_scene_world_origin with the scene type and
-  /// render-texture size to determine the correct world-space camera centre for
-  /// this scene, then writes the result to SceneState::camera_state.m_position.
-  ///
-  /// Must be called after ConfigureSceneResources so that the render texture
-  /// has already been resized.
-  ///
-  /// @param scene      Scene whose camera state will be initialised.
-  /// @param scene_data SceneData used to obtain the scene type.
-  /////////////////////////////////////////////////
-  std::expected<std::monostate, FailInfo>
-  ConfigureCameraState(Scene &scene, const SceneData &scene_data);
-
-  /////////////////////////////////////////////////
   /// @brief Create and configure a UIExplorerScene without data files.
   ///
   /// Creates a UIExplorerScene with a fixed 1280x720 render texture and an

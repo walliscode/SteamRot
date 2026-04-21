@@ -14,7 +14,9 @@
 #include "CameraState.h"
 #include "EventPayload.h"
 #include "MrGhost.h"
+#include "SceneType.h"
 #include "Subscriber.h"
+#include "containers.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <memory>
@@ -27,11 +29,12 @@ namespace steamrot::logic::positioning::ghost {
 /// mouse cursor, and cache the result in world_mouse_position.
 ///
 /// Converts the screen-space mouse position to world-space coordinates using
-/// positioning::camera::MapToWorldCoords (the single authoritative conversion), writes
-/// the result into both @p world_mouse_position and @p mr_ghost.m_position,
-/// and should be called once per tick before any world-space system consumes
-/// either value. The stored @p mr_ghost.m_rotation_degrees is applied to
-/// the instance transform so the ghost is rendered at the correct rotation.
+/// positioning::camera::map_to_world_coords (the single authoritative
+/// conversion), writes the result into both @p world_mouse_position and
+/// @p mr_ghost.m_position, and should be called once per tick before any
+/// world-space system consumes either value. The stored
+/// @p mr_ghost.m_rotation_degrees is applied to the instance transform so
+/// the ghost is rendered at the correct rotation.
 ///
 /// @param mr_ghost            MrGhost instance whose position will be updated.
 /// @param world_mouse_position Out-parameter receiving the computed world-space
@@ -40,12 +43,17 @@ namespace steamrot::logic::positioning::ghost {
 /// @param mouse_position       Screen-space pixel position of the mouse cursor.
 /// @param camera_state         Camera/view state used for the coordinate
 ///                             conversion.
-/// @param scene_texture        Render texture required by MapToWorldCoords.
+/// @param scene_texture        Render texture required by map_to_world_coords.
+/// @param scene_type           Scene type forwarded to map_to_world_coords for
+///                             the per-scene view offset.
+/// @param pool                 Entity pool forwarded to map_to_world_coords.
 /////////////////////////////////////////////////
 void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
                     const sf::Vector2i &mouse_position,
                     const CameraState &camera_state,
-                    const sf::RenderTexture &scene_texture);
+                    const sf::RenderTexture &scene_texture,
+                    SceneType scene_type,
+                    const EntityMemoryPool &pool);
 
 /////////////////////////////////////////////////
 /// @brief Rotate the ghost selection by 90 degrees.
