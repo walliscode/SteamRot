@@ -78,7 +78,7 @@ TestPartLibrary TestPartLibrary::Create() {
     Fragment f;
     f.name = "fragment_no_socket";
     f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                      MakeGreenOriginTriangle());
+                                         MakeGreenOriginTriangle());
     lib.fragments.emplace("fragment_no_socket", std::move(f));
   }
 
@@ -87,12 +87,13 @@ TestPartLibrary TestPartLibrary::Create() {
     Fragment f;
     f.name = "fragment_one_socket";
     f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                      MakeGreenOriginTriangle());
+                                         MakeGreenOriginTriangle());
     f.sockets = {{5.f, 5.f}};
     lib.fragments.emplace("fragment_one_socket", std::move(f));
   }
 
-  // "fragment_two_sockets": white 20×20 square + sockets at (0, 10) and (20, 10)
+  // "fragment_two_sockets": white 20×20 square + sockets at (0, 10) and (20,
+  // 10)
   {
     Fragment f;
     f.name = "fragment_two_sockets";
@@ -103,7 +104,8 @@ TestPartLibrary TestPartLibrary::Create() {
     lib.fragments.emplace("fragment_two_sockets", std::move(f));
   }
 
-  // "fragment_three_sockets": white 20×20 square + sockets at (0,10), (10,10) and (20,10)
+  // "fragment_three_sockets": white 20×20 square + sockets at (0,10), (10,10)
+  // and (20,10)
   {
     Fragment f;
     f.name = "fragment_three_sockets";
@@ -121,7 +123,7 @@ TestPartLibrary TestPartLibrary::Create() {
     Joint j;
     j.name = "joint_no_socket";
     j.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                      MakeBlueOriginTriangle());
+                                         MakeBlueOriginTriangle());
     lib.joints.emplace("joint_no_socket", std::move(j));
   }
 
@@ -170,7 +172,8 @@ FragmentInstance
 PartLibraryBuilder::MakeFragmentInstance(const std::string &name,
                                          sf::Transform initial_transform) {
   auto it = m_library.fragments.find(name);
-  REQUIRE(it != m_library.fragments.end());
+  if (it == m_library.fragments.end())
+    FAIL("Fragment with name '" << name << "' not found in library");
 
   FragmentInstance instance{&it->second, initial_transform};
   instance.id = m_next_id++;
@@ -182,7 +185,8 @@ JointInstance
 PartLibraryBuilder::MakeJointInstance(const std::string &name,
                                       sf::Transform initial_transform) {
   auto it = m_library.joints.find(name);
-  REQUIRE(it != m_library.joints.end());
+  if (it == m_library.joints.end())
+    FAIL("Joint with name '" << name << "' not found in library");
 
   JointInstance instance{&it->second, initial_transform};
   instance.id = m_next_id++;

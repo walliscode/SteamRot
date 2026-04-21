@@ -226,14 +226,13 @@ void ProcessDropDownListElementActions(
 
   case DataPopulationFunction::GetAllFragmentNames:
     if (grimoire_ptr)
-      fragment_names =
-          grimoire_machina::GetAllFragmentNames(*grimoire_ptr);
+      fragment_names = grimoire_machina::get_all_fragment_names(*grimoire_ptr);
 
     break;
 
   case DataPopulationFunction::GetAllJointNames:
     if (grimoire_ptr)
-      joint_names = grimoire_machina::GetAllJointNames(*grimoire_ptr);
+      joint_names = grimoire_machina::get_all_joint_names(*grimoire_ptr);
 
     break;
 

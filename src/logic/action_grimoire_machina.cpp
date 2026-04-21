@@ -11,12 +11,14 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
+#include <expected>
 #include <string>
 #include <vector>
 
 namespace steamrot::logic::action::grimoire_machina {
 /////////////////////////////////////////////////
-void InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
+void initialise_active_machina_form_scaffold(
+    GrimoireMachina &grimoire_machina) {
 
   // clear the active form if it exists
   if (grimoire_machina.m_scaffold_form)
@@ -26,20 +28,20 @@ void InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-void ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina) {
+void clear_active_machina_form_scaffold(GrimoireMachina &grimoire_machina) {
   // clear the active form if it exists
   if (grimoire_machina.m_scaffold_form)
     grimoire_machina.m_scaffold_form = nullptr;
 }
 
 /////////////////////////////////////////////////
-void ToggleSocketVisibility(MachinaFormScaffold &scaffold) {
+void toggle_socket_visibility(MachinaFormScaffold &scaffold) {
 
   scaffold.are_sockets_visible = !scaffold.are_sockets_visible;
 }
 /////////////////////////////////////////////////
 std::vector<std::string>
-GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
+get_all_fragment_names(GrimoireMachina &grimoire_machina) {
 
   std::vector<std::string> fragment_names;
   // cycle through all fragments in the GrimoireMachina and add their names to
@@ -51,7 +53,8 @@ GetAllFragmentNames(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina) {
+std::vector<std::string>
+get_all_joint_names(GrimoireMachina &grimoire_machina) {
 
   std::vector<std::string> joint_names;
   // cycle through all joints in the GrimoireMachina and add their names to
@@ -63,8 +66,8 @@ std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina) {
 }
 
 /////////////////////////////////////////////////
-void ProcessLogicEvents(Subscriber &subscriber,
-                        GrimoireMachina &grimoire_machina) {
+void process_logic_events(Subscriber &subscriber,
+                          GrimoireMachina &grimoire_machina) {
   if (!subscriber.captured_payload.has_value())
     return;
 
@@ -76,12 +79,12 @@ void ProcessLogicEvents(Subscriber &subscriber,
   switch (logic_payload->toggle_name) {
 
   case LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD: {
-    InitialiseActiveMachinaFormScaffold(grimoire_machina);
+    initialise_active_machina_form_scaffold(grimoire_machina);
     break;
   }
 
   case LogicPayload::LogicToggle::CLEAR_MACHINA_FORM_SCAFFOLD: {
-    ClearActiveMachinaFormScaffold(grimoire_machina);
+    clear_active_machina_form_scaffold(grimoire_machina);
     break;
   }
 
@@ -90,8 +93,8 @@ void ProcessLogicEvents(Subscriber &subscriber,
   }
 }
 /////////////////////////////////////////////////
-void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
-                     const MrGhost &mr_ghost) {
+void place_first_piece(GrimoireMachina &grimoire_machina,
+                       const MrGhost &mr_ghost) {
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
@@ -125,15 +128,15 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
 }
 
 /////////////////////////////////////////////////
-void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
-                          const MrGhost &mr_ghost) {
+void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
+                             const MrGhost &mr_ghost) {
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
     return;
 
   if (scaffold->parts.empty()) {
-    PlaceFirstPiece(grimoire_machina, mr_ghost);
+    place_first_piece(grimoire_machina, mr_ghost);
     return;
   }
 
@@ -142,9 +145,9 @@ void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
 }
 
 /////////////////////////////////////////////////
-void ProcessUserInputEvents(Subscriber &subscriber,
-                            const SceneContext &scene_context,
-                            GrimoireMachina &grimoire_machina) {
+void proces_user_input_events(Subscriber &subscriber,
+                              const SceneContext &scene_context,
+                              GrimoireMachina &grimoire_machina) {
 
   if (!subscriber.captured_payload.has_value())
     return;
@@ -166,12 +169,12 @@ void ProcessUserInputEvents(Subscriber &subscriber,
     // if mouse is hovering over UI, do not place piece on scaffold
     if (scene_context.scene_state.is_mouse_over_ui_layer)
       break;
-    PlaceGhostOnScaffold(grimoire_machina, scene_context.mr_ghost);
+    place_ghost_on_scaffold(grimoire_machina, scene_context.mr_ghost);
     break;
 
   case InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY:
     if (grimoire_machina.m_scaffold_form)
-      ToggleSocketVisibility(*grimoire_machina.m_scaffold_form);
+      toggle_socket_visibility(*grimoire_machina.m_scaffold_form);
     break;
 
   default:
@@ -180,7 +183,7 @@ void ProcessUserInputEvents(Subscriber &subscriber,
 }
 
 /////////////////////////////////////////////////
-void ProcessSubscribers(
+void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina) {
   for (const auto &subscriber : subscribers) {
@@ -188,11 +191,34 @@ void ProcessSubscribers(
       continue;
 
     if (subscriber->event_type == EventType::LOGIC)
-      ProcessLogicEvents(*subscriber, grimoire_machina);
+      process_logic_events(*subscriber, grimoire_machina);
 
     else if (subscriber->event_type == EventType::USER_INPUT)
-      ProcessUserInputEvents(*subscriber, scene_context, grimoire_machina);
+      proces_user_input_events(*subscriber, scene_context, grimoire_machina);
   }
+}
+/////////////////////////////////////////////////
+std::expected<Connection, std::string>
+create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
+                  JointInstance &joint_instance, size_t socket_index_b) {
+
+  if (fragment_instance.sockets.empty() && joint_instance.sockets.empty())
+    return std::unexpected(
+        "Connection creation failed: both parts have no sockets.");
+
+  if (socket_index_a >= fragment_instance.sockets.size() ||
+      socket_index_b >= joint_instance.sockets.size())
+    return std::unexpected(
+        "Connection creation failed: one or both socket indices are out of "
+        "range.");
+
+  // modify the socket data on the FragmentInstance and JointInstance to reflect
+  // the new connection
+  fragment_instance.sockets[socket_index_a].state = SocketState::Connected;
+  joint_instance.sockets[socket_index_b].state = SocketState::Connected;
+
+  return Connection{Connection::Endpoint{fragment_instance.id, socket_index_a},
+                    Connection::Endpoint{joint_instance.id, socket_index_b}};
 }
 
 } // namespace steamrot::logic::action::grimoire_machina

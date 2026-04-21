@@ -259,6 +259,17 @@ struct Connection {
   /////////////////////////////////////////////////
   struct Endpoint {
     /////////////////////////////////////////////////
+    /// @brief Create an Endpoint with the given part ID and socket index.
+    ///
+    /// @param part_id stable ID of the PartInstance owning the socket at this
+    /// endpoint
+    /// @param socket_index vector index of the socket within that
+    /// PartInstance's @c sockets vector
+    /////////////////////////////////////////////////
+    explicit Endpoint(uint32_t part_id, size_t socket_index)
+        : part_id{part_id}, socket_index{socket_index} {}
+
+    /////////////////////////////////////////////////
     /// @brief Stable instance ID (matches JointInstance::id or
     /// FragmentInstance::id).
     /////////////////////////////////////////////////
@@ -269,6 +280,9 @@ struct Connection {
     /////////////////////////////////////////////////
     size_t socket_index{0};
   };
+
+  explicit Connection(Endpoint socket_a, Endpoint socket_b)
+      : socket_a{socket_a}, socket_b{socket_b} {}
 
   Endpoint socket_a;
   Endpoint socket_b;

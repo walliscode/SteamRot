@@ -28,7 +28,7 @@ namespace steamrot::logic::action::grimoire_machina {
 /// @param grimoire_machina GrimoireMachina to intialise the active MachinaForm
 /// in.
 /////////////////////////////////////////////////
-void InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
+void initialise_active_machina_form_scaffold(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Clear the active ClearActiveMachinaFormScaffold in the
@@ -36,7 +36,7 @@ void InitialiseActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 ///
 /// @param grimoire_machina GrimoireMachina to clear the active MachinaForm in.
 /////////////////////////////////////////////////
-void ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
+void clear_active_machina_form_scaffold(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Return the string names of all fragments in the GrimoireMachina.
@@ -44,7 +44,8 @@ void ClearActiveMachinaFormScaffold(GrimoireMachina &grimoire_machina);
 /// @param grimoire_machina Instance of GrimoireMachina to get the fragment
 /// names from.
 /////////////////////////////////////////////////
-std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
+std::vector<std::string>
+get_all_fragment_names(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Return the string names of all joints in the GrimoireMachina.
@@ -52,7 +53,7 @@ std::vector<std::string> GetAllFragmentNames(GrimoireMachina &grimoire_machina);
 /// @param grimoire_machina Instance of GrimoireMachina to get the joint
 /// names from.
 /////////////////////////////////////////////////
-std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
+std::vector<std::string> get_all_joint_names(GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Toggle the are_sockets_visible boolean on the active
@@ -60,7 +61,7 @@ std::vector<std::string> GetAllJointNames(GrimoireMachina &grimoire_machina);
 ///
 /// @param scaffold MachinaFormScaffold to toggle the socket visibility on.
 /////////////////////////////////////////////////
-void ToggleSocketVisibility(MachinaFormScaffold &scaffold);
+void toggle_socket_visibility(MachinaFormScaffold &scaffold);
 
 /////////////////////////////////////////////////
 /// @brief Handle a single LOGIC subscriber for scaffold init/clear events.
@@ -72,8 +73,8 @@ void ToggleSocketVisibility(MachinaFormScaffold &scaffold);
 /// @param subscriber Subscriber whose captured_payload holds the action.
 /// @param grimoire_machina GrimoireMachina instance to mutate.
 /////////////////////////////////////////////////
-void ProcessLogicEvents(Subscriber &subscriber,
-                        GrimoireMachina &grimoire_machina);
+void process_logic_events(Subscriber &subscriber,
+                          GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Handle a single USER_INPUT SELECT subscriber and, when all placement
@@ -84,9 +85,9 @@ void ProcessLogicEvents(Subscriber &subscriber,
 /// state, camera, and mouse position.
 /// @param grimoire_machina GrimoireMachina instance to mutate.
 /////////////////////////////////////////////////
-void ProcessUserInputEvents(Subscriber &subscriber,
-                            const SceneContext &scene_context,
-                            GrimoireMachina &grimoire_machina);
+void proces_user_input_events(Subscriber &subscriber,
+                              const SceneContext &scene_context,
+                              GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item as the very first piece on
@@ -100,8 +101,8 @@ void ProcessUserInputEvents(Subscriber &subscriber,
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
-void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
-                     const MrGhost &mr_ghost);
+void place_first_piece(GrimoireMachina &grimoire_machina,
+                       const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
@@ -115,8 +116,8 @@ void PlaceFirstPiece(GrimoireMachina &grimoire_machina,
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
-void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
-                          const MrGhost &mr_ghost);
+void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
+                             const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers by iterating the list, checking
@@ -132,8 +133,25 @@ void PlaceGhostOnScaffold(GrimoireMachina &grimoire_machina,
 ///                       entities, camera, and mouse position.
 /// @param grimoire_machina GrimoireMachina instance to mutate.
 /////////////////////////////////////////////////
-void ProcessSubscribers(
+void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Creates and returns a Connection between specific SocketData on two
+/// PartInstances. returns an error string if object creation fails
+///
+/// Connections are ,by convention, only between a JointInstance and a
+/// FragmentInstance.
+/// @param fragment FragmentInstance to connect.
+/// @param socket_index_a Socket index of the FragmentInstance to connect.
+/// @param joint JointInstance to connect.
+/// @param socket_index_b Socket index of the JointInstance to connect.
+/// @return Connection struct representing the connection between the specified
+/// sockets. return by value
+/////////////////////////////////////////////////
+std::expected<Connection, std::string>
+create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
+                  JointInstance &joint_instance, size_t socket_index_b);
 
 } // namespace steamrot::logic::action::grimoire_machina

@@ -91,6 +91,12 @@ void check_socket_collisions(SocketData &socket_data,
                              SocketData &other_socket_data,
                              const sf::Transform &other_socket_transform) {
 
+  // return early if either socket is not available
+  if (socket_data.state != SocketState::Available ||
+      other_socket_data.state != SocketState::Available) {
+    return;
+  }
+
   const sf::Vector2f socket_world_pos =
       socket_transform.transformPoint(socket_data.local_position);
   const sf::Vector2f other_socket_world_pos =

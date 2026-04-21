@@ -100,7 +100,8 @@ TEST_CASE("draw_view with RenderStates draws Fragment positioning_views at "
   sf::RenderStates states;
   states.transform.translate({10.f, 10.f});
   steamrot::logic::render::grimoire_machina::draw_view(
-      texture, fragment.positioning_views, steamrot::ViewDirection::Front, states);
+      texture, fragment.positioning_views, steamrot::ViewDirection::Front,
+      states);
   texture.display();
 
   const sf::Image image = texture.getTexture().copyToImage();
@@ -437,7 +438,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
       steamrot::FragmentInstance{&grimoire_machina.m_all_fragments["frag"]};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  steamrot::logic::action::grimoire_machina::place_ghost_on_scaffold(
       grimoire_machina, mr_ghost);
 
   REQUIRE_NOTHROW(
@@ -459,7 +460,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
       steamrot::JointInstance{&grimoire_machina.m_all_joints["joint"]};
   grimoire_machina.m_scaffold_form =
       std::make_unique<steamrot::MachinaFormScaffold>();
-  steamrot::logic::action::grimoire_machina::PlaceGhostOnScaffold(
+  steamrot::logic::action::grimoire_machina::place_ghost_on_scaffold(
       grimoire_machina, mr_ghost);
 
   REQUIRE_NOTHROW(
