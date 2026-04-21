@@ -86,4 +86,60 @@ CollectScrollDelta(const std::vector<sf::Event> &sfml_events) {
   return total_delta;
 }
 
+/////////////////////////////////////////////////
+std::vector<CameraPayload>
+CollectPanEvents(const std::vector<sf::Event> &sfml_events) {
+  std::vector<CameraPayload> result;
+
+  for (const auto &event : sfml_events) {
+    if (const auto *key_pressed = event.getIf<sf::Event::KeyPressed>()) {
+      switch (key_pressed->code) {
+      case sf::Keyboard::Key::W:
+        result.emplace_back(CameraPayload::CameraAction::PAN_PRESS,
+                            CameraPayload::PanDirection::UP);
+        break;
+      case sf::Keyboard::Key::A:
+        result.emplace_back(CameraPayload::CameraAction::PAN_PRESS,
+                            CameraPayload::PanDirection::LEFT);
+        break;
+      case sf::Keyboard::Key::S:
+        result.emplace_back(CameraPayload::CameraAction::PAN_PRESS,
+                            CameraPayload::PanDirection::DOWN);
+        break;
+      case sf::Keyboard::Key::D:
+        result.emplace_back(CameraPayload::CameraAction::PAN_PRESS,
+                            CameraPayload::PanDirection::RIGHT);
+        break;
+      default:
+        break;
+      }
+    }
+
+    if (const auto *key_released = event.getIf<sf::Event::KeyReleased>()) {
+      switch (key_released->code) {
+      case sf::Keyboard::Key::W:
+        result.emplace_back(CameraPayload::CameraAction::PAN_RELEASE,
+                            CameraPayload::PanDirection::UP);
+        break;
+      case sf::Keyboard::Key::A:
+        result.emplace_back(CameraPayload::CameraAction::PAN_RELEASE,
+                            CameraPayload::PanDirection::LEFT);
+        break;
+      case sf::Keyboard::Key::S:
+        result.emplace_back(CameraPayload::CameraAction::PAN_RELEASE,
+                            CameraPayload::PanDirection::DOWN);
+        break;
+      case sf::Keyboard::Key::D:
+        result.emplace_back(CameraPayload::CameraAction::PAN_RELEASE,
+                            CameraPayload::PanDirection::RIGHT);
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  return result;
+}
+
 } // namespace steamrot::events::convert

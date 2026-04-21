@@ -125,6 +125,19 @@ CreateCameraEventPacket(uint8_t lifetime,
                         const CameraPayload::CameraAction action);
 
 /////////////////////////////////////////////////
+/// @brief Creates an EventPacket with a CameraPayload for a pan press or
+/// release.
+///
+/// @param lifetime      The lifetime of the event in ticks.
+/// @param action        PAN_PRESS or PAN_RELEASE.
+/// @param pan_direction The pan direction being toggled.
+/////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime,
+                        const CameraPayload::CameraAction action,
+                        const CameraPayload::PanDirection pan_direction);
+
+/////////////////////////////////////////////////
 /// @brief Creates an EventPacket with random valid values for testing purposes
 /////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket();

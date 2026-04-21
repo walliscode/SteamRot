@@ -22,6 +22,48 @@ void apply_zoom(CameraState &camera_state, float scroll_delta) {
 void reset_zoom(CameraState &camera_state) { camera_state.m_zoom_level = 1.0f; }
 
 /////////////////////////////////////////////////
+void apply_pan_start(CameraState &camera_state,
+                     CameraPayload::PanDirection direction) {
+  switch (direction) {
+  case CameraPayload::PanDirection::UP:
+    camera_state.m_panning_up = true;
+    break;
+  case CameraPayload::PanDirection::DOWN:
+    camera_state.m_panning_down = true;
+    break;
+  case CameraPayload::PanDirection::LEFT:
+    camera_state.m_panning_left = true;
+    break;
+  case CameraPayload::PanDirection::RIGHT:
+    camera_state.m_panning_right = true;
+    break;
+  default:
+    break;
+  }
+}
+
+/////////////////////////////////////////////////
+void apply_pan_stop(CameraState &camera_state,
+                    CameraPayload::PanDirection direction) {
+  switch (direction) {
+  case CameraPayload::PanDirection::UP:
+    camera_state.m_panning_up = false;
+    break;
+  case CameraPayload::PanDirection::DOWN:
+    camera_state.m_panning_down = false;
+    break;
+  case CameraPayload::PanDirection::LEFT:
+    camera_state.m_panning_left = false;
+    break;
+  case CameraPayload::PanDirection::RIGHT:
+    camera_state.m_panning_right = false;
+    break;
+  default:
+    break;
+  }
+}
+
+/////////////////////////////////////////////////
 void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     CameraState &camera_state) {
@@ -45,6 +87,14 @@ void process_subscribers(
 
     case CameraPayload::CameraAction::RESET_ZOOM:
       reset_zoom(camera_state);
+      break;
+
+    case CameraPayload::CameraAction::PAN_PRESS:
+      apply_pan_start(camera_state, camera_payload->m_pan_direction);
+      break;
+
+    case CameraPayload::CameraAction::PAN_RELEASE:
+      apply_pan_stop(camera_state, camera_payload->m_pan_direction);
       break;
 
     default:

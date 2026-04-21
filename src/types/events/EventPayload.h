@@ -274,8 +274,21 @@ struct CameraPayload {
   enum class CameraAction {
     NONE,
     SCROLL,
-    RESET_ZOOM
+    RESET_ZOOM,
+    PAN_PRESS,
+    PAN_RELEASE
   } action{CameraAction::NONE};
+
+  /////////////////////////////////////////////////
+  /// @brief Identifies which pan direction is being toggled.
+  /////////////////////////////////////////////////
+  enum class PanDirection {
+    NONE,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
+  } m_pan_direction{PanDirection::NONE};
 
   /////////////////////////////////////////////////
   /// @brief Default constructor.
@@ -296,6 +309,16 @@ struct CameraPayload {
   /////////////////////////////////////////////////
   explicit CameraPayload(float delta)
       : action(CameraAction::SCROLL), scroll_delta(delta) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Constructor for pan press/release events.
+  ///
+  /// @param camera_action PAN_PRESS or PAN_RELEASE.
+  /// @param pan_direction  Direction being toggled.
+  /////////////////////////////////////////////////
+  CameraPayload(const CameraAction camera_action,
+                const PanDirection pan_direction)
+      : action(camera_action), m_pan_direction(pan_direction) {}
 
   /////////////////////////////////////////////////
   /// @brief Raw scroll delta from SFML this tick.

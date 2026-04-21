@@ -146,8 +146,165 @@ TEST_CASE(
   REQUIRE(camera_state.m_zoom_level != 1.0f);
 }
 
-TEST_CASE("action_camera::ProcessSubscribers: multiple active subscribers each "
-          "apply their scroll delta",
+/////////////////////////////////////////////////
+// ApplyPanStart / ApplyPanStop
+/////////////////////////////////////////////////
+
+TEST_CASE("action_camera::apply_pan_start: UP sets m_panning_up",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::action::camera::apply_pan_start(
+      camera_state, steamrot::CameraPayload::PanDirection::UP);
+  REQUIRE(camera_state.m_panning_up == true);
+  REQUIRE(camera_state.m_panning_down == false);
+  REQUIRE(camera_state.m_panning_left == false);
+  REQUIRE(camera_state.m_panning_right == false);
+}
+
+TEST_CASE("action_camera::apply_pan_start: DOWN sets m_panning_down",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::action::camera::apply_pan_start(
+      camera_state, steamrot::CameraPayload::PanDirection::DOWN);
+  REQUIRE(camera_state.m_panning_down == true);
+}
+
+TEST_CASE("action_camera::apply_pan_start: LEFT sets m_panning_left",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::action::camera::apply_pan_start(
+      camera_state, steamrot::CameraPayload::PanDirection::LEFT);
+  REQUIRE(camera_state.m_panning_left == true);
+}
+
+TEST_CASE("action_camera::apply_pan_start: RIGHT sets m_panning_right",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::action::camera::apply_pan_start(
+      camera_state, steamrot::CameraPayload::PanDirection::RIGHT);
+  REQUIRE(camera_state.m_panning_right == true);
+}
+
+TEST_CASE("action_camera::apply_pan_start: NONE changes no flags",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::action::camera::apply_pan_start(
+      camera_state, steamrot::CameraPayload::PanDirection::NONE);
+  REQUIRE(camera_state.m_panning_up == false);
+  REQUIRE(camera_state.m_panning_down == false);
+  REQUIRE(camera_state.m_panning_left == false);
+  REQUIRE(camera_state.m_panning_right == false);
+}
+
+TEST_CASE("action_camera::apply_pan_stop: UP clears m_panning_up",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_up = true;
+  steamrot::logic::action::camera::apply_pan_stop(
+      camera_state, steamrot::CameraPayload::PanDirection::UP);
+  REQUIRE(camera_state.m_panning_up == false);
+}
+
+TEST_CASE("action_camera::apply_pan_stop: DOWN clears m_panning_down",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_down = true;
+  steamrot::logic::action::camera::apply_pan_stop(
+      camera_state, steamrot::CameraPayload::PanDirection::DOWN);
+  REQUIRE(camera_state.m_panning_down == false);
+}
+
+TEST_CASE("action_camera::apply_pan_stop: LEFT clears m_panning_left",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_left = true;
+  steamrot::logic::action::camera::apply_pan_stop(
+      camera_state, steamrot::CameraPayload::PanDirection::LEFT);
+  REQUIRE(camera_state.m_panning_left == false);
+}
+
+TEST_CASE("action_camera::apply_pan_stop: RIGHT clears m_panning_right",
+          "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_right = true;
+  steamrot::logic::action::camera::apply_pan_stop(
+      camera_state, steamrot::CameraPayload::PanDirection::RIGHT);
+  REQUIRE(camera_state.m_panning_right == false);
+}
+
+/////////////////////////////////////////////////
+// ProcessSubscribers — panning
+/////////////////////////////////////////////////
+
+TEST_CASE(
+    "action_camera::ProcessSubscribers: PAN_PRESS UP activates panning_up",
+    "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->captured_payload = steamrot::CameraPayload{
+      steamrot::CameraPayload::CameraAction::PAN_PRESS,
+      steamrot::CameraPayload::PanDirection::UP};
+
+  steamrot::logic::action::camera::process_subscribers({subscriber},
+                                                       camera_state);
+
+  REQUIRE(camera_state.m_panning_up == true);
+}
+
+TEST_CASE(
+    "action_camera::ProcessSubscribers: PAN_RELEASE UP deactivates panning_up",
+    "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_up = true;
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->captured_payload = steamrot::CameraPayload{
+      steamrot::CameraPayload::CameraAction::PAN_RELEASE,
+      steamrot::CameraPayload::PanDirection::UP};
+
+  steamrot::logic::action::camera::process_subscribers({subscriber},
+                                                       camera_state);
+
+  REQUIRE(camera_state.m_panning_up == false);
+}
+
+TEST_CASE(
+    "action_camera::ProcessSubscribers: PAN_PRESS RIGHT activates panning_right",
+    "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->captured_payload = steamrot::CameraPayload{
+      steamrot::CameraPayload::CameraAction::PAN_PRESS,
+      steamrot::CameraPayload::PanDirection::RIGHT};
+
+  steamrot::logic::action::camera::process_subscribers({subscriber},
+                                                       camera_state);
+
+  REQUIRE(camera_state.m_panning_right == true);
+}
+
+TEST_CASE(
+    "action_camera::ProcessSubscribers: inactive PAN_PRESS subscriber is "
+    "skipped",
+    "[unit][action_camera]") {
+  steamrot::CameraState camera_state;
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = false;
+  subscriber->captured_payload = steamrot::CameraPayload{
+      steamrot::CameraPayload::CameraAction::PAN_PRESS,
+      steamrot::CameraPayload::PanDirection::UP};
+
+  steamrot::logic::action::camera::process_subscribers({subscriber},
+                                                       camera_state);
+
+  REQUIRE(camera_state.m_panning_up == false);
+}
           "[unit][action_camera]") {
   steamrot::CameraState camera_state;
 

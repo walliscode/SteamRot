@@ -49,4 +49,16 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                  sf::Vector2i screen_pos,
                                  const sf::RenderTexture &texture);
 
+/////////////////////////////////////////////////
+/// @brief Apply the current pan state to the camera position.
+///
+/// Each tick that a pan direction flag is active in @p camera_state, the
+/// camera's world-space position is moved by CameraState::kPanSpeed units in
+/// that direction.  Multiple flags may be active simultaneously (e.g. W+D
+/// for diagonal movement).
+///
+/// @param camera_state Camera state providing pan flags and position to mutate.
+/////////////////////////////////////////////////
+void apply_pan(CameraState &camera_state);
+
 } // namespace steamrot::logic::positioning::camera

@@ -83,4 +83,17 @@ bool CollectGhostClearEvents(const std::vector<sf::Event> &sfml_events);
 std::optional<float>
 CollectScrollDelta(const std::vector<sf::Event> &sfml_events);
 
+/////////////////////////////////////////////////
+/// @brief Collect WASD key-press and key-release events as CameraPayloads.
+///
+/// Iterates the SFML events and emits one CameraPayload per W/A/S/D key-press
+/// (PAN_PRESS) or key-release (PAN_RELEASE).  Returns an empty vector when no
+/// WASD events occurred this tick.
+///
+/// @param sfml_events Vector of SFML events gathered this tick.
+/// @return Zero or more CameraPayloads representing pan press/release events.
+/////////////////////////////////////////////////
+std::vector<CameraPayload>
+CollectPanEvents(const std::vector<sf::Event> &sfml_events);
+
 } // namespace steamrot::events::convert

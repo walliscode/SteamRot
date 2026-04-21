@@ -77,6 +77,18 @@ SFMLEventConverter::ConvertSFMLEvents(const std::vector<sf::Event> &sfml_events)
     }
   }
 
+  // Step 11: Collect WASD pan press/release events.
+  auto pan_events = events::convert::CollectPanEvents(sfml_events);
+
+  // Step 12: Emit a CAMERA EventPacket for each pan event.
+  for (const auto &pan_payload : pan_events) {
+    auto pan_packet = events::CreateCameraEventPacket(
+        1, pan_payload.action, pan_payload.m_pan_direction);
+    if (pan_packet.has_value()) {
+      result.push_back(pan_packet.value());
+    }
+  }
+
   return result;
 }
 
