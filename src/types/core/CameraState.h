@@ -37,6 +37,11 @@ struct CameraState {
   static constexpr float kZoomStep{0.1f};
 
   /////////////////////////////////////////////////
+  /// @brief World units moved per tick while a pan direction is active.
+  /////////////////////////////////////////////////
+  static constexpr float kPanSpeed{5.0f};
+
+  /////////////////////////////////////////////////
   /// @brief Current zoom level.
   ///
   /// A value of 1.0 is the default (no zoom).  Values > 1.0 zoom out
@@ -48,9 +53,28 @@ struct CameraState {
   /// @brief World-space position of the camera centre.
   ///
   /// Defaults to (0, 0) so the world origin is centred on screen at startup.
-  /// Future pan operations write to this field.
   /////////////////////////////////////////////////
   sf::Vector2f m_position{0.f, 0.f};
+
+  /////////////////////////////////////////////////
+  /// @brief True while the W key is held — camera pans upward each tick.
+  /////////////////////////////////////////////////
+  bool m_panning_up{false};
+
+  /////////////////////////////////////////////////
+  /// @brief True while the S key is held — camera pans downward each tick.
+  /////////////////////////////////////////////////
+  bool m_panning_down{false};
+
+  /////////////////////////////////////////////////
+  /// @brief True while the A key is held — camera pans left each tick.
+  /////////////////////////////////////////////////
+  bool m_panning_left{false};
+
+  /////////////////////////////////////////////////
+  /// @brief True while the D key is held — camera pans right each tick.
+  /////////////////////////////////////////////////
+  bool m_panning_right{false};
 };
 
 } // namespace steamrot

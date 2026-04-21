@@ -126,11 +126,11 @@ bool MatchPayload(const GhostPayload &filter_payload,
 }
 
 /////////////////////////////////////////////////
-bool MatchPayload(const CameraPayload & /*filter_payload*/,
-                  const CameraPayload & /*event_payload*/) {
-  // Any camera scroll event matches — the subscriber reads the delta
-  // from captured_payload rather than filtering on a specific value.
-  return true;
+bool MatchPayload(const CameraPayload &filter_payload,
+                  const CameraPayload &event_payload) {
+  // Each subscriber filters on a specific CameraAction so that SCROLL,
+  // RESET_ZOOM, PAN_PRESS and PAN_RELEASE subscribers fire independently.
+  return filter_payload.action == event_payload.action;
 }
 
 /////////////////////////////////////////////////

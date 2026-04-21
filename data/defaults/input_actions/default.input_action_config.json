@@ -5,7 +5,7 @@
       "action": "SELECT"
     },
     {
-      "keyboard_pressed": ["S"],
+      "keyboard_pressed": ["P"],
       "action": "TOGGLE_SOCKET_VISIBILITY"
     },
     {

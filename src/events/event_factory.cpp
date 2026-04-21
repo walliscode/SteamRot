@@ -107,6 +107,17 @@ CreateCameraEventPacket(uint8_t lifetime,
 }
 
 /////////////////////////////////////////////////
+std::expected<EventPacket, FailInfo>
+CreateCameraEventPacket(uint8_t lifetime,
+                        const CameraPayload::CameraAction action,
+                        const CameraPayload::PanDirection pan_direction) {
+  EventContext context{lifetime};
+  CameraPayload payload(action, pan_direction);
+  EventPacket packet{context, EventType::CAMERA, payload};
+  return packet;
+}
+
+/////////////////////////////////////////////////
 std::expected<EventPacket, FailInfo> CreateRandomEventPacket() {
   // Initialize random number generator
   std::random_device rd;

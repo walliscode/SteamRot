@@ -28,4 +28,16 @@ sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                   get_world_view(camera_state, texture));
 }
 
+/////////////////////////////////////////////////
+void apply_pan(CameraState &camera_state) {
+  if (camera_state.m_panning_left)
+    camera_state.m_position.x -= CameraState::kPanSpeed;
+  if (camera_state.m_panning_right)
+    camera_state.m_position.x += CameraState::kPanSpeed;
+  if (camera_state.m_panning_up)
+    camera_state.m_position.y -= CameraState::kPanSpeed;
+  if (camera_state.m_panning_down)
+    camera_state.m_position.y += CameraState::kPanSpeed;
+}
+
 } // namespace steamrot::logic::positioning::camera

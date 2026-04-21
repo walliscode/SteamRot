@@ -63,7 +63,9 @@ enum GhostActionFbs: byte {
 enum CameraActionFbs: byte {
   NONE = 0,
   SCROLL,
-  RESET_ZOOM
+  RESET_ZOOM,
+  PAN_PRESS,
+  PAN_RELEASE
 }
 
 ////////////////////////////////////////////////////////////

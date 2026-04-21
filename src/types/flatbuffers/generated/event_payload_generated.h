@@ -240,31 +240,37 @@ enum CameraActionFbs : int8_t {
   CameraActionFbs_NONE = 0,
   CameraActionFbs_SCROLL = 1,
   CameraActionFbs_RESET_ZOOM = 2,
+  CameraActionFbs_PAN_PRESS = 3,
+  CameraActionFbs_PAN_RELEASE = 4,
   CameraActionFbs_MIN = CameraActionFbs_NONE,
-  CameraActionFbs_MAX = CameraActionFbs_RESET_ZOOM
+  CameraActionFbs_MAX = CameraActionFbs_PAN_RELEASE
 };
 
-inline const CameraActionFbs (&EnumValuesCameraActionFbs())[3] {
+inline const CameraActionFbs (&EnumValuesCameraActionFbs())[5] {
   static const CameraActionFbs values[] = {
     CameraActionFbs_NONE,
     CameraActionFbs_SCROLL,
-    CameraActionFbs_RESET_ZOOM
+    CameraActionFbs_RESET_ZOOM,
+    CameraActionFbs_PAN_PRESS,
+    CameraActionFbs_PAN_RELEASE
   };
   return values;
 }
 
 inline const char * const *EnumNamesCameraActionFbs() {
-  static const char * const names[4] = {
+  static const char * const names[6] = {
     "NONE",
     "SCROLL",
     "RESET_ZOOM",
+    "PAN_PRESS",
+    "PAN_RELEASE",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCameraActionFbs(CameraActionFbs e) {
-  if (::flatbuffers::IsOutRange(e, CameraActionFbs_NONE, CameraActionFbs_RESET_ZOOM)) return "";
+  if (::flatbuffers::IsOutRange(e, CameraActionFbs_NONE, CameraActionFbs_PAN_RELEASE)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCameraActionFbs()[index];
 }

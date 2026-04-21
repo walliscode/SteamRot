@@ -74,3 +74,87 @@ TEST_CASE("positioning_camera::MapToWorldCoords: default camera maps screen "
   REQUIRE(std::abs(world_pos.x) < 0.01f);
   REQUIRE(std::abs(world_pos.y) < 0.01f);
 }
+
+/////////////////////////////////////////////////
+// ApplyPan
+/////////////////////////////////////////////////
+
+TEST_CASE("positioning_camera::apply_pan: no pan flags active leaves position "
+          "unchanged",
+          "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == 0.f);
+  REQUIRE(camera_state.m_position.y == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::apply_pan: panning_right moves position x by kPanSpeed",
+    "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_right = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == steamrot::CameraState::kPanSpeed);
+  REQUIRE(camera_state.m_position.y == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::apply_pan: panning_left moves position x by -kPanSpeed",
+    "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_left = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == -steamrot::CameraState::kPanSpeed);
+  REQUIRE(camera_state.m_position.y == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::apply_pan: panning_down moves position y by kPanSpeed",
+    "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_down = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == 0.f);
+  REQUIRE(camera_state.m_position.y == steamrot::CameraState::kPanSpeed);
+}
+
+TEST_CASE(
+    "positioning_camera::apply_pan: panning_up moves position y by -kPanSpeed",
+    "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_up = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == 0.f);
+  REQUIRE(camera_state.m_position.y == -steamrot::CameraState::kPanSpeed);
+}
+
+TEST_CASE("positioning_camera::apply_pan: simultaneous panning_right and "
+          "panning_down produces diagonal movement",
+          "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_right = true;
+  camera_state.m_panning_down = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == steamrot::CameraState::kPanSpeed);
+  REQUIRE(camera_state.m_position.y == steamrot::CameraState::kPanSpeed);
+}
+
+TEST_CASE("positioning_camera::apply_pan: opposing panning flags cancel out",
+          "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_left = true;
+  camera_state.m_panning_right = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x == 0.f);
+}
+
+TEST_CASE(
+    "positioning_camera::apply_pan: accumulates over multiple calls",
+    "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_right = true;
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+  REQUIRE(camera_state.m_position.x ==
+          2.f * steamrot::CameraState::kPanSpeed);
+}
