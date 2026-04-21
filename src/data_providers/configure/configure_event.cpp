@@ -247,6 +247,12 @@ ConfigureCameraPayload(CameraPayload &camera_payload,
   case CameraActionFbs_RESET_ZOOM:
     camera_payload.action = CameraPayload::CameraAction::RESET_ZOOM;
     break;
+  case CameraActionFbs_PAN_PRESS:
+    camera_payload.action = CameraPayload::CameraAction::PAN_PRESS;
+    break;
+  case CameraActionFbs_PAN_RELEASE:
+    camera_payload.action = CameraPayload::CameraAction::PAN_RELEASE;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,

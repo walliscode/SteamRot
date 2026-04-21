@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CameraState.h"
+#include "EventPayload.h"
 #include "Subscriber.h"
 #include <memory>
 #include <vector>

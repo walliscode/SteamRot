@@ -84,13 +84,13 @@ bool MatchPayload(const GhostPayload &filter_payload,
 /////////////////////////////////////////////////
 /// @brief Returns true if the filter payload matches the event payload.
 ///
-/// Any CameraPayload matches any other CameraPayload — the subscriber
-/// receives the scroll delta from the captured_payload rather than
-/// selecting on a specific delta value.
+/// Compares the CameraAction field of the filter and event payloads.
+/// This ensures each action-specific subscriber (SCROLL, RESET_ZOOM,
+/// PAN_PRESS, PAN_RELEASE) only fires for its own event type.
 ///
 /// @param filter_payload CameraPayload from Subscriber filter
 /// @param event_payload  CameraPayload from EventBus
-/// @return Always true when both payloads are CameraPayload.
+/// @return True when both payloads share the same CameraAction.
 /////////////////////////////////////////////////
 bool MatchPayload(const CameraPayload &filter_payload,
                   const CameraPayload &event_payload);

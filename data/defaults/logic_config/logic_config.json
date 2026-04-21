@@ -64,7 +64,22 @@
       {
         "event_type": "CAMERA",
         "filter_payload_type": "CameraPayloadFbs",
+        "filter_payload": { "action": "SCROLL" }
+      },
+      {
+        "event_type": "CAMERA",
+        "filter_payload_type": "CameraPayloadFbs",
         "filter_payload": { "action": "RESET_ZOOM" }
+      },
+      {
+        "event_type": "CAMERA",
+        "filter_payload_type": "CameraPayloadFbs",
+        "filter_payload": { "action": "PAN_PRESS" }
+      },
+      {
+        "event_type": "CAMERA",
+        "filter_payload_type": "CameraPayloadFbs",
+        "filter_payload": { "action": "PAN_RELEASE" }
       }
     ]
   }
