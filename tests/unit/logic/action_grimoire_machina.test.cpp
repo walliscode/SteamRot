@@ -1267,3 +1267,257 @@ TEST_CASE("create_connection tests",
             steamrot::SocketState::Connected);
   }
 }
+
+TEST_CASE("check_socket_for_connection_readiness tests",
+          "[unit][actions][grimoire_machina][check_socket_for_connection_"
+          "readiness]") {
+  steamrot::tests::TestPartLibrary library{
+      steamrot::tests::TestPartLibrary::Create()};
+  steamrot::tests::PartLibraryBuilder builder(library);
+
+  SECTION("check_socket_for_connection_readiness returns false for state != "
+          "Available and is_ready_to_connect is false") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_one_socket");
+    // manually set the only socket to occupied
+    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    frag_instance.sockets.at(0).is_ready_to_connect = false;
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_socket_for_connection_readiness(frag_instance.sockets.at(0));
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_socket_for_connection_readiness returns false for state != "
+          "Available but is_ready_to_connect is true") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_one_socket");
+    // manually set the only socket to occupied but ready
+    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    frag_instance.sockets.at(0).is_ready_to_connect = true;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_socket_for_connection_readiness(frag_instance.sockets.at(0));
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_socket_for_connection_readiness returns false for state == "
+          "Available but is_ready_to_connect is false") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_one_socket");
+    // ensure the only socket is available but not ready
+    frag_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(0).is_ready_to_connect = false;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_socket_for_connection_readiness(frag_instance.sockets.at(0));
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_socket_for_connection_readiness returns true for state == "
+          "Available and is_ready_to_connect == true") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_one_socket");
+    // ensure the only socket is available and ready
+    frag_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(0).is_ready_to_connect = true;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_socket_for_connection_readiness(frag_instance.sockets.at(0));
+    REQUIRE(result);
+  }
+}
+TEST_CASE("check_MrGhost_for_connection_readiness tests",
+          "[unit][actions][grimoire_machina][check_MrGhost_for_connection_"
+          "readiness]") {
+  steamrot::tests::TestPartLibrary library{
+      steamrot::tests::TestPartLibrary::Create()};
+  steamrot::tests::PartLibraryBuilder builder(library);
+
+  steamrot::MrGhost mr_ghost; // default monostate selection
+  REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
+
+  SECTION("check_MrGhost_for_connection_readiness returns false for monostate "
+          "selection") {
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_MrGhost_for_connection_readiness returns false for fragment "
+          "with no sockets") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_no_socket");
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = frag_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_MrGhost_for_connection_readiness returns false for joint with "
+          "no sockets") {
+    steamrot::JointInstance joint_instance =
+        builder.MakeJointInstance("joint_no_socket");
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = joint_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+  SECTION("check_MrGhost_for_connection_readiness returns false for fragment "
+          "with state != Available") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_one_socket");
+    // manually set the only socket to occupied
+    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = frag_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_MrGhost_for_connection_readiness returns false for joint with "
+          "state != Available") {
+    steamrot::JointInstance joint_instance =
+        builder.MakeJointInstance("joint_one_socket");
+    // manually set the only socket to occupied
+    joint_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = joint_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+  SECTION(
+      "check_MrGhost_for_connection_readiness returns true for fragment with"
+      "available sockets") {
+    steamrot::FragmentInstance frag_instance =
+        builder.MakeFragmentInstance("fragment_two_sockets");
+    frag_instance.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(1).is_ready_to_connect = true;
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = frag_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE(result);
+    REQUIRE(result.value() ==
+            1); // the index of the first available and ready socket
+  }
+
+  SECTION("check_MrGhost_for_connection_readiness returns true for joint with"
+          "available sockets") {
+    steamrot::JointInstance joint_instance =
+        builder.MakeJointInstance("joint_two_sockets");
+    joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    joint_instance.sockets.at(0).is_ready_to_connect = true;
+    steamrot::MrGhost mr_ghost;
+    mr_ghost.m_instance = joint_instance;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_MrGhost_for_connection_readiness(mr_ghost);
+    REQUIRE(result);
+    REQUIRE(result.value() ==
+            0); // the index of the first available and ready socket_data
+  }
+}
+
+TEST_CASE("check_PartMap_for_connection_readiness tests",
+          "[unit][actions][grimoire_machina][check_PartMap_for_connection_"
+          "readiness]") {
+  steamrot::tests::TestPartLibrary library{
+      steamrot::tests::TestPartLibrary::Create()};
+  steamrot::tests::PartLibraryBuilder builder(library);
+
+  SECTION("check_PartMap_for_connection_readiness returns std::nullopt for "
+          "empty PartMap") {
+    steamrot::PartMap part_map;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartMap_for_connection_readiness(part_map);
+
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_PartMap_for_connection_readiness returns std::nullopt when no "
+          "parts have available sockets") {
+
+    steamrot::PartMap part_map =
+        builder.MakePartMap({"fragment_no_socket"}, {"joint_no_socket"});
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartMap_for_connection_readiness(part_map);
+
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+          "FragmentInstance with "
+          "available sockets") {
+    steamrot::PartMap part_map =
+        builder.MakePartMap({"fragment_two_sockets"}, {"joint_no_socket"});
+
+    // get the Fragment at id 0
+    auto &part = part_map.at(0);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part));
+    auto &frag_instance = std::get<steamrot::FragmentInstance>(part);
+    // set its only socket to available and ready
+    frag_instance.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(1).is_ready_to_connect = true;
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartMap_for_connection_readiness(part_map);
+    REQUIRE(result);
+    REQUIRE(result.value().first ==
+            0); // the id of the part with available sockets
+    REQUIRE(
+        result.value().second ==
+        1); // the index of the first available and ready socket on that part
+  }
+
+  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+          "JointInstance with "
+          "available sockets") {
+    steamrot::PartMap part_map =
+        builder.MakePartMap({"fragment_no_socket"}, {"joint_two_sockets"});
+    // get the Joint at id 1
+    auto &part = part_map.at(1);
+    REQUIRE(std::holds_alternative<steamrot::JointInstance>(part));
+    auto &joint_instance = std::get<steamrot::JointInstance>(part);
+    // set its first socket to available and ready
+    joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    joint_instance.sockets.at(0).is_ready_to_connect = true;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartMap_for_connection_readiness(part_map);
+    REQUIRE(result);
+    REQUIRE(result.value().first ==
+            1); // the id of the part with available sockets
+    REQUIRE(
+        result.value().second ==
+        0); // the index of the first available and ready socket on that part
+  }
+
+  SECTION(
+      "check_PartMap_for_connection_readiness returns the id of a part with "
+      "available sockets when multiple parts have available sockets") {
+    steamrot::PartMap part_map = builder.MakePartMap(
+        {"fragment_two_sockets", "fragment_one_socket"}, {"joint_no_socket"});
+    // set the first Fragment's socket 1 to available and ready
+    auto &part0 = part_map.at(0);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part0));
+    auto &frag_instance0 = std::get<steamrot::FragmentInstance>(part0);
+    frag_instance0.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance0.sockets.at(1).is_ready_to_connect = true;
+    // set the second Fragment's socket 0 to available and ready
+    auto &part1 = part_map.at(1);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part1));
+    auto &frag_instance1 = std::get<steamrot::FragmentInstance>(part1);
+    frag_instance1.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance1.sockets.at(0).is_ready_to_connect = true;
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartMap_for_connection_readiness(part_map);
+    REQUIRE(result);
+    // the result should be the first part with available sockets, which is the
+    // Fragment at id 0
+    REQUIRE(result.value().first == 0);
+    REQUIRE(result.value().second == 1); // socket index 1 on that Fragment
+  }
+}
