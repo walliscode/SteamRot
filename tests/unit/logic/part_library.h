@@ -153,6 +153,30 @@ public:
   PartMap MakePartMap(const std::vector<std::string> &fragment_names,
                       const std::vector<std::string> &joint_names);
 
+  /////////////////////////////////////////////////
+  /// @brief Build a MachinaFormScaffold pre-populated with instances but no
+  /// connections.
+  ///
+  /// Fragment instances are added first (in order), then Joint instances.
+  /// Each instance is assigned a monotonically increasing ID from this
+  /// builder's internal counter and the scaffold's @c next_id is advanced to
+  /// match.
+  ///
+  /// All raw pointers in the instances point into the library's storage — the
+  /// library must outlive the returned scaffold.
+  ///
+  /// Typical usage: call MakeScaffoldWithParts to obtain a scaffold, then push
+  /// Connection values into @c scaffold.connections to build connected or ring
+  /// scenarios.
+  ///
+  /// @param fragment_names Names of Fragments to include, in order.
+  /// @param joint_names    Names of Joints to include, in order.
+  /// @return MachinaFormScaffold containing the requested instances.
+  /////////////////////////////////////////////////
+  MachinaFormScaffold
+  MakeScaffoldWithParts(const std::vector<std::string> &fragment_names,
+                        const std::vector<std::string> &joint_names);
+
 private:
   /////////////////////////////////////////////////
   /// @brief Reference to the library this builder draws from.
