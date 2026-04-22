@@ -14,7 +14,6 @@
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
 #include "PartGraph.h"
-#include <cstddef>
 
 namespace steamrot::logic::analysis::grimoire_machina {
 
@@ -42,35 +41,6 @@ extern const NodeDescriptor is_fragment;
 /// JointInstance.
 /////////////////////////////////////////////////
 extern const NodeDescriptor is_joint;
-
-/////////////////////////////////////////////////
-/// @brief Return true if the node has no edges in the graph.
-///
-/// @param node  PartNode to test.
-/// @param graph PartGraph containing the edge list to search.
-/// @return True when no edge in @p graph references @p node.id.
-/////////////////////////////////////////////////
-bool is_isolated(const PartNode &node, const PartGraph &graph);
-
-/////////////////////////////////////////////////
-/// @brief Count the edges that reference this node.
-///
-/// An edge is counted once for each endpoint that matches @p node.id,
-/// so a self-loop would count twice.
-///
-/// @param node  PartNode to count edges for.
-/// @param graph PartGraph containing the edge list to search.
-/// @return Number of edge endpoints matching @p node.id.
-/////////////////////////////////////////////////
-size_t edge_count(const PartNode &node, const PartGraph &graph);
-
-/////////////////////////////////////////////////
-/// @brief Return the number of sockets on this node's instance.
-///
-/// @param node PartNode to query.
-/// @return Size of the instance's sockets vector.
-/////////////////////////////////////////////////
-size_t socket_count(const PartNode &node);
 
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node has at least one

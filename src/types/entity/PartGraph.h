@@ -53,8 +53,8 @@ struct PartNode {
   /// @param variant  Const reference to the PartMap value; the address is
   ///                 stored. The PartMap must outlive this node.
   /////////////////////////////////////////////////
-  explicit PartNode(uint32_t id,
-                    const std::variant<JointInstance, FragmentInstance> &variant)
+  explicit PartNode(
+      uint32_t id, const std::variant<JointInstance, FragmentInstance> &variant)
       : id{id}, instance{&variant} {}
 };
 

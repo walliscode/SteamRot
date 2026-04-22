@@ -38,34 +38,6 @@ const NodeDescriptor is_joint = [](const PartNode &node) -> bool {
 };
 
 /////////////////////////////////////////////////
-bool is_isolated(const PartNode &node, const PartGraph &graph) {
-  for (const auto &edge : graph.edges) {
-    if (edge.part_id_a == node.id || edge.part_id_b == node.id)
-      return false;
-  }
-  return true;
-}
-
-/////////////////////////////////////////////////
-size_t edge_count(const PartNode &node, const PartGraph &graph) {
-  size_t count = 0;
-  for (const auto &edge : graph.edges) {
-    if (edge.part_id_a == node.id)
-      ++count;
-    if (edge.part_id_b == node.id)
-      ++count;
-  }
-  return count;
-}
-
-/////////////////////////////////////////////////
-size_t socket_count(const PartNode &node) {
-  return std::visit(
-      [](const auto &instance) -> size_t { return instance.sockets.size(); },
-      *node.instance);
-}
-
-/////////////////////////////////////////////////
 const NodeDescriptor has_available_socket = [](const PartNode &node) -> bool {
   return std::visit(
       [](const auto &instance) -> bool {
