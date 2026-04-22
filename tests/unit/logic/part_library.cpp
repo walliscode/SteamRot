@@ -212,4 +212,24 @@ PartLibraryBuilder::MakePartMap(const std::vector<std::string> &fragment_names,
   return parts;
 }
 
+/////////////////////////////////////////////////
+MachinaFormScaffold PartLibraryBuilder::MakeScaffoldWithParts(
+    const std::vector<std::string> &fragment_names,
+    const std::vector<std::string> &joint_names) {
+  MachinaFormScaffold scaffold;
+
+  for (const auto &name : fragment_names) {
+    FragmentInstance instance = MakeFragmentInstance(name);
+    scaffold.parts.emplace(instance.id, std::move(instance));
+  }
+
+  for (const auto &name : joint_names) {
+    JointInstance instance = MakeJointInstance(name);
+    scaffold.parts.emplace(instance.id, std::move(instance));
+  }
+
+  scaffold.next_id = m_next_id;
+  return scaffold;
+}
+
 } // namespace steamrot::tests
