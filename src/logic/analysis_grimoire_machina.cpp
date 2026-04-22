@@ -27,10 +27,6 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
   return graph;
 }
 
-} // namespace steamrot::logic::analysis::grimoire_machina
-
-namespace steamrot::logic::analysis::grimoire_machina::node_descriptor {
-
 /////////////////////////////////////////////////
 bool is_fragment(const PartNode &node) {
   return std::holds_alternative<FragmentInstance>(*node.instance);
@@ -82,4 +78,4 @@ bool has_available_socket(const PartNode &node) {
       *node.instance);
 }
 
-} // namespace steamrot::logic::analysis::grimoire_machina::node_descriptor
+} // namespace steamrot::logic::analysis::grimoire_machina

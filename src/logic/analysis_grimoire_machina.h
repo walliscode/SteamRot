@@ -31,12 +31,10 @@ namespace steamrot::logic::analysis::grimoire_machina {
 /////////////////////////////////////////////////
 PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
 
-} // namespace steamrot::logic::analysis::grimoire_machina
-
-namespace steamrot::logic::analysis::grimoire_machina::node_descriptor {
-
 /////////////////////////////////////////////////
 /// @brief Return true if the node's instance is a FragmentInstance.
+///
+/// Matches the @c NodeDescriptor signature.
 ///
 /// @param node PartNode to query.
 /// @return True when the variant holds a FragmentInstance.
@@ -45,6 +43,8 @@ bool is_fragment(const PartNode &node);
 
 /////////////////////////////////////////////////
 /// @brief Return true if the node's instance is a JointInstance.
+///
+/// Matches the @c NodeDescriptor signature.
 ///
 /// @param node PartNode to query.
 /// @return True when the variant holds a JointInstance.
@@ -84,9 +84,11 @@ size_t socket_count(const PartNode &node);
 /// @brief Return true if the node's instance has at least one available
 /// socket.
 ///
+/// Matches the @c NodeDescriptor signature.
+///
 /// @param node PartNode to query.
 /// @return True when at least one SocketData has state SocketState::Available.
 /////////////////////////////////////////////////
 bool has_available_socket(const PartNode &node);
 
-} // namespace steamrot::logic::analysis::grimoire_machina::node_descriptor
+} // namespace steamrot::logic::analysis::grimoire_machina
