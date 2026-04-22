@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of free functions for analysing a
-/// MachinaFormScaffold as a PartGraph.
+/// @brief Implementation of analysis utilities for a MachinaFormScaffold
+/// as a PartGraph, including free functions and NodeDescriptor predicates.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -28,14 +28,14 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
 }
 
 /////////////////////////////////////////////////
-bool is_fragment(const PartNode &node) {
+const NodeDescriptor is_fragment = [](const PartNode &node) -> bool {
   return std::holds_alternative<FragmentInstance>(*node.instance);
-}
+};
 
 /////////////////////////////////////////////////
-bool is_joint(const PartNode &node) {
+const NodeDescriptor is_joint = [](const PartNode &node) -> bool {
   return std::holds_alternative<JointInstance>(*node.instance);
-}
+};
 
 /////////////////////////////////////////////////
 bool is_isolated(const PartNode &node, const PartGraph &graph) {
@@ -66,7 +66,7 @@ size_t socket_count(const PartNode &node) {
 }
 
 /////////////////////////////////////////////////
-bool has_available_socket(const PartNode &node) {
+const NodeDescriptor has_available_socket = [](const PartNode &node) -> bool {
   return std::visit(
       [](const auto &instance) -> bool {
         for (const auto &socket : instance.sockets) {
@@ -76,6 +76,6 @@ bool has_available_socket(const PartNode &node) {
         return false;
       },
       *node.instance);
-}
+};
 
 } // namespace steamrot::logic::analysis::grimoire_machina

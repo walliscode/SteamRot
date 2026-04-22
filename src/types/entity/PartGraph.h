@@ -127,10 +127,11 @@ struct PartGraph {
 /////////////////////////////////////////////////
 /// @brief Predicate type for single-node queries on a PartGraph.
 ///
-/// Any callable with signature @c bool(const PartNode&) qualifies,
-/// including the free functions @c is_fragment, @c is_joint, and
-/// @c has_available_socket declared in
-/// @c steamrot::logic::analysis::grimoire_machina.
+/// Any callable with signature @c bool(const PartNode&) qualifies.
+/// @c is_fragment, @c is_joint, and @c has_available_socket in
+/// @c steamrot::logic::analysis::grimoire_machina are declared as
+/// @c const @c NodeDescriptor variables and can be used directly or
+/// assigned to other @c NodeDescriptor instances.
 ///
 /// Example:
 /// @code

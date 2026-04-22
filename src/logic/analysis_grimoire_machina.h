@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of free functions for analysing a MachinaFormScaffold
-/// as a PartGraph.
+/// @brief Declaration of analysis utilities for a MachinaFormScaffold
+/// as a PartGraph, including free functions and NodeDescriptor predicates.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -32,24 +32,16 @@ namespace steamrot::logic::analysis::grimoire_machina {
 PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
 
 /////////////////////////////////////////////////
-/// @brief Return true if the node's instance is a FragmentInstance.
-///
-/// Matches the @c NodeDescriptor signature.
-///
-/// @param node PartNode to query.
-/// @return True when the variant holds a FragmentInstance.
+/// @brief NodeDescriptor that returns true when the node holds a
+/// FragmentInstance.
 /////////////////////////////////////////////////
-bool is_fragment(const PartNode &node);
+extern const NodeDescriptor is_fragment;
 
 /////////////////////////////////////////////////
-/// @brief Return true if the node's instance is a JointInstance.
-///
-/// Matches the @c NodeDescriptor signature.
-///
-/// @param node PartNode to query.
-/// @return True when the variant holds a JointInstance.
+/// @brief NodeDescriptor that returns true when the node holds a
+/// JointInstance.
 /////////////////////////////////////////////////
-bool is_joint(const PartNode &node);
+extern const NodeDescriptor is_joint;
 
 /////////////////////////////////////////////////
 /// @brief Return true if the node has no edges in the graph.
@@ -81,14 +73,9 @@ size_t edge_count(const PartNode &node, const PartGraph &graph);
 size_t socket_count(const PartNode &node);
 
 /////////////////////////////////////////////////
-/// @brief Return true if the node's instance has at least one available
-/// socket.
-///
-/// Matches the @c NodeDescriptor signature.
-///
-/// @param node PartNode to query.
-/// @return True when at least one SocketData has state SocketState::Available.
+/// @brief NodeDescriptor that returns true when the node has at least one
+/// available socket.
 /////////////////////////////////////////////////
-bool has_available_socket(const PartNode &node);
+extern const NodeDescriptor has_available_socket;
 
 } // namespace steamrot::logic::analysis::grimoire_machina
