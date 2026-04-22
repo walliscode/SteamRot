@@ -5,7 +5,7 @@ var searchData=
   ['index_2',['index',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ab891e3af3f3cfccd29ecf97c7cf7edcf',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
   ['initial_5fasset_5fconfig_3',['initial_asset_config',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#aac218f45dc87ee926e8585767e7a7a92',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
   ['initial_5fscene_5ftype_4',['initial_scene_type',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ab59d41b8c5334094ee64d68984367638',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
-  ['initialiseactivemachinaformscaffold_5',['InitialiseActiveMachinaFormScaffold',['../namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ad0de42c2fe3b1e81a8b1c016f238455e',1,'steamrot::logic::action::grimoire_machina']]],
+  ['initialise_5factive_5fmachina_5fform_5fscaffold_5',['initialise_active_machina_form_scaffold',['../namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ae1724e3a02ee3f5b38999dc38a5c9294',1,'steamrot::logic::action::grimoire_machina']]],
   ['initialize_5fjoint_5fsocket_5fpositions_6',['initialize_joint_socket_positions',['../namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a445dd43b82a91cb930333938ec788083',1,'steamrot::logic::positioning::grimoire_machina']]],
   ['inner_5fmargin_7',['inner_margin',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a2e9405a1a4d76d065f0613c62e3d89df',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
   ['input_5fdata_8',['input_data',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a54d2f40738d5ca387aa71bdb0200e591',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],

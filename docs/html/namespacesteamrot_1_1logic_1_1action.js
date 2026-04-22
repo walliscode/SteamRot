@@ -1,6 +1,8 @@
 var namespacesteamrot_1_1logic_1_1action =
 [
     [ "camera", "namespacesteamrot_1_1logic_1_1action_1_1camera.html", [
+      [ "apply_pan_start", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#aadefe8a37ac8336f0445afe605d8fabf", null ],
+      [ "apply_pan_stop", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#aa467cc61a02b26ad3a360217c2843fe1", null ],
       [ "apply_zoom", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#ab2178c2daeef0a485704a309da32fd30", null ],
       [ "process_subscribers", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3", null ],
       [ "reset_zoom", "namespacesteamrot_1_1logic_1_1action_1_1camera.html#abb0ba3c92238fabe9b78127f9e6de47f", null ]
@@ -12,16 +14,21 @@ var namespacesteamrot_1_1logic_1_1action =
       [ "SelectGhostItem", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a5822cc57ac5658382ad1fb3d1f1142ab", null ]
     ] ],
     [ "grimoire_machina", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html", [
-      [ "ClearActiveMachinaFormScaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a6fe6338daf0dfc17cfd9947b2df86f10", null ],
-      [ "GetAllFragmentNames", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a54cefc7701635e2e38d9277932f5afda", null ],
-      [ "GetAllJointNames", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa3ed40a1c70f70dc657af5059f7dae8b", null ],
-      [ "InitialiseActiveMachinaFormScaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ad0de42c2fe3b1e81a8b1c016f238455e", null ],
-      [ "PlaceFirstPiece", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#afd041a74089b011592ed5a7ff16d326f", null ],
-      [ "PlaceGhostOnScaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa105a63ee3409a8f406f20e2d042fb36", null ],
-      [ "ProcessLogicEvents", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a40f77522a5faa991c68098dc78a255e2", null ],
-      [ "ProcessSubscribers", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a26fcce758020336d86d72700259218e5", null ],
-      [ "ProcessUserInputEvents", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aacee6fd448a20a3a9d2b82bbed8f2406", null ],
-      [ "ToggleSocketVisibility", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#adc2b2a4a7604e39f0b376088b9c1c557", null ]
+      [ "check_MrGhost_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ac335f904174682cba04257f5d9143b4f", null ],
+      [ "check_PartMap_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a0b038b40b0b0e3f9f5f22da8fe1b80dc", null ],
+      [ "check_socket_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa0c928e0020861fd6d00dfe07bd75cbf", null ],
+      [ "clear_active_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a12caf908a9ff54937c82558ecaf9da67", null ],
+      [ "create_connection", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a015aaaac2c55039ed8eeae1b088d7089", null ],
+      [ "get_all_fragment_names", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a1493aed9574a4967f743f80fa9ec7124", null ],
+      [ "get_all_joint_names", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a4ece06f0db252af0470fde7d2f439241", null ],
+      [ "initialise_active_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ae1724e3a02ee3f5b38999dc38a5c9294", null ],
+      [ "place_first_piece", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a0a4ef1b301b0ccbe6934eb665e8da7a8", null ],
+      [ "place_ghost_on_scaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a5ac44bf50994db4a66b5cd6716bbd60d", null ],
+      [ "place_next_piece", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a32026a52a09e2bd05d1db2497a5625e0", null ],
+      [ "proces_user_input_events", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa511f65e7136ed1e2b63992e3eb0424a", null ],
+      [ "process_logic_events", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a548859d8e2f00f733a34598e7736125f", null ],
+      [ "process_subscribers", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a39b8adb5061ddfc957ac607b4084527f", null ],
+      [ "toggle_socket_visibility", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ad08aeadf3309b7a8d07ea1b155001c9d", null ]
     ] ],
     [ "ui", "namespacesteamrot_1_1logic_1_1action_1_1ui.html", [
       [ "ProcessButtonElementActions", "namespacesteamrot_1_1logic_1_1action_1_1ui.html#a964ece1d9d17a76f92d57fe42397caa1", null ],

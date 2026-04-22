@@ -9,5 +9,5 @@ var searchData=
   ['joints_6',['joints',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ad4c36b2cf6c61569944762253046b0ef',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
   ['jointtag_7',['JointTag',['../structsteamrot_1_1JointTag.html',1,'steamrot']]],
   ['json_8',['json',['../ReTile_8h.html#ab701e3ac61a85b337ec5c1abaad6742d',1,'ReTile.h']]],
-  ['json_20configuration_20file_9',['6.2 Update JSON Configuration File',['../md_documentation_2workflows_2ADDING__LOGIC.html#autotoc_md144',1,'']]]
+  ['json_20configuration_20file_9',['6.2 Update JSON Configuration File',['../adding_logic_classes.html#autotoc_md138',1,'']]]
 ];

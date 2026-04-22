@@ -23,7 +23,8 @@ var LogicType_8h =
       [ "steamrot::LogicType::GhostAction", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eafb6543864473a5074c83f653d16f78d3", null ],
       [ "steamrot::LogicType::GhostPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaa1fcc50f0130bfef31960d6eb19f94d8", null ],
       [ "steamrot::LogicType::GhostRender", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaaa544a4104ef4b266714378c4d39706d", null ],
-      [ "steamrot::LogicType::CameraPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0", null ]
+      [ "steamrot::LogicType::CameraPositioning", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995ea3f32850019c60503d4a1eb9656f8dab0", null ],
+      [ "steamrot::LogicType::CameraAction", "namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eaf493bfee8abce0525d8c84c0701ddaf3", null ]
     ] ],
     [ "steamrot::EnumNameLogicGrouping", "namespacesteamrot.html#ab70ec017d683aae03cdfe8b3caddfb09", null ],
     [ "steamrot::EnumNameLogicType", "namespacesteamrot.html#a10492ae039fa81a3ca85e6c64e9d48a1", null ]

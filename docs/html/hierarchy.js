@@ -147,6 +147,7 @@ var hierarchy =
     [ "steamrot::KeyboardInputDataFbsBuilder", "structsteamrot_1_1KeyboardInputDataFbsBuilder.html", null ],
     [ "Logger", "classLogger.html", null ],
     [ "steamrot::logic::Logic", "classsteamrot_1_1logic_1_1Logic.html", [
+      [ "steamrot::logic::CameraActionLogic", "classsteamrot_1_1logic_1_1CameraActionLogic.html", null ],
       [ "steamrot::logic::CameraPositioningLogic", "classsteamrot_1_1logic_1_1CameraPositioningLogic.html", null ],
       [ "steamrot::logic::GhostActionLogic", "classsteamrot_1_1logic_1_1GhostActionLogic.html", null ],
       [ "steamrot::logic::GhostPositioningLogic", "classsteamrot_1_1logic_1_1GhostPositioningLogic.html", null ],
@@ -178,10 +179,13 @@ var hierarchy =
       [ "steamrot::Fragment", "structsteamrot_1_1Fragment.html", null ],
       [ "steamrot::Joint", "structsteamrot_1_1Joint.html", null ]
     ] ],
+    [ "steamrot::PartEdge", "structsteamrot_1_1PartEdge.html", null ],
+    [ "steamrot::PartGraph", "structsteamrot_1_1PartGraph.html", null ],
     [ "steamrot::PartInstance", "structsteamrot_1_1PartInstance.html", [
       [ "steamrot::FragmentInstance", "structsteamrot_1_1FragmentInstance.html", null ],
       [ "steamrot::JointInstance", "structsteamrot_1_1JointInstance.html", null ]
     ] ],
+    [ "steamrot::PartNode", "structsteamrot_1_1PartNode.html", null ],
     [ "steamrot::PerformanceMetrics", "structsteamrot_1_1PerformanceMetrics.html", null ],
     [ "steamrot::SaveData", "structsteamrot_1_1SaveData.html", null ],
     [ "steamrot::SaveDataFbsBuilder", "structsteamrot_1_1SaveDataFbsBuilder.html", null ],

@@ -1,5 +1,7 @@
 # Coordinate Spaces: Screen Space vs World Space
 
+\page coordinate_spaces Coordinate Spaces
+
 ## Overview
 
 Any game that renders to a window operates in at least two distinct coordinate

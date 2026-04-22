@@ -22,7 +22,7 @@ var searchData=
   ['tile_19',['Tile',['../classTile.html#a6bd8949c13edc65e007f167ca3ca0034',1,'Tile::Tile()'],['../classsteamrot_1_1Tile.html#aeeb5593bb6b75aae2edfcccbc84ab378',1,'steamrot::Tile::Tile()']]],
   ['to_5findex_20',['to_index',['../namespacesteamrot.html#a14ef645978b4e8e1d0e12ab20795b425',1,'steamrot']]],
   ['toggle_5fname_21',['toggle_name',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a35a47750becd6a1bb001b6a3bdeccebc',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
-  ['togglesocketvisibility_22',['ToggleSocketVisibility',['../namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#adc2b2a4a7604e39f0b376088b9c1c557',1,'steamrot::logic::action::grimoire_machina']]],
+  ['toggle_5fsocket_5fvisibility_22',['toggle_socket_visibility',['../namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ad08aeadf3309b7a8d07ea1b155001c9d',1,'steamrot::logic::action::grimoire_machina']]],
   ['tosfmlevent_23',['ToSFMLEvent',['../namespacesteamrot_1_1data_1_1configure.html#acba69d8973cc0e94495e5ea9643b5826',1,'steamrot::data::configure']]],
   ['triangle_5fcolor_24',['triangle_color',['../structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#aae322c36e3735ace248433ccdd166157',1,'steamrot::FLATBUFFERS_FINAL_CLASS']]],
   ['trianglefbsbuilder_25',['TriangleFbsBuilder',['../structsteamrot_1_1TriangleFbsBuilder.html#accc28f19bafa04985df126536a2224e9',1,'steamrot::TriangleFbsBuilder']]],

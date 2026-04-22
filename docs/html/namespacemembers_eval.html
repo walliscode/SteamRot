@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: Namespace Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('namespacemembers_eval.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -90,6 +104,17 @@ $(function(){initNavTree('namespacemembers_eval.html','',''); });
 
 <div class="contents">
 <div class="textblock">Here is a list of all namespace enum values with links to the namespace documentation for each enum value:</div>
+
+<h3 class="doxsection"><a id="index_c" name="index_c"></a>- c -</h3><ul>
+<li>CameraActionFbs_MAX&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfacfd58a53c3bc5a01f08566e91e88b02f">steamrot</a></li>
+<li>CameraActionFbs_MIN&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfada3c01ed834951833ed1af7fa412036f">steamrot</a></li>
+<li>CameraActionFbs_NONE&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa9ca9cc004aea7a5893a1e1a7850cfe1b">steamrot</a></li>
+<li>CameraActionFbs_PAN_PRESS&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cface17bd2a3639b601d7ecf4280cb2bef4">steamrot</a></li>
+<li>CameraActionFbs_PAN_RELEASE&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa72421612f3c3eea7ecea57e4e9e5bd75">steamrot</a></li>
+<li>CameraActionFbs_RESET_ZOOM&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa6ede74ef8913c0f29b470ef91f41e2a9">steamrot</a></li>
+<li>CameraActionFbs_SCROLL&#160;:&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa046f111378ca2a4ea6913f68c841ca24">steamrot</a></li>
+</ul>
+
 
 <h3 class="doxsection"><a id="index_d" name="index_d"></a>- d -</h3><ul>
 <li>DataPopulationFunctionFbs_GetAllFragmentNames&#160;:&#160;<a class="el" href="namespacesteamrot.html#ad7d618a1f630265bc4d64c4803bdd46ba4c54da9f2a4d0cd35ccd0a04288b02fd">steamrot</a></li>

@@ -5,6 +5,7 @@ var annotated_dup =
     ] ],
     [ "steamrot", "namespacesteamrot.html", [
       [ "logic", "namespacesteamrot_1_1logic.html", [
+        [ "CameraActionLogic", "classsteamrot_1_1logic_1_1CameraActionLogic.html", "classsteamrot_1_1logic_1_1CameraActionLogic" ],
         [ "CameraPositioningLogic", "classsteamrot_1_1logic_1_1CameraPositioningLogic.html", "classsteamrot_1_1logic_1_1CameraPositioningLogic" ],
         [ "GhostActionLogic", "classsteamrot_1_1logic_1_1GhostActionLogic.html", "classsteamrot_1_1logic_1_1GhostActionLogic" ],
         [ "GhostPositioningLogic", "classsteamrot_1_1logic_1_1GhostPositioningLogic.html", "classsteamrot_1_1logic_1_1GhostPositioningLogic" ],
@@ -99,6 +100,9 @@ var annotated_dup =
       [ "Connection", "structsteamrot_1_1Connection.html", "structsteamrot_1_1Connection" ],
       [ "MachinaFormScaffold", "structsteamrot_1_1MachinaFormScaffold.html", "structsteamrot_1_1MachinaFormScaffold" ],
       [ "Part", "structsteamrot_1_1Part.html", "structsteamrot_1_1Part" ],
+      [ "PartNode", "structsteamrot_1_1PartNode.html", "structsteamrot_1_1PartNode" ],
+      [ "PartEdge", "structsteamrot_1_1PartEdge.html", "structsteamrot_1_1PartEdge" ],
+      [ "PartGraph", "structsteamrot_1_1PartGraph.html", "structsteamrot_1_1PartGraph" ],
       [ "ViewTable", "structsteamrot_1_1ViewTable.html", "structsteamrot_1_1ViewTable" ],
       [ "EventContext", "structsteamrot_1_1EventContext.html", "structsteamrot_1_1EventContext" ],
       [ "EventPacket", "structsteamrot_1_1EventPacket.html", "structsteamrot_1_1EventPacket" ],

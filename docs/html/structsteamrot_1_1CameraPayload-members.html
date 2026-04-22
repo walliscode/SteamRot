@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: Member List</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('structsteamrot_1_1CameraPayload.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -97,8 +111,12 @@ $(function(){initNavTree('structsteamrot_1_1CameraPayload.html','',''); });
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> enum name</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a>()=default</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">CameraPayload</a>(float delta)</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#a6c72c2f4c402338d554435f6e13b2a97">CameraPayload</a>(const CameraAction camera_action)</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">CameraPayload</a>(float delta)</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#a24da7536e4750a478036e9b7dc49d2e3">CameraPayload</a>(const CameraAction camera_action, const PanDirection pan_direction)</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="odd"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a></td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#ab97cc4fd4c35c0cb869d97ad531d627b">NONE</a></td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
+  <tr class="odd"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">PanDirection</a> enum name</td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a></td><td class="entry"><a class="el" href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->

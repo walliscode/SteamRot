@@ -83,6 +83,7 @@ var structsteamrot_1_1FLATBUFFERS__FINAL__CLASS =
     [ "Builder", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a4efc1fe24766cb98c750ab35c56e4558", null ],
     [ "a", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ab51934b94b66085e214f2c6d0299a439", null ],
     [ "accessibility", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a9d9697ccc0a73c1a7bde84ac1a8cd4a7", null ],
+    [ "action", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a4c9c1a1c99d06c2f8aca6ba536d84ed7", null ],
     [ "action", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#af9afc0e0fed8e519a577b00a2e5e718f", null ],
     [ "action", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#afbb4d63c15028ad911fddcc2bcab6fe4", null ],
     [ "action", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a7b7a03a5231a90291317772b47351d6d", null ],

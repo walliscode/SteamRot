@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: src/events/event_factory.h Source File</title>
+<title>SteamRot: event_factory.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('event__factory_8h_source.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -137,12 +151,21 @@ $(function(){initNavTree('event__factory_8h_source.html','',''); });
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>std::expected&lt;EventPacket, FailInfo&gt;</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><a class="code hl_function" href="namespacesteamrot_1_1events.html#add6835b0b5e15ea60809dd356bcc2474">CreateCameraEventPacket</a>(uint8_t lifetime, <span class="keywordtype">float</span> scroll_delta);</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span></div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>std::expected&lt;EventPacket, FailInfo&gt; <a class="code hl_function" href="namespacesteamrot_1_1events.html#a6ef09940f6196a5710a490d4a934e0cf">CreateRandomEventPacket</a>();</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>} <span class="comment">// namespace steamrot::events</span></div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>std::expected&lt;EventPacket, FailInfo&gt;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><a class="code hl_function" href="namespacesteamrot_1_1events.html#add6835b0b5e15ea60809dd356bcc2474">CreateCameraEventPacket</a>(uint8_t lifetime,</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                        <span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a> action);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span></div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>std::expected&lt;EventPacket, FailInfo&gt;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span><a class="code hl_function" href="namespacesteamrot_1_1events.html#add6835b0b5e15ea60809dd356bcc2474">CreateCameraEventPacket</a>(uint8_t lifetime,</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>                        <span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a> action,</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>                        <span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">CameraPayload::PanDirection</a> pan_direction);</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span></div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>std::expected&lt;EventPacket, FailInfo&gt; <a class="code hl_function" href="namespacesteamrot_1_1events.html#a6ef09940f6196a5710a490d4a934e0cf">CreateRandomEventPacket</a>();</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>} <span class="comment">// namespace steamrot::events</span></div>
 <div class="ttc" id="aEventPacket_8h_html"><div class="ttname"><a href="EventPacket_8h.html">EventPacket.h</a></div><div class="ttdoc">Decleration of the EventPacket struct.</div></div>
 <div class="ttc" id="aFailInfo_8h_html"><div class="ttname"><a href="FailInfo_8h.html">FailInfo.h</a></div><div class="ttdoc">decleration of FailInfo struct</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1events_html"><div class="ttname"><a href="namespacesteamrot_1_1events.html">steamrot::events</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:16</div></div>
-<div class="ttc" id="anamespacesteamrot_1_1events_html_a6ef09940f6196a5710a490d4a934e0cf"><div class="ttname"><a href="namespacesteamrot_1_1events.html#a6ef09940f6196a5710a490d4a934e0cf">steamrot::events::CreateRandomEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateRandomEventPacket()</div><div class="ttdoc">Creates an EventPacket with random valid values for testing purposes.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:100</div></div>
+<div class="ttc" id="anamespacesteamrot_1_1events_html_a6ef09940f6196a5710a490d4a934e0cf"><div class="ttname"><a href="namespacesteamrot_1_1events.html#a6ef09940f6196a5710a490d4a934e0cf">steamrot::events::CreateRandomEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateRandomEventPacket()</div><div class="ttdoc">Creates an EventPacket with random valid values for testing purposes.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:121</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1events_html_a81f1a3ec689f95dff7f9cdcc372d03a1"><div class="ttname"><a href="namespacesteamrot_1_1events.html#a81f1a3ec689f95dff7f9cdcc372d03a1">steamrot::events::CreateGhostEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateGhostEventPacket(const uint8_t lifetime, const GhostPayload::GhostAction action, const GhostSelection &amp;selection)</div><div class="ttdoc">Creates an EventPacket with a GhostPayload.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:81</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1events_html_ab0b7786da03abf467b66c55d22125537"><div class="ttname"><a href="namespacesteamrot_1_1events.html#ab0b7786da03abf467b66c55d22125537">steamrot::events::CreateUIEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateUIEventPacket(const uint8_t lifetime, const UIPayload::UIAction action, const std::string &amp;c_ui_state_name)</div><div class="ttdoc">Creates an EventPacket with a UIPayload.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:30</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1events_html_ab2430091b569fa72eaeba3d8c5b6287d"><div class="ttname"><a href="namespacesteamrot_1_1events.html#ab2430091b569fa72eaeba3d8c5b6287d">steamrot::events::CreateSystemEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateSystemEventPacket(const uint8_t lifetime, const SystemPayload::SystemAction action)</div><div class="ttdoc">Creates an EventPacket with a SystemPayload.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:71</div></div>
@@ -152,6 +175,8 @@ $(function(){initNavTree('event__factory_8h_source.html','',''); });
 <div class="ttc" id="anamespacesteamrot_1_1events_html_af2007a02c081c883ea2f35288587fe2b"><div class="ttname"><a href="namespacesteamrot_1_1events.html#af2007a02c081c883ea2f35288587fe2b">steamrot::events::CreateLogicEventPacket</a></div><div class="ttdeci">std::expected&lt; EventPacket, FailInfo &gt; CreateLogicEventPacket(const uint8_t lifetime, const LogicPayload::LogicToggle toggle_name)</div><div class="ttdoc">Creates an EventPacket with a LogicPayload.</div><div class="ttdef"><b>Definition</b> event_factory.cpp:40</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a24c82489204f0b4f5d11ec18a7b1bcbb"><div class="ttname"><a href="namespacesteamrot.html#a24c82489204f0b4f5d11ec18a7b1bcbb">steamrot::SceneType</a></div><div class="ttdeci">SceneType</div><div class="ttdoc">Native C++ enum representing different scene types.</div><div class="ttdef"><b>Definition</b> SceneType.h:28</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a492d0f6e26c9eed5a949733e85fd359d"><div class="ttname"><a href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">steamrot::GhostSelection</a></div><div class="ttdeci">std::variant&lt; std::monostate, FragmentTag, JointTag &gt; GhostSelection</div><div class="ttdoc">Variant carrying a lightweight selection tag for a ghost item.</div><div class="ttdef"><b>Definition</b> MrGhost.h:52</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a></div><div class="ttdeci">PanDirection</div><div class="ttdoc">Identifies which pan direction is being toggled.</div><div class="ttdef"><b>Definition</b> EventPayload.h:285</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a></div><div class="ttdeci">CameraAction</div><div class="ttdoc">Enum discriminating between different types of camera-related actions.</div><div class="ttdef"><b>Definition</b> EventPayload.h:274</div></div>
 <div class="ttc" id="astructsteamrot_1_1GhostPayload_html_abc819b3dbb65d3a18b48232988cfa46c"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html#abc819b3dbb65d3a18b48232988cfa46c">steamrot::GhostPayload::GhostAction</a></div><div class="ttdeci">GhostAction</div><div class="ttdoc">Discriminates between selecting and clearing the ghost state.</div><div class="ttdef"><b>Definition</b> EventPayload.h:227</div></div>
 <div class="ttc" id="astructsteamrot_1_1InputPayload_html_a670764572f31d5c4d5c600aa20bc78ad"><div class="ttname"><a href="structsteamrot_1_1InputPayload.html#a670764572f31d5c4d5c600aa20bc78ad">steamrot::InputPayload::InputAction</a></div><div class="ttdeci">InputAction</div><div class="ttdoc">The InputAction enum provides the action the user is taking.</div><div class="ttdef"><b>Definition</b> EventPayload.h:34</div></div>
 <div class="ttc" id="astructsteamrot_1_1LogicPayload_html_a026bb2c82b5c575aefc189c3bafc58e6"><div class="ttname"><a href="structsteamrot_1_1LogicPayload.html#a026bb2c82b5c575aefc189c3bafc58e6">steamrot::LogicPayload::LogicToggle</a></div><div class="ttdeci">LogicToggle</div><div class="ttdoc">LogicToggle enum provides the name of the logic toggle being triggered.</div><div class="ttdef"><b>Definition</b> EventPayload.h:107</div></div>

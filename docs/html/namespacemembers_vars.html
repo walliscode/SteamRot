@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: Namespace Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('namespacemembers_vars.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -91,6 +105,9 @@ $(function(){initNavTree('namespacemembers_vars.html','',''); });
 <div class="contents">
 <div class="textblock">Here is a list of all namespace variables with links to the namespace documentation for each variable:</div><ul>
 <li>ComponentRegisterSize&#160;:&#160;<a class="el" href="namespacesteamrot.html#a1754276c51344a1d12d0521f126739b4">steamrot</a></li>
+<li>has_available_socket&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1analysis_1_1grimoire__machina.html#ab89bfbbfc20d3ef68804f562e73bc288">steamrot::logic::analysis::grimoire_machina</a></li>
+<li>is_fragment&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1analysis_1_1grimoire__machina.html#ad118a18afc2e3cf663fcfd29f0581542">steamrot::logic::analysis::grimoire_machina</a></li>
+<li>is_joint&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1analysis_1_1grimoire__machina.html#a78218aaea4e895f52871c1f078e3cfa9">steamrot::logic::analysis::grimoire_machina</a></li>
 <li>kCompositeSlots&#160;:&#160;<a class="el" href="namespacesteamrot.html#aab7befdb7dedf8757b3afaf393e41546">steamrot</a></li>
 <li>kKeyboardBits&#160;:&#160;<a class="el" href="namespacesteamrot.html#a202c36566b846094556177463d48d149">steamrot</a></li>
 <li>kMouseBits&#160;:&#160;<a class="el" href="namespacesteamrot.html#a4088cd8f9cd281f14cdb5495a4e61212">steamrot</a></li>

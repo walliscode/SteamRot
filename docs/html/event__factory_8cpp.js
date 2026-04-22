@@ -1,5 +1,7 @@
 var event__factory_8cpp =
 [
+    [ "steamrot::events::CreateCameraEventPacket", "namespacesteamrot_1_1events.html#a88e6f78f7d28db154147c72713b8b73c", null ],
+    [ "steamrot::events::CreateCameraEventPacket", "namespacesteamrot_1_1events.html#a0ba6899187cbea3b1afc739a9435f73e", null ],
     [ "steamrot::events::CreateCameraEventPacket", "namespacesteamrot_1_1events.html#add6835b0b5e15ea60809dd356bcc2474", null ],
     [ "steamrot::events::CreateGhostEventPacket", "namespacesteamrot_1_1events.html#a81f1a3ec689f95dff7f9cdcc372d03a1", null ],
     [ "steamrot::events::CreateInputEventPacket", "namespacesteamrot_1_1events.html#ac41e8d3e20e901e0c94e2700ac4f96b6", null ],

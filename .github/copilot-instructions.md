@@ -1,18 +1,21 @@
 # GitHub Copilot Instructions for SteamRot
 
-This document provides guidelines for GitHub Copilot agents working on the SteamRot game engine repository.
+This document provides guidelines for GitHub Copilot agents working on the
+SteamRot game engine repository.
 
 ## ⚠️ IMPORTANT: No Build or Test Steps for Agents
 
 **Agents should NEVER attempt to build, test, or lint this repository.**
 
 All building, testing, and linting is done locally by the user. Your role is to:
+
 - Make code changes only
 - Write test files (but not run them)
 - Focus on code implementation
 - Trust that the user will build and test your changes locally
 
 **Do NOT:**
+
 - Run `cmake` commands
 - Run build commands
 - Run test commands (`ctest`, individual test executables)
@@ -20,11 +23,14 @@ All building, testing, and linting is done locally by the user. Your role is to:
 - Attempt to verify that code compiles
 - Check if tests pass
 
-The testing and build infrastructure documentation in this file is for **reference only** to help you understand the project structure and write appropriate code and tests.
+The testing and build infrastructure documentation in this file is for
+**reference only** to help you understand the project structure and write
+appropriate code and tests.
 
 ## Project Overview
 
 SteamRot is a C++ game engine built using:
+
 - **Language**: C++23 (minimum required)
 - **Build System**: CMake (minimum version 3.31)
 - **Graphics**: SFML
@@ -36,23 +42,31 @@ SteamRot is a C++ game engine built using:
 
 ### General Style
 
-Follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) with specific formatting conventions inspired by the [SFML Repository](https://github.com/SFML/SFML/tree/master).
+Follow the
+[Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) with
+specific formatting conventions inspired by the
+[SFML Repository](https://github.com/SFML/SFML/tree/master).
 
 ### Formatting Conventions
 
 #### File Structure
+
 - Use `#pragma once` for header guards
 - Organize headers with preprocessor directives section first
 - Separate sections with visual dividers
 
 #### Spacing Between Functions
+
 Use the following divider between function definitions:
+
 ```cpp
 ////////////////////////////////////////////////////////////
 ```
 
 #### Function Documentation
+
 Use Doxygen-style comments with visual dividers:
+
 ```cpp
 ////////////////////////////////////////////////////////////
 /// @brief Brief description of the function
@@ -63,30 +77,39 @@ Use Doxygen-style comments with visual dividers:
 ```
 
 #### Indentation
+
 - Use **2 spaces** for indentation (not tabs)
 - This is enforced in `.editorconfig`
 
 #### Naming Conventions
 
 **Variables and Code Elements:**
+
 - Member variables: `m_variable_name` (prefix with `m_`)
 - Classes: `PascalCase`
 - Functions: `PascalCase` for public methods
 - Namespaces: `lowercase`
 - Components: Prefix with `C` (e.g., `CUserInterface`, `CGrimoireMachina`)
 
-**File Naming:**
-See [FILE_NAMING_CONVENTIONS.md](../documentation/naming/FILE_NAMING_CONVENTIONS.md) for complete details.
+**File Naming:** See
+[FILE_NAMING_CONVENTIONS.md](../documentation/naming/FILE_NAMING_CONVENTIONS.md)
+for complete details.
 
 Quick reference:
+
 - **Classes**: `ClassName.h/cpp` (PascalCase) → `steamrot::ClassName`
-- **Functions**: All functions use PascalCase (e.g., `GetComponent`, `ProcessLogic`)
-- **Free Function Files**: `subsystem_category.h/cpp` (snake_case files) → `steamrot::subsystem::category`
-- **Template Utils**: `SubsystemUtils.h` (PascalCase, header-only) → `steamrot::subsystem`
-- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case files) → `steamrot::tests::subsystem`
+- **Functions**: All functions use PascalCase (e.g., `GetComponent`,
+  `ProcessLogic`)
+- **Free Function Files**: `subsystem_category.h/cpp` (snake_case files) →
+  `steamrot::subsystem::category`
+- **Template Utils**: `SubsystemUtils.h` (PascalCase, header-only) →
+  `steamrot::subsystem`
+- **Test Helpers**: `subsystem_test_helpers.h/cpp` (snake_case files) →
+  `steamrot::tests::subsystem`
 - **Test Files**: `ModuleName.test.cpp` (matches module being tested)
 
 #### Comments
+
 - Prefer Doxygen-style documentation comments (`///`)
 - Use `@brief`, `@param`, `@return` tags
 - Add comments for complex logic, not obvious code
@@ -95,7 +118,8 @@ Quick reference:
 
 ### Directory Layout
 
-The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork) layout:
+The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
+layout:
 
 - `src/` - Source code
   - `components/` - Pure data container structs (no logic)
@@ -121,17 +145,20 @@ The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
 ### Key Classes and Patterns
 
 #### PathProvider
+
 - Provides absolute paths to data files
 - Configured via CMake with source directory
 - `EnvironmentType` is set once per runtime
 
 #### Components
+
 - Pure data containers with no logic
 - Inherit from `Component` struct
 - Must be default-constructible
 - Register in `ComponentRegister` tuple
 
 #### FlatBuffers Data
+
 - Each component has a FlatBuffers schema (`.fbs` file)
 - Naming: Add `Data` suffix (e.g., `NewComponentData`)
 - Include in `entities.fbs` and `EntityData` table
@@ -139,17 +166,21 @@ The project follows the [Pitchfork](https://github.com/vector-of-bool/pitchfork)
 ## Error Handling
 
 ### Exception Handling
+
 - Let exceptions propagate up the stack
 - **Do not** use try/catch except at the top game loop level
 - Top-level catch displays error screen with actionable information
 
 ### Expected Pattern
+
 - Use `std::expected` for operations that may fail at runtime
-- Return `std::expected<std::monostate, FailInfo>` for operations without return values
+- Return `std::expected<std::monostate, FailInfo>` for operations without return
+  values
 - Use `ErrorHandler` namespace to process errors by severity
 - Critical errors throw exceptions
 
 ### Validation
+
 - Add extensive null checks for FlatBuffers data (susceptible to segfaults)
 - Use if statements to validate all optional fields before access
 
@@ -162,17 +193,21 @@ Follow these steps to add a new component to the game engine:
 #### 1. Create Component Struct (`src/components/`)
 
 **Files to create:**
+
 - `src/components/CNewComponent.h` (header)
 - `src/components/CNewComponent.cpp` (source)
 
 **Component Requirements:**
+
 - Inherit from `Component` struct
-- Pure data container (no logic, only data members + `GetComponentRegisterIndex()`)
+- Pure data container (no logic, only data members +
+  `GetComponentRegisterIndex()`)
 - Must be default-constructible (initialize all members)
 - Use `C` prefix for class name (e.g., `CNewComponent`)
 - Use `m_` prefix for member variables
 
 **Example Header:**
+
 ```cpp
 ////////////////////////////////////////////////////////////
 /// @file
@@ -193,7 +228,7 @@ struct CNewComponent : public Component {
   /// @brief Description of data member
   ////////////////////////////////////////////////////////////
   std::string m_data_field{"default_value"};
-  
+
   int m_numeric_value{0};
 
   ////////////////////////////////////////////////////////////
@@ -207,6 +242,7 @@ struct CNewComponent : public Component {
 ```
 
 **Example Source:**
+
 ```cpp
 #include "CNewComponent.h"
 #include "containers.h"
@@ -226,11 +262,13 @@ size_t CNewComponent::GetComponentRegisterIndex() const {
 **In `src/components/containers.h`:**
 
 Add include:
+
 ```cpp
 #include "CNewComponent.h"
 ```
 
 Add to `ComponentRegister` tuple (at the end):
+
 ```cpp
 typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CNewComponent>
     ComponentRegister;
@@ -239,6 +277,7 @@ typedef std::tuple<CMeta, CUserInterface, CMachinaForm, CGrimoireMachina, CNewCo
 #### 3. Create FlatBuffers Schema (`.fbs` file)
 
 **Create `src/flatbuffers_headers/new_component.fbs`:**
+
 ```fbs
 namespace steamrot;
 
@@ -249,6 +288,7 @@ table NewComponentData {
 ```
 
 **Add to `src/flatbuffers_headers/generate_flatbuffers_headers.cmake`:**
+
 ```cmake
 set(schema_files
     # ... existing files ...
@@ -257,6 +297,7 @@ set(schema_files
 ```
 
 **Include in `src/flatbuffers_headers/entities.fbs`:**
+
 ```fbs
 include "user_interface.fbs";
 include "grimoire_machina.fbs";
@@ -271,19 +312,22 @@ table EntityData{
 }
 ```
 
-**Note:** Building is done locally by the user. FlatBuffers headers are auto-generated during the build process by the user.
+**Note:** Building is done locally by the user. FlatBuffers headers are
+auto-generated during the build process by the user.
 
 #### 4. Create ConfigureComponent Method
 
 **In `src/entity/FlatbuffersConfigurator.h`:**
 
 Add includes:
+
 ```cpp
 #include "CNewComponent.h"
 #include "new_component_generated.h"
 ```
 
 Add method declaration in private section:
+
 ```cpp
 ////////////////////////////////////////////////////////////
 /// @brief Overloaded method for configuring CNewComponent
@@ -299,6 +343,7 @@ ConfigureComponent(const NewComponentData *component_data,
 **In `src/entity/FlatbuffersConfigurator.cpp`:**
 
 Add implementation:
+
 ```cpp
 ////////////////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
@@ -328,6 +373,7 @@ FlatbuffersConfigurator::ConfigureComponent(
 **In `FlatbuffersConfigurator::ConfigureEntitiesFromDefaultData`:**
 
 Add this block with other component configurations:
+
 ```cpp
 // CNewComponent component configuration
 if (entity_data->c_new_component()) {
@@ -342,7 +388,9 @@ if (entity_data->c_new_component()) {
 
 #### 6. Write Tests
 
-**Create `tests/components/CNewComponent.test.cpp` (if testing component itself):**
+**Create `tests/components/CNewComponent.test.cpp` (if testing component
+itself):**
+
 ```cpp
 #include "CNewComponent.h"
 #include <catch2/catch_test_macros.hpp>
@@ -355,6 +403,7 @@ TEST_CASE("CNewComponent is default constructible", "[CNewComponent]") {
 ```
 
 **Add to `tests/components/CMakeLists.txt`:**
+
 ```cmake
 add_executable(test_components
   CGrimoireMachina.test.cpp
@@ -362,19 +411,24 @@ add_executable(test_components
 )
 ```
 
-**Update `tests/entity/FlatbuffersConfigurator.test.cpp`** for configuration testing
+**Update `tests/entity/FlatbuffersConfigurator.test.cpp`** for configuration
+testing
 
 #### 7. Completion
 
-**Note:** Building and testing are done locally by the user. Agents should focus on code changes and writing test files. Tests will be run and verified locally.
+**Note:** Building and testing are done locally by the user. Agents should focus
+on code changes and writing test files. Tests will be run and verified locally.
 
 #### Critical Points
 
-- **Always** wrap FlatBuffers field access in `if` statements (strings, vectors, tables)
+- **Always** wrap FlatBuffers field access in `if` statements (strings, vectors,
+  tables)
 - **Always** call base `ConfigureComponent(Component&)` first
 - **Always** use default initialization for all member variables
-- **Write tests** for new functionality (but don't run them - user will test locally)
-- **Primitive types** (int, bool, float) can be accessed directly from FlatBuffers
+- **Write tests** for new functionality (but don't run them - user will test
+  locally)
+- **Primitive types** (int, bool, float) can be accessed directly from
+  FlatBuffers
 - **Complex types** (strings, vectors, tables) must be null-checked
 
 ### Adding UI Elements
@@ -396,9 +450,12 @@ add_executable(test_components
 
 ### Adding Logic Classes
 
-Logic classes implement game system behaviors (collision, rendering, actions, positioning).
+Logic classes implement game system behaviors (collision, rendering, actions,
+positioning).
 
-**Complete Examples**: See `documentation/examples/` for full example files (ExampleLogic.h, ExampleLogic.cpp, ExampleLogic.test.cpp) demonstrating all patterns.
+**Complete Examples**: See `documentation/examples/` for full example files
+(ExampleLogic.h, ExampleLogic.cpp, ExampleLogic.test.cpp) demonstrating all
+patterns.
 
 #### Quick Reference Steps
 
@@ -499,7 +556,7 @@ void NewLogic::ProcessLogic() {
   ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CYourComponent>();
 
   const auto it = m_logic_context.archetypes.find(archetype_id);
-  
+
   if (it != m_logic_context.archetypes.end()) {
     const Archetype &archetype = it->second;
 
@@ -535,7 +592,7 @@ void NewLogic::ProcessLogic() {
 TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
-  
+
   steamrot::NewLogic new_logic(
       test_context.GetLogicContextForTestScene());
   SUCCEED("NewLogic instantiated successfully");
@@ -544,21 +601,22 @@ TEST_CASE("NewLogic::NewLogic Constructor", "[NewLogic]") {
 TEST_CASE("NewLogic::ProcessLogic performs expected logic", "[NewLogic]") {
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context;
-  
+
   auto logic_context = test_context.GetLogicContextForTestScene();
-  
+
   // Set up test entities and components
   // ...
-  
+
   steamrot::NewLogic new_logic(logic_context);
   new_logic.RunLogic();
-  
+
   // Assert expected state changes
   // REQUIRE(...);
 }
 ```
 
 **Add to `tests/logic/CMakeLists.txt`:**
+
 ```cmake
 add_executable(test_logic
   # ... existing tests ...
@@ -577,7 +635,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
   steamrot::PathProvider path_provider{steamrot::EnvironmentType::Test};
   steamrot::tests::TestContext test_context{
       steamrot::SceneType::SceneType_YOUR_SCENE};
-  
+
   steamrot::LogicFactory logic_factory(
       steamrot::SceneType::SceneType_YOUR_SCENE,
       test_context.GetLogicContextForYourScene());
@@ -586,7 +644,7 @@ TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
   REQUIRE(logic_map_result.has_value());
 
   steamrot::tests::CheckStaticLogicCollections(
-      logic_map_result.value(), 
+      logic_map_result.value(),
       steamrot::SceneType::SceneType_YOUR_SCENE);
 }
 ```
@@ -596,11 +654,13 @@ TEST_CASE("LogicFactory creates correct Logic instances for YourScene",
 **In `src/logic/LogicFactory.cpp`:**
 
 Add include:
+
 ```cpp
 #include "NewLogic.h"
 ```
 
 Add to appropriate Create method:
+
 ```cpp
 std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
   LogicVector action_logics;
@@ -626,11 +686,13 @@ std::expected<LogicVector, FailInfo> LogicFactory::CreateActionLogics() {
 **In `tests/logic/logic_helpers.cpp`:**
 
 Add include:
+
 ```cpp
 #include "NewLogic.h"
 ```
 
 Update `CheckStaticLogicCollections()`:
+
 ```cpp
 void CheckStaticLogicCollections(const LogicCollection &collection,
                                  const SceneType &scene_type) {
@@ -638,12 +700,12 @@ void CheckStaticLogicCollections(const LogicCollection &collection,
   case SceneType::SceneType_YOUR_SCENE: {
     REQUIRE(collection.size() == 3);
     REQUIRE(collection.find(LogicType::Action) != collection.end());
-    
+
     const LogicVector &action_logics = collection.at(LogicType::Action);
     REQUIRE(action_logics.size() == 2);  // Updated count
     REQUIRE(dynamic_cast<NewLogic *>(action_logics[0].get()));
     REQUIRE(dynamic_cast<UIActionLogic *>(action_logics[1].get()));
-    
+
     // ... check other LogicTypes ...
     break;
   }
@@ -655,6 +717,7 @@ void CheckStaticLogicCollections(const LogicCollection &collection,
 #### Logic Class Patterns
 
 **Archetype-Based Processing:**
+
 ```cpp
 ArchetypeID archetype_id = GenerateArchetypeIDfromTypes<CComponent1, CComponent2>();
 const auto it = m_logic_context.archetypes.find(archetype_id);
@@ -664,17 +727,20 @@ if (it != m_logic_context.archetypes.end()) {
 ```
 
 **Component Access:**
+
 ```cpp
 CComponent &comp = emp_helpers::GetComponent<CComponent>(
     entity_id, m_logic_context.scene_entities);
 ```
 
 **Rendering Logic:**
+
 ```cpp
 m_logic_context.scene_texture.draw(drawable);
 ```
 
 **Event Handling:**
+
 ```cpp
 m_logic_context.event_handler.AddEvent(event_packet);
 ```
@@ -711,16 +777,19 @@ m_logic_context.event_handler.AddEvent(event_packet);
 #### Common Issues and Solutions
 
 **Issue**: Logic not executing
+
 - **Check**: Archetype exists in scene
 - **Check**: Entities have required components
 - **Check**: Logic added to correct LogicType
 
 **Issue**: Test failures with "dynamic_cast returned null"
+
 - **Check**: Logic added to LogicFactory for that scene
 - **Check**: Include statement in LogicFactory.cpp
 - **Check**: Order in vector matches test expectations
 
 **Issue**: Wrong Logic order
+
 - **Remember**: Order in LogicVector = execution order
 - **Check**: Test helper validates expected order
 - **Update**: Both LogicFactory and test helper together
@@ -729,12 +798,15 @@ m_logic_context.event_handler.AddEvent(event_packet);
 
 - **Always** call base constructor: `Logic(logic_context)`
 - **Always** check archetype existence before iterating
-- **Write tests** for new implementation (but don't run them - user tests locally)
+- **Write tests** for new implementation (but don't run them - user tests
+  locally)
 - **Always** update test helpers when changing LogicFactory
 - **Never** add logic to component classes (keep them pure data)
 - **Never** modify entities outside their archetype's Logic
-- **Never** register subscribers in a Logic constructor — use `logic_config.json` instead (see below)
-- **Always** keep `ProcessLogic()` as a clean list of named free-function calls (see below)
+- **Never** register subscribers in a Logic constructor — use
+  `logic_config.json` instead (see below)
+- **Always** keep `ProcessLogic()` as a clean list of named free-function calls
+  (see below)
 - Use `m_logic_context` members (don't store duplicates)
 - Use visual dividers (`/////////////////////////////////////////////////`)
 - Use Doxygen documentation (`///`)
@@ -742,9 +814,13 @@ m_logic_context.event_handler.AddEvent(event_packet);
 
 #### Logic Subscriber Registration Pattern
 
-Subscribers must **always** be registered through `data/defaults/logic_config/logic_config.json`, never manually in a Logic constructor. The `LogicFactory` reads this file and wires all subscribers automatically via `Logic::AddSubscriber` and `EventHandler::RegisterSubscriber`.
+Subscribers must **always** be registered through
+`data/defaults/logic_config/logic_config.json`, never manually in a Logic
+constructor. The `LogicFactory` reads this file and wires all subscribers
+automatically via `Logic::AddSubscriber` and `EventHandler::RegisterSubscriber`.
 
 **DO NOT:**
+
 ```cpp
 // ❌ Wrong — manual subscriber in constructor
 MyLogic::MyLogic(const SceneContext scene_context)
@@ -757,6 +833,7 @@ MyLogic::MyLogic(const SceneContext scene_context)
 ```
 
 **DO:**
+
 ```json
 // ✅ Correct — declare in logic_config.json
 "my_action_logic": {
@@ -769,15 +846,20 @@ MyLogic::MyLogic(const SceneContext scene_context)
   ]
 }
 ```
+
 The subscriber(s) become available in `m_subscribers` automatically.
 
 #### ProcessLogic Pattern: Clean List of Free Functions
 
 `ProcessLogic()` must **not** contain inline logic or subscriber loops. Instead:
-1. Obtain any required assets/resources at the top.
-2. Call named free functions (from the matching `action_*.h` file) in a clean, readable list.
 
-Each free function handles its own subscriber iteration and all qualifying guards internally. This keeps `ProcessLogic` readable at a glance and makes the free functions independently testable.
+1. Obtain any required assets/resources at the top.
+2. Call named free functions (from the matching `action_*.h` file) in a clean,
+   readable list.
+
+Each free function handles its own subscriber iteration and all qualifying
+guards internally. This keeps `ProcessLogic` readable at a glance and makes the
+free functions independently testable.
 
 ```cpp
 // ✅ Correct — ProcessLogic is a clean list of named free-function calls
@@ -792,7 +874,9 @@ void MyActionLogic::ProcessLogic() {
 }
 ```
 
-Free functions that consume subscribers check the subscriber's `event_type` (and, if needed, cast `captured_payload`) internally to determine whether a given subscriber is relevant to them:
+Free functions that consume subscribers check the subscriber's `event_type`
+(and, if needed, cast `captured_payload`) internally to determine whether a
+given subscriber is relevant to them:
 
 ```cpp
 // ✅ Correct — free function checks event_type and guards internally
@@ -816,7 +900,9 @@ void ProcessUserInputSubscribers(
 }
 ```
 
-**DO NOT** add `std::shared_ptr<Subscriber>` member variables to Logic classes. All subscribers live in the base-class `m_subscribers` vector and are distinguished by `event_type` at processing time.
+**DO NOT** add `std::shared_ptr<Subscriber>` member variables to Logic classes.
+All subscribers live in the base-class `m_subscribers` vector and are
+distinguished by `event_type` at processing time.
 
 ### Adding Actions
 
@@ -842,9 +928,11 @@ void ProcessUserInputSubscribers(
 
 ## Testing Guidelines (Reference Only)
 
-**Note: Agents do NOT run tests. This section is for reference to help you write test files.**
+**Note: Agents do NOT run tests. This section is for reference to help you write
+test files.**
 
 ### Test-Driven Development (TDD)
+
 - Write test files when implementing features
 - Users will run tests locally
 - Important areas for test coverage:
@@ -855,6 +943,7 @@ void ProcessUserInputSubscribers(
 ### Test Organization and Classification
 
 **Directory Structure:**
+
 ```
 tests/
 ├── unit/                    # Unit tests organized by subsystem
@@ -877,17 +966,20 @@ tests/
 └── context/                 # Test utilities
 ```
 
-**Note**: All unit tests have been migrated to `unit/` directory and organized by subsystem.
+**Note**: All unit tests have been migrated to `unit/` directory and organized
+by subsystem.
 
-**Test Tags:**
-All tests must include appropriate Catch2 tags:
+**Test Tags:** All tests must include appropriate Catch2 tags:
+
 - `[unit]` - Unit tests (isolated with mocked dependencies)
 - `[integration]` - Integration tests (multiple components)
 - `[system]` - System tests (end-to-end, future)
 - `[perf]` - Performance tests (benchmarks, future)
-- `[.visual]` - Visual confirmation tests (hidden tag - automatically excluded from default runs, require user input/visual verification)
+- `[.visual]` - Visual confirmation tests (hidden tag - automatically excluded
+  from default runs, require user input/visual verification)
 
 **Example:**
+
 ```cpp
 TEST_CASE("ClassName constructor", "[unit][ClassName]") {
   // Test implementation
@@ -906,9 +998,11 @@ TEST_CASE("Visual confirmation test", "[unit][ClassName][.visual]") {
 
 ### Running Tests
 
-**Note:** Building is done locally by the user. The following commands are for reference on how tests will be run locally.
+**Note:** Building is done locally by the user. The following commands are for
+reference on how tests will be run locally.
 
 **Using CMake Presets (Reference):**
+
 ```bash
 # Tests will be run locally after code changes
 
@@ -935,6 +1029,7 @@ ctest --preset Debug --output-on-failure
 ```
 
 ### Test File Naming
+
 - Unit tests: `ClassName.test.cpp` (existing, in subsystem directories)
 - Integration tests: `feature_name.integration.test.cpp`
 - System tests: `workflow.system.test.cpp` (future)
@@ -945,6 +1040,7 @@ ctest --preset Debug --output-on-failure
 **Note: Agents do NOT build. This section is for reference only.**
 
 ### CMake Configuration
+
 - Minimum CMake version: 3.31
 - C++23 standard required
 - Enable testing with `enable_testing()`
@@ -962,14 +1058,17 @@ ctest --preset Debug --output-on-failure
 ```
 
 ### Available Presets
+
 - **Debug**: Debug build with Ninja generator
 - **Release**: Release build with Ninja generator
 
 ### Key CMake Variables
+
 - `data_dir`: `${CMAKE_SOURCE_DIR}/data`
 - `test_data_dir`: `${CMAKE_SOURCE_DIR}/tests/data`
 
 ### Important Notes
+
 - **Agents NEVER build, test, or lint** - All done locally by the user
 - CMake presets are used for configuration and building (done locally only)
 - Focus on making code changes and writing test files
@@ -977,6 +1076,7 @@ ctest --preset Debug --output-on-failure
 ## When Updating README
 
 ### Add New Workflows
+
 When adding new features or workflows, update `README.md`:
 
 1. **Add to Table of Contents**
@@ -995,6 +1095,7 @@ When adding new features or workflows, update `README.md`:
    - `## Testing` - for new test patterns
 
 ### Formatting README Updates
+
 - Use clear section headers
 - Provide code examples in fenced code blocks
 - Use bullet points for steps
@@ -1004,6 +1105,7 @@ When adding new features or workflows, update `README.md`:
 ## Common Patterns
 
 ### Member Variable Initialization
+
 ```cpp
 class MyClass {
 private:
@@ -1013,6 +1115,7 @@ private:
 ```
 
 ### FlatBuffers Null Checking
+
 ```cpp
 if (flatbuffer_data) {
   if (flatbuffer_data->field()) {
@@ -1023,20 +1126,22 @@ if (flatbuffer_data) {
 ```
 
 ### Expected Pattern
+
 ```cpp
-std::expected<std::monostate, FailInfo> 
+std::expected<std::monostate, FailInfo>
 ConfigureComponent(const Data* data, Component& component) {
   if (!data) {
     return std::unexpected(FailInfo{"Data is null"});
   }
-  
+
   // Configuration logic
-  
+
   return std::monostate{};
 }
 ```
 
 ### Visual Dividers
+
 ```cpp
 ////////////////////////////////////////////////////////////
 // Preprocessor directives
@@ -1061,12 +1166,14 @@ void Function() {
 ## Dependencies and Libraries
 
 ### Core Dependencies
+
 - SFML (graphics, window, system)
 - FlatBuffers (serialization)
 - Catch2 (testing)
 - spdlog (logging)
 
 ### Adding New Dependencies
+
 - Use `FetchContent` or find_package in CMake
 - Document in CMakeLists.txt
 - Update relevant README sections
@@ -1077,20 +1184,26 @@ void Function() {
 2. **Pure Data Containers**: Components and UIElements should have no logic
 3. **Write Tests**: Create test files for new features (but don't run them)
 4. **Null Safety**: Always validate FlatBuffers data before access
-5. **Error Handling**: Use std::expected for runtime failures, exceptions for critical errors
+5. **Error Handling**: Use std::expected for runtime failures, exceptions for
+   critical errors
 6. **Documentation**: Update README when adding new workflows or patterns
 7. **Consistency**: Follow existing patterns in the codebase
 8. **Default Construction**: Ensure all components can be default-constructed
-9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins for tests
-10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or `[system]`
+9. **Reusable Test Infrastructure**: Use TestScenarios, assertions, and mixins
+   for tests
+10. **Test Tags**: Always tag tests with `[unit]`, `[integration]`, or
+    `[system]`
 
 ## Context Configuration
 
 ### Overview
 
-The context configuration system provides data-driven context configuration via FlatBuffers. This allows game and scene settings to be externalized to JSON files.
+The context configuration system provides data-driven context configuration via
+FlatBuffers. This allows game and scene settings to be externalized to JSON
+files.
 
-See `documentation/configuration/CONTEXT_CONFIGURATION.md` for complete documentation.
+See `documentation/configuration/CONTEXT_CONFIGURATION.md` for complete
+documentation.
 
 ### Configuration Files
 
@@ -1161,6 +1274,7 @@ steamrot::tests::TestScenarios::ActivateComponent<CMyComponent>(0, pool);
 ```
 
 Available methods:
+
 - `CreateEmptyPool()` - Empty entity pool
 - `CreatePoolWithNEntities(n)` - Pool with n entities
 - `CreatePoolWithArchetype(archetype_id, n)` - Entities matching archetype
@@ -1196,6 +1310,7 @@ TEST_CASE("MyComponent contract", "[unit][MyComponent]") {
 ```
 
 Validates:
+
 - Default construction
 - Component register index
 - Activation/deactivation
@@ -1231,7 +1346,8 @@ When implementing new features:
 5. **Tag tests appropriately** with `[unit]`, `[integration]`, or `[system]`
 6. **Keep tests independent** - no shared state between tests
 7. **Test edge cases** - boundary conditions and errors in test files
-8. **Note:** Building and test execution done locally by user - agents only write code and test files
+8. **Note:** Building and test execution done locally by user - agents only
+   write code and test files
 
 ### Example Workflow
 
@@ -1274,14 +1390,21 @@ class NewLogicTest : public LogicTestBase<NewLogic> {
 
 ### Overview
 
-The Test Data Configuration System provides a FlatBuffers-based framework for data-driven testing. Tests can be defined in JSON files and loaded at runtime, enabling easy addition of test cases without code changes.
+The Test Data Configuration System provides a FlatBuffers-based framework for
+data-driven testing. Tests can be defined in JSON files and loaded at runtime,
+enabling easy addition of test cases without code changes.
 
 **Documentation:**
-- **Human Workflow Guide**: `documentation/workflows/FILLING_TEST_DATA.md` - Practical guide for creating test_data.json files
-- **Technical Reference**: `documentation/testing/TEST_DATA_CONFIGURATION.md` - Complete API and schema reference
+
+- **Human Workflow Guide**: `documentation/workflows/FILLING_TEST_DATA.md` -
+  Practical guide for creating test_data.json files
+- **Technical Reference**: `documentation/testing/TEST_DATA_CONFIGURATION.md` -
+  Complete API and schema reference
 
 **When helping users create test_data.json files:**
-1. Direct them to `documentation/workflows/FILLING_TEST_DATA.md` for workflow-based guidance
+
+1. Direct them to `documentation/workflows/FILLING_TEST_DATA.md` for
+   workflow-based guidance
 2. Reference the specific workflow section that matches their testing scenario:
    - Workflow 1: Metadata-Only Test
    - Workflow 2: Simple Entity Comparison
@@ -1292,13 +1415,20 @@ The Test Data Configuration System provides a FlatBuffers-based framework for da
    - Workflow 7: Combined Testing (Input + Events + Simulation)
    - Workflow 8: Negative Testing (Expected to Fail)
 3. Use the field reference and examples in the workflow guide
-4. For technical details about schemas and APIs, reference `TEST_DATA_CONFIGURATION.md`
+4. For technical details about schemas and APIs, reference
+   `TEST_DATA_CONFIGURATION.md`
 
 ### EntityMemoryPool Matcher with Test Metadata
 
-The `EntityMemoryPoolEqualsMatcher` supports optional test metadata that is included in failure messages. When using data-driven tests with `run_fixture_test()` or `run_entity_memory_pool_comparison_test()`, test metadata (test name and description) from JSON files is automatically extracted and included in error messages, making it easier to identify which test case failed.
+The `EntityMemoryPoolEqualsMatcher` supports optional test metadata that is
+included in failure messages. When using data-driven tests with
+`run_fixture_test()` or `run_entity_memory_pool_comparison_test()`, test
+metadata (test name and description) from JSON files is automatically extracted
+and included in error messages, making it easier to identify which test case
+failed.
 
 **Example usage:**
+
 ```cpp
 // Automatic - metadata extracted from config
 auto result = steamrot::tests::run_fixture_test(config);
@@ -1371,7 +1501,8 @@ steamrot::tests::run_entity_memory_pool_comparison_test(
 
 #### 2. Build Project (done locally)
 
-**Note:** Building is done locally by the user. FlatBuffers compilation from JSON to binary happens during the build process.
+**Note:** Building is done locally by the user. FlatBuffers compilation from
+JSON to binary happens during the build process.
 
 #### 3. Use test_data_harness in Tests
 
@@ -1381,13 +1512,13 @@ steamrot::tests::run_entity_memory_pool_comparison_test(
 TEST_CASE("Load and use test data", "[unit][data-driven]") {
   // Load all test data configs from adjacent data/ directory
   auto configs = steamrot::tests::load_test_data_configs();
-  
+
   REQUIRE(configs.has_value());
   const auto* config = configs.value()[0];  // Get first config
-  
+
   // Access metadata
   REQUIRE(config->metadata()->test_name()->str() == "my_component_test");
-  
+
   // Access entity data
   if (config->start_entity_collection()) {
     // Process starting entities
@@ -1403,31 +1534,42 @@ TEST_CASE("Load and use test data", "[unit][data-driven]") {
 Test data files follow a hybrid naming strategy:
 
 **Unit Tests** - Descriptive short names:
+
 - **Pattern**: `{component}_{aspect}[_{variant}].test_data.json`
-- **Examples**: `ui_collision_basic.test_data.json`, `pool_comparison_equal.test_data.json`
+- **Examples**: `ui_collision_basic.test_data.json`,
+  `pool_comparison_equal.test_data.json`
 - **When**: Simple, focused tests (1-3 ticks, single concern)
 - **Guidelines**: Keep to 3-4 words max, use snake_case, component first
 
 **Integration Tests** - ID-based naming:
+
 - **Pattern**: `{test_area}_{ID}.test_data.json`
-- **Examples**: `ui_workflow_001.test_data.json`, `scene_transition_001.test_data.json`
+- **Examples**: `ui_workflow_001.test_data.json`,
+  `scene_transition_001.test_data.json`
 - **When**: Complex multi-component tests (4+ ticks, multiple systems)
 - **ID Format**: Zero-padded 3-digit numbers (001-999)
 - **With**: Directory README documenting each test
 
 **System Tests** - Scenario names with IDs:
+
 - **Pattern**: `{scenario_name}_{ID}.test_data.json`
-- **Examples**: `crafting_success_001.test_data.json`, `combat_player_death_001.test_data.json`
+- **Examples**: `crafting_success_001.test_data.json`,
+  `combat_player_death_001.test_data.json`
 - **When**: End-to-end gameplay scenarios
 
 **Test Infrastructure** - Harness prefix:
+
 - **Pattern**: `harness_{purpose}_{ID}.test_data.json`
-- **Examples**: `harness_workflow_001.test_data.json`, `harness_simulation_001.test_data.json`
+- **Examples**: `harness_workflow_001.test_data.json`,
+  `harness_simulation_001.test_data.json`
 - **When**: Testing the test harness infrastructure itself
 
-**Key Principle**: Metadata is the source of truth. File names are convenient handles. Complete `metadata` fields (`test_name`, `description`, `tags`) contain the authoritative description.
+**Key Principle**: Metadata is the source of truth. File names are convenient
+handles. Complete `metadata` fields (`test_name`, `description`, `tags`) contain
+the authoritative description.
 
-**Reference**: See `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for complete guidelines.
+**Reference**: See `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for
+complete guidelines.
 
 - **Compiled binaries**: `<test_name>.test_data.bin` (auto-generated)
 - **Location**: `tests/<test_executable_dir>/data/`
@@ -1447,10 +1589,10 @@ TEST_CASE("Run all component test data", "[unit][data-driven]") {
   // Load all test data configs with one call
   auto configs = steamrot::tests::load_test_data_configs("components");
   REQUIRE(configs.has_value());
-  
+
   // Use Catch2 generator to run test for each config
   const auto* config = GENERATE_COPY(from_range(configs.value()));
-  
+
   REQUIRE(config->metadata() != nullptr);
   // Run test with this configuration
 }
@@ -1479,13 +1621,17 @@ table TestDataConfig {
 
 ### Best Practices
 
-- **Follow naming conventions**: Use the hybrid naming strategy (descriptive for unit tests, ID-based for integration/system tests)
+- **Follow naming conventions**: Use the hybrid naming strategy (descriptive for
+  unit tests, ID-based for integration/system tests)
 - **Organize by category**: Place test data in matching subdirectories
-- **Complete metadata**: Always fill out all metadata fields with detailed descriptions
+- **Complete metadata**: Always fill out all metadata fields with detailed
+  descriptions
 - **Keep focused**: One scenario per test data file
 - **Reuse types**: Leverage existing FlatBuffers tables
-- **Follow schema**: Use `start_data_collection` and `expected_data_collection` as defined in `test_data.fbs`
-- **Reference documentation**: See `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for naming guidelines
+- **Follow schema**: Use `start_data_collection` and `expected_data_collection`
+  as defined in `test_data.fbs`
+- **Reference documentation**: See
+  `documentation/testing/TEST_DATA_NAMING_CONVENTIONS.md` for naming guidelines
 
 ### test_data_harness Functions
 
@@ -1501,8 +1647,10 @@ load_test_data_configs(const std::string& subdirectory);
 
 ## Common Gotchas
 
-1. **FlatBuffers Segfaults**: Always check for null before accessing FlatBuffers fields
-2. **Component Registration**: Don't forget to register new components in ComponentRegister
+1. **FlatBuffers Segfaults**: Always check for null before accessing FlatBuffers
+   fields
+2. **Component Registration**: Don't forget to register new components in
+   ComponentRegister
 3. **PathProvider**: Set EnvironmentType only once per runtime
 4. **Indentation**: Use 2 spaces, not tabs
 5. **Member Prefix**: Remember `m_` prefix for member variables
@@ -1520,13 +1668,17 @@ load_test_data_configs(const std::string& subdirectory);
 
 When working as a GitHub Copilot agent:
 
-1. **NEVER build, test, or lint** - All building, testing, and linting is done locally by the user
+1. **NEVER build, test, or lint** - All building, testing, and linting is done
+   locally by the user
 2. **Always read README.md first** to understand current project state
 3. **Write test files** but do NOT run them - tests will be executed locally
-4. **Focus on code implementation only** - trust the user will verify your changes
+4. **Focus on code implementation only** - trust the user will verify your
+   changes
 5. **Validate FlatBuffers data** with extensive null checks in your code
 6. **Update README** when adding new workflows or significant features
 7. **Maintain consistency** with existing code patterns
-8. **Use visual dividers** (`////////////////////////////////////////////////////////////`) as shown in existing code
+8. **Use visual dividers**
+   (`////////////////////////////////////////////////////////////`) as shown in
+   existing code
 9. **Document with Doxygen** style comments
 10. **Keep changes minimal** - don't refactor unless necessary

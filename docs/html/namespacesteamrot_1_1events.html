@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: steamrot::events Namespace Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('namespacesteamrot_1_1events.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -119,6 +133,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:a81f1a3ec689f95dff7f9cdcc372d03a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1GhostPayload.html" title="Event payload for MrGhost selection changes.">GhostPayload</a>.  <br /></td></tr>
 <tr class="memitem:add6835b0b5e15ea60809dd356bcc2474" id="r_add6835b0b5e15ea60809dd356bcc2474"><td class="memItemLeft">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#add6835b0b5e15ea60809dd356bcc2474">CreateCameraEventPacket</a> (uint8_t lifetime, float scroll_delta)</td></tr>
 <tr class="memdesc:add6835b0b5e15ea60809dd356bcc2474"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> carrying a scroll delta.  <br /></td></tr>
+<tr class="memitem:a88e6f78f7d28db154147c72713b8b73c" id="r_a88e6f78f7d28db154147c72713b8b73c"><td class="memItemLeft">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a88e6f78f7d28db154147c72713b8b73c">CreateCameraEventPacket</a> (uint8_t lifetime, const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a> action)</td></tr>
+<tr class="memdesc:a88e6f78f7d28db154147c72713b8b73c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> carrying a CameraAction.  <br /></td></tr>
+<tr class="memitem:a0ba6899187cbea3b1afc739a9435f73e" id="r_a0ba6899187cbea3b1afc739a9435f73e"><td class="memItemLeft">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a0ba6899187cbea3b1afc739a9435f73e">CreateCameraEventPacket</a> (uint8_t lifetime, const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a> action, const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">CameraPayload::PanDirection</a> pan_direction)</td></tr>
+<tr class="memdesc:a0ba6899187cbea3b1afc739a9435f73e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> for a pan press or release.  <br /></td></tr>
 <tr class="memitem:a6ef09940f6196a5710a490d4a934e0cf" id="r_a6ef09940f6196a5710a490d4a934e0cf"><td class="memItemLeft">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a6ef09940f6196a5710a490d4a934e0cf">CreateRandomEventPacket</a> ()</td></tr>
 <tr class="memdesc:a6ef09940f6196a5710a490d4a934e0cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with random valid values for testing purposes.  <br /></td></tr>
 <tr class="memitem:a5747ff68a4ef904725b3651a19f8f0cd" id="r_a5747ff68a4ef904725b3651a19f8f0cd"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a5747ff68a4ef904725b3651a19f8f0cd">MatchPayload</a> (const <a class="el" href="structsteamrot_1_1InputPayload.html">InputPayload</a> &amp;filter_payload, const <a class="el" href="structsteamrot_1_1InputPayload.html">InputPayload</a> &amp;event_payload)</td></tr>
@@ -143,8 +161,74 @@ Functions</h2></td></tr>
 <p>Preprocessor Directives.</p>
 <p>Headers </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a88e6f78f7d28db154147c72713b8b73c" name="a88e6f78f7d28db154147c72713b8b73c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88e6f78f7d28db154147c72713b8b73c">&#9670;&#160;</a></span>CreateCameraEventPacket() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt; steamrot::events::CreateCameraEventPacket </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>lifetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a></td>          <td class="paramname"><span class="paramname"><em>action</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> carrying a CameraAction. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lifetime</td><td>The lifetime of the event in ticks. </td></tr>
+    <tr><td class="paramname">action</td><td>CameraAction enum value specifying the camera action to perform. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0ba6899187cbea3b1afc739a9435f73e" name="a0ba6899187cbea3b1afc739a9435f73e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ba6899187cbea3b1afc739a9435f73e">&#9670;&#160;</a></span>CreateCameraEventPacket() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::expected&lt; <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a>, <a class="el" href="structsteamrot_1_1FailInfo.html">FailInfo</a> &gt; steamrot::events::CreateCameraEventPacket </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>lifetime</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraPayload::CameraAction</a></td>          <td class="paramname"><span class="paramname"><em>action</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">CameraPayload::PanDirection</a></td>          <td class="paramname"><span class="paramname"><em>pan_direction</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates an <a class="el" href="structsteamrot_1_1EventPacket.html">EventPacket</a> with a <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> for a pan press or release. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lifetime</td><td>The lifetime of the event in ticks. </td></tr>
+    <tr><td class="paramname">action</td><td>PAN_PRESS or PAN_RELEASE. </td></tr>
+    <tr><td class="paramname">pan_direction</td><td>The pan direction being toggled. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="add6835b0b5e15ea60809dd356bcc2474" name="add6835b0b5e15ea60809dd356bcc2474"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add6835b0b5e15ea60809dd356bcc2474">&#9670;&#160;</a></span>CreateCameraEventPacket()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#add6835b0b5e15ea60809dd356bcc2474">&#9670;&#160;</a></span>CreateCameraEventPacket() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -460,7 +544,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns true if the filter payload matches the event payload. </p>
-<p>Any <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> matches any other <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> — the subscriber receives the scroll delta from the captured_payload rather than selecting on a specific delta value.</p>
+<p>Compares the CameraAction field of the filter and event payloads. This ensures each action-specific subscriber (SCROLL, RESET_ZOOM, PAN_PRESS, PAN_RELEASE) only fires for its own event type.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">filter_payload</td><td><a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a> from <a class="el" href="structsteamrot_1_1Subscriber.html" title="For registering with the EventHandler.">Subscriber</a> filter </td></tr>
@@ -468,7 +552,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Always true when both payloads are <a class="el" href="structsteamrot_1_1CameraPayload.html" title="Event payload carrying a mouse-scroll delta for camera zoom.">CameraPayload</a>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True when both payloads share the same CameraAction. </dd></dl>
 
 </div>
 </div>
