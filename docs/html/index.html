@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: SteamRot Wiki</title>
+<title>SteamRot: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('index.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -88,64 +102,10 @@ $(function(){initNavTree('index.html','',''); });
 </div>
 </div>
 
-<div><div class="header">
-  <div class="headertitle"><div class="title">SteamRot Wiki </div></div>
+<div class="header">
+  <div class="headertitle"><div class="title">SteamRot Documentation</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_documentation_2index"></a></p>
-<p>Welcome to the SteamRot game engine wiki. Use the navigation on the left to browse conceptual documentation, workflow guides, and design notes.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md100"></a>
-What is SteamRot?</h1>
-<p>SteamRot is a data-driven C++ game engine built with:</p>
-<ul>
-<li><b>SFML</b> — graphics, windowing, and input</li>
-<li><b>FlatBuffers</b> — data serialization and runtime configuration</li>
-<li><b>Catch2</b> — unit and integration testing</li>
-<li><b>spdlog</b> — structured logging</li>
-<li><b>C++23</b> — modern language features throughout</li>
-</ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md101"></a>
-Quick Links</h1>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Section  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="md_documentation_2workflows_2ADDING__LOGIC.html" title="Adding Logic Classes">Workflows</a>  </td><td class="markdownTableBodyNone">Step-by-step guides for common development tasks  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="md_documentation_2design_2LOGIC__DECOMPOSITION.html" title="Logic Decomposition: Keeping &lt;tt&gt;ProcessLogic&lt;/tt&gt; Clean">Design</a>  </td><td class="markdownTableBodyNone">Architectural decisions and design notes  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="md_documentation_2concepts_2COORDINATE__SPACES.html" title="Coordinate Spaces: Screen Space vs World Space">Coordinate Spaces</a>  </td><td class="markdownTableBodyNone">Screen space vs world space — concepts and mechanics  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="md_documentation_2concepts_2COORDINATE__SPACES__STEAMROT.html" title="Coordinate Spaces in SteamRot: Implementation Guide">Coordinate Spaces in SteamRot</a>  </td><td class="markdownTableBodyNone">How the codebase handles coordinate conversion and pitfalls  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="md_documentation_2design_2GRIMOIRE__MACHINA__LOGIC__MAP.html" title="GrimoireMachina Logic Responsibility Map">GrimoireMachina Logic Map</a>  </td><td class="markdownTableBodyNone">Audit and responsibility map for all GrimoireMachina logic (Collision / Action / Positioning / Render)  </td></tr>
-</table>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md102"></a>
-Getting Started</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md103"></a>
-Build</h2>
-<div class="fragment"><div class="line">cmake --preset Debug</div>
-<div class="line">cmake --build --preset Debug</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md104"></a>
-Run tests</h2>
-<div class="fragment"><div class="line">ctest --preset Debug</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md105"></a>
-Generate test dashboard</h2>
-<div class="fragment"><div class="line"># Activate a Python virtual environment first</div>
-<div class="line">python -m tools.test_dashboard --tests-dir tests/</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md106"></a>
-Generate and view docs locally</h2>
-<div class="fragment"><div class="line"># Install Doxygen (once)</div>
-<div class="line">sudo apt-get install doxygen   # Debian / Ubuntu</div>
-<div class="line"># brew install doxygen         # macOS</div>
-<div class="line"> </div>
-<div class="line"># Generate docs (from repository root)</div>
-<div class="line">doxygen Doxyfile</div>
-<div class="line"> </div>
-<div class="line"># Open in browser</div>
-<div class="line">xdg-open docs/html/index.html  # Linux</div>
-<div class="line"># open docs/html/index.html    # macOS</div>
-</div><!-- fragment --> </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->
 </div><!-- doc-content -->

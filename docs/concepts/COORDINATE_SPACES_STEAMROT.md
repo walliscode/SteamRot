@@ -1,7 +1,10 @@
 # Coordinate Spaces in SteamRot: Implementation Guide
 
-> **Prerequisite**: Read [Coordinate Spaces: Screen Space vs World Space](COORDINATE_SPACES.md)
-> for the foundational concepts before reading this document.
+\page coordinate_spaces_in_SteamRot Coordinate Spaces in SteamRot
+
+> **Prerequisite**: Read
+> [Coordinate Spaces: Screen Space vs World Space](COORDINATE_SPACES.md) for the
+> foundational concepts before reading this document.
 
 ---
 
@@ -10,10 +13,10 @@
 SteamRot enforces the screen/world split through two named, typed fields on
 `SceneContext` that are always available to every Logic class:
 
-| Field | Type | Space | Canonical consumers |
-|---|---|---|---|
-| `scene_context.mouse_position` | `sf::Vector2i` | Screen pixels | UI collision only |
-| `scene_context.world_mouse_position` | `sf::Vector2f` | World space | Ghost, grimoire collision, piece placement |
+| Field                                | Type           | Space         | Canonical consumers                        |
+| ------------------------------------ | -------------- | ------------- | ------------------------------------------ |
+| `scene_context.mouse_position`       | `sf::Vector2i` | Screen pixels | UI collision only                          |
+| `scene_context.world_mouse_position` | `sf::Vector2f` | World space   | Ghost, grimoire collision, piece placement |
 
 The different C++ types (`Vector2i` vs `Vector2f`) make misuse visible at the
 call site: if you accidentally pass `world_mouse_position` to a function that
@@ -56,16 +59,16 @@ scene (via `LogicFactory`). The execution order within a tick is:
 Collision → Render → Action → Positioning
 ```
 
-This means world_mouse_position is computed during the Positioning phase and is
-available for the *next* tick's Collision, Render, and Action phases. The value
-is initialised to `{0.f, 0.f}` at scene startup and updated every tick, so it
-is never stale beyond one tick.
+This means world*mouse_position is computed during the Positioning phase and is
+available for the \_next* tick's Collision, Render, and Action phases. The value
+is initialised to `{0.f, 0.f}` at scene startup and updated every tick, so it is
+never stale beyond one tick.
 
 > **Note**: If you add a new world-space Logic that runs in the same tick as
 > `GhostPositioningLogic` and needs the current mouse position, make sure it
-> runs *after* `GhostPositioningLogic` in the Positioning phase — or reads from
-> the pre-converted value produced in the previous tick (which is fine for
-> a one-tick lag in most cases).
+> runs _after_ `GhostPositioningLogic` in the Positioning phase — or reads from
+> the pre-converted value produced in the previous tick (which is fine for a
+> one-tick lag in most cases).
 
 ---
 
@@ -125,18 +128,18 @@ radius²) — no coordinate conversion inside.
 
 ### Ghost Positioning (`GhostPositioningLogic`)
 
-*Produces* `world_mouse_position` rather than consuming it. It is the only
-Logic that writes to both `world_mouse_position` and `mr_ghost.m_position`.
+_Produces_ `world_mouse_position` rather than consuming it. It is the only Logic
+that writes to both `world_mouse_position` and `mr_ghost.m_position`.
 
 ### Piece Placement (`GrimoireMachinaActionLogic` / `action_grimoire_machina.cpp`)
 
 Uses `scene_context.world_mouse_position` for placing a piece at the cursor.
 
-The first piece on an empty scaffold is special: it is centred on the *canvas*
+The first piece on an empty scaffold is special: it is centred on the _canvas_
 midpoint (a fixed screen position), not the mouse cursor. That calculation uses
-its own explicit `mapPixelToCoords` call with a comment explaining why — it is
-a canvas-pixel-to-world conversion, not a mouse-to-world conversion, and must
-not be collapsed into `world_mouse_position`.
+its own explicit `mapPixelToCoords` call with a comment explaining why — it is a
+canvas-pixel-to-world conversion, not a mouse-to-world conversion, and must not
+be collapsed into `world_mouse_position`.
 
 ```cpp
 sf::Vector2f place_pos = scene_context.world_mouse_position; // ← cursor placement
@@ -176,8 +179,8 @@ sf::Vector2f world_pos = scene_context.scene_texture.mapPixelToCoords(
 );
 ```
 
-SFML's `mapPixelToCoords` without a view argument uses the current view *set on
-the texture*, which may be the UI view (unzoomed default) after the render pass
+SFML's `mapPixelToCoords` without a view argument uses the current view _set on
+the texture_, which may be the UI view (unzoomed default) after the render pass
 has switched views. Always pass the explicit world view from `GetWorldView()` —
 or better, use `CameraState::MapToWorldCoords` which does this correctly.
 
@@ -206,24 +209,26 @@ overload that accepts `sf::Vector2f` for UIElement checking.
 
 ### ❌ Adding a new world-space Logic that reads `world_mouse_position` before `GhostPositioningLogic` has run
 
-Because `GhostPositioningLogic` runs in the Positioning phase, Logic classes that
-run in the same tick's Collision, Render, or Action phases will read the value
-from the *previous* tick. For most use cases a one-tick lag is imperceptible,
-but for precise placement or fine-grained collision, be aware of this ordering.
+Because `GhostPositioningLogic` runs in the Positioning phase, Logic classes
+that run in the same tick's Collision, Render, or Action phases will read the
+value from the _previous_ tick. For most use cases a one-tick lag is
+imperceptible, but for precise placement or fine-grained collision, be aware of
+this ordering.
 
 If you need guaranteed same-tick conversion, place your Logic after
-`GhostPositioningLogic` in the Positioning phase execution order
-(see `LogicFactory.cpp`).
+`GhostPositioningLogic` in the Positioning phase execution order (see
+`LogicFactory.cpp`).
 
 ---
 
 ## Rules for Adding New World-Space Logic
 
-1. **Read `scene_context.world_mouse_position`** — do not call `mapPixelToCoords`
-   yourself.
-2. **Accept `sf::Vector2f` for any world-position parameter** — the compiler will
-   prevent accidental screen-space input.
-3. **Never implicitly cast `mouse_position` to float** — if you see `sf::Vector2f(mouse_position)` in new code it is almost certainly a bug.
+1. **Read `scene_context.world_mouse_position`** — do not call
+   `mapPixelToCoords` yourself.
+2. **Accept `sf::Vector2f` for any world-position parameter** — the compiler
+   will prevent accidental screen-space input.
+3. **Never implicitly cast `mouse_position` to float** — if you see
+   `sf::Vector2f(mouse_position)` in new code it is almost certainly a bug.
 4. **Canvas-pixel conversions are different from mouse-to-world** — if you need
    to convert a fixed UI point (button centre, canvas edge) to world space, do
    it explicitly at the call site with a comment; do not fold it into the mouse
@@ -237,11 +242,11 @@ If you need guaranteed same-tick conversion, place your Logic after
 
 ## Quick Reference: Which Field to Use
 
-| What you need | Field to use | Type |
-|---|---|---|
-| "Is the mouse over this UI button?" | `mouse_position` | `sf::Vector2i` |
-| "Is the mouse over this socket/fragment/joint?" | `world_mouse_position` | `sf::Vector2f` |
-| "Where should I place the ghost piece?" | `world_mouse_position` | `sf::Vector2f` |
-| "Where should I place the first piece (canvas centre)?" | explicit `mapPixelToCoords` call | `sf::Vector2f` |
-| "What is the current zoom level?" | `camera_state.m_zoom_level` | `float` |
-| "Convert an arbitrary screen point to world?" | `camera_state.MapToWorldCoords(...)` | `sf::Vector2f` |
+| What you need                                           | Field to use                         | Type           |
+| ------------------------------------------------------- | ------------------------------------ | -------------- |
+| "Is the mouse over this UI button?"                     | `mouse_position`                     | `sf::Vector2i` |
+| "Is the mouse over this socket/fragment/joint?"         | `world_mouse_position`               | `sf::Vector2f` |
+| "Where should I place the ghost piece?"                 | `world_mouse_position`               | `sf::Vector2f` |
+| "Where should I place the first piece (canvas centre)?" | explicit `mapPixelToCoords` call     | `sf::Vector2f` |
+| "What is the current zoom level?"                       | `camera_state.m_zoom_level`          | `float`        |
+| "Convert an arbitrary screen point to world?"           | `camera_state.MapToWorldCoords(...)` | `sf::Vector2f` |

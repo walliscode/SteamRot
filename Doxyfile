@@ -26,14 +26,14 @@ GENERATE_LATEX         = NO
 
 # Produce a collapsible sidebar tree (requires JavaScript)
 GENERATE_TREEVIEW      = YES
-FULL_SIDEBAR           = NO
+FULL_SIDEBAR           = YES
 
 #---------------------------------------------------------------------------
 # Input
 #---------------------------------------------------------------------------
 
 # Include hand-written docs alongside API source.
-INPUT                  = documentation \
+INPUT                  = docs\
                          src
 RECURSIVE              = YES
 FILE_PATTERNS          = *.h \
@@ -44,16 +44,17 @@ EXCLUDE                =
 EXCLUDE_PATTERNS       = */_deps/* \
                          */build/*
 
-#---------------------------------------------------------------------------
+FULL_PATH_NAMES        = NO
+#---------------------------------------------------------------------------#
 # Markdown / main page
 #---------------------------------------------------------------------------
 
 MARKDOWN_SUPPORT       = YES
 AUTOLINK_SUPPORT       = YES
-EXTENSION_MAPPING      = md=Markdown
+EXTENSION_MAPPING      = md=markdown
 
 # Make documentation/index.md the Doxygen main page
-USE_MDFILE_AS_MAINPAGE = documentation/index.md
+USE_MDFILE_AS_MAINPAGE = docs/main.md
 
 # Enable Mermaid diagrams (Doxygen 1.9.3+)
 MERMAID_VERSION        = latest
@@ -66,6 +67,7 @@ EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = YES
 
+SHOW_FILES              = YES
 #---------------------------------------------------------------------------
 # Diagrams
 #---------------------------------------------------------------------------

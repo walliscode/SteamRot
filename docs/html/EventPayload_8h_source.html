@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: src/types/events/EventPayload.h Source File</title>
+<title>SteamRot: EventPayload.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('EventPayload_8h_source.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -225,43 +239,76 @@ $(function(){initNavTree('EventPayload_8h_source.html','',''); });
 <div class="foldopen" id="foldopen00268" data-start="{" data-end="};">
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html">  268</a></span><span class="keyword">struct </span><a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a> {</div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span></div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">  273</a></span>  <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">  280</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">CameraPayload</a>(<span class="keywordtype">float</span> delta) : <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a>(delta) {}</div>
+<div class="foldopen" id="foldopen00274" data-start="{" data-end="};">
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">  274</a></span>  <span class="keyword">enum class</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">  275</a></span>    <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a>,</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">  276</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">SCROLL</a>,</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">  277</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">RESET_ZOOM</a>,</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743">  278</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743">PAN_PRESS</a>,</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed">  279</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed">PAN_RELEASE</a></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">  280</a></span>  } action{<a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">CameraAction::NONE</a>};</div>
+</div>
 <div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span></div>
-<div class="foldopen" id="foldopen00286" data-start="{" data-end="};">
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">  286</a></span>  <span class="keyword">enum class</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> {</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">  287</a></span>    <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a>,</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">  288</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">SCROLL</a>,</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">  289</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">RESET_ZOOM</a></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">  290</a></span>  } action{<a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">CameraAction::NONE</a>};</div>
+<div class="foldopen" id="foldopen00285" data-start="{" data-end="};">
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">  285</a></span>  <span class="keyword">enum class</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">PanDirection</a> {</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693">  286</a></span>    <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a>,</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758">  287</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758">LEFT</a>,</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403">  288</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403">RIGHT</a>,</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1">  289</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1">UP</a>,</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f">  290</a></span>    <a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f">DOWN</a></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#ab97cc4fd4c35c0cb869d97ad531d627b">  291</a></span>  } m_pan_direction{<a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693">PanDirection::NONE</a>};</div>
 </div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span></div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">  297</a></span>  <span class="keywordtype">float</span> <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a>{0.0f};</div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>};</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">  296</a></span>  <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a6c72c2f4c402338d554435f6e13b2a97">  303</a></span>  <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a6c72c2f4c402338d554435f6e13b2a97">CameraPayload</a>(<span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> camera_action) : action(camera_action) {};</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span></div>
+<div class="foldopen" id="foldopen00310" data-start="{" data-end="}">
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">  310</a></span>  <span class="keyword">explicit</span> <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">CameraPayload</a>(<span class="keywordtype">float</span> delta)</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>      : action(<a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a>::<a class="code hl_enumvalue" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">SCROLL</a>), <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a>(delta) {}</div>
 </div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno"><a class="line" href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">  300</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">EventPayload</a> =</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    std::variant&lt;std::monostate, <a class="code hl_class" href="structsteamrot_1_1InputPayload.html">InputPayload</a>, <a class="code hl_class" href="structsteamrot_1_1UIPayload.html">UIPayload</a>, <a class="code hl_class" href="structsteamrot_1_1LogicPayload.html">LogicPayload</a>,</div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>                 <a class="code hl_class" href="structsteamrot_1_1ScenePayload.html">ScenePayload</a>, <a class="code hl_class" href="structsteamrot_1_1SystemPayload.html">SystemPayload</a>, <a class="code hl_class" href="structsteamrot_1_1GhostPayload.html">GhostPayload</a>, <a class="code hl_class" href="structsteamrot_1_1CameraPayload.html">CameraPayload</a>&gt;;</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>} <span class="comment">// namespace steamrot</span></div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span></div>
+<div class="foldopen" id="foldopen00319" data-start="{" data-end="}">
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#a24da7536e4750a478036e9b7dc49d2e3">  319</a></span>  <a class="code hl_function" href="structsteamrot_1_1CameraPayload.html#a24da7536e4750a478036e9b7dc49d2e3">CameraPayload</a>(<span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> camera_action,</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>                <span class="keyword">const</span> <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">PanDirection</a> pan_direction)</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>      : action(camera_action), m_pan_direction(pan_direction) {}</div>
+</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno"><a class="line" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">  328</a></span>  <span class="keywordtype">float</span> <a class="code hl_variable" href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a>{0.0f};</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>};</div>
+</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno"><a class="line" href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">  331</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">EventPayload</a> =</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    std::variant&lt;std::monostate, <a class="code hl_class" href="structsteamrot_1_1InputPayload.html">InputPayload</a>, <a class="code hl_class" href="structsteamrot_1_1UIPayload.html">UIPayload</a>, <a class="code hl_class" href="structsteamrot_1_1LogicPayload.html">LogicPayload</a>,</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>                 <a class="code hl_class" href="structsteamrot_1_1ScenePayload.html">ScenePayload</a>, <a class="code hl_class" href="structsteamrot_1_1SystemPayload.html">SystemPayload</a>, <a class="code hl_class" href="structsteamrot_1_1GhostPayload.html">GhostPayload</a>, <a class="code hl_class" href="structsteamrot_1_1CameraPayload.html">CameraPayload</a>&gt;;</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span> </div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>} <span class="comment">// namespace steamrot</span></div>
 <div class="ttc" id="aMrGhost_8h_html"><div class="ttname"><a href="MrGhost_8h.html">MrGhost.h</a></div><div class="ttdoc">Declaration of the MrGhost struct.</div></div>
 <div class="ttc" id="aSceneType_8h_html"><div class="ttname"><a href="SceneType_8h.html">SceneType.h</a></div><div class="ttdoc">Declaration of the native SceneType enum.</div></div>
 <div class="ttc" id="anamespacesteamrot_html"><div class="ttname"><a href="namespacesteamrot.html">steamrot</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> AssetManager.cpp:21</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a24c82489204f0b4f5d11ec18a7b1bcbb"><div class="ttname"><a href="namespacesteamrot.html#a24c82489204f0b4f5d11ec18a7b1bcbb">steamrot::SceneType</a></div><div class="ttdeci">SceneType</div><div class="ttdoc">Native C++ enum representing different scene types.</div><div class="ttdef"><b>Definition</b> SceneType.h:28</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a24c82489204f0b4f5d11ec18a7b1bcbba696b031073e74bf2cb98e5ef201d4aa3"><div class="ttname"><a href="namespacesteamrot.html#a24c82489204f0b4f5d11ec18a7b1bcbba696b031073e74bf2cb98e5ef201d4aa3">steamrot::SceneType::UNKNOWN</a></div><div class="ttdeci">@ UNKNOWN</div><div class="ttdef"><b>Definition</b> SceneType.h:28</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a492d0f6e26c9eed5a949733e85fd359d"><div class="ttname"><a href="namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d">steamrot::GhostSelection</a></div><div class="ttdeci">std::variant&lt; std::monostate, FragmentTag, JointTag &gt; GhostSelection</div><div class="ttdoc">Variant carrying a lightweight selection tag for a ghost item.</div><div class="ttdef"><b>Definition</b> MrGhost.h:52</div></div>
-<div class="ttc" id="anamespacesteamrot_html_ad914e32cf23ef3bd00656a0a0744417d"><div class="ttname"><a href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">steamrot::EventPayload</a></div><div class="ttdeci">std::variant&lt; std::monostate, InputPayload, UIPayload, LogicPayload, ScenePayload, SystemPayload, GhostPayload, CameraPayload &gt; EventPayload</div><div class="ttdef"><b>Definition</b> EventPayload.h:300</div></div>
+<div class="ttc" id="anamespacesteamrot_html_ad914e32cf23ef3bd00656a0a0744417d"><div class="ttname"><a href="namespacesteamrot.html#ad914e32cf23ef3bd00656a0a0744417d">steamrot::EventPayload</a></div><div class="ttdeci">std::variant&lt; std::monostate, InputPayload, UIPayload, LogicPayload, ScenePayload, SystemPayload, GhostPayload, CameraPayload &gt; EventPayload</div><div class="ttdef"><b>Definition</b> EventPayload.h:331</div></div>
 <div class="ttc" id="astructsteamrot_1_1CameraPayload_html"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html">steamrot::CameraPayload</a></div><div class="ttdoc">Event payload carrying a mouse-scroll delta for camera zoom.</div><div class="ttdef"><b>Definition</b> EventPayload.h:268</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_a24da7536e4750a478036e9b7dc49d2e3"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#a24da7536e4750a478036e9b7dc49d2e3">steamrot::CameraPayload::CameraPayload</a></div><div class="ttdeci">CameraPayload(const CameraAction camera_action, const PanDirection pan_direction)</div><div class="ttdoc">Constructor for pan press/release events.</div><div class="ttdef"><b>Definition</b> EventPayload.h:319</div></div>
 <div class="ttc" id="astructsteamrot_1_1CameraPayload_html_a4493500342f37ff87b88e756a49ddba1"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#a4493500342f37ff87b88e756a49ddba1">steamrot::CameraPayload::CameraPayload</a></div><div class="ttdeci">CameraPayload()=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_a6268be738156e8420837636c535e38a3"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">steamrot::CameraPayload::CameraPayload</a></div><div class="ttdeci">CameraPayload(float delta)</div><div class="ttdoc">Constructor taking a scroll delta.</div><div class="ttdef"><b>Definition</b> EventPayload.h:280</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a></div><div class="ttdeci">CameraAction</div><div class="ttdoc">Enum discriminating between different types of camera-related actions.</div><div class="ttdef"><b>Definition</b> EventPayload.h:286</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">steamrot::CameraPayload::CameraAction::SCROLL</a></div><div class="ttdeci">@ SCROLL</div><div class="ttdef"><b>Definition</b> EventPayload.h:288</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">steamrot::CameraPayload::CameraAction::NONE</a></div><div class="ttdeci">@ NONE</div><div class="ttdef"><b>Definition</b> EventPayload.h:287</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">steamrot::CameraPayload::CameraAction::RESET_ZOOM</a></div><div class="ttdeci">@ RESET_ZOOM</div><div class="ttdef"><b>Definition</b> EventPayload.h:289</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_a6268be738156e8420837636c535e38a3"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#a6268be738156e8420837636c535e38a3">steamrot::CameraPayload::CameraPayload</a></div><div class="ttdeci">CameraPayload(float delta)</div><div class="ttdoc">Constructor taking a scroll delta.</div><div class="ttdef"><b>Definition</b> EventPayload.h:310</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_a6c72c2f4c402338d554435f6e13b2a97"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#a6c72c2f4c402338d554435f6e13b2a97">steamrot::CameraPayload::CameraPayload</a></div><div class="ttdeci">CameraPayload(const CameraAction camera_action)</div><div class="ttdoc">Constructor taking a CameraAction enum value.</div><div class="ttdef"><b>Definition</b> EventPayload.h:303</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a></div><div class="ttdeci">PanDirection</div><div class="ttdoc">Identifies which pan direction is being toggled.</div><div class="ttdef"><b>Definition</b> EventPayload.h:285</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403">steamrot::CameraPayload::PanDirection::RIGHT</a></div><div class="ttdeci">@ RIGHT</div><div class="ttdef"><b>Definition</b> EventPayload.h:288</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758">steamrot::CameraPayload::PanDirection::LEFT</a></div><div class="ttdeci">@ LEFT</div><div class="ttdef"><b>Definition</b> EventPayload.h:287</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693">steamrot::CameraPayload::PanDirection::NONE</a></div><div class="ttdeci">@ NONE</div><div class="ttdef"><b>Definition</b> EventPayload.h:286</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f">steamrot::CameraPayload::PanDirection::DOWN</a></div><div class="ttdeci">@ DOWN</div><div class="ttdef"><b>Definition</b> EventPayload.h:290</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1">steamrot::CameraPayload::PanDirection::UP</a></div><div class="ttdeci">@ UP</div><div class="ttdef"><b>Definition</b> EventPayload.h:289</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a></div><div class="ttdeci">CameraAction</div><div class="ttdoc">Enum discriminating between different types of camera-related actions.</div><div class="ttdef"><b>Definition</b> EventPayload.h:274</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">steamrot::CameraPayload::CameraAction::SCROLL</a></div><div class="ttdeci">@ SCROLL</div><div class="ttdef"><b>Definition</b> EventPayload.h:276</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743">steamrot::CameraPayload::CameraAction::PAN_PRESS</a></div><div class="ttdeci">@ PAN_PRESS</div><div class="ttdef"><b>Definition</b> EventPayload.h:278</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">steamrot::CameraPayload::CameraAction::NONE</a></div><div class="ttdeci">@ NONE</div><div class="ttdef"><b>Definition</b> EventPayload.h:275</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed">steamrot::CameraPayload::CameraAction::PAN_RELEASE</a></div><div class="ttdeci">@ PAN_RELEASE</div><div class="ttdef"><b>Definition</b> EventPayload.h:279</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">steamrot::CameraPayload::CameraAction::RESET_ZOOM</a></div><div class="ttdeci">@ RESET_ZOOM</div><div class="ttdef"><b>Definition</b> EventPayload.h:277</div></div>
 <div class="ttc" id="astructsteamrot_1_1CameraPayload_html_af7d4a3ada75dc14245a90ba12d5ba1fb"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#af7d4a3ada75dc14245a90ba12d5ba1fb">steamrot::CameraPayload::NONE</a></div><div class="ttdeci">enum steamrot::CameraPayload::CameraAction NONE</div></div>
-<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_afdff114ef2cc30eef68bc576c2f9253d"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">steamrot::CameraPayload::scroll_delta</a></div><div class="ttdeci">float scroll_delta</div><div class="ttdoc">Raw scroll delta from SFML this tick.</div><div class="ttdef"><b>Definition</b> EventPayload.h:297</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_afdff114ef2cc30eef68bc576c2f9253d"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#afdff114ef2cc30eef68bc576c2f9253d">steamrot::CameraPayload::scroll_delta</a></div><div class="ttdeci">float scroll_delta</div><div class="ttdoc">Raw scroll delta from SFML this tick.</div><div class="ttdef"><b>Definition</b> EventPayload.h:328</div></div>
 <div class="ttc" id="astructsteamrot_1_1GhostPayload_html"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html">steamrot::GhostPayload</a></div><div class="ttdoc">Event payload for MrGhost selection changes.</div><div class="ttdef"><b>Definition</b> EventPayload.h:222</div></div>
 <div class="ttc" id="astructsteamrot_1_1GhostPayload_html_a7e5589fb1a7ef7bca1b28d1dff7497cf"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html#a7e5589fb1a7ef7bca1b28d1dff7497cf">steamrot::GhostPayload::GhostPayload</a></div><div class="ttdeci">GhostPayload(const GhostSelection &amp;selection)</div><div class="ttdoc">Constructor for a SELECT action carrying the chosen tag.</div><div class="ttdef"><b>Definition</b> EventPayload.h:239</div></div>
 <div class="ttc" id="astructsteamrot_1_1GhostPayload_html_a80445bfaceb3f796962d20b67fc25e5a"><div class="ttname"><a href="structsteamrot_1_1GhostPayload.html#a80445bfaceb3f796962d20b67fc25e5a">steamrot::GhostPayload::GhostPayload</a></div><div class="ttdeci">GhostPayload(const GhostAction ghost_action, const GhostSelection &amp;selection)</div><div class="ttdoc">Constructor taking an explicit action and selection tag.</div><div class="ttdef"><b>Definition</b> EventPayload.h:248</div></div>

@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: src/logic/action_camera.h Source File</title>
+<title>SteamRot: action_camera.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('action__camera_8h_source.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -97,27 +111,38 @@ $(function(){initNavTree('action__camera_8h_source.html','',''); });
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;<a class="code" href="CameraState_8h.html">CameraState.h</a>&quot;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;<a class="code" href="Subscriber_8h.html">Subscriber.h</a>&quot;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html">steamrot::logic::action::camera</a> {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#ab2178c2daeef0a485704a309da32fd30">apply_zoom</a>(CameraState &amp;camera_state, <span class="keywordtype">float</span> scroll_delta);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#abb0ba3c92238fabe9b78127f9e6de47f">reset_zoom</a>(CameraState &amp;camera_state);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">process_subscribers</a>(</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <span class="keyword">const</span> std::vector&lt;std::shared_ptr&lt;Subscriber&gt;&gt; &amp;subscribers,</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    CameraState &amp;camera_state);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>} <span class="comment">// namespace steamrot::logic::action::camera</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;<a class="code" href="EventPayload_8h.html">EventPayload.h</a>&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="code" href="Subscriber_8h.html">Subscriber.h</a>&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html">steamrot::logic::action::camera</a> {</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#ab2178c2daeef0a485704a309da32fd30">apply_zoom</a>(CameraState &amp;camera_state, <span class="keywordtype">float</span> scroll_delta);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#abb0ba3c92238fabe9b78127f9e6de47f">reset_zoom</a>(CameraState &amp;camera_state);</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#aadefe8a37ac8336f0445afe605d8fabf">apply_pan_start</a>(CameraState &amp;camera_state,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                     <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">CameraPayload::PanDirection</a> direction);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#aa467cc61a02b26ad3a360217c2843fe1">apply_pan_stop</a>(CameraState &amp;camera_state,</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                    <a class="code hl_enumeration" href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">CameraPayload::PanDirection</a> direction);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keywordtype">void</span> <a class="code hl_function" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">process_subscribers</a>(</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keyword">const</span> std::vector&lt;std::shared_ptr&lt;Subscriber&gt;&gt; &amp;subscribers,</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    CameraState &amp;camera_state);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>} <span class="comment">// namespace steamrot::logic::action::camera</span></div>
 <div class="ttc" id="aCameraState_8h_html"><div class="ttname"><a href="CameraState_8h.html">CameraState.h</a></div><div class="ttdoc">Declaration of the CameraState struct.</div></div>
+<div class="ttc" id="aEventPayload_8h_html"><div class="ttname"><a href="EventPayload_8h.html">EventPayload.h</a></div><div class="ttdoc">Declaration of all payload types for Events.</div></div>
 <div class="ttc" id="aSubscriber_8h_html"><div class="ttname"><a href="Subscriber_8h.html">Subscriber.h</a></div><div class="ttdoc">Declaration of the Subscriber class.</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html">steamrot::logic::action::camera</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:12</div></div>
-<div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_a55433c113c8bf617e912a5580f9e89c3"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">steamrot::logic::action::camera::process_subscribers</a></div><div class="ttdeci">void process_subscribers(const std::vector&lt; std::shared_ptr&lt; Subscriber &gt; &gt; &amp;subscribers, CameraState &amp;camera_state)</div><div class="ttdoc">Process all active subscribers and apply their camera scroll deltas.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:25</div></div>
+<div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_a55433c113c8bf617e912a5580f9e89c3"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">steamrot::logic::action::camera::process_subscribers</a></div><div class="ttdeci">void process_subscribers(const std::vector&lt; std::shared_ptr&lt; Subscriber &gt; &gt; &amp;subscribers, CameraState &amp;camera_state)</div><div class="ttdoc">Process all active subscribers and apply their camera scroll deltas.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:67</div></div>
+<div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_aa467cc61a02b26ad3a360217c2843fe1"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#aa467cc61a02b26ad3a360217c2843fe1">steamrot::logic::action::camera::apply_pan_stop</a></div><div class="ttdeci">void apply_pan_stop(CameraState &amp;camera_state, CameraPayload::PanDirection direction)</div><div class="ttdoc">Clear the pan flag for the given direction (key-release behaviour).</div><div class="ttdef"><b>Definition</b> action_camera.cpp:46</div></div>
+<div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_aadefe8a37ac8336f0445afe605d8fabf"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#aadefe8a37ac8336f0445afe605d8fabf">steamrot::logic::action::camera::apply_pan_start</a></div><div class="ttdeci">void apply_pan_start(CameraState &amp;camera_state, CameraPayload::PanDirection direction)</div><div class="ttdoc">Set the pan flag for the given direction (key-press behaviour).</div><div class="ttdef"><b>Definition</b> action_camera.cpp:25</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_ab2178c2daeef0a485704a309da32fd30"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#ab2178c2daeef0a485704a309da32fd30">steamrot::logic::action::camera::apply_zoom</a></div><div class="ttdeci">void apply_zoom(CameraState &amp;camera_state, float scroll_delta)</div><div class="ttdoc">Apply a mouse-scroll delta to the camera zoom level.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:15</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_1_1action_1_1camera_html_abb0ba3c92238fabe9b78127f9e6de47f"><div class="ttname"><a href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#abb0ba3c92238fabe9b78127f9e6de47f">steamrot::logic::action::camera::reset_zoom</a></div><div class="ttdeci">void reset_zoom(CameraState &amp;camera_state)</div><div class="ttdoc">Reset the camera zoom level to the default value.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:22</div></div>
+<div class="ttc" id="astructsteamrot_1_1CameraPayload_html_ab0e842864c2c7e79135c576822501ce7"><div class="ttname"><a href="structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a></div><div class="ttdeci">PanDirection</div><div class="ttdoc">Identifies which pan direction is being toggled.</div><div class="ttdef"><b>Definition</b> EventPayload.h:285</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

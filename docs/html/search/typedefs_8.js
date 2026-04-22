@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['partmap_0',['PartMap',['../namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8',1,'steamrot']]]
+  ['nodedescriptor_0',['NodeDescriptor',['../namespacesteamrot.html#a33087f5d921496aa703e653f0f2d207c',1,'steamrot']]]
 ];

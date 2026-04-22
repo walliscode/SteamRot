@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: Namespace Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('namespacemembers_p.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -93,8 +107,9 @@ $(function(){initNavTree('namespacemembers_p.html','',''); });
 
 <h3 class="doxsection"><a id="index_p" name="index_p"></a>- p -</h3><ul>
 <li>PartMap&#160;:&#160;<a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">steamrot</a></li>
-<li>PlaceFirstPiece()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#afd041a74089b011592ed5a7ff16d326f">steamrot::logic::action::grimoire_machina</a></li>
-<li>PlaceGhostOnScaffold()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa105a63ee3409a8f406f20e2d042fb36">steamrot::logic::action::grimoire_machina</a></li>
+<li>place_first_piece()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a0a4ef1b301b0ccbe6934eb665e8da7a8">steamrot::logic::action::grimoire_machina</a></li>
+<li>place_ghost_on_scaffold()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a5ac44bf50994db4a66b5cd6716bbd60d">steamrot::logic::action::grimoire_machina</a></li>
+<li>place_next_piece()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a32026a52a09e2bd05d1db2497a5625e0">steamrot::logic::action::grimoire_machina</a></li>
 <li>position_first_part_of_machina_form_scaffold()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#ac226c81d26533da2162bd3e88bf8bf7f">steamrot::logic::positioning::grimoire_machina</a></li>
 <li>position_machina_form_scaffold()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a5037acd78b5bc3215919831342543522">steamrot::logic::positioning::grimoire_machina</a></li>
 <li>PositionAllUIEntities()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#abdbc599267d0fe913009f37a74632810">steamrot::logic::positioning::ui</a></li>
@@ -103,7 +118,9 @@ $(function(){initNavTree('namespacemembers_p.html','',''); });
 <li>PositionHorizontalLayoutChildren()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a3a560bfec8a62eca49cb350f215c0022">steamrot::logic::positioning::ui</a></li>
 <li>PositionNestedUIElements()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#ac9ec24349b82ccafbb363ce95778318d">steamrot::logic::positioning::ui</a></li>
 <li>PositionVerticalLayoutChildren()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a86616bac04401c27e9e8ecf9b5636f5d">steamrot::logic::positioning::ui</a></li>
-<li>process_subscribers()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">steamrot::logic::action::camera</a></li>
+<li>proces_user_input_events()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa511f65e7136ed1e2b63992e3eb0424a">steamrot::logic::action::grimoire_machina</a></li>
+<li>process_logic_events()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a548859d8e2f00f733a34598e7736125f">steamrot::logic::action::grimoire_machina</a></li>
+<li>process_subscribers()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1camera.html#a55433c113c8bf617e912a5580f9e89c3">steamrot::logic::action::camera</a>, <a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a39b8adb5061ddfc957ac607b4084527f">steamrot::logic::action::grimoire_machina</a></li>
 <li>ProcessButtonElementActions()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ui.html#a964ece1d9d17a76f92d57fe42397caa1">steamrot::logic::action::ui</a></li>
 <li>ProcessDropDownButtonElementActions()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ui.html#a173e4d78ea7e0b98cd243c3af4b4171f">steamrot::logic::action::ui</a></li>
 <li>ProcessDropDownContainerElementActions()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ui.html#a706d3dfcb23c789d895ce488a06acead">steamrot::logic::action::ui</a></li>
@@ -112,14 +129,12 @@ $(function(){initNavTree('namespacemembers_p.html','',''); });
 <li>ProcessErrorLog()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1log__handler.html#ab72051c60f9a2c685ad825fdb972c10c">steamrot::log_handler</a></li>
 <li>ProcessInfoLog()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1log__handler.html#a5604f1ded14d6c0614fb8e643b26b147">steamrot::log_handler</a></li>
 <li>ProcessLog()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1log__handler.html#aa6c5a566a8afd0a2d393fe82e3c709d7">steamrot::log_handler</a></li>
-<li>ProcessLogicEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a40f77522a5faa991c68098dc78a255e2">steamrot::logic::action::grimoire_machina</a></li>
 <li>ProcessNestedUIActionsAndEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ui.html#acbe7d5bf7ae8491347f61f80bbb33054">steamrot::logic::action::ui</a></li>
 <li>ProcessRotateSubscribers()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#abec836af744c8cc9b01b655946d4b7f2">steamrot::logic::positioning::ghost</a></li>
 <li>ProcessScaffoldCollisions()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1collision_1_1mouse.html#a485484b973451726f9cc0d30284603e5">steamrot::logic::collision::mouse</a></li>
 <li>ProcessSubscriber()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ghost.html#ae031af741b30b8f45f640bac41d958b7">steamrot::logic::action::ghost</a></li>
-<li>ProcessSubscribers()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ghost.html#af0e42ef5acc2f4b398cbb586e97053a5">steamrot::logic::action::ghost</a>, <a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a26fcce758020336d86d72700259218e5">steamrot::logic::action::grimoire_machina</a></li>
+<li>ProcessSubscribers()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ghost.html#af0e42ef5acc2f4b398cbb586e97053a5">steamrot::logic::action::ghost</a></li>
 <li>ProcessUIActionsAndEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1ui.html#a3e910fb3c2324f9c94a57bfc02782da1">steamrot::logic::action::ui</a></li>
-<li>ProcessUserInputEvents()&#160;:&#160;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aacee6fd448a20a3a9d2b82bbed8f2406">steamrot::logic::action::grimoire_machina</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

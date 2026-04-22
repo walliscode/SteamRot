@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: src/types/flatbuffers/generated/event_payload_generated.h File Reference</title>
+<title>SteamRot: event_payload_generated.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('event__payload__generated_8h.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -165,6 +179,18 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="memdesc:abe025cf9d35988eb24c8d565bfbdfcf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ghost action types.  <a href="namespacesteamrot.html#abe025cf9d35988eb24c8d565bfbdfcf8">More...</a><br /></td></tr>
+<tr class="memitem:a8c1eea767ebb0ce87023fffd1a51f4cf" id="r_a8c1eea767ebb0ce87023fffd1a51f4cf"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cf">steamrot::CameraActionFbs</a> : int8_t { <br />
+&#160;&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa9ca9cc004aea7a5893a1e1a7850cfe1b">steamrot::CameraActionFbs_NONE</a> = 0
+, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa046f111378ca2a4ea6913f68c841ca24">steamrot::CameraActionFbs_SCROLL</a> = 1
+, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa6ede74ef8913c0f29b470ef91f41e2a9">steamrot::CameraActionFbs_RESET_ZOOM</a> = 2
+, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cface17bd2a3639b601d7ecf4280cb2bef4">steamrot::CameraActionFbs_PAN_PRESS</a> = 3
+, <br />
+&#160;&#160;<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa72421612f3c3eea7ecea57e4e9e5bd75">steamrot::CameraActionFbs_PAN_RELEASE</a> = 4
+, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfada3c01ed834951833ed1af7fa412036f">steamrot::CameraActionFbs_MIN</a> = CameraActionFbs_NONE
+, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfacfd58a53c3bc5a01f08566e91e88b02f">steamrot::CameraActionFbs_MAX</a> = CameraActionFbs_PAN_RELEASE
+<br />
+ }</td></tr>
+<tr class="memdesc:a8c1eea767ebb0ce87023fffd1a51f4cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Camera action types.  <a href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cf">More...</a><br /></td></tr>
 <tr class="memitem:aace55da91acda4459c31ab1d358cf400" id="r_aace55da91acda4459c31ab1d358cf400"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#aace55da91acda4459c31ab1d358cf400">steamrot::EventPayloadFbs</a> : uint8_t { <br />
 &#160;&#160;<a class="el" href="namespacesteamrot.html#aace55da91acda4459c31ab1d358cf400ad8ce8c0b360db5953d8be8f96b97f026">steamrot::EventPayloadFbs_NONE</a> = 0
 , <a class="el" href="namespacesteamrot.html#aace55da91acda4459c31ab1d358cf400a7679bd6d1339a5ab66161dfab6861b06">steamrot::EventPayloadFbs_InputPayloadFbs</a> = 1
@@ -202,6 +228,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aaf221455192a2faae8b8456bd4f3d254" id="r_aaf221455192a2faae8b8456bd4f3d254"><td class="memItemLeft">const <a class="el" href="namespacesteamrot.html#abe025cf9d35988eb24c8d565bfbdfcf8">GhostActionFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#aaf221455192a2faae8b8456bd4f3d254">steamrot::EnumValuesGhostActionFbs</a> ())[3]</td></tr>
 <tr class="memitem:a24b64c4c201b81a0f0d8a666e238109a" id="r_a24b64c4c201b81a0f0d8a666e238109a"><td class="memItemLeft">const char *const *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a24b64c4c201b81a0f0d8a666e238109a">steamrot::EnumNamesGhostActionFbs</a> ()</td></tr>
 <tr class="memitem:a175a9ba26ffbab8f024b9de69805c42c" id="r_a175a9ba26ffbab8f024b9de69805c42c"><td class="memItemLeft">const char *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a175a9ba26ffbab8f024b9de69805c42c">steamrot::EnumNameGhostActionFbs</a> (<a class="el" href="namespacesteamrot.html#abe025cf9d35988eb24c8d565bfbdfcf8">GhostActionFbs</a> e)</td></tr>
+<tr class="memitem:ab567fded2bf21a73e66990c38beedeea" id="r_ab567fded2bf21a73e66990c38beedeea"><td class="memItemLeft">const <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cf">CameraActionFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ab567fded2bf21a73e66990c38beedeea">steamrot::EnumValuesCameraActionFbs</a> ())[5]</td></tr>
+<tr class="memitem:a640cb1e79ac1410b1d01f7ec8e38bae8" id="r_a640cb1e79ac1410b1d01f7ec8e38bae8"><td class="memItemLeft">const char *const *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a640cb1e79ac1410b1d01f7ec8e38bae8">steamrot::EnumNamesCameraActionFbs</a> ()</td></tr>
+<tr class="memitem:af314bfa85d369d92f7a313f8ce474d51" id="r_af314bfa85d369d92f7a313f8ce474d51"><td class="memItemLeft">const char *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#af314bfa85d369d92f7a313f8ce474d51">steamrot::EnumNameCameraActionFbs</a> (<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cf">CameraActionFbs</a> e)</td></tr>
 <tr class="memitem:ac580498c64f0dea5458382347478f0d8" id="r_ac580498c64f0dea5458382347478f0d8"><td class="memItemLeft">const <a class="el" href="namespacesteamrot.html#aace55da91acda4459c31ab1d358cf400">EventPayloadFbs</a>(&amp;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ac580498c64f0dea5458382347478f0d8">steamrot::EnumValuesEventPayloadFbs</a> ())[8]</td></tr>
 <tr class="memitem:a00e6fc4e919395d90efc33d21ec84c4f" id="r_a00e6fc4e919395d90efc33d21ec84c4f"><td class="memItemLeft">const char *const *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a00e6fc4e919395d90efc33d21ec84c4f">steamrot::EnumNamesEventPayloadFbs</a> ()</td></tr>
 <tr class="memitem:a2923fc007cd7ffe5af96cfe284eb981f" id="r_a2923fc007cd7ffe5af96cfe284eb981f"><td class="memItemLeft">const char *&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a2923fc007cd7ffe5af96cfe284eb981f">steamrot::EnumNameEventPayloadFbs</a> (<a class="el" href="namespacesteamrot.html#aace55da91acda4459c31ab1d358cf400">EventPayloadFbs</a> e)</td></tr>
@@ -215,7 +244,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a892784d8edc55662eac1022996c62d79" id="r_a892784d8edc55662eac1022996c62d79"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; ScenePayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a892784d8edc55662eac1022996c62d79">steamrot::CreateScenePayloadFbsDirect</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="namespacesteamrot.html#a8fbb96fab930780c3d8e52527b6d9b4b">steamrot::SceneTypeFbs</a> scene_type=<a class="el" href="namespacesteamrot.html#a8fbb96fab930780c3d8e52527b6d9b4ba8fac254bfba886b98876e8e7e341c518">steamrot::SceneTypeFbs_UNKNOWN</a>, const char *scene_id=nullptr, <a class="el" href="namespacesteamrot.html#a446e9e33e0dddc33d3de5d7879466a94">steamrot::SceneActionFbs</a> action=<a class="el" href="namespacesteamrot.html#a446e9e33e0dddc33d3de5d7879466a94afab8b29ac9fd1168e71a21b646807ae5">steamrot::SceneActionFbs_CHANGE</a>)</td></tr>
 <tr class="memitem:acc7320ca5640fd88130add5fd7533bcb" id="r_acc7320ca5640fd88130add5fd7533bcb"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; SystemPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#acc7320ca5640fd88130add5fd7533bcb">steamrot::CreateSystemPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="namespacesteamrot.html#a301c46aa6c0f1242c09744523d5f40a0">steamrot::SystemActionFbs</a> action=<a class="el" href="namespacesteamrot.html#a301c46aa6c0f1242c09744523d5f40a0a3b745bc18ec27ca212b7addf105d2006">steamrot::SystemActionFbs_QUIT</a>)</td></tr>
 <tr class="memitem:a0f1ee7e34011d67b0278b6c287b543fd" id="r_a0f1ee7e34011d67b0278b6c287b543fd"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; GhostPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#a0f1ee7e34011d67b0278b6c287b543fd">steamrot::CreateGhostPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="namespacesteamrot.html#abe025cf9d35988eb24c8d565bfbdfcf8">steamrot::GhostActionFbs</a> action=<a class="el" href="namespacesteamrot.html#abe025cf9d35988eb24c8d565bfbdfcf8a566b48acac606c01297a31b8172d81bf">steamrot::GhostActionFbs_NONE</a>)</td></tr>
-<tr class="memitem:aa644219cb74704ddd6fdc7abf0536b60" id="r_aa644219cb74704ddd6fdc7abf0536b60"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; CameraPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#aa644219cb74704ddd6fdc7abf0536b60">steamrot::CreateCameraPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb)</td></tr>
+<tr class="memitem:ada1339eddfd46b5d4c029d0d9889c94d" id="r_ada1339eddfd46b5d4c029d0d9889c94d"><td class="memItemLeft">inline ::flatbuffers::Offset&lt; CameraPayloadFbs &gt;&#160;</td><td class="memItemRight"><a class="el" href="namespacesteamrot.html#ada1339eddfd46b5d4c029d0d9889c94d">steamrot::CreateCameraPayloadFbs</a> (::flatbuffers::FlatBufferBuilder &amp;_fbb, <a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cf">steamrot::CameraActionFbs</a> action=<a class="el" href="namespacesteamrot.html#a8c1eea767ebb0ce87023fffd1a51f4cfa9ca9cc004aea7a5893a1e1a7850cfe1b">steamrot::CameraActionFbs_NONE</a>)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>

@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: steamrot::CameraPayload Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('structsteamrot_1_1CameraPayload.html','','structsteamrot_1_1CameraPayload-members'); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -100,22 +114,42 @@ $(function(){initNavTree('structsteamrot_1_1CameraPayload.html','','structsteamr
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ab5e8821a67078dc48cece7a71ebefe36" id="r_ab5e8821a67078dc48cece7a71ebefe36"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> { <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">NONE</a>
+<tr class="memitem:ab5e8821a67078dc48cece7a71ebefe36" id="r_ab5e8821a67078dc48cece7a71ebefe36"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> { <br />
+&#160;&#160;<a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693">NONE</a>
 , <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25">SCROLL</a>
 , <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06">RESET_ZOOM</a>
+, <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743">PAN_PRESS</a>
+, <br />
+&#160;&#160;<a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed">PAN_RELEASE</a>
+<br />
  }</td></tr>
 <tr class="memdesc:ab5e8821a67078dc48cece7a71ebefe36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum discriminating between different types of camera-related actions.  <a href="#ab5e8821a67078dc48cece7a71ebefe36">More...</a><br /></td></tr>
+<tr class="memitem:ab0e842864c2c7e79135c576822501ce7" id="r_ab0e842864c2c7e79135c576822501ce7"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ab0e842864c2c7e79135c576822501ce7">PanDirection</a> { <br />
+&#160;&#160;<a class="el" href="#ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693">NONE</a>
+, <a class="el" href="#ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758">LEFT</a>
+, <a class="el" href="#ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403">RIGHT</a>
+, <a class="el" href="#ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1">UP</a>
+, <br />
+&#160;&#160;<a class="el" href="#ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f">DOWN</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ab0e842864c2c7e79135c576822501ce7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifies which pan direction is being toggled.  <a href="#ab0e842864c2c7e79135c576822501ce7">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4493500342f37ff87b88e756a49ddba1" id="r_a4493500342f37ff87b88e756a49ddba1"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a4493500342f37ff87b88e756a49ddba1">CameraPayload</a> ()=default</td></tr>
 <tr class="memdesc:a4493500342f37ff87b88e756a49ddba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
+<tr class="memitem:a6c72c2f4c402338d554435f6e13b2a97" id="r_a6c72c2f4c402338d554435f6e13b2a97"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a6c72c2f4c402338d554435f6e13b2a97">CameraPayload</a> (const <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> camera_action)</td></tr>
+<tr class="memdesc:a6c72c2f4c402338d554435f6e13b2a97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking a <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36" title="Enum discriminating between different types of camera-related actions.">CameraAction</a> enum value.  <br /></td></tr>
 <tr class="memitem:a6268be738156e8420837636c535e38a3" id="r_a6268be738156e8420837636c535e38a3"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a6268be738156e8420837636c535e38a3">CameraPayload</a> (float delta)</td></tr>
 <tr class="memdesc:a6268be738156e8420837636c535e38a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking a scroll delta.  <br /></td></tr>
+<tr class="memitem:a24da7536e4750a478036e9b7dc49d2e3" id="r_a24da7536e4750a478036e9b7dc49d2e3"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a24da7536e4750a478036e9b7dc49d2e3">CameraPayload</a> (const <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a> camera_action, const <a class="el" href="#ab0e842864c2c7e79135c576822501ce7">PanDirection</a> pan_direction)</td></tr>
+<tr class="memdesc:a24da7536e4750a478036e9b7dc49d2e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for pan press/release events.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:af7d4a3ada75dc14245a90ba12d5ba1fb" id="r_af7d4a3ada75dc14245a90ba12d5ba1fb"><td class="memItemLeft">enum <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">steamrot::CameraPayload::CameraAction</a>&#160;</td><td class="memItemRight"><a class="el" href="#af7d4a3ada75dc14245a90ba12d5ba1fb">NONE</a></td></tr>
+<tr class="memitem:ab97cc4fd4c35c0cb869d97ad531d627b" id="r_ab97cc4fd4c35c0cb869d97ad531d627b"><td class="memItemLeft">enum <a class="el" href="#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab97cc4fd4c35c0cb869d97ad531d627b">NONE</a></td></tr>
 <tr class="memitem:afdff114ef2cc30eef68bc576c2f9253d" id="r_afdff114ef2cc30eef68bc576c2f9253d"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#afdff114ef2cc30eef68bc576c2f9253d">scroll_delta</a> {0.0f}</td></tr>
 <tr class="memdesc:afdff114ef2cc30eef68bc576c2f9253d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw scroll delta from SFML this tick.  <br /></td></tr>
 </table>
@@ -148,13 +182,46 @@ Public Attributes</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693" name="ab5e8821a67078dc48cece7a71ebefe36ab50339a10e1de285ac99d4c3990b8693"></a>NONE&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25" name="ab5e8821a67078dc48cece7a71ebefe36a71574275cadb387a5082e87e9dd60c25"></a>SCROLL&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06" name="ab5e8821a67078dc48cece7a71ebefe36ae23b5d34417a4f571853b547345f9a06"></a>RESET_ZOOM&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743" name="ab5e8821a67078dc48cece7a71ebefe36a94da9effff6e565ee34bcef40f64c743"></a>PAN_PRESS&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed" name="ab5e8821a67078dc48cece7a71ebefe36ab920d822130b1926bd0d92ca859e63ed"></a>PAN_RELEASE&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="ab0e842864c2c7e79135c576822501ce7" name="ab0e842864c2c7e79135c576822501ce7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0e842864c2c7e79135c576822501ce7">&#9670;&#160;</a></span>PanDirection</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class <a class="el" href="#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel strong">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Identifies which pan direction is being toggled. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693" name="ab0e842864c2c7e79135c576822501ce7ab50339a10e1de285ac99d4c3990b8693"></a>NONE&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758" name="ab0e842864c2c7e79135c576822501ce7a684d325a7303f52e64011467ff5c5758"></a>LEFT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403" name="ab0e842864c2c7e79135c576822501ce7a21507b40c80068eda19865706fdc2403"></a>RIGHT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1" name="ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1"></a>UP&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f" name="ab0e842864c2c7e79135c576822501ce7ac4e0e4e3118472beeb2ae75827450f1f"></a>DOWN&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
 </div>
 <a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4493500342f37ff87b88e756a49ddba1" name="a4493500342f37ff87b88e756a49ddba1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4493500342f37ff87b88e756a49ddba1">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4493500342f37ff87b88e756a49ddba1">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,8 +247,41 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a6c72c2f4c402338d554435f6e13b2a97" name="a6c72c2f4c402338d554435f6e13b2a97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c72c2f4c402338d554435f6e13b2a97">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">steamrot::CameraPayload::CameraPayload </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a></td>          <td class="paramname"><span class="paramname"><em>camera_action</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor taking a <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36" title="Enum discriminating between different types of camera-related actions.">CameraAction</a> enum value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">camera_action</td><td><a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36" title="Enum discriminating between different types of camera-related actions.">CameraAction</a> enum value to set the action member to </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a6268be738156e8420837636c535e38a3" name="a6268be738156e8420837636c535e38a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6268be738156e8420837636c535e38a3">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6268be738156e8420837636c535e38a3">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -213,9 +313,61 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a24da7536e4750a478036e9b7dc49d2e3" name="a24da7536e4750a478036e9b7dc49d2e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24da7536e4750a478036e9b7dc49d2e3">&#9670;&#160;</a></span>CameraPayload() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">steamrot::CameraPayload::CameraPayload </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#ab5e8821a67078dc48cece7a71ebefe36">CameraAction</a></td>          <td class="paramname"><span class="paramname"><em>camera_action</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="#ab0e842864c2c7e79135c576822501ce7">PanDirection</a></td>          <td class="paramname"><span class="paramname"><em>pan_direction</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor for pan press/release events. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">camera_action</td><td>PAN_PRESS or PAN_RELEASE. </td></tr>
+    <tr><td class="paramname">pan_direction</td><td>Direction being toggled. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="ab97cc4fd4c35c0cb869d97ad531d627b" name="ab97cc4fd4c35c0cb869d97ad531d627b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab97cc4fd4c35c0cb869d97ad531d627b">&#9670;&#160;</a></span>NONE <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#ab0e842864c2c7e79135c576822501ce7">steamrot::CameraPayload::PanDirection</a> steamrot::CameraPayload::NONE</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af7d4a3ada75dc14245a90ba12d5ba1fb" name="af7d4a3ada75dc14245a90ba12d5ba1fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7d4a3ada75dc14245a90ba12d5ba1fb">&#9670;&#160;</a></span>NONE</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af7d4a3ada75dc14245a90ba12d5ba1fb">&#9670;&#160;</a></span>NONE <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +398,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/types/events/<a class="el" href="EventPayload_8h_source.html">EventPayload.h</a></li>
+<li><a class="el" href="EventPayload_8h_source.html">EventPayload.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

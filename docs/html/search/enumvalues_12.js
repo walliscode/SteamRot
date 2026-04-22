@@ -24,5 +24,6 @@ var searchData=
   ['uistate_21',['UIState',['../namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995eac4ec4807a3fe8dcd8894e4b7c336221a',1,'steamrot']]],
   ['uistatelogic_22',['UIStateLogic',['../namespacesteamrot.html#af179d5f79d78f1e8e5a0879482bc7576a35725b89f594ce88bfca535e6ec69cc1',1,'steamrot']]],
   ['unknown_23',['UNKNOWN',['../namespacesteamrot.html#a24c82489204f0b4f5d11ec18a7b1bcbba696b031073e74bf2cb98e5ef201d4aa3',1,'steamrot']]],
-  ['user_5finput_24',['USER_INPUT',['../namespacesteamrot.html#ac88f3bda138e187719062f9972ef4bcdab80683b77da929c917a6a968c80fa6a7',1,'steamrot']]]
+  ['up_24',['UP',['../structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7afbaedde498cdead4f2780217646e9ba1',1,'steamrot::CameraPayload']]],
+  ['user_5finput_25',['USER_INPUT',['../namespacesteamrot.html#ac88f3bda138e187719062f9972ef4bcdab80683b77da929c917a6a968c80fa6a7',1,'steamrot']]]
 ];

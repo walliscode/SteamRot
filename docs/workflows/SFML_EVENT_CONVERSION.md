@@ -1,5 +1,7 @@
 # SFML Event Conversion Workflow
 
+\page adding_sfml_event_conversions Adding SFML Event Conversions
+
 This guide explains how the SFML event conversion pipeline works and how to
 extend it with new input actions or new event types.
 

@@ -5,6 +5,7 @@ var searchData=
   ['camera_5fstate_2',['camera_state',['../structsteamrot_1_1SceneContext.html#a8671f9b56525e4d2b92139c508ed8f14',1,'steamrot::SceneContext::camera_state'],['../structsteamrot_1_1SceneState.html#a38c2a0f0198da512a42473948f956ba3',1,'steamrot::SceneState::camera_state']]],
   ['captured_5fpayload_3',['captured_payload',['../structsteamrot_1_1Subscriber.html#a66e2a3259e6fbb239e447428150133d7',1,'steamrot::Subscriber']]],
   ['componentregistersize_4',['ComponentRegisterSize',['../namespacesteamrot.html#a1754276c51344a1d12d0521f126739b4',1,'steamrot']]],
-  ['connections_5',['connections',['../structsteamrot_1_1MachinaFormScaffold.html#acedd1d92f9c70e2edf2c34d194646171',1,'steamrot::MachinaFormScaffold']]],
-  ['context_6',['context',['../structsteamrot_1_1EventPacket.html#ae76b4621256470a4b625b700271b27e7',1,'steamrot::EventPacket']]]
+  ['connection_5',['connection',['../structsteamrot_1_1PartEdge.html#ad49697e7353f0715e5936ff76a7206c1',1,'steamrot::PartEdge']]],
+  ['connections_6',['connections',['../structsteamrot_1_1MachinaFormScaffold.html#acedd1d92f9c70e2edf2c34d194646171',1,'steamrot::MachinaFormScaffold']]],
+  ['context_7',['context',['../structsteamrot_1_1EventPacket.html#ae76b4621256470a4b625b700271b27e7',1,'steamrot::EventPacket']]]
 ];

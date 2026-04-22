@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>SteamRot: steamrot::Connection::Endpoint Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('structsteamrot_1_1Connection_1_1Endpoint.html','','structsteamrot_1_1Connection_1_1Endpoint-members'); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -98,6 +112,11 @@ $(function(){initNavTree('structsteamrot_1_1Connection_1_1Endpoint.html','','str
 
 <p><code>#include &lt;<a class="el" href="MachinaFormScaffold_8h_source.html">MachinaFormScaffold.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ae8e94962a5a74972a23d2f2e1582bdce" id="r_ae8e94962a5a74972a23d2f2e1582bdce"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ae8e94962a5a74972a23d2f2e1582bdce">Endpoint</a> (uint32_t <a class="el" href="#a00fd7e94f6f40bdbce8b6f8ac4527054">part_id</a>, size_t <a class="el" href="#ac62a3e51f00044dc04ea993470acd436">socket_index</a>)</td></tr>
+<tr class="memdesc:ae8e94962a5a74972a23d2f2e1582bdce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an <a class="el" href="structsteamrot_1_1Connection_1_1Endpoint.html" title="One end of a Connection.">Endpoint</a> with the given part ID and socket index.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a00fd7e94f6f40bdbce8b6f8ac4527054" id="r_a00fd7e94f6f40bdbce8b6f8ac4527054"><td class="memItemLeft">uint32_t&#160;</td><td class="memItemRight"><a class="el" href="#a00fd7e94f6f40bdbce8b6f8ac4527054">part_id</a> {0}</td></tr>
@@ -107,7 +126,46 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>One end of a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a>. </p>
-</div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ae8e94962a5a74972a23d2f2e1582bdce" name="ae8e94962a5a74972a23d2f2e1582bdce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8e94962a5a74972a23d2f2e1582bdce">&#9670;&#160;</a></span>Endpoint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">steamrot::Connection::Endpoint::Endpoint </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>part_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>socket_index</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create an <a class="el" href="structsteamrot_1_1Connection_1_1Endpoint.html" title="One end of a Connection.">Endpoint</a> with the given part ID and socket index. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname"><a class="el" href="#a00fd7e94f6f40bdbce8b6f8ac4527054" title="Stable instance ID (matches JointInstance::id or FragmentInstance::id).">part_id</a></td><td>stable ID of the <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> owning the socket at this endpoint </td></tr>
+    <tr><td class="paramname"><a class="el" href="#ac62a3e51f00044dc04ea993470acd436" title="Index into that instance&#39;s sockets vector.">socket_index</a></td><td>vector index of the socket within that <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a>'s <code>sockets</code> vector </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a00fd7e94f6f40bdbce8b6f8ac4527054" name="a00fd7e94f6f40bdbce8b6f8ac4527054"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00fd7e94f6f40bdbce8b6f8ac4527054">&#9670;&#160;</a></span>part_id</h2>
 
@@ -141,7 +199,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/types/entity/<a class="el" href="MachinaFormScaffold_8h_source.html">MachinaFormScaffold.h</a></li>
+<li><a class="el" href="MachinaFormScaffold_8h_source.html">MachinaFormScaffold.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

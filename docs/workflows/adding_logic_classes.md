@@ -1,4 +1,6 @@
-# Adding Logic Classes
+# Adding Logic
+
+\page adding_logic_classes Adding Logic Classes
 
 This guide provides a comprehensive workflow for adding new Logic-derived
 classes to the SteamRot game engine.
@@ -829,9 +831,10 @@ void YourLogic::ProcessLogic() {
 
 - ✅ Check order in `Configure{Scene}Logics()` array - that's the execution
   order
-- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action, Positioning,
-  Render)
-- ✅ Remember groupings execute in order: Collision → Action → Positioning → Render
+- ✅ Verify you're in the correct `LogicGrouping` (Collision, Action,
+  Positioning, Render)
+- ✅ Remember groupings execute in order: Collision → Action → Positioning →
+  Render
 
 ### Test Failures: "dynamic_cast returned null"
 

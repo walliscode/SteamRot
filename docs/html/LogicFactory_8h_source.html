@@ -5,8 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>SteamRot: src/logic/LogicFactory.h Source File</title>
+<title>SteamRot: LogicFactory.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript">var page_layout=1;</script>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <script type="text/javascript" src="clipboard.js"></script>
@@ -17,9 +18,13 @@
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(function() { init_search(); });
+</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="side-nav" class="ui-resizable side-nav-resizable"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
@@ -31,6 +36,18 @@
    <div id="projectbrief">A data-driven C++ game engine</div>
   </td>
  </tr>
+   <tr><td colspan="2">        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <span id="MSearchSelect" class="search-icon" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"><span class="search-icon-dropdown"></span></span>
+          <input type="text" id="MSearchField" value="" placeholder="Search" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><div id="MSearchCloseImg" class="close-icon"></div></a>
+          </span>
+        </div>
+</td></tr>
  </tbody>
 </table>
 </div>
@@ -42,17 +59,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 <script type="text/javascript">
 $(function() { codefold.init(); });
 </script>
-<script type="text/javascript" src="menudata.js"></script>
-<script type="text/javascript" src="menu.js"></script>
-<script type="text/javascript">
-$(function() {
-  initMenu('',true,false,'search.php','Search',true);
-  $(function() { init_search(); });
-});
-</script>
-<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
     <div id="nav-tree-contents">
       <div id="nav-sync" class="sync"></div>
@@ -65,8 +72,15 @@ $(function() {
 <script type="text/javascript">
 $(function(){initNavTree('LogicFactory_8h_source.html','',''); });
 </script>
-<div id="container">
-<div id="doc-content">
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',false,false,'search.php','Search',true);
+});
+</script>
+<div id="main-nav"></div>
+<div id="container"><div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -148,15 +162,15 @@ $(function(){initNavTree('LogicFactory_8h_source.html','',''); });
 <div class="ttc" id="aLogic_8h_html"><div class="ttname"><a href="Logic_8h.html">Logic.h</a></div><div class="ttdoc">Declaration of the abstract Logic class.</div></div>
 <div class="ttc" id="aSceneContext_8h_html"><div class="ttname"><a href="SceneContext_8h.html">SceneContext.h</a></div><div class="ttdoc">Declaration of the SceneContext struct.</div></div>
 <div class="ttc" id="aSceneType_8h_html"><div class="ttname"><a href="SceneType_8h.html">SceneType.h</a></div><div class="ttdoc">Declaration of the native SceneType enum.</div></div>
-<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ac3f6372d9d16c55ee63554ed205c93f0"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ac3f6372d9d16c55ee63554ed205c93f0">steamrot::logic::LogicFactory::ConfigureLogicObject</a></div><div class="ttdeci">std::expected&lt; std::monostate, FailInfo &gt; ConfigureLogicObject(Logic &amp;logic_object)</div><div class="ttdoc">Configures the provided Logic object.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:182</div></div>
-<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ac89f4fe607e921b161561e99f6f1dabc"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ac89f4fe607e921b161561e99f6f1dabc">steamrot::logic::LogicFactory::LogicFactory</a></div><div class="ttdeci">LogicFactory(const SceneContext &amp;scene_context)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:32</div></div>
-<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ad5fc000e65efa26ae14992ba2427595d"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ad5fc000e65efa26ae14992ba2427595d">steamrot::logic::LogicFactory::ProvideLogicCollection</a></div><div class="ttdeci">std::expected&lt; LogicCollection, FailInfo &gt; ProvideLogicCollection(SceneType scene_type)</div><div class="ttdoc">Provides a LogicCollection based on the SceneType.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:63</div></div>
+<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ac3f6372d9d16c55ee63554ed205c93f0"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ac3f6372d9d16c55ee63554ed205c93f0">steamrot::logic::LogicFactory::ConfigureLogicObject</a></div><div class="ttdeci">std::expected&lt; std::monostate, FailInfo &gt; ConfigureLogicObject(Logic &amp;logic_object)</div><div class="ttdoc">Configures the provided Logic object.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:185</div></div>
+<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ac89f4fe607e921b161561e99f6f1dabc"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ac89f4fe607e921b161561e99f6f1dabc">steamrot::logic::LogicFactory::LogicFactory</a></div><div class="ttdeci">LogicFactory(const SceneContext &amp;scene_context)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:33</div></div>
+<div class="ttc" id="aclasssteamrot_1_1logic_1_1LogicFactory_html_ad5fc000e65efa26ae14992ba2427595d"><div class="ttname"><a href="classsteamrot_1_1logic_1_1LogicFactory.html#ad5fc000e65efa26ae14992ba2427595d">steamrot::logic::LogicFactory::ProvideLogicCollection</a></div><div class="ttdeci">std::expected&lt; LogicCollection, FailInfo &gt; ProvideLogicCollection(SceneType scene_type)</div><div class="ttdoc">Provides a LogicCollection based on the SceneType.</div><div class="ttdef"><b>Definition</b> LogicFactory.cpp:64</div></div>
 <div class="ttc" id="aclasssteamrot_1_1logic_1_1Logic_html"><div class="ttname"><a href="classsteamrot_1_1logic_1_1Logic.html">steamrot::logic::Logic</a></div><div class="ttdoc">Abstract base class for all logic processing in the game.</div><div class="ttdef"><b>Definition</b> Logic.h:26</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_html"><div class="ttname"><a href="namespacesteamrot_1_1logic.html">steamrot::logic</a></div><div class="ttdoc">Headers.</div><div class="ttdef"><b>Definition</b> action_camera.cpp:12</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_html_a7efe04db00507e50c5992d47132e6559"><div class="ttname"><a href="namespacesteamrot_1_1logic.html#a7efe04db00507e50c5992d47132e6559">steamrot::logic::LogicCollection</a></div><div class="ttdeci">std::unordered_map&lt; LogicGrouping, LogicVector &gt; LogicCollection</div><div class="ttdef"><b>Definition</b> LogicFactory.h:25</div></div>
 <div class="ttc" id="anamespacesteamrot_1_1logic_html_a91808e44f7b6a8ceeaad42943e7284f6"><div class="ttname"><a href="namespacesteamrot_1_1logic.html#a91808e44f7b6a8ceeaad42943e7284f6">steamrot::logic::LogicVector</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; Logic &gt; &gt; LogicVector</div><div class="ttdef"><b>Definition</b> LogicFactory.h:24</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a24c82489204f0b4f5d11ec18a7b1bcbb"><div class="ttname"><a href="namespacesteamrot.html#a24c82489204f0b4f5d11ec18a7b1bcbb">steamrot::SceneType</a></div><div class="ttdeci">SceneType</div><div class="ttdoc">Native C++ enum representing different scene types.</div><div class="ttdef"><b>Definition</b> SceneType.h:28</div></div>
-<div class="ttc" id="anamespacesteamrot_html_a5b672c57ca4f22f000f8da0d41482db9"><div class="ttname"><a href="namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9">steamrot::LogicGrouping</a></div><div class="ttdeci">LogicGrouping</div><div class="ttdef"><b>Definition</b> LogicType.h:74</div></div>
+<div class="ttc" id="anamespacesteamrot_html_a5b672c57ca4f22f000f8da0d41482db9"><div class="ttname"><a href="namespacesteamrot.html#a5b672c57ca4f22f000f8da0d41482db9">steamrot::LogicGrouping</a></div><div class="ttdeci">LogicGrouping</div><div class="ttdef"><b>Definition</b> LogicType.h:77</div></div>
 <div class="ttc" id="anamespacesteamrot_html_a7719fe793bc1e817cb91cddf21a5995e"><div class="ttname"><a href="namespacesteamrot.html#a7719fe793bc1e817cb91cddf21a5995e">steamrot::LogicType</a></div><div class="ttdeci">LogicType</div><div class="ttdef"><b>Definition</b> LogicType.h:15</div></div>
 <div class="ttc" id="astructsteamrot_1_1FailInfo_html"><div class="ttname"><a href="structsteamrot_1_1FailInfo.html">steamrot::FailInfo</a></div><div class="ttdef"><b>Definition</b> FailInfo.h:44</div></div>
 <div class="ttc" id="astructsteamrot_1_1SceneContext_html"><div class="ttname"><a href="structsteamrot_1_1SceneContext.html">steamrot::SceneContext</a></div><div class="ttdoc">Lightweight reference container for scene and game core objects.</div><div class="ttdef"><b>Definition</b> SceneContext.h:36</div></div>
