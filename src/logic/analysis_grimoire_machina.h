@@ -31,6 +31,10 @@ namespace steamrot::logic::analysis::grimoire_machina {
 /////////////////////////////////////////////////
 PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
 
+} // namespace steamrot::logic::analysis::grimoire_machina
+
+namespace steamrot::logic::analysis::grimoire_machina::node_descriptor {
+
 /////////////////////////////////////////////////
 /// @brief Return true if the node's instance is a FragmentInstance.
 ///
@@ -85,4 +89,4 @@ size_t socket_count(const PartNode &node);
 /////////////////////////////////////////////////
 bool has_available_socket(const PartNode &node);
 
-} // namespace steamrot::logic::analysis::grimoire_machina
+} // namespace steamrot::logic::analysis::grimoire_machina::node_descriptor

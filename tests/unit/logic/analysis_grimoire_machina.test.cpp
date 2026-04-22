@@ -13,6 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 namespace agm = steamrot::logic::analysis::grimoire_machina;
+namespace nd = steamrot::logic::analysis::grimoire_machina::node_descriptor;
 
 TEST_CASE("build_part_graph from empty scaffold yields empty graph",
           "[unit][analysis][grimoire_machina]") {
@@ -76,9 +77,9 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
   int fragment_count = 0;
   int joint_count = 0;
   for (const auto &node : graph.nodes) {
-    if (agm::is_fragment(node))
+    if (nd::is_fragment(node))
       ++fragment_count;
-    if (agm::is_joint(node))
+    if (nd::is_joint(node))
       ++joint_count;
   }
   REQUIRE(fragment_count == 1);
@@ -95,7 +96,7 @@ TEST_CASE("is_isolated returns true for a node with no edges",
 
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
   REQUIRE(graph.nodes.size() == 1);
-  REQUIRE(agm::is_isolated(graph.nodes[0], graph));
+  REQUIRE(nd::is_isolated(graph.nodes[0], graph));
 }
 
 TEST_CASE("is_isolated returns false for a node that has an edge",
@@ -122,7 +123,7 @@ TEST_CASE("is_isolated returns false for a node that has an edge",
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
 
   for (const auto &node : graph.nodes) {
-    REQUIRE_FALSE(agm::is_isolated(node, graph));
+    REQUIRE_FALSE(nd::is_isolated(node, graph));
   }
 }
 
@@ -136,7 +137,7 @@ TEST_CASE("edge_count returns 0 for isolated node",
 
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
   REQUIRE(graph.nodes.size() == 1);
-  REQUIRE(agm::edge_count(graph.nodes[0], graph) == 0);
+  REQUIRE(nd::edge_count(graph.nodes[0], graph) == 0);
 }
 
 TEST_CASE("edge_count returns 1 on each node when connected by one edge",
@@ -163,7 +164,7 @@ TEST_CASE("edge_count returns 1 on each node when connected by one edge",
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
 
   for (const auto &node : graph.nodes) {
-    REQUIRE(agm::edge_count(node, graph) == 1);
+    REQUIRE(nd::edge_count(node, graph) == 1);
   }
 }
 
@@ -199,13 +200,13 @@ TEST_CASE("edge_count returns 2 on the joint in a ring of 2 fragments + 1 joint"
   // Find the joint node and verify it has edge_count == 2
   const steamrot::PartNode *joint_node = nullptr;
   for (const auto &node : graph.nodes) {
-    if (agm::is_joint(node)) {
+    if (nd::is_joint(node)) {
       joint_node = &node;
       break;
     }
   }
   REQUIRE(joint_node != nullptr);
-  REQUIRE(agm::edge_count(*joint_node, graph) == 2);
+  REQUIRE(nd::edge_count(*joint_node, graph) == 2);
 }
 
 TEST_CASE("socket_count matches the part definition's socket count",
@@ -218,7 +219,7 @@ TEST_CASE("socket_count matches the part definition's socket count",
         builder.MakeScaffoldWithParts({"fragment_three_sockets"}, {});
     steamrot::PartGraph graph = agm::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == 1);
-    REQUIRE(agm::socket_count(graph.nodes[0]) == 3);
+    REQUIRE(nd::socket_count(graph.nodes[0]) == 3);
   }
 
   SECTION("joint_two_sockets has socket_count 2") {
@@ -226,7 +227,7 @@ TEST_CASE("socket_count matches the part definition's socket count",
         builder.MakeScaffoldWithParts({}, {"joint_two_sockets"});
     steamrot::PartGraph graph = agm::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == 1);
-    REQUIRE(agm::socket_count(graph.nodes[0]) == 2);
+    REQUIRE(nd::socket_count(graph.nodes[0]) == 2);
   }
 
   SECTION("fragment_no_socket has socket_count 0") {
@@ -234,7 +235,7 @@ TEST_CASE("socket_count matches the part definition's socket count",
         builder.MakeScaffoldWithParts({"fragment_no_socket"}, {});
     steamrot::PartGraph graph = agm::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == 1);
-    REQUIRE(agm::socket_count(graph.nodes[0]) == 0);
+    REQUIRE(nd::socket_count(graph.nodes[0]) == 0);
   }
 }
 
@@ -248,7 +249,7 @@ TEST_CASE("has_available_socket returns true when all sockets are Available",
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
   REQUIRE(graph.nodes.size() == 1);
   // Default SocketState is Available
-  REQUIRE(agm::has_available_socket(graph.nodes[0]));
+  REQUIRE(nd::has_available_socket(graph.nodes[0]));
 }
 
 TEST_CASE("has_available_socket returns false when all sockets are Connected",
@@ -268,7 +269,7 @@ TEST_CASE("has_available_socket returns false when all sockets are Connected",
 
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
   REQUIRE(graph.nodes.size() == 1);
-  REQUIRE_FALSE(agm::has_available_socket(graph.nodes[0]));
+  REQUIRE_FALSE(nd::has_available_socket(graph.nodes[0]));
 }
 
 TEST_CASE("has_available_socket returns false for a node with no sockets",
@@ -280,5 +281,5 @@ TEST_CASE("has_available_socket returns false for a node with no sockets",
       builder.MakeScaffoldWithParts({"fragment_no_socket"}, {});
   steamrot::PartGraph graph = agm::build_part_graph(scaffold);
   REQUIRE(graph.nodes.size() == 1);
-  REQUIRE_FALSE(agm::has_available_socket(graph.nodes[0]));
+  REQUIRE_FALSE(nd::has_available_socket(graph.nodes[0]));
 }
