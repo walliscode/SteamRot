@@ -166,3 +166,36 @@ TEST_CASE("NodeDescriptor can wrap atomic predicate functions",
   REQUIRE(joint_count == 1);
   REQUIRE(with_socket_count == 2);
 }
+
+TEST_CASE("has_maximum_n_connected_sockets tests",
+          "[unit][analysis][grimoire_machina]") {
+
+  // arrange
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
+      {"fragment_one_socket", "fragment_two_sockets"}, {"joint_two_sockets"});
+
+  SECTION("Function construction does not throw") {
+    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(0));
+    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(1));
+    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(2));
+  }
+  // set up some NodeDescriptors for testing
+  steamrot::NodeDescriptor max_0 = agm::has_maximum_n_connected_sockets(0);
+  steamrot::NodeDescriptor max_1 = agm::has_maximum_n_connected_sockets(1);
+  steamrot::NodeDescriptor max_2 = agm::has_maximum_n_connected_sockets(2);
+
+  SECTION("0 connected sockets") {
+    // No sockets are connected, so all nodes should satisfy max_0
+    for (const auto &node : agm::build_part_graph(scaffold).nodes) {
+      REQUIRE(max_0(node));
+    }
+  }
+
+  SECTION("1 connected socket") {
+    // create connec
+  }
+}

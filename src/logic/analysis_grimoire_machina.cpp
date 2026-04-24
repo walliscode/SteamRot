@@ -50,4 +50,28 @@ const NodeDescriptor has_available_socket = [](const PartNode &node) -> bool {
       *node.instance);
 };
 
+/////////////////////////////////////////////////
+const NodeDescriptor has_maximum_n_connected_sockets(size_t n) {
+
+  // take in the PartNode parameter, this is is necesary to match the return
+  // type of NodeDescriptor
+  return [n](const PartNode &node) -> bool {
+    // compile time dispatch on the instance variant which will check for
+    // .sockets member
+    return std::visit(
+        [n](const auto &instance) -> bool {
+          // iterate over the sockets and count how many are connected, then
+          // compare to n
+          size_t connected_count = 0;
+          for (const auto &socket : instance.sockets) {
+            if (socket.state == SocketState::Connected)
+              connected_count++;
+          }
+          // return true if the number of connected sockets is less than or
+          // equal to n
+          return connected_count <= n;
+        },
+        *node.instance);
+  };
+};
 } // namespace steamrot::logic::analysis::grimoire_machina
