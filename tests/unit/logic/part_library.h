@@ -6,8 +6,8 @@
 /// TestPartLibrary is a value-type struct that holds a small, fixed set of
 /// pre-defined Fragment and Joint objects keyed by name. Instantiate it via
 /// TestPartLibrary::Create() to get the standard catalog. The catalog also
-/// exposes a scaffold_scenarios map of pre-wired MachinaFormScaffold
-/// topologies for use in NodeDescriptor tests.
+/// exposes a scaffold_scenarios map (keyed by ScaffoldScenario) of pre-wired
+/// MachinaFormScaffold topologies for use in NodeDescriptor tests.
 ///
 /// ConnectionSpec describes one connection between two parts using
 /// insertion-order indices (fragments first, then joints) so callers never
@@ -48,6 +48,41 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
+/// @enum ScaffoldScenario
+/// @brief Identifies a pre-wired MachinaFormScaffold topology stored in
+///        TestPartLibrary::scaffold_scenarios.
+///
+/// Use as the key to TestPartLibrary::scaffold_scenarios:
+/// @code
+/// const MachinaFormScaffold& chain =
+///     lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
+/// @endcode
+/////////////////////////////////////////////////
+enum class ScaffoldScenario {
+  /////////////////////////////////////////////////
+  /// fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets;
+  /// both connections wired, all involved sockets Connected.
+  /////////////////////////////////////////////////
+  LinearChain,
+
+  /////////////////////////////////////////////////
+  /// Three joint_two_sockets in a cycle; all sockets Connected.
+  /////////////////////////////////////////////////
+  Ring,
+
+  /////////////////////////////////////////////////
+  /// Two fragment_one_sockets fully connected to each other.
+  /////////////////////////////////////////////////
+  IsolatedPair,
+
+  /////////////////////////////////////////////////
+  /// fragment_three_sockets with sockets 0 and 2 connected to two
+  /// joint_one_sockets; socket 1 remains Available.
+  /////////////////////////////////////////////////
+  Partial,
+};
+
+/////////////////////////////////////////////////
 /// @struct TestPartLibrary
 /// @brief Fixed catalog of named Fragment and Joint test definitions, plus
 ///        pre-wired scaffold topologies.
@@ -68,12 +103,12 @@ namespace steamrot::tests {
 ///   "joint_three_sockets"  — 3 sockets at radius 15, full rotation arc
 ///
 /// Scaffold scenarios (pre-wired topologies for NodeDescriptor tests):
-///   "linear_chain"   — fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets;
-///                      both connections wired, all involved sockets Connected
-///   "ring"           — three joint_two_sockets in a cycle, all sockets Connected
-///   "isolated_pair"  — two fragment_one_sockets connected to each other
-///   "partial"        — fragment_three_sockets with sockets 0 and 2 connected to
-///                      two joint_one_sockets; socket 1 remains Available
+///   ScaffoldScenario::LinearChain  — fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets;
+///                                    both connections wired, all involved sockets Connected
+///   ScaffoldScenario::Ring         — three joint_two_sockets in a cycle, all sockets Connected
+///   ScaffoldScenario::IsolatedPair — two fragment_one_sockets connected to each other
+///   ScaffoldScenario::Partial      — fragment_three_sockets with sockets 0 and 2 connected to
+///                                    two joint_one_sockets; socket 1 remains Available
 /////////////////////////////////////////////////
 struct TestPartLibrary {
   /////////////////////////////////////////////////
@@ -87,13 +122,13 @@ struct TestPartLibrary {
   std::map<std::string, Joint> joints;
 
   /////////////////////////////////////////////////
-  /// @brief Pre-wired MachinaFormScaffold topologies keyed by name.
+  /// @brief Pre-wired MachinaFormScaffold topologies keyed by ScaffoldScenario.
   ///
   /// All instances inside each scenario hold raw pointers into @c fragments
   /// and @c joints above. The scenarios are only valid while this
   /// TestPartLibrary object is alive and unmoved.
   /////////////////////////////////////////////////
-  std::map<std::string, MachinaFormScaffold> scaffold_scenarios;
+  std::map<ScaffoldScenario, MachinaFormScaffold> scaffold_scenarios;
 
   /////////////////////////////////////////////////
   /// @brief Create a TestPartLibrary pre-populated with the standard catalog
@@ -200,7 +235,7 @@ struct ScaffoldResult {
 ///
 /// // Or use a pre-built scenario
 /// const MachinaFormScaffold& chain =
-///     lib.scaffold_scenarios.at("linear_chain");
+///     lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
 /// @endcode
 /////////////////////////////////////////////////
 class PartLibraryBuilder {

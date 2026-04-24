@@ -172,7 +172,7 @@ TestPartLibrary TestPartLibrary::Create() {
       ScaffoldResult result = builder.MakeConnectedScaffold(
           {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
           {{0, 1, 2, 0}, {2, 1, 1, 0}});
-      lib.scaffold_scenarios.emplace("linear_chain", std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain, std::move(result.scaffold));
     }
 
     // "ring": three joint_two_sockets in a cycle
@@ -185,7 +185,7 @@ TestPartLibrary TestPartLibrary::Create() {
           {},
           {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
           {{0, 0, 1, 0}, {1, 1, 2, 0}, {2, 1, 0, 1}});
-      lib.scaffold_scenarios.emplace("ring", std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring, std::move(result.scaffold));
     }
 
     // "isolated_pair": two fragment_one_sockets, fully connected to each other
@@ -194,7 +194,7 @@ TestPartLibrary TestPartLibrary::Create() {
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
           {"fragment_one_socket", "fragment_one_socket"}, {}, {{0, 0, 1, 0}});
-      lib.scaffold_scenarios.emplace("isolated_pair", std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair, std::move(result.scaffold));
     }
 
     // "partial": fragment_three_sockets with sockets 0 and 2 connected,
@@ -206,7 +206,7 @@ TestPartLibrary TestPartLibrary::Create() {
           {"fragment_three_sockets"},
           {"joint_one_socket", "joint_one_socket"},
           {{0, 0, 1, 0}, {0, 2, 2, 0}});
-      lib.scaffold_scenarios.emplace("partial", std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Partial, std::move(result.scaffold));
     }
   }
 
