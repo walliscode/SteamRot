@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -47,6 +48,13 @@ struct PartNode {
   const std::variant<JointInstance, FragmentInstance> *instance{nullptr};
 
   /////////////////////////////////////////////////
+  /// @brief Indices into @c PartGraph::edges for every edge incident to this
+  ///        node. Populated by @c build_part_graph; provides O(degree) neighbour
+  ///        access without scanning the full edge list.
+  /////////////////////////////////////////////////
+  std::vector<size_t> edge_indices;
+
+  /////////////////////////////////////////////////
   /// @brief Construct a PartNode from a PartMap entry.
   ///
   /// @param id       Stable ID of the instance.
@@ -62,9 +70,8 @@ struct PartNode {
 /// @struct PartEdge
 /// @brief Non-owning view of a single Connection in a MachinaFormScaffold.
 ///
-/// Mirrors the endpoint fields of @c Connection for quick access, and
-/// stores a raw pointer back to the original Connection for full detail.
-/// The source @c std::vector<Connection> must outlive this edge.
+/// Mirrors the endpoint fields of @c Connection for direct access.
+/// The source @c MachinaFormScaffold must outlive this edge.
 /////////////////////////////////////////////////
 struct PartEdge {
   /////////////////////////////////////////////////
@@ -86,22 +93,6 @@ struct PartEdge {
   /// @brief Socket index within the second endpoint's instance.
   /////////////////////////////////////////////////
   size_t socket_index_b{0};
-
-  /////////////////////////////////////////////////
-  /// @brief Non-owning pointer to the original Connection.
-  /////////////////////////////////////////////////
-  const Connection *connection{nullptr};
-
-  /////////////////////////////////////////////////
-  /// @brief Construct a PartEdge from a Connection.
-  ///
-  /// @param c Connection to view. The connections vector must outlive this
-  ///          edge.
-  /////////////////////////////////////////////////
-  explicit PartEdge(const Connection &c)
-      : part_id_a{c.socket_a.part_id}, socket_index_a{c.socket_a.socket_index},
-        part_id_b{c.socket_b.part_id}, socket_index_b{c.socket_b.socket_index},
-        connection{&c} {}
 };
 
 /////////////////////////////////////////////////
@@ -122,6 +113,14 @@ struct PartGraph {
   /// @brief One edge per Connection in the scaffold.
   /////////////////////////////////////////////////
   std::vector<PartEdge> edges;
+
+  /////////////////////////////////////////////////
+  /// @brief Maps each part ID to its index in @c nodes.
+  ///
+  /// Populated by @c build_part_graph. Enables O(1) node lookup by ID
+  /// without scanning the full @c nodes vector.
+  /////////////////////////////////////////////////
+  std::unordered_map<uint32_t, size_t> node_index_by_id;
 };
 
 /////////////////////////////////////////////////

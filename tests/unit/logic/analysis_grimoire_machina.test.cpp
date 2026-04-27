@@ -11,6 +11,7 @@
 #include "PartGraph.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 
 namespace agm = steamrot::logic::analysis::grimoire_machina;
 
@@ -152,6 +153,252 @@ TEST_CASE("NodeDescriptor can wrap atomic predicate functions",
   REQUIRE(fragment_count == 1);
   REQUIRE(joint_count == 1);
   REQUIRE(with_socket_count == 2);
+}
+
+TEST_CASE("find_node returns nullptr for unknown id",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  REQUIRE(agm::find_node(graph, 9999) == nullptr);
+}
+
+TEST_CASE("find_node returns valid pointer for known id",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
+      {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
+  steamrot::PartGraph graph = agm::build_part_graph(result.scaffold);
+
+  const steamrot::PartNode *node = agm::find_node(graph, result.part_ids[0]);
+  REQUIRE(node != nullptr);
+  REQUIRE(node->id == result.part_ids[0]);
+}
+
+TEST_CASE("get_neighbors returns correct neighbors for LinearChain",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  // The sole joint is the middle node — it should have exactly 2 neighbors,
+  // both of which are fragments.
+  auto joints = agm::find_nodes_matching(graph, agm::is_joint);
+  REQUIRE(joints.size() == 1);
+
+  auto neighbors = agm::get_neighbors(graph, *joints[0]);
+  REQUIRE(neighbors.size() == 2);
+  for (const auto *n : neighbors)
+    REQUIRE(agm::is_fragment(*n));
+}
+
+TEST_CASE("get_neighbors returns correct neighbors for Ring",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  // Every joint in the Ring has exactly 2 neighbors, both joints.
+  for (const auto &node : graph.nodes) {
+    auto neighbors = agm::get_neighbors(graph, node);
+    REQUIRE(neighbors.size() == 2);
+    for (const auto *n : neighbors)
+      REQUIRE(agm::is_joint(*n));
+  }
+}
+
+TEST_CASE("find_nodes_matching filters correctly",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  auto fragments = agm::find_nodes_matching(graph, agm::is_fragment);
+  auto joints = agm::find_nodes_matching(graph, agm::is_joint);
+
+  // LinearChain: fragment ─ joint ─ fragment
+  REQUIRE(fragments.size() == 2);
+  REQUIRE(joints.size() == 1);
+}
+
+TEST_CASE("count_nodes_matching counts correctly",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  // Ring has 3 joints and 0 fragments
+  REQUIRE(agm::count_nodes_matching(graph, agm::is_joint) == 3);
+  REQUIRE(agm::count_nodes_matching(graph, agm::is_fragment) == 0);
+}
+
+TEST_CASE("is_connected tests", "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  SECTION("empty scaffold is connected") {
+    steamrot::MachinaFormScaffold empty;
+    steamrot::PartGraph graph = agm::build_part_graph(empty);
+    REQUIRE(agm::is_connected(graph));
+  }
+
+  SECTION("LinearChain is connected") {
+    const auto &scaffold =
+        builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(agm::is_connected(graph));
+  }
+
+  SECTION("Ring is connected") {
+    const auto &scaffold =
+        builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(agm::is_connected(graph));
+  }
+
+  SECTION("two parts with no connections are not connected") {
+    steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
+        {"fragment_no_socket", "fragment_no_socket"}, {});
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE_FALSE(agm::is_connected(graph));
+  }
+}
+
+TEST_CASE("bfs visits each node exactly once on LinearChain",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  std::vector<uint32_t> visited_ids;
+  agm::bfs(graph, graph.nodes[0].id,
+           [&visited_ids](const steamrot::PartNode &node) {
+             visited_ids.push_back(node.id);
+           });
+
+  // All 3 nodes should be visited exactly once.
+  REQUIRE(visited_ids.size() == 3);
+  std::unordered_set<uint32_t> unique_ids(visited_ids.begin(),
+                                          visited_ids.end());
+  REQUIRE(unique_ids.size() == 3);
+}
+
+TEST_CASE("bfs on unknown start id is a no-op",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  int visit_count = 0;
+  agm::bfs(graph, 9999,
+           [&visit_count](const steamrot::PartNode &) { ++visit_count; });
+  REQUIRE(visit_count == 0);
+}
+
+TEST_CASE("EdgeDescriptor connects_fragment_to_joint on LinearChain",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::LinearChain);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  steamrot::logic::analysis::grimoire_machina::EdgeDescriptor frag_to_joint =
+      agm::connects_fragment_to_joint(graph);
+  steamrot::logic::analysis::grimoire_machina::EdgeDescriptor frags =
+      agm::connects_fragments(graph);
+  steamrot::logic::analysis::grimoire_machina::EdgeDescriptor jnts =
+      agm::connects_joints(graph);
+
+  // LinearChain: fragment ─ joint ─ fragment; both edges are fragment–joint.
+  REQUIRE_FALSE(graph.edges.empty());
+  for (const auto &edge : graph.edges) {
+    REQUIRE(frag_to_joint(edge));
+    REQUIRE_FALSE(frags(edge));
+    REQUIRE_FALSE(jnts(edge));
+  }
+}
+
+TEST_CASE("EdgeDescriptor connects_joints on Ring",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  const steamrot::MachinaFormScaffold &scaffold =
+      builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+
+  steamrot::logic::analysis::grimoire_machina::EdgeDescriptor jnts =
+      agm::connects_joints(graph);
+  steamrot::logic::analysis::grimoire_machina::EdgeDescriptor frag_to_joint =
+      agm::connects_fragment_to_joint(graph);
+
+  // Ring has only joints; all edges are joint–joint.
+  REQUIRE_FALSE(graph.edges.empty());
+  for (const auto &edge : graph.edges) {
+    REQUIRE(jnts(edge));
+    REQUIRE_FALSE(frag_to_joint(edge));
+  }
+}
+
+TEST_CASE("predicate combinators compose correctly",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
+      {"fragment_two_sockets"}, {"joint_two_sockets"});
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+  REQUIRE(graph.nodes.size() == 2);
+
+  steamrot::NodeDescriptor is_both =
+      agm::and_(agm::is_fragment, agm::is_joint);
+  steamrot::NodeDescriptor is_either =
+      agm::or_(agm::is_fragment, agm::is_joint);
+  steamrot::NodeDescriptor not_fragment = agm::not_(agm::is_fragment);
+
+  for (const auto &node : graph.nodes) {
+    REQUIRE_FALSE(is_both(node));
+    REQUIRE(is_either(node));
+    REQUIRE(not_fragment(node) == agm::is_joint(node));
+  }
 }
 
 TEST_CASE("has_maximum_n_connected_sockets tests",
