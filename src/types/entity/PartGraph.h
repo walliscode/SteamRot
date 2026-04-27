@@ -49,8 +49,8 @@ struct PartNode {
 
   /////////////////////////////////////////////////
   /// @brief Indices into @c PartGraph::edges for every edge incident to this
-  ///        node. Populated by @c build_part_graph; provides O(degree) neighbour
-  ///        access without scanning the full edge list.
+  ///        node. Populated by @c build_part_graph; provides O(degree)
+  ///        neighbour access without scanning the full edge list.
   /////////////////////////////////////////////////
   std::vector<size_t> edge_indices;
 
@@ -140,4 +140,13 @@ struct PartGraph {
 /////////////////////////////////////////////////
 using NodeDescriptor = std::function<bool(const PartNode &)>;
 
+/////////////////////////////////////////////////
+/// @brief Predicate type for single-edge queries on a PartGraph.
+///
+/// Any callable with signature @c bool(const PartEdge&) qualifies.
+/// Use @c connects_fragments, @c connects_joints, or
+/// @c connects_fragment_to_joint factory functions to obtain ready-made
+/// descriptors for common edge-type queries.
+/////////////////////////////////////////////////
+using EdgeDescriptor = std::function<bool(const PartEdge &)>;
 } // namespace steamrot
