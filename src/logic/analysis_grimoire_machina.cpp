@@ -74,4 +74,8 @@ const NodeDescriptor has_maximum_n_connected_sockets(size_t n) {
         *node.instance);
   };
 };
+
+/////////////////////////////////////////////////
+const NodeDescriptor is_terminal = has_maximum_n_connected_sockets(1);
+
 } // namespace steamrot::logic::analysis::grimoire_machina

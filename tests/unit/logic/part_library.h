@@ -93,8 +93,9 @@ enum class ScaffoldScenario {
 /// Fragments:
 ///   "fragment_no_socket"     — green triangle in Front view, no sockets
 ///   "fragment_one_socket"    — green origin triangle + one socket at (5, 5)
-///   "fragment_two_sockets"   — white 20×20 square + sockets at (0, 10) and (20, 10)
-///   "fragment_three_sockets" — white 20×20 square + sockets at (0, 10), (10, 10) and (20, 10)
+///   "fragment_two_sockets"   — white 20×20 square + sockets at (0, 10) and
+///   (20, 10) "fragment_three_sockets" — white 20×20 square + sockets at (0,
+///   10), (10, 10) and (20, 10)
 ///
 /// Joints:
 ///   "joint_no_socket"      — blue triangle in Front view, no sockets
@@ -103,12 +104,16 @@ enum class ScaffoldScenario {
 ///   "joint_three_sockets"  — 3 sockets at radius 15, full rotation arc
 ///
 /// Scaffold scenarios (pre-wired topologies for NodeDescriptor tests):
-///   ScaffoldScenario::LinearChain  — fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets;
-///                                    both connections wired, all involved sockets Connected
-///   ScaffoldScenario::Ring         — three joint_two_sockets in a cycle, all sockets Connected
-///   ScaffoldScenario::IsolatedPair — two fragment_one_sockets connected to each other
-///   ScaffoldScenario::Partial      — fragment_three_sockets with sockets 0 and 2 connected to
-///                                    two joint_one_sockets; socket 1 remains Available
+///   ScaffoldScenario::LinearChain  — fragment_two_sockets ─ joint_two_sockets
+///   ─ fragment_two_sockets;
+///                                    both connections wired, all involved
+///                                    sockets Connected
+///   ScaffoldScenario::Ring         — three joint_two_sockets in a cycle, all
+///   sockets Connected ScaffoldScenario::IsolatedPair — two
+///   fragment_one_sockets connected to each other ScaffoldScenario::Partial —
+///   fragment_three_sockets with sockets 0 and 2 connected to
+///                                    two joint_one_sockets; socket 1 remains
+///                                    Available
 /////////////////////////////////////////////////
 struct TestPartLibrary {
   /////////////////////////////////////////////////
@@ -239,6 +244,32 @@ struct ScaffoldResult {
 /// @endcode
 /////////////////////////////////////////////////
 class PartLibraryBuilder {
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Reference to the library this builder draws from.
+  /////////////////////////////////////////////////
+  TestPartLibrary &m_library;
+
+  /////////////////////////////////////////////////
+  /// @brief Monotonically increasing counter for assigning instance IDs.
+  /////////////////////////////////////////////////
+  uint32_t m_next_id{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Build a scaffold and record insertion-order part IDs.
+  ///
+  /// Shared implementation used by MakeScaffoldWithParts and
+  /// MakeConnectedScaffold.
+  ///
+  /// @param fragment_names Names of Fragments to include, in order.
+  /// @param joint_names    Names of Joints to include, in order.
+  /// @return ScaffoldResult with no connections and IDs in insertion order.
+  /////////////////////////////////////////////////
+  ScaffoldResult
+  BuildScaffoldWithIds(const std::vector<std::string> &fragment_names,
+                       const std::vector<std::string> &joint_names);
+
 public:
   /////////////////////////////////////////////////
   /// @brief Construct a builder that draws from the given library.
@@ -257,9 +288,9 @@ public:
   /// @param initial_transform World-space transform for the instance.
   /// @return A new FragmentInstance referencing the stored Fragment.
   /////////////////////////////////////////////////
-  FragmentInstance
-  MakeFragmentInstance(const std::string &name,
-                       sf::Transform initial_transform = sf::Transform::Identity);
+  FragmentInstance MakeFragmentInstance(
+      const std::string &name,
+      sf::Transform initial_transform = sf::Transform::Identity);
 
   /////////////////////////////////////////////////
   /// @brief Create a JointInstance backed by the named Joint.
@@ -346,30 +377,29 @@ public:
                         const std::vector<std::string> &joint_names,
                         const std::vector<ConnectionSpec> &connections);
 
-private:
   /////////////////////////////////////////////////
-  /// @brief Reference to the library this builder draws from.
+  /// @brief Return a const reference to a pre-wired MachinaFormScaffold
+  /// scenario from the library.
+  ///
+  ///  This is designed for analysis only, no modification required
+  ///
+  /// @param scenario Enum key for the desired scaffold scenario in the
+  /// library's
+  /// @return const reference to the requested MachinaFormScaffold scenario.
   /////////////////////////////////////////////////
-  TestPartLibrary &m_library;
+  const MachinaFormScaffold &
+  GetScenarioForAnalysis(ScaffoldScenario scenario) const;
 
   /////////////////////////////////////////////////
-  /// @brief Monotonically increasing counter for assigning instance IDs.
-  /////////////////////////////////////////////////
-  uint32_t m_next_id{0};
-
-  /////////////////////////////////////////////////
-  /// @brief Build a scaffold and record insertion-order part IDs.
+  /// @brief Return a reference to a pre-wired MachinaFormScaffold scenario from
+  /// the library.
   ///
-  /// Shared implementation used by MakeScaffoldWithParts and
-  /// MakeConnectedScaffold.
-  ///
-  /// @param fragment_names Names of Fragments to include, in order.
-  /// @param joint_names    Names of Joints to include, in order.
-  /// @return ScaffoldResult with no connections and IDs in insertion order.
+  /// @param scenario Enum key for the desired scaffold scenario in the
+  /// library's
+  /// @return reference to the requested MachinaFormScaffold scenario, which can
+  /// be modified by the caller.
   /////////////////////////////////////////////////
-  ScaffoldResult
-  BuildScaffoldWithIds(const std::vector<std::string> &fragment_names,
-                       const std::vector<std::string> &joint_names);
+  MachinaFormScaffold &GetScenarioForModification(ScaffoldScenario scenario);
 };
 
 } // namespace steamrot::tests

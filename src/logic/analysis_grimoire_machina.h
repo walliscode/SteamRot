@@ -58,4 +58,12 @@ extern const NodeDescriptor has_available_socket;
 /////////////////////////////////////////////////
 extern const NodeDescriptor has_maximum_n_connected_sockets(size_t n);
 
+/////////////////////////////////////////////////
+/// @brief an implementation has_maximum_n_connected_sockets with n = 1
+///
+/// A terminal node is a node with at most 1 connected socket, meaning it is on
+/// the "end" of a chain of connections
+/////////////////////////////////////////////////
+extern const NodeDescriptor is_terminal;
+
 } // namespace steamrot::logic::analysis::grimoire_machina

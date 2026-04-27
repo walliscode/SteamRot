@@ -162,9 +162,6 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
 
-  steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
-      {"fragment_one_socket", "fragment_two_sockets"}, {"joint_two_sockets"});
-
   SECTION("Function construction does not throw") {
     REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(0));
     REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(1));
@@ -175,14 +172,46 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
   steamrot::NodeDescriptor max_1 = agm::has_maximum_n_connected_sockets(1);
   steamrot::NodeDescriptor max_2 = agm::has_maximum_n_connected_sockets(2);
 
-  SECTION("0 connected sockets") {
-    // No sockets are connected, so all nodes should satisfy max_0
-    for (const auto &node : agm::build_part_graph(scaffold).nodes) {
-      REQUIRE(max_0(node));
-    }
-  }
+  // create a scaffold with two fragments and two joints, creating various
+  // combos of connections
+  steamrot::tests::ScaffoldResult scaffold_result =
+      builder.MakeConnectedScaffold(
+          {"fragment_two_sockets", "fragment_two_sockets"},
+          {"joint_two_sockets", "joint_two_sockets"},
+          {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[2].socket[0]
+           {0, 1, 3, 0},   // fragment[0].socket[1] -> joint[3].socket[0]
+           {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[2].socket[1]
 
-  SECTION("1 connected socket") {
-    // create connec
+  // build the graph
+  steamrot::PartGraph graph = agm::build_part_graph(scaffold_result.scaffold);
+
+  // act & assert
+  for (const auto &node : graph.nodes) {
+    // node 0: fragment with 2 connected sockets
+    if (node.id == scaffold_result.part_ids[0]) {
+      REQUIRE_FALSE(max_0(node));
+      REQUIRE_FALSE(max_1(node));
+      REQUIRE(max_2(node));
+    }
+    // node 1: fragment with 1 connected socket
+    else if (node.id == scaffold_result.part_ids[1]) {
+      REQUIRE_FALSE(max_0(node));
+      REQUIRE(max_1(node));
+      REQUIRE(max_2(node));
+    }
+    // node 2: joint with 2 connected sockets
+    else if (node.id == scaffold_result.part_ids[2]) {
+      REQUIRE_FALSE(max_0(node));
+      REQUIRE_FALSE(max_1(node));
+      REQUIRE(max_2(node));
+    }
+    // node 3: joint with 1 connected socket
+    else if (node.id == scaffold_result.part_ids[3]) {
+      REQUIRE_FALSE(max_0(node));
+      REQUIRE(max_1(node));
+      REQUIRE(max_2(node));
+    } else {
+      FAIL("Unexpected node ID " << node.id);
+    }
   }
 }
