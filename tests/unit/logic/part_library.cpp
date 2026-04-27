@@ -160,6 +160,56 @@ TestPartLibrary TestPartLibrary::Create() {
     lib.joints.emplace("joint_three_sockets", std::move(j));
   }
 
+  // ── Scaffold scenarios ────────────────────────────────────────────────── //
+
+  {
+    PartLibraryBuilder builder{lib};
+
+    // "linear_chain": fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets
+    // part_ids: [0]=frag0, [1]=frag1, [2]=joint0
+    // frag0.socket[1] ↔ joint0.socket[0], joint0.socket[1] ↔ frag1.socket[0]
+    {
+      ScaffoldResult result = builder.MakeConnectedScaffold(
+          {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
+          {{0, 1, 2, 0}, {2, 1, 1, 0}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain, std::move(result.scaffold));
+    }
+
+    // "ring": three joint_two_sockets in a cycle
+    // part_ids: [0]=joint0, [1]=joint1, [2]=joint2
+    // joint0.socket[0] ↔ joint1.socket[0]
+    // joint1.socket[1] ↔ joint2.socket[0]
+    // joint2.socket[1] ↔ joint0.socket[1]
+    {
+      ScaffoldResult result = builder.MakeConnectedScaffold(
+          {},
+          {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
+          {{0, 0, 1, 0}, {1, 1, 2, 0}, {2, 1, 0, 1}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring, std::move(result.scaffold));
+    }
+
+    // "isolated_pair": two fragment_one_sockets, fully connected to each other
+    // part_ids: [0]=frag0, [1]=frag1
+    // frag0.socket[0] ↔ frag1.socket[0]
+    {
+      ScaffoldResult result = builder.MakeConnectedScaffold(
+          {"fragment_one_socket", "fragment_one_socket"}, {}, {{0, 0, 1, 0}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair, std::move(result.scaffold));
+    }
+
+    // "partial": fragment_three_sockets with sockets 0 and 2 connected,
+    // socket 1 remains Available
+    // part_ids: [0]=frag0, [1]=joint0, [2]=joint1
+    // frag0.socket[0] ↔ joint0.socket[0], frag0.socket[2] ↔ joint1.socket[0]
+    {
+      ScaffoldResult result = builder.MakeConnectedScaffold(
+          {"fragment_three_sockets"},
+          {"joint_one_socket", "joint_one_socket"},
+          {{0, 0, 1, 0}, {0, 2, 2, 0}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Partial, std::move(result.scaffold));
+    }
+  }
+
   return lib;
 }
 
@@ -216,20 +266,75 @@ PartLibraryBuilder::MakePartMap(const std::vector<std::string> &fragment_names,
 MachinaFormScaffold PartLibraryBuilder::MakeScaffoldWithParts(
     const std::vector<std::string> &fragment_names,
     const std::vector<std::string> &joint_names) {
-  MachinaFormScaffold scaffold;
+  return BuildScaffoldWithIds(fragment_names, joint_names).scaffold;
+}
+
+/////////////////////////////////////////////////
+ScaffoldResult PartLibraryBuilder::BuildScaffoldWithIds(
+    const std::vector<std::string> &fragment_names,
+    const std::vector<std::string> &joint_names) {
+  ScaffoldResult result;
+  result.part_ids.reserve(fragment_names.size() + joint_names.size());
 
   for (const auto &name : fragment_names) {
     FragmentInstance instance = MakeFragmentInstance(name);
-    scaffold.parts.emplace(instance.id, std::move(instance));
+    result.part_ids.push_back(instance.id);
+    result.scaffold.parts.emplace(instance.id, std::move(instance));
   }
 
   for (const auto &name : joint_names) {
     JointInstance instance = MakeJointInstance(name);
-    scaffold.parts.emplace(instance.id, std::move(instance));
+    result.part_ids.push_back(instance.id);
+    result.scaffold.parts.emplace(instance.id, std::move(instance));
   }
 
-  scaffold.next_id = m_next_id;
-  return scaffold;
+  result.scaffold.next_id = m_next_id;
+  return result;
+}
+
+/////////////////////////////////////////////////
+ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
+    const std::vector<std::string> &fragment_names,
+    const std::vector<std::string> &joint_names,
+    const std::vector<ConnectionSpec> &connections) {
+  ScaffoldResult result = BuildScaffoldWithIds(fragment_names, joint_names);
+
+  for (const auto &spec : connections) {
+    if (spec.part_index_a >= result.part_ids.size())
+      FAIL("ConnectionSpec.part_index_a ("
+           << spec.part_index_a << ") out of range (size="
+           << result.part_ids.size() << ")");
+    if (spec.part_index_b >= result.part_ids.size())
+      FAIL("ConnectionSpec.part_index_b ("
+           << spec.part_index_b << ") out of range (size="
+           << result.part_ids.size() << ")");
+
+    const uint32_t id_a = result.part_ids[spec.part_index_a];
+    const uint32_t id_b = result.part_ids[spec.part_index_b];
+
+    auto mark_connected = [&result](uint32_t part_id, size_t socket_index) {
+      auto &variant = result.scaffold.parts.at(part_id);
+      std::visit(
+          [part_id, socket_index](auto &instance) {
+            if (socket_index >= instance.sockets.size())
+              FAIL("socket_index (" << socket_index
+                                    << ") out of range for part " << part_id
+                                    << " (sockets=" << instance.sockets.size()
+                                    << ")");
+            instance.sockets[socket_index].state = SocketState::Connected;
+          },
+          variant);
+    };
+
+    mark_connected(id_a, spec.socket_index_a);
+    mark_connected(id_b, spec.socket_index_b);
+
+    result.scaffold.connections.emplace_back(
+        Connection{Connection::Endpoint{id_a, spec.socket_index_a},
+                   Connection::Endpoint{id_b, spec.socket_index_b}});
+  }
+
+  return result;
 }
 
 } // namespace steamrot::tests
