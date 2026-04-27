@@ -42,24 +42,11 @@ TEST_CASE("build_part_graph edges match scaffold connections count",
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
 
-  steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
-      {"fragment_two_sockets"}, {"joint_two_sockets"});
+  // fragment[0].socket[0] -> joint[0].socket[0]
+  steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
+      {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
 
-  // Retrieve the two node IDs so we can form a valid connection
-  uint32_t frag_id = 0;
-  uint32_t joint_id = 0;
-  for (const auto &[id, variant] : scaffold.parts) {
-    if (std::holds_alternative<steamrot::FragmentInstance>(variant))
-      frag_id = id;
-    else
-      joint_id = id;
-  }
-
-  scaffold.connections.emplace_back(
-      steamrot::Connection{steamrot::Connection::Endpoint{frag_id, 0},
-                           steamrot::Connection::Endpoint{joint_id, 0}});
-
-  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+  steamrot::PartGraph graph = agm::build_part_graph(result.scaffold);
   REQUIRE(graph.nodes.size() == 2);
   REQUIRE(graph.edges.size() == 1);
 }
