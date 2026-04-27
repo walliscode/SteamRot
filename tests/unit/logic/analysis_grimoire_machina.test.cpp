@@ -11,6 +11,7 @@
 #include "PartGraph.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
+#include <vector>
 
 namespace agm = steamrot::logic::analysis::grimoire_machina;
 
@@ -289,22 +290,17 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
 
-  SECTION("Function construction does not throw") {
-    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(0));
-    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(1));
-    REQUIRE_NOTHROW(agm::has_maximum_n_connected_sockets(2));
-  }
   // set up some NodeDescriptors for testing
-  steamrot::NodeDescriptor max_0 = agm::has_maximum_n_connected_sockets(0);
-  steamrot::NodeDescriptor max_1 = agm::has_maximum_n_connected_sockets(1);
-  steamrot::NodeDescriptor max_2 = agm::has_maximum_n_connected_sockets(2);
+  steamrot::NodeDescriptor max_0 = agm::has_maximum_n_edges(0);
+  steamrot::NodeDescriptor max_1 = agm::has_maximum_n_edges(1);
+  steamrot::NodeDescriptor max_2 = agm::has_maximum_n_edges(2);
 
   // create a scaffold with two fragments and two joints, creating various
   // combos of connections
   steamrot::tests::ScaffoldResult scaffold_result =
       builder.MakeConnectedScaffold(
           {"fragment_two_sockets", "fragment_two_sockets"},
-          {"joint_two_sockets", "joint_two_sockets"},
+          {"joint_two_sockets", "joint_two_sockets", "joint_one_socket"},
           {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[2].socket[0]
            {0, 1, 3, 0},   // fragment[0].socket[1] -> joint[3].socket[0]
            {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[2].socket[1]
@@ -313,32 +309,93 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
   steamrot::PartGraph graph = agm::build_part_graph(scaffold_result.scaffold);
 
   // act & assert
-  for (const auto &node : graph.nodes) {
-    // node 0: fragment with 2 connected sockets
-    if (node.id == scaffold_result.part_ids[0]) {
-      REQUIRE_FALSE(max_0(node));
-      REQUIRE_FALSE(max_1(node));
-      REQUIRE(max_2(node));
-    }
-    // node 1: fragment with 1 connected socket
-    else if (node.id == scaffold_result.part_ids[1]) {
-      REQUIRE_FALSE(max_0(node));
-      REQUIRE(max_1(node));
-      REQUIRE(max_2(node));
-    }
-    // node 2: joint with 2 connected sockets
-    else if (node.id == scaffold_result.part_ids[2]) {
-      REQUIRE_FALSE(max_0(node));
-      REQUIRE_FALSE(max_1(node));
-      REQUIRE(max_2(node));
-    }
-    // node 3: joint with 1 connected socket
-    else if (node.id == scaffold_result.part_ids[3]) {
-      REQUIRE_FALSE(max_0(node));
-      REQUIRE(max_1(node));
-      REQUIRE(max_2(node));
-    } else {
-      FAIL("Unexpected node ID " << node.id);
-    }
+  const std::vector<uint32_t> &part_ids = scaffold_result.part_ids;
+  REQUIRE(graph.nodes.size() == 5);
+  // fragment[0] has 2 edges, fragment[1] has 1 edge, joint[2] has 2 edges,
+  // joint[3] has 1 edge, and joint[4] has 0 edges
+  REQUIRE_FALSE(max_0(graph.nodes[0]));
+  REQUIRE_FALSE(max_0(graph.nodes[1]));
+  REQUIRE_FALSE(max_0(graph.nodes[2]));
+  REQUIRE_FALSE(max_0(graph.nodes[3]));
+  REQUIRE(max_0(graph.nodes[4]));
+
+  REQUIRE_FALSE(max_1(graph.nodes[0]));
+  REQUIRE(max_1(graph.nodes[1]));
+  REQUIRE_FALSE(max_1(graph.nodes[2]));
+  REQUIRE(max_1(graph.nodes[3]));
+  REQUIRE(max_1(graph.nodes[4]));
+
+  REQUIRE(max_2(graph.nodes[0]));
+  REQUIRE(max_2(graph.nodes[1]));
+  REQUIRE(max_2(graph.nodes[2]));
+  REQUIRE(max_2(graph.nodes[3]));
+  REQUIRE(max_2(graph.nodes[4]));
+}
+
+TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  steamrot::NodeDescriptor not_terminal = agm::not_(agm::is_terminal);
+
+  SECTION("Returns false for nodes with 2 or more edges") {
+    steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
+        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
+        {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[0].socket[0]
+         {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
+    steamrot::PartGraph graph = agm::build_part_graph(result.scaffold);
+    REQUIRE(graph.nodes.size() == 3);
+    // joint[0] has 2 edges, so it should not be terminal
+    REQUIRE(not_terminal(graph.nodes[2]));
+  }
+  SECTION("Returns true for nodes with 0 or 1 edge") {
+    steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
+        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
+        {{0, 0, 2, 0}}); // fragment[0].socket[0] -> joint[0].socket[0]
+    steamrot::PartGraph graph = agm::build_part_graph(result.scaffold);
+    REQUIRE(graph.nodes.size() == 3);
+    // fragment[1] has 0 edges and joint[0] has 1 edge, so both should be
+    // terminal
+    REQUIRE(agm::is_terminal(graph.nodes[0]));
+    REQUIRE(agm::is_terminal(graph.nodes[1]));
+    REQUIRE(agm::is_terminal(graph.nodes[2]));
+  }
+
+  SECTION("Analyses ScaffoldScenario::LinearChain correctly") {
+    const steamrot::MachinaFormScaffold &scaffold =
+        builder.GetScenarioForAnalysis(
+            steamrot::tests::ScaffoldScenario::LinearChain);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == 3);
+    // The two fragments at the ends of the chain should be terminal, but the
+    // joint in the middle should not be
+    // because of how the LinearChain is built, the FragentInstances are added
+    // first so the joints is [2]
+    REQUIRE(agm::is_terminal(graph.nodes[0]));
+    REQUIRE(agm::is_terminal(graph.nodes[1]));
+    REQUIRE(not_terminal(graph.nodes[2]));
+  }
+
+  SECTION("Analyses ScaffoldScenario::Ring correctly") {
+    const steamrot::MachinaFormScaffold &scaffold =
+        builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == 3);
+    // In the Ring scenario, all joints have 2 edges, so none should be terminal
+    for (const auto &node : graph.nodes)
+      REQUIRE(not_terminal(node));
+  }
+
+  SECTION("Analyses ScaffoldScenario::IsolatedPair correctly") {
+    const steamrot::MachinaFormScaffold &scaffold =
+        builder.GetScenarioForAnalysis(
+            steamrot::tests::ScaffoldScenario::IsolatedPair);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == 2);
+    // Both fragments are connected to each other with 1 edge, so both should
+    // be terminal
+    REQUIRE(agm::is_terminal(graph.nodes[0]));
+    REQUIRE(agm::is_terminal(graph.nodes[1]));
   }
 }

@@ -199,18 +199,6 @@ TestPartLibrary TestPartLibrary::Create() {
       lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair,
                                      std::move(result.scaffold));
     }
-
-    // "partial": fragment_three_sockets with sockets 0 and 2 connected,
-    // socket 1 remains Available
-    // part_ids: [0]=frag0, [1]=joint0, [2]=joint1
-    // frag0.socket[0] ↔ joint0.socket[0], frag0.socket[2] ↔ joint1.socket[0]
-    {
-      ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_three_sockets"}, {"joint_one_socket", "joint_one_socket"},
-          {{0, 0, 1, 0}, {0, 2, 2, 0}});
-      lib.scaffold_scenarios.emplace(ScaffoldScenario::Partial,
-                                     std::move(result.scaffold));
-    }
   }
 
   return lib;

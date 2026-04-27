@@ -60,12 +60,12 @@ extern const NodeDescriptor has_available_socket;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at
-/// most @p n connected sockets.
+/// most @p n PartEdges (i.e., at most @p n connected sockets).
 ///
-/// @param n Maximum number of connected sockets.
-/// @return NodeDescriptor returning true when connected-socket count <= n.
+/// @param n Maximum number of edges.
+/// @return NodeDescriptor returning true when edges count <= n.
 /////////////////////////////////////////////////
-NodeDescriptor has_maximum_n_connected_sockets(size_t n);
+NodeDescriptor has_maximum_n_edges(size_t n);
 
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true for nodes with at most 1 connected

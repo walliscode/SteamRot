@@ -82,23 +82,14 @@ const NodeDescriptor has_available_socket = [](const PartNode &node) -> bool {
 };
 
 /////////////////////////////////////////////////
-NodeDescriptor has_maximum_n_connected_sockets(size_t n) {
+NodeDescriptor has_maximum_n_edges(size_t n) {
   return [n](const PartNode &node) -> bool {
-    return std::visit(
-        [n](const auto &instance) -> bool {
-          size_t connected_count = 0;
-          for (const auto &socket : instance.sockets) {
-            if (socket.state == SocketState::Connected)
-              connected_count++;
-          }
-          return connected_count <= n;
-        },
-        *node.instance);
+    return node.edge_indices.size() <= n;
   };
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_terminal = has_maximum_n_connected_sockets(1);
+const NodeDescriptor is_terminal = has_maximum_n_edges(1);
 
 /////////////////////////////////////////////////
 const PartNode *find_node(const PartGraph &graph, uint32_t id) {
