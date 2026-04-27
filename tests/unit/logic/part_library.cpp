@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "part_library.h"
+#include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
@@ -165,14 +166,15 @@ TestPartLibrary TestPartLibrary::Create() {
   {
     PartLibraryBuilder builder{lib};
 
-    // "linear_chain": fragment_two_sockets ─ joint_two_sockets ─ fragment_two_sockets
-    // part_ids: [0]=frag0, [1]=frag1, [2]=joint0
+    // "linear_chain": fragment_two_sockets ─ joint_two_sockets ─
+    // fragment_two_sockets part_ids: [0]=frag0, [1]=frag1, [2]=joint0
     // frag0.socket[1] ↔ joint0.socket[0], joint0.socket[1] ↔ frag1.socket[0]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-          {{0, 1, 2, 0}, {2, 1, 1, 0}});
-      lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain, std::move(result.scaffold));
+          {"fragment_two_sockets", "fragment_two_sockets"},
+          {"joint_two_sockets"}, {{0, 1, 2, 0}, {2, 1, 1, 0}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain,
+                                     std::move(result.scaffold));
     }
 
     // "ring": three joint_two_sockets in a cycle
@@ -182,10 +184,10 @@ TestPartLibrary TestPartLibrary::Create() {
     // joint2.socket[1] ↔ joint0.socket[1]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {},
-          {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
+          {}, {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
           {{0, 0, 1, 0}, {1, 1, 2, 0}, {2, 1, 0, 1}});
-      lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring, std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring,
+                                     std::move(result.scaffold));
     }
 
     // "isolated_pair": two fragment_one_sockets, fully connected to each other
@@ -194,7 +196,8 @@ TestPartLibrary TestPartLibrary::Create() {
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
           {"fragment_one_socket", "fragment_one_socket"}, {}, {{0, 0, 1, 0}});
-      lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair, std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair,
+                                     std::move(result.scaffold));
     }
 
     // "partial": fragment_three_sockets with sockets 0 and 2 connected,
@@ -203,10 +206,10 @@ TestPartLibrary TestPartLibrary::Create() {
     // frag0.socket[0] ↔ joint0.socket[0], frag0.socket[2] ↔ joint1.socket[0]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_three_sockets"},
-          {"joint_one_socket", "joint_one_socket"},
+          {"fragment_three_sockets"}, {"joint_one_socket", "joint_one_socket"},
           {{0, 0, 1, 0}, {0, 2, 2, 0}});
-      lib.scaffold_scenarios.emplace(ScaffoldScenario::Partial, std::move(result.scaffold));
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::Partial,
+                                     std::move(result.scaffold));
     }
   }
 
@@ -302,12 +305,12 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
   for (const auto &spec : connections) {
     if (spec.part_index_a >= result.part_ids.size())
       FAIL("ConnectionSpec.part_index_a ("
-           << spec.part_index_a << ") out of range (size="
-           << result.part_ids.size() << ")");
+           << spec.part_index_a
+           << ") out of range (size=" << result.part_ids.size() << ")");
     if (spec.part_index_b >= result.part_ids.size())
       FAIL("ConnectionSpec.part_index_b ("
-           << spec.part_index_b << ") out of range (size="
-           << result.part_ids.size() << ")");
+           << spec.part_index_b
+           << ") out of range (size=" << result.part_ids.size() << ")");
 
     const uint32_t id_a = result.part_ids[spec.part_index_a];
     const uint32_t id_b = result.part_ids[spec.part_index_b];
@@ -317,10 +320,9 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
       std::visit(
           [part_id, socket_index](auto &instance) {
             if (socket_index >= instance.sockets.size())
-              FAIL("socket_index (" << socket_index
-                                    << ") out of range for part " << part_id
-                                    << " (sockets=" << instance.sockets.size()
-                                    << ")");
+              FAIL("socket_index ("
+                   << socket_index << ") out of range for part " << part_id
+                   << " (sockets=" << instance.sockets.size() << ")");
             instance.sockets[socket_index].state = SocketState::Connected;
           },
           variant);
@@ -337,4 +339,23 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
   return result;
 }
 
+/////////////////////////////////////////////////
+const MachinaFormScaffold &
+PartLibraryBuilder::GetScenarioForAnalysis(ScaffoldScenario scenario) const {
+  auto it = m_library.scaffold_scenarios.find(scenario);
+  if (it == m_library.scaffold_scenarios.end())
+    FAIL("ScaffoldScenario '" << static_cast<int>(scenario)
+                              << "' not found in library");
+  return it->second;
+}
+
+/////////////////////////////////////////////////
+MachinaFormScaffold &
+PartLibraryBuilder::GetScenarioForModification(ScaffoldScenario scenario) {
+  auto it = m_library.scaffold_scenarios.find(scenario);
+  if (it == m_library.scaffold_scenarios.end())
+    FAIL("ScaffoldScenario '" << static_cast<int>(scenario)
+                              << "' not found in library");
+  return it->second;
+}
 } // namespace steamrot::tests
