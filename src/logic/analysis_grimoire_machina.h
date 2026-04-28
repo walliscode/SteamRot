@@ -53,10 +53,13 @@ extern const NodeDescriptor is_fragment;
 extern const NodeDescriptor is_joint;
 
 /////////////////////////////////////////////////
-/// @brief NodeDescriptor that returns true when the node has at least one
-/// available socket.
+/// @brief Returns a NodeDescriptor that returns true when the node has exactly
+/// @p n
+///
+/// @param n Number of edges.
+/// @return NodeDescriptor returning true when edges count == n.
 /////////////////////////////////////////////////
-extern const NodeDescriptor has_available_socket;
+NodeDescriptor has_exactly_n_edges(size_t n);
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at
