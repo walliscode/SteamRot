@@ -82,7 +82,8 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
         agm::is_fragment,
         {.linear_chain = {true, true, false},
          .ring = {false, false, false},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, false}},
         lib);
   }
 
@@ -91,7 +92,8 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
         agm::is_joint,
         {.linear_chain = {false, false, true},
          .ring = {true, true, true},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, true}},
         lib);
   }
 }
@@ -124,7 +126,8 @@ TEST_CASE("predicate combinators compose correctly",
         agm::and_(agm::is_fragment, agm::is_joint),
         {.linear_chain = {false, false, false},
          .ring = {false, false, false},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, false}},
         lib);
   }
 
@@ -134,7 +137,8 @@ TEST_CASE("predicate combinators compose correctly",
         agm::or_(agm::is_fragment, agm::is_joint),
         {.linear_chain = {true, true, true},
          .ring = {true, true, true},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, true}},
         lib);
   }
 
@@ -143,7 +147,8 @@ TEST_CASE("predicate combinators compose correctly",
         agm::not_(agm::is_fragment),
         {.linear_chain = {false, false, true},
          .ring = {true, true, true},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, true}},
         lib);
   }
 }
@@ -210,7 +215,8 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
         agm::has_exactly_n_edges(0),
         {.linear_chain = {false, false, false},
          .ring = {false, false, false},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, false}},
         lib);
   }
 
@@ -219,7 +225,8 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
         agm::has_exactly_n_edges(1),
         {.linear_chain = {true, true, false},
          .ring = {false, false, false},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, false}},
         lib);
   }
 
@@ -228,7 +235,8 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
         agm::has_exactly_n_edges(2),
         {.linear_chain = {false, false, true},
          .ring = {true, true, true},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, false}},
         lib);
   }
 }
@@ -237,6 +245,17 @@ TEST_CASE("is_serial tests", "[unit][analysis][grimoire_machina]") {
   steamrot::tests::TestPartLibrary lib =
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
+
+  // just test the pre-built scenarios for named predicates
+  SECTION("Analyses all ScaffoldScenarios correctly for is_serial") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::is_serial,
+        {.linear_chain = {false, false, true},
+         .ring = {true, true, true},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, false}},
+        lib);
+  }
 }
 
 TEST_CASE("has_minimum_n_connected_sockets tests",
@@ -303,6 +322,22 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
   }
 }
 
+TEST_CASE("is_branched tests", "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+  // just test the pre-built scenarios for named predicates
+  SECTION("Analyses all ScaffoldScenarios correctly for is_branched") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::is_branched,
+        {.linear_chain = {false, false, false},
+         .ring = {false, false, false},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, true}},
+        lib);
+  }
+}
+
 TEST_CASE("has_maximum_n_connected_sockets tests",
           "[unit][analysis][grimoire_machina]") {
 
@@ -357,7 +392,8 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
         agm::has_maximum_n_edges(0),
         {.linear_chain = {false, false, false},
          .ring = {false, false, false},
-         .isolated_pair = {false, false}},
+         .isolated_pair = {false, false},
+         .simple_branch = {false, false, false, false}},
         lib);
   }
 
@@ -366,7 +402,8 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
         agm::has_maximum_n_edges(1),
         {.linear_chain = {true, true, false},
          .ring = {false, false, false},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, false}},
         lib);
   }
 
@@ -375,7 +412,8 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
         agm::has_maximum_n_edges(2),
         {.linear_chain = {true, true, true},
          .ring = {true, true, true},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, false}},
         lib);
   }
 }
@@ -415,7 +453,8 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
         agm::is_terminal,
         {.linear_chain = {true, true, false},
          .ring = {false, false, false},
-         .isolated_pair = {true, true}},
+         .isolated_pair = {true, true},
+         .simple_branch = {true, true, true, false}},
         lib);
   }
 }

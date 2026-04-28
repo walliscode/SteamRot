@@ -77,6 +77,13 @@ extern const NodeDescriptor is_serial;
 NodeDescriptor has_minimum_n_edges(size_t n);
 
 /////////////////////////////////////////////////
+/// @brief A NodeDescriptor that returns true when the node has at least 3
+/// PartEdges (i.e., at least 3 connected sockets), indicating a "branching"
+/// point
+/////////////////////////////////////////////////
+extern const NodeDescriptor is_branched;
+
+/////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at
 /// most @p n PartEdges (i.e., at most @p n connected sockets).
 ///
