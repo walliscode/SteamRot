@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of the TestPartLibrary struct and PartLibraryBuilder
-///        class.
+/// @brief Implementation of the TestPartLibrary struct, PartLibraryBuilder
+///        class, and CheckNodeDescriptorForAllScenarios helper.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -9,7 +9,9 @@
 /////////////////////////////////////////////////
 #include "part_library.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraph.h"
 #include "ViewDirection.h"
+#include "analysis_grimoire_machina.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -346,4 +348,48 @@ PartLibraryBuilder::GetScenarioForModification(ScaffoldScenario scenario) {
                               << "' not found in library");
   return it->second;
 }
+
+/////////////////////////////////////////////////
+void CheckNodeDescriptorForAllScenarios(
+    const steamrot::NodeDescriptor &descriptor,
+    const ScaffoldScenarioExpectations &expected, const TestPartLibrary &lib) {
+  namespace agm = steamrot::logic::analysis::grimoire_machina;
+
+  {
+    INFO("ScaffoldScenario::LinearChain");
+    const steamrot::MachinaFormScaffold &scaffold =
+        lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == expected.linear_chain.size());
+    for (size_t i = 0; i < expected.linear_chain.size(); ++i) {
+      INFO("node index " << i);
+      CHECK(descriptor(graph.nodes[i]) == expected.linear_chain[i]);
+    }
+  }
+
+  {
+    INFO("ScaffoldScenario::Ring");
+    const steamrot::MachinaFormScaffold &scaffold =
+        lib.scaffold_scenarios.at(ScaffoldScenario::Ring);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == expected.ring.size());
+    for (size_t i = 0; i < expected.ring.size(); ++i) {
+      INFO("node index " << i);
+      CHECK(descriptor(graph.nodes[i]) == expected.ring[i]);
+    }
+  }
+
+  {
+    INFO("ScaffoldScenario::IsolatedPair");
+    const steamrot::MachinaFormScaffold &scaffold =
+        lib.scaffold_scenarios.at(ScaffoldScenario::IsolatedPair);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == expected.isolated_pair.size());
+    for (size_t i = 0; i < expected.isolated_pair.size(); ++i) {
+      INFO("node index " << i);
+      CHECK(descriptor(graph.nodes[i]) == expected.isolated_pair[i]);
+    }
+  }
+}
+
 } // namespace steamrot::tests
