@@ -16,8 +16,6 @@
 #include "MachinaFormScaffold.h"
 #include "PartGraph.h"
 #include <cstddef>
-#include <cstdint>
-#include <vector>
 
 namespace steamrot::logic::analysis::grimoire_machina {
 
@@ -75,71 +73,6 @@ NodeDescriptor has_maximum_n_edges(size_t n);
 /// socket (i.e., at the "end" of a chain of connections).
 /////////////////////////////////////////////////
 extern const NodeDescriptor is_terminal;
-
-/////////////////////////////////////////////////
-/// Graph query functions
-/////////////////////////////////////////////////
-
-/////////////////////////////////////////////////
-/// @brief Look up a node by its part ID.
-///
-/// O(1) via @c PartGraph::node_index_by_id.
-///
-/// @param graph PartGraph to search.
-/// @param id    Part ID to look up.
-/// @return Pointer to the matching PartNode, or nullptr if not found.
-/////////////////////////////////////////////////
-const PartNode *find_node(const PartGraph &graph, uint32_t id);
-
-/////////////////////////////////////////////////
-/// @brief Return pointers to every edge incident to @p node.
-///
-/// @param graph PartGraph that owns @p node.
-/// @param node  Node whose incident edges are returned.
-/// @return Vector of non-owning PartEdge pointers.
-/////////////////////////////////////////////////
-std::vector<const PartEdge *> get_adjacent_edges(const PartGraph &graph,
-                                                 const PartNode &node);
-
-/////////////////////////////////////////////////
-/// @brief Return the IDs of all nodes directly connected to @p node.
-///
-/// @param graph PartGraph that owns @p node.
-/// @param node  Node whose neighbour IDs are returned.
-/// @return Vector of neighbour part IDs.
-/////////////////////////////////////////////////
-std::vector<uint32_t> get_neighbor_ids(const PartGraph &graph,
-                                       const PartNode &node);
-
-/////////////////////////////////////////////////
-/// @brief Return pointers to all nodes directly connected to @p node.
-///
-/// @param graph PartGraph that owns @p node.
-/// @param node  Node whose neighbours are returned.
-/// @return Vector of non-owning PartNode pointers.
-/////////////////////////////////////////////////
-std::vector<const PartNode *> get_neighbors(const PartGraph &graph,
-                                            const PartNode &node);
-
-/////////////////////////////////////////////////
-/// @brief Return pointers to all nodes satisfying @p predicate.
-///
-/// @param graph     PartGraph to search.
-/// @param predicate NodeDescriptor applied to each node.
-/// @return Vector of non-owning pointers to matching nodes.
-/////////////////////////////////////////////////
-std::vector<const PartNode *>
-find_nodes_matching(const PartGraph &graph, const NodeDescriptor &predicate);
-
-/////////////////////////////////////////////////
-/// @brief Count the nodes in @p graph satisfying @p predicate.
-///
-/// @param graph     PartGraph to search.
-/// @param predicate NodeDescriptor applied to each node.
-/// @return Number of matching nodes.
-/////////////////////////////////////////////////
-size_t count_nodes_matching(const PartGraph &graph,
-                            const NodeDescriptor &predicate);
 
 /////////////////////////////////////////////////
 /// Predicate combinators
