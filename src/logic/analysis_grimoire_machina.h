@@ -52,12 +52,36 @@ extern const NodeDescriptor is_joint;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has exactly
-/// @p n
+/// @p n PartEdges (i.e., exactly @p n connected sockets).
 ///
 /// @param n Number of edges.
 /// @return NodeDescriptor returning true when edges count == n.
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n);
+
+/////////////////////////////////////////////////
+/// @brief Returns a NodeDescriptor that returns true when the node has exactly
+/// 2 PartEdges
+///
+/// serial is used to indicate part of a serial chain
+/////////////////////////////////////////////////
+extern const NodeDescriptor is_serial;
+
+/////////////////////////////////////////////////
+/// @brief Returns a NodeDescriptor that returns true when the node has at least
+/// @p n PartEdges (i.e., at least @p n connected sockets).
+///
+/// @param n Minimum number of edges.
+/// @return NodeDescriptor returning true when edges count >= n.
+/////////////////////////////////////////////////
+NodeDescriptor has_minimum_n_edges(size_t n);
+
+/////////////////////////////////////////////////
+/// @brief A NodeDescriptor that returns true when the node has at least 3
+/// PartEdges (i.e., at least 3 connected sockets), indicating a "branching"
+/// point
+/////////////////////////////////////////////////
+extern const NodeDescriptor is_branched;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at

@@ -201,6 +201,21 @@ TestPartLibrary TestPartLibrary::Create() {
       lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair,
                                      std::move(result.scaffold));
     }
+
+    // "simple_branch": one Joint connected to one socket each of three
+    // Fragments, creating a branching point
+    // part_ids:  [0]=frag0, [1]=frag1, [2]=frag2, [3]=joint0,
+    //           frag0.socket[0] ↔ joint0.socket[0]
+    //           frag1.socket[0] ↔ joint0.socket[1]
+    //           frag2.socket[0] ↔ joint0.socket[2]
+    //
+    {
+      ScaffoldResult result = builder.MakeConnectedScaffold(
+          {"fragment_one_socket", "fragment_one_socket", "fragment_one_socket"},
+          {"joint_three_sockets"}, {{0, 0, 3, 0}, {1, 0, 3, 1}, {2, 0, 3, 2}});
+      lib.scaffold_scenarios.emplace(ScaffoldScenario::SimpleBranch,
+                                     std::move(result.scaffold));
+    }
   }
 
   return lib;
@@ -388,6 +403,18 @@ void CheckNodeDescriptorForAllScenarios(
     for (size_t i = 0; i < expected.isolated_pair.size(); ++i) {
       INFO("node index " << i);
       CHECK(descriptor(graph.nodes[i]) == expected.isolated_pair[i]);
+    }
+  }
+
+  {
+    INFO("ScaffoldScenario::SimpleBranch");
+    const steamrot::MachinaFormScaffold &scaffold =
+        lib.scaffold_scenarios.at(ScaffoldScenario::SimpleBranch);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == expected.simple_branch.size());
+    for (size_t i = 0; i < expected.simple_branch.size(); ++i) {
+      INFO("node index " << i);
+      CHECK(descriptor(graph.nodes[i]) == expected.simple_branch[i]);
     }
   }
 }

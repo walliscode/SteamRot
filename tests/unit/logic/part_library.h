@@ -87,6 +87,12 @@ enum class ScaffoldScenario {
   /////////////////////////////////////////////////
   IsolatedPair,
 
+  /////////////////////////////////////////////////
+  /// One Joint connected to one socket each of three fragments, creating a
+  /// branching point
+  /////////////////////////////////////////////////
+  SimpleBranch
+
 };
 
 /////////////////////////////////////////////////
@@ -256,6 +262,13 @@ struct ScaffoldScenarioExpectations {
   /// Indices: [0]=frag0, [1]=frag1.
   /////////////////////////////////////////////////
   std::array<bool, 2> isolated_pair{};
+
+  /////////////////////////////////////////////////
+  /// @brief Expected results for ScaffoldScenario::SimpleBranch.
+  ///
+  /// Indices: [0]=frag0, [1]=frag1, [2]=frag2, [3]=joint0.
+  /////////////////////////////////////////////////
+  std::array<bool, 4> simple_branch{};
 };
 
 /////////////////////////////////////////////////
@@ -279,7 +292,6 @@ struct ScaffoldScenarioExpectations {
 void CheckNodeDescriptorForAllScenarios(
     const steamrot::NodeDescriptor &descriptor,
     const ScaffoldScenarioExpectations &expected, const TestPartLibrary &lib);
-
 
 /////////////////////////////////////////////////
 /// @class PartLibraryBuilder

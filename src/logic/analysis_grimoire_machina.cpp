@@ -74,6 +74,20 @@ NodeDescriptor has_exactly_n_edges(size_t n) {
     return node.edge_indices.size() == n;
   };
 }
+
+/////////////////////////////////////////////////
+const NodeDescriptor is_serial = has_exactly_n_edges(2);
+
+/////////////////////////////////////////////////
+NodeDescriptor has_minimum_n_edges(size_t n) {
+  return [n](const PartNode &node) -> bool {
+    return node.edge_indices.size() >= n;
+  };
+}
+
+/////////////////////////////////////////////////
+const NodeDescriptor is_branched = has_minimum_n_edges(3);
+
 /////////////////////////////////////////////////
 NodeDescriptor has_maximum_n_edges(size_t n) {
   return [n](const PartNode &node) -> bool {
