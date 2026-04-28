@@ -74,6 +74,24 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
   }
   REQUIRE(fragment_count == 1);
   REQUIRE(joint_count == 1);
+
+  SECTION("Analyses all ScaffoldScenarios correctly for is_fragment") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::is_fragment,
+        {.linear_chain = {true, true, false},
+         .ring = {false, false, false},
+         .isolated_pair = {true, true}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for is_joint") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::is_joint,
+        {.linear_chain = {false, false, true},
+         .ring = {true, true, true},
+         .isolated_pair = {false, false}},
+        lib);
+  }
 }
 
 TEST_CASE("predicate combinators compose correctly",
@@ -96,6 +114,33 @@ TEST_CASE("predicate combinators compose correctly",
     REQUIRE_FALSE(is_both(node));
     REQUIRE(is_either(node));
     REQUIRE(not_fragment(node) == agm::is_joint(node));
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for and_(is_fragment, is_joint)") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::and_(agm::is_fragment, agm::is_joint),
+        {.linear_chain = {false, false, false},
+         .ring = {false, false, false},
+         .isolated_pair = {false, false}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for or_(is_fragment, is_joint)") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::or_(agm::is_fragment, agm::is_joint),
+        {.linear_chain = {true, true, true},
+         .ring = {true, true, true},
+         .isolated_pair = {true, true}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for not_(is_fragment)") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::not_(agm::is_fragment),
+        {.linear_chain = {false, false, true},
+         .ring = {true, true, true},
+         .isolated_pair = {false, false}},
+        lib);
   }
 }
 
@@ -155,6 +200,33 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
     REQUIRE_FALSE(has_2(graph.nodes[1]));
     REQUIRE(has_2(graph.nodes[2]));
   }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_0_edges") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_exactly_n_edges(0),
+        {.linear_chain = {false, false, false},
+         .ring = {false, false, false},
+         .isolated_pair = {false, false}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_1_edge") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_exactly_n_edges(1),
+        {.linear_chain = {true, true, false},
+         .ring = {false, false, false},
+         .isolated_pair = {true, true}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_2_edges") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_exactly_n_edges(2),
+        {.linear_chain = {false, false, true},
+         .ring = {true, true, true},
+         .isolated_pair = {false, false}},
+        lib);
+  }
 }
 
 TEST_CASE("has_maximum_n_connected_sockets tests",
@@ -205,6 +277,33 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
   REQUIRE(max_2(graph.nodes[2]));
   REQUIRE(max_2(graph.nodes[3]));
   REQUIRE(max_2(graph.nodes[4]));
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_maximum_0_edges") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_maximum_n_edges(0),
+        {.linear_chain = {false, false, false},
+         .ring = {false, false, false},
+         .isolated_pair = {false, false}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_maximum_1_edge") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_maximum_n_edges(1),
+        {.linear_chain = {true, true, false},
+         .ring = {false, false, false},
+         .isolated_pair = {true, true}},
+        lib);
+  }
+
+  SECTION("Analyses all ScaffoldScenarios correctly for has_maximum_2_edges") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::has_maximum_n_edges(2),
+        {.linear_chain = {true, true, true},
+         .ring = {true, true, true},
+         .isolated_pair = {true, true}},
+        lib);
+  }
 }
 
 TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
