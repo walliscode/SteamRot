@@ -58,22 +58,24 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
 
-  steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
-      {"fragment_one_socket"}, {"joint_one_socket"});
+  SECTION("Scaffold with one fragment and one joint") {
+    steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
+        {"fragment_one_socket"}, {"joint_one_socket"});
 
-  steamrot::PartGraph graph = agm::build_part_graph(scaffold);
-  REQUIRE(graph.nodes.size() == 2);
+    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    REQUIRE(graph.nodes.size() == 2);
 
-  int fragment_count = 0;
-  int joint_count = 0;
-  for (const auto &node : graph.nodes) {
-    if (agm::is_fragment(node))
-      ++fragment_count;
-    if (agm::is_joint(node))
-      ++joint_count;
+    int fragment_count = 0;
+    int joint_count = 0;
+    for (const auto &node : graph.nodes) {
+      if (agm::is_fragment(node))
+        ++fragment_count;
+      if (agm::is_joint(node))
+        ++joint_count;
+    }
+    REQUIRE(fragment_count == 1);
+    REQUIRE(joint_count == 1);
   }
-  REQUIRE(fragment_count == 1);
-  REQUIRE(joint_count == 1);
 
   SECTION("Analyses all ScaffoldScenarios correctly for is_fragment") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
@@ -116,7 +118,8 @@ TEST_CASE("predicate combinators compose correctly",
     REQUIRE(not_fragment(node) == agm::is_joint(node));
   }
 
-  SECTION("Analyses all ScaffoldScenarios correctly for and_(is_fragment, is_joint)") {
+  SECTION("Analyses all ScaffoldScenarios correctly for and_(is_fragment, "
+          "is_joint)") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
         agm::and_(agm::is_fragment, agm::is_joint),
         {.linear_chain = {false, false, false},
@@ -125,7 +128,8 @@ TEST_CASE("predicate combinators compose correctly",
         lib);
   }
 
-  SECTION("Analyses all ScaffoldScenarios correctly for or_(is_fragment, is_joint)") {
+  SECTION("Analyses all ScaffoldScenarios correctly for or_(is_fragment, "
+          "is_joint)") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
         agm::or_(agm::is_fragment, agm::is_joint),
         {.linear_chain = {true, true, true},
