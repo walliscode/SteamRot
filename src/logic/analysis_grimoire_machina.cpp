@@ -69,18 +69,11 @@ const NodeDescriptor is_joint = [](const PartNode &node) -> bool {
 };
 
 /////////////////////////////////////////////////
-const NodeDescriptor has_available_socket = [](const PartNode &node) -> bool {
-  return std::visit(
-      [](const auto &instance) -> bool {
-        for (const auto &socket : instance.sockets) {
-          if (socket.state == SocketState::Available)
-            return true;
-        }
-        return false;
-      },
-      *node.instance);
-};
-
+NodeDescriptor has_exactly_n_edges(size_t n) {
+  return [n](const PartNode &node) -> bool {
+    return node.edge_indices.size() == n;
+  };
+}
 /////////////////////////////////////////////////
 NodeDescriptor has_maximum_n_edges(size_t n) {
   return [n](const PartNode &node) -> bool {
