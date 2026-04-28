@@ -16,6 +16,16 @@
 /// ScaffoldResult bundles a MachinaFormScaffold with the insertion-order ID
 /// list, making it easy to wire additional connections programmatically.
 ///
+/// ScaffoldScenarioExpectations holds one std::array<bool, N> per
+/// ScaffoldScenario (N equals the node count for that scenario) so callers can
+/// express exact per-node expected results in a compact, type-safe way.
+/// Node order within each array matches insertion order (fragments first, then
+/// joints) as documented on each field.
+///
+/// CheckNodeDescriptorForAllScenarios runs a NodeDescriptor against every
+/// ScaffoldScenario in the library and CHECKs each node's result against the
+/// corresponding entry in a ScaffoldScenarioExpectations value.
+///
 /// PartLibraryBuilder wraps a TestPartLibrary reference and provides
 /// convenience methods to create FragmentInstances, JointInstances, PartMaps,
 /// and fully-connected scaffolds backed by the library's storage.
@@ -39,7 +49,9 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraph.h"
 #include <SFML/Graphics/Transform.hpp>
+#include <array>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -200,6 +212,74 @@ struct ScaffoldResult {
   /////////////////////////////////////////////////
   std::vector<uint32_t> part_ids;
 };
+
+/////////////////////////////////////////////////
+/// @struct ScaffoldScenarioExpectations
+/// @brief Holds exact per-node expected results for every ScaffoldScenario.
+///
+/// Each field is a fixed-size array of booleans whose length equals the node
+/// count of the corresponding scenario.  Array indices follow insertion order
+/// (fragments first, then joints) as built by TestPartLibrary::Create():
+///
+///   linear_chain[0] — frag0 (fragment_two_sockets, socket[1] connected)
+///   linear_chain[1] — frag1 (fragment_two_sockets, socket[0] connected)
+///   linear_chain[2] — joint0 (joint_two_sockets, both sockets connected)
+///
+///   ring[0] — joint0 (joint_two_sockets, sockets[0] and [1] connected)
+///   ring[1] — joint1 (joint_two_sockets, sockets[0] and [1] connected)
+///   ring[2] — joint2 (joint_two_sockets, sockets[0] and [1] connected)
+///
+///   isolated_pair[0] — frag0 (fragment_one_socket, socket[0] connected)
+///   isolated_pair[1] — frag1 (fragment_one_socket, socket[0] connected)
+///
+/// Pass a value of this type to CheckNodeDescriptorForAllScenarios together
+/// with the NodeDescriptor under test.
+/////////////////////////////////////////////////
+struct ScaffoldScenarioExpectations {
+  /////////////////////////////////////////////////
+  /// @brief Expected results for ScaffoldScenario::LinearChain.
+  ///
+  /// Indices: [0]=frag0, [1]=frag1, [2]=joint0.
+  /////////////////////////////////////////////////
+  std::array<bool, 3> linear_chain{};
+
+  /////////////////////////////////////////////////
+  /// @brief Expected results for ScaffoldScenario::Ring.
+  ///
+  /// Indices: [0]=joint0, [1]=joint1, [2]=joint2.
+  /////////////////////////////////////////////////
+  std::array<bool, 3> ring{};
+
+  /////////////////////////////////////////////////
+  /// @brief Expected results for ScaffoldScenario::IsolatedPair.
+  ///
+  /// Indices: [0]=frag0, [1]=frag1.
+  /////////////////////////////////////////////////
+  std::array<bool, 2> isolated_pair{};
+};
+
+/////////////////////////////////////////////////
+/// @brief Run a NodeDescriptor against every ScaffoldScenario and assert
+///        exact per-node results.
+///
+/// Builds a PartGraph from each pre-wired scenario in @p lib, applies
+/// @p descriptor to every node, and CHECKs the result against the
+/// corresponding entry in @p expected.  A REQUIRE guards that each graph's
+/// node count matches the expected array size before the per-node CHECKs
+/// run, so a mismatch is reported immediately rather than causing an
+/// out-of-bounds access.
+///
+/// Must be called from within a Catch2 TEST_CASE (or SECTION) because it
+/// uses the CHECK and REQUIRE macros.
+///
+/// @param descriptor NodeDescriptor predicate to exercise.
+/// @param expected   Exact expected result for every node in every scenario.
+/// @param lib        TestPartLibrary whose scaffold_scenarios are used.
+/////////////////////////////////////////////////
+void CheckNodeDescriptorForAllScenarios(
+    const steamrot::NodeDescriptor &descriptor,
+    const ScaffoldScenarioExpectations &expected, const TestPartLibrary &lib);
+
 
 /////////////////////////////////////////////////
 /// @class PartLibraryBuilder

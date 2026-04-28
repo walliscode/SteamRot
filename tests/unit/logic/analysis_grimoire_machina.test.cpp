@@ -362,40 +362,12 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
     REQUIRE(agm::is_terminal(graph.nodes[2]));
   }
 
-  SECTION("Analyses ScaffoldScenario::LinearChain correctly") {
-    const steamrot::MachinaFormScaffold &scaffold =
-        builder.GetScenarioForAnalysis(
-            steamrot::tests::ScaffoldScenario::LinearChain);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == 3);
-    // The two fragments at the ends of the chain should be terminal, but the
-    // joint in the middle should not be
-    // because of how the LinearChain is built, the FragentInstances are added
-    // first so the joints is [2]
-    REQUIRE(agm::is_terminal(graph.nodes[0]));
-    REQUIRE(agm::is_terminal(graph.nodes[1]));
-    REQUIRE(not_terminal(graph.nodes[2]));
-  }
-
-  SECTION("Analyses ScaffoldScenario::Ring correctly") {
-    const steamrot::MachinaFormScaffold &scaffold =
-        builder.GetScenarioForAnalysis(steamrot::tests::ScaffoldScenario::Ring);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == 3);
-    // In the Ring scenario, all joints have 2 edges, so none should be terminal
-    for (const auto &node : graph.nodes)
-      REQUIRE(not_terminal(node));
-  }
-
-  SECTION("Analyses ScaffoldScenario::IsolatedPair correctly") {
-    const steamrot::MachinaFormScaffold &scaffold =
-        builder.GetScenarioForAnalysis(
-            steamrot::tests::ScaffoldScenario::IsolatedPair);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == 2);
-    // Both fragments are connected to each other with 1 edge, so both should
-    // be terminal
-    REQUIRE(agm::is_terminal(graph.nodes[0]));
-    REQUIRE(agm::is_terminal(graph.nodes[1]));
+  SECTION("Analyses all ScaffoldScenarios correctly") {
+    steamrot::tests::CheckNodeDescriptorForAllScenarios(
+        agm::is_terminal,
+        {.linear_chain  = {true, true, false},
+         .ring          = {false, false, false},
+         .isolated_pair = {true, true}},
+        lib);
   }
 }
