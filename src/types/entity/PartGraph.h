@@ -159,8 +159,7 @@ using EdgeDescriptor = std::function<bool(const PartEdge &)>;
 /// but does not need to walk further than one hop from the anchor.
 ///
 /// Obtain instances from the modifier free functions in
-/// @c steamrot::descriptors (see @c descriptor_ops.h),
-/// e.g. @c is_connected_to, @c exactly_n_of.
+/// @c steamrot::descriptors (see @c descriptor_ops.h in @c src/logic/).
 /////////////////////////////////////////////////
 using ContextualNodeDescriptor =
     std::function<bool(const PartGraph &, const PartNode &)>;
@@ -185,7 +184,8 @@ using ChainDescriptor =
 ///
 /// Any callable with signature @c bool(const PartGraph&) qualifies.
 /// Derive instances via @c steamrot::descriptors::any_node_satisfies() or
-/// @c steamrot::descriptors::all_nodes_satisfy() in @c descriptor_ops.h.
+/// @c steamrot::descriptors::all_nodes_satisfy() in
+/// @c src/logic/descriptor_ops.h.
 ///
 /// @c GraphDescriptor is the terminal type in the hierarchy — it is only
 /// consumed by Logic/Action classes and is never passed back into a modifier.

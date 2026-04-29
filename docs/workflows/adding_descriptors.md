@@ -50,7 +50,7 @@ There are four descriptor levels, ordered from narrowest to broadest scope:
 
 All four aliases live in `src/types/entity/PartGraph.h` in the `steamrot` namespace.
 Generic lifting utilities, graph queries, and combinators live in
-`src/types/entity/descriptor_ops.h` under the `steamrot::descriptors` namespace.
+`src/logic/descriptor_ops.h` under the `steamrot::descriptors` namespace.
 The `ChainDescriptorBuilder` class lives in `src/logic/ChainDescriptorBuilder.h`
 under the `steamrot::logic` namespace.
 
@@ -138,7 +138,7 @@ Start: I need to query something about the assembled machine.
 | File | Purpose |
 | --- | --- |
 | `src/types/entity/PartGraph.h` | Type aliases for all four descriptor levels (`steamrot` namespace) |
-| `src/types/entity/descriptor_ops.h` | `lift`, `lift_to_chain`, combinators, graph queries (`steamrot::descriptors` namespace) |
+| `src/logic/descriptor_ops.h` | `lift`, `lift_to_chain`, combinators, graph queries (`steamrot::descriptors` namespace) |
 | `src/logic/ChainDescriptorBuilder.h` | `ChainDescriptorBuilder` class (`steamrot::logic` namespace) |
 | `src/logic/analysis_grimoire_machina.h` | Declarations of concrete descriptors and `build_part_graph` |
 | `src/logic/analysis_grimoire_machina.cpp` | Definitions of concrete descriptors and `build_part_graph` |

@@ -40,10 +40,11 @@ src/            Source code
   error_loop/
   events/         Event handling system
   logger/         Logging utilities
-  logic/          Game logic classes
+  logic/          Game logic classes and free-function operations
   resources/
   scenes/         Scene management
-  types/
+  types/          Pure type definitions only (structs, enums, type aliases)
+                  NO free functions, NO classes with behaviour
 
 data/           Non-code assets (images, JSON, FlatBuffers schemas)
                 Organised by purpose, not file type (e.g. scene/ not json/)
@@ -300,6 +301,8 @@ These commands are **documentation only**. Agents must never execute them.
 - Always initialise all member variables with brace-initialisation.
 - Use `C` prefix for component classes; `m_` prefix for member variables.
 - 2-space indentation — no tabs.
+- **`src/types/` is for pure type definitions only** (structs, enums, `using` type aliases). Never place free functions, classes with behaviour, or template utilities in `src/types/`.
+- **Free functions that operate on types belong in `src/logic/`** (or the subsystem they serve), in a named namespace such as `steamrot::descriptors` or `steamrot::logic`. Never place them in `src/types/entity/` or any other `src/types/` subdirectory.
 
 ## Gotchas
 

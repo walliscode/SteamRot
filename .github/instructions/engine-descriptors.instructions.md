@@ -23,7 +23,7 @@ narrowest to broadest scope:
 All four type aliases live in `src/types/entity/PartGraph.h` in the `steamrot` namespace.
 The lifting utilities, graph queries, and generic combinators (`lift`, `and_`, `or_`,
 `not_`, `any_node_satisfies`, `all_nodes_satisfy`) live in
-`src/types/entity/descriptor_ops.h` under the `steamrot::descriptors` namespace.
+`src/logic/descriptor_ops.h` under the `steamrot::descriptors` namespace.
 `ChainDescriptorBuilder` lives in `src/logic/ChainDescriptorBuilder.h` under the
 `steamrot::logic` namespace.
 
@@ -72,7 +72,7 @@ Key rules:
 | `ContextualNodeDescriptor` modifiers | `src/logic/analysis_grimoire_machina.cpp` |
 | `ChainDescriptor` (via builder) | `src/logic/analysis_grimoire_machina.cpp` |
 | `GraphDescriptor` | Derived in the Logic/Action layer via `steamrot::descriptors::any_node_satisfies` |
-| Lifting / combinators / graph queries | `src/types/entity/descriptor_ops.h` — `steamrot::descriptors` namespace |
+| Lifting / combinators / graph queries | `src/logic/descriptor_ops.h` — `steamrot::descriptors` namespace |
 | `ChainDescriptorBuilder` | `src/logic/ChainDescriptorBuilder.h` — `steamrot::logic` namespace |
 
 Declare new descriptors in the matching `.h` file and define them in the `.cpp`.
@@ -204,7 +204,7 @@ traversal work needed. Do not write tests that expect `true` results from
 
 `GraphDescriptor` is always derived, never written from scratch. Use
 `any_node_satisfies` or `all_nodes_satisfy` from `steamrot::descriptors`
-(`src/types/entity/descriptor_ops.h`):
+(`src/logic/descriptor_ops.h`):
 
 ```cpp
 // "Does the graph contain at least one terminal fragment?"
@@ -369,7 +369,7 @@ The following are not yet implemented and represent planned work:
 ## Related files
 
 - `src/types/entity/PartGraph.h` — type aliases for all four descriptor levels (`steamrot` namespace)
-- `src/types/entity/descriptor_ops.h` — lift, combinators, graph queries (`steamrot::descriptors` namespace)
+- `src/logic/descriptor_ops.h` — lift, combinators, graph queries (`steamrot::descriptors` namespace)
 - `src/logic/ChainDescriptorBuilder.h` — `ChainDescriptorBuilder` class (`steamrot::logic` namespace)
 - `src/logic/analysis_grimoire_machina.h` / `.cpp` — concrete descriptors and
   `build_part_graph`
