@@ -1,17 +1,15 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Implementation of analysis utilities for a MachinaFormScaffold
-/// as a PartGraph, including free functions and NodeDescriptor predicates.
+/// @brief Implementation of the free functions for general-purpose
+/// descriptors/helpers
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "analysis_grimoire_machina.h"
-#include <variant>
+#include "descriptors_general.h"
 
-namespace steamrot::logic::analysis::grimoire_machina {
-
+namespace steamrot::logic::descriptors {
 /////////////////////////////////////////////////
 PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
 
@@ -57,45 +55,4 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
 
   return graph;
 }
-
-/////////////////////////////////////////////////
-const NodeDescriptor is_fragment = [](const PartNode &node) -> bool {
-  return std::holds_alternative<FragmentInstance>(*node.instance);
-};
-
-/////////////////////////////////////////////////
-const NodeDescriptor is_joint = [](const PartNode &node) -> bool {
-  return std::holds_alternative<JointInstance>(*node.instance);
-};
-
-/////////////////////////////////////////////////
-NodeDescriptor has_exactly_n_edges(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return node.edge_indices.size() == n;
-  };
-}
-
-/////////////////////////////////////////////////
-const NodeDescriptor is_serial = has_exactly_n_edges(2);
-
-/////////////////////////////////////////////////
-NodeDescriptor has_minimum_n_edges(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return node.edge_indices.size() >= n;
-  };
-}
-
-/////////////////////////////////////////////////
-const NodeDescriptor is_branched = has_minimum_n_edges(3);
-
-/////////////////////////////////////////////////
-NodeDescriptor has_maximum_n_edges(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return node.edge_indices.size() <= n;
-  };
-}
-
-/////////////////////////////////////////////////
-const NodeDescriptor is_terminal = has_maximum_n_edges(1);
-
-} // namespace steamrot::logic::analysis::grimoire_machina
+} // namespace steamrot::logic::descriptors

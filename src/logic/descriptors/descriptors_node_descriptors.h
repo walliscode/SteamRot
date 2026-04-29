@@ -1,8 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of analysis utilities for a MachinaFormScaffold
-/// as a PartGraph, including free functions, NodeDescriptor
-/// predicates, graph traversal functions, and predicate combinators.
+/// @brief Declaration of the free functions for Node Descriptors
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -13,33 +11,57 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "ChainDescriptorBuilder.h"
-#include "MachinaFormScaffold.h"
+
 #include "PartGraph.h"
-#include "descriptor_ops.h"
-#include <cstddef>
-
-namespace steamrot::logic::analysis::grimoire_machina {
+#include <functional>
+namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
-/// @brief Build a PartGraph from a MachinaFormScaffold.
+/// @brief Predicate type for single-node queries on a PartGraph.
 ///
-/// Single O(N+E) pass: creates one PartNode per part (populating
-/// @c node_index_by_id), then creates one PartEdge per connection (pushing
-/// the edge index into both endpoint nodes' @c edge_indices). All nodes and
-/// edges hold non-owning pointers into @p scaffold, which must outlive the
-/// returned PartGraph.
+/// Any callable with signature @c bool(const PartNode&) qualifies.
+/// @c is_fragment, @c is_joint, and @c has_available_socket in
+/// @c steamrot::logic::analysis::grimoire_machina are declared as
+/// @c const @c NodeDescriptor variables and can be used directly or
+/// assigned to other @c NodeDescriptor instances.
 ///
-/// @param scaffold Source scaffold to build the graph from.
-/// @return PartGraph with one node per part, one edge per connection, and
-///         fully populated @c node_index_by_id and @c edge_indices.
+/// Example:
+/// @code
+/// NodeDescriptor predicate = agm::is_fragment;
+/// bool result = predicate(node);
+/// @endcode
 /////////////////////////////////////////////////
-PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
+using NodeDescriptor = std::function<bool(const PartNode &)>;
 
 /////////////////////////////////////////////////
-/// NodeDescriptor predicates
+/// @brief Predicate for a single node with access to the whole graph.
+///
+/// Any callable with signature
+/// @c bool(const PartGraph&, const PartNode&) qualifies.
+/// Use when the predicate needs to examine neighbouring nodes via the graph
+/// but does not need to walk further than one hop from the anchor.
+///
+/// Obtain instances from the modifier free functions in
+/// @c steamrot::descriptors (see @c descriptor_ops.h in @c src/logic/).
 /////////////////////////////////////////////////
+using ContextualNodeDescriptor =
+    std::function<bool(const PartGraph &, const PartNode &)>;
 
+/////////////////////////////////////////////////
+/// @brief Lift a NodeDescriptor to a ContextualNodeDescriptor.
+///
+/// The PartGraph argument is ignored; the wrapped descriptor is applied to
+/// the node alone. Use when a function requires a ContextualNodeDescriptor
+/// but you only need to examine the node's own data.
+///
+/// @param nd NodeDescriptor to lift.
+/// @return ContextualNodeDescriptor that delegates to @p nd.
+/////////////////////////////////////////////////
+inline ContextualNodeDescriptor lift(NodeDescriptor nd) {
+  return
+      [nd = std::move(nd)](const PartGraph & /*graph*/,
+                           const PartNode &node) -> bool { return nd(node); };
+}
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
 /// FragmentInstance.
@@ -99,16 +121,4 @@ NodeDescriptor has_maximum_n_edges(size_t n);
 /// socket (i.e., at the "end" of a chain of connections).
 /////////////////////////////////////////////////
 extern const NodeDescriptor is_terminal;
-
-/////////////////////////////////////////////////
-/// Predicate combinators
-///
-/// Brought in from descriptor_ops.h (steamrot::descriptors namespace).
-/// Work uniformly across NodeDescriptor, ContextualNodeDescriptor,
-/// ChainDescriptor, and GraphDescriptor.
-/////////////////////////////////////////////////
-using steamrot::descriptors::and_;
-using steamrot::descriptors::not_;
-using steamrot::descriptors::or_;
-
-} // namespace steamrot::logic::analysis::grimoire_machina
+} // namespace steamrot::logic::descriptors

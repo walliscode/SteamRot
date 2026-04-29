@@ -20,9 +20,11 @@ GhostRenderLogic.test.cpp
 positioning_ui.test.cpp
 collision_mouse.test.cpp
 collision_grimoire_machina.test.cpp
-analysis_grimoire_machina.test.cpp
+
 # pixel_render.test.cpp
 
+# descriptors tests
+descriptors/descriptors_node_descriptors.test.cpp
 )
 
 target_include_directories(test_logic
