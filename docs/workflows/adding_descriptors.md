@@ -384,9 +384,15 @@ if (has_terminal_fragment(graph)) {
 | `steamrot::descriptors::lift_to_chain(nd)` | `NodeDescriptor` → `ChainDescriptor` | Same, typed as `ChainDescriptor` |
 | `steamrot::descriptors::any_node_satisfies(cd)` | `ChainDescriptor` → `GraphDescriptor` | True if any node satisfies `cd` |
 | `steamrot::descriptors::all_nodes_satisfy(cd)` | `ChainDescriptor` → `GraphDescriptor` | True if every node satisfies `cd` |
-| `agm::and_(a, b)` | `Desc × Desc` → `Desc` | Both must be true; same level required |
-| `agm::or_(a, b)` | `Desc × Desc` → `Desc` | Either must be true; same level required |
-| `agm::not_(a)` | `Desc` → `Desc` | Negate; same level required |
+| `steamrot::descriptors::and_(a, b)` | `Desc × Desc` → `Desc` | Both must be true; same level required |
+| `steamrot::descriptors::or_(a, b)` | `Desc × Desc` → `Desc` | Either must be true; same level required |
+| `steamrot::descriptors::not_(a)` | `Desc` → `Desc` | Negate; same level required |
+
+> **Note:** When working inside `analysis_grimoire_machina.h/cpp`, the `and_`,
+> `or_`, and `not_` combinators are available as `agm::and_`, `agm::or_`,
+> `agm::not_` via the `using steamrot::descriptors::and_` declarations in
+> `analysis_grimoire_machina.h`. The full `steamrot::descriptors::` prefix is
+> always valid from any context.
 
 ### Example: composing without declaring a new descriptor
 

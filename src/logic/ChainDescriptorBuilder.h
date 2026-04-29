@@ -21,10 +21,19 @@ namespace steamrot::logic {
 /// @brief Builds a ChainDescriptor from an ordered list of NodeDescriptor
 ///        steps matched against a DFS walk through the PartGraph.
 ///
-/// Usage:
+/// Usage (from outside the `steamrot::logic` namespace):
 /// @code
 /// ChainDescriptor linear_3 =
 ///     steamrot::logic::ChainDescriptorBuilder{}
+///         .StartWith(is_terminal)
+///         .Then(is_serial)
+///         .End(is_terminal);
+/// @endcode
+///
+/// Usage (from within `steamrot::logic` or via a `using` declaration):
+/// @code
+/// ChainDescriptor linear_3 =
+///     ChainDescriptorBuilder{}
 ///         .StartWith(is_terminal)
 ///         .Then(is_serial)
 ///         .End(is_terminal);
