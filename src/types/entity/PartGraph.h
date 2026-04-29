@@ -149,4 +149,45 @@ using NodeDescriptor = std::function<bool(const PartNode &)>;
 /// descriptors for common edge-type queries.
 /////////////////////////////////////////////////
 using EdgeDescriptor = std::function<bool(const PartEdge &)>;
+
+/////////////////////////////////////////////////
+/// @brief Predicate for a single node with access to the whole graph.
+///
+/// Any callable with signature
+/// @c bool(const PartGraph&, const PartNode&) qualifies.
+/// Use when the predicate needs to examine neighbouring nodes via the graph
+/// but does not need to walk further than one hop from the anchor.
+///
+/// Obtain instances from the modifier free functions in @c descriptor_ops.h
+/// (e.g. @c is_connected_to, @c exactly_n_of).
+/////////////////////////////////////////////////
+using ContextualNodeDescriptor =
+    std::function<bool(const PartGraph &, const PartNode &)>;
+
+/////////////////////////////////////////////////
+/// @brief Predicate for a multi-hop walk starting from one anchor node.
+///
+/// Shares the underlying signature with @c ContextualNodeDescriptor.
+/// The distinction is semantic: a @c ChainDescriptor answers a structural
+/// question about a subgraph reachable from the start node (e.g. "does a
+/// 3-node linear chain begin here?") rather than a question about the
+/// start node alone.
+///
+/// Build instances with @c ChainDescriptorBuilder in @c descriptor_ops.h.
+/////////////////////////////////////////////////
+using ChainDescriptor =
+    std::function<bool(const PartGraph &, const PartNode &)>;
+
+/////////////////////////////////////////////////
+/// @brief Predicate for the whole graph with no anchor node.
+///
+/// Any callable with signature @c bool(const PartGraph&) qualifies.
+/// Derive instances via @c any_node_satisfies() or @c all_nodes_satisfy()
+/// in @c descriptor_ops.h.
+///
+/// @c GraphDescriptor is the terminal type in the hierarchy — it is only
+/// consumed by Logic/Action classes and is never passed back into a modifier.
+/////////////////////////////////////////////////
+using GraphDescriptor = std::function<bool(const PartGraph &)>;
+
 } // namespace steamrot
