@@ -102,8 +102,8 @@ Start: I need to query something about the assembled machine.
 │   │
 │   ├── No ──────────────────────────────────────► NodeDescriptor
 │   │                                               bool(const PartNode&)
-│   │                                               Declare in analysis_grimoire_machina.h
-│   │                                               Define in analysis_grimoire_machina.cpp
+│   │                                               Declare in descriptors_node_descriptors.h
+│   │                                               Define in descriptors_node_descriptors.cpp
 │   │
 │   └── Yes
 │        │
@@ -129,7 +129,7 @@ Start: I need to query something about the assembled machine.
 │
 └─ Does the question belong in a Logic/Action class (gates a gameplay decision)?
     └── Yes → GraphDescriptor consumed directly in that class.
-              Define there, not in analysis_grimoire_machina.
+              Define there, not in descriptors_graph_descriptors.
 ```
 
 ---
@@ -202,7 +202,7 @@ Add a `TEST_CASE` using `CheckNodeDescriptorForAllScenarios` (see
 
 ```bash
 cmake --build --preset Debug
-ctest --preset Debug -R analysis_grimoire_machina
+ctest --preset Debug -R descriptors_node_descriptors
 ```
 
 ---
@@ -313,7 +313,7 @@ extern const ChainDescriptor linear_3_chain;
 // NOTE: ChainDescriptorBuilder::End() always returns false until the
 // DFS traversal is implemented in ChainDescriptorBuilder.cpp.
 const ChainDescriptor linear_3_chain =
-    steamrot::logic::ChainDescriptorBuilder{}
+    steamrot::logic::descriptors::ChainDescriptorBuilder{}
         .StartWith(is_terminal)
         .Then(is_serial)
         .End(is_terminal);
@@ -341,14 +341,20 @@ in "descriptors_graph_descriptors.cpp"
 
 ```cpp
 // "Does the graph contain at least one terminal fragment?"
-steamrot::GraphDescriptor has_terminal_fragment =
-    steamrot::descriptors::any_node_satisfies(
-        steamrot::descriptors::lift(agm::and_(agm::is_terminal, agm::is_fragment)));
+steamrot::logic::descriptors::GraphDescriptor has_terminal_fragment =
+    steamrot::logic::descriptors::any_node_satisfies(
+        steamrot::logic::descriptors::lift(
+            steamrot::logic::descriptors::and_(
+                steamrot::logic::descriptors::is_terminal,
+                steamrot::logic::descriptors::is_fragment)));
 
 // "Are all nodes either a fragment or a joint?"
-steamrot::GraphDescriptor all_known_types =
-    steamrot::descriptors::all_nodes_satisfy(
-        steamrot::descriptors::lift(agm::or_(agm::is_fragment, agm::is_joint)));
+steamrot::logic::descriptors::GraphDescriptor all_known_types =
+    steamrot::logic::descriptors::all_nodes_satisfy(
+        steamrot::logic::descriptors::lift(
+            steamrot::logic::descriptors::or_(
+                steamrot::logic::descriptors::is_fragment,
+                steamrot::logic::descriptors::is_joint)));
 
 // Evaluate
 if (has_terminal_fragment(graph)) {
@@ -360,32 +366,34 @@ if (has_terminal_fragment(graph)) {
 
 ## Lifting and Composing Descriptors
 
-| Operation                                       | Input → Output                                | Purpose                                               |
-| ----------------------------------------------- | --------------------------------------------- | ----------------------------------------------------- |
-| `steamrot::descriptors::lift(nd)`               | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
-| `steamrot::descriptors::lift_to_chain(nd)`      | `NodeDescriptor` → `ChainDescriptor`          | Same, typed as `ChainDescriptor`                      |
-| `steamrot::descriptors::any_node_satisfies(cd)` | `ChainDescriptor` → `GraphDescriptor`         | True if any node satisfies `cd`                       |
-| `steamrot::descriptors::all_nodes_satisfy(cd)`  | `ChainDescriptor` → `GraphDescriptor`         | True if every node satisfies `cd`                     |
-| `steamrot::descriptors::and_(a, b)`             | `Desc × Desc` → `Desc`                        | Both must be true; same level required                |
-| `steamrot::descriptors::or_(a, b)`              | `Desc × Desc` → `Desc`                        | Either must be true; same level required              |
-| `steamrot::descriptors::not_(a)`                | `Desc` → `Desc`                               | Negate; same level required                           |
+| Operation                                                          | Input → Output                                | Purpose                                               |
+| ------------------------------------------------------------------ | --------------------------------------------- | ----------------------------------------------------- |
+| `steamrot::logic::descriptors::lift(nd)`                           | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
+| `steamrot::logic::descriptors::lift_to_chain(nd)`                  | `NodeDescriptor` → `ChainDescriptor`          | Same, typed as `ChainDescriptor`                      |
+| `steamrot::logic::descriptors::any_node_satisfies(cd)`             | `ChainDescriptor` → `GraphDescriptor`         | True if any node satisfies `cd`                       |
+| `steamrot::logic::descriptors::all_nodes_satisfy(cd)`              | `ChainDescriptor` → `GraphDescriptor`         | True if every node satisfies `cd`                     |
+| `steamrot::logic::descriptors::and_(a, b)`                         | `Desc × Desc` → `Desc`                        | Both must be true; same level required                |
+| `steamrot::logic::descriptors::or_(a, b)`                          | `Desc × Desc` → `Desc`                        | Either must be true; same level required              |
+| `steamrot::logic::descriptors::not_(a)`                            | `Desc` → `Desc`                               | Negate; same level required                           |
 
-> **Note:** When working inside `analysis_grimoire_machina.h/cpp`, the `and_`,
-> `or_`, and `not_` combinators are available as `agm::and_`, `agm::or_`,
-> `agm::not_` via the `using steamrot::descriptors::and_` declarations in
-> `analysis_grimoire_machina.h`. The full `steamrot::descriptors::` prefix is
-> always valid from any context.
+> **Note:** All combinators and lifting utilities live in the
+> `steamrot::logic::descriptors` namespace (defined in
+> `src/logic/descriptors/descriptors_general.h` and the individual type headers).
+> Use `namespace descriptors = steamrot::logic::descriptors;` for brevity in
+> implementation files.
 
 ### Example: composing without declaring a new descriptor
 
 ```cpp
+namespace descriptors = steamrot::logic::descriptors;
+
 // "Is this node a fragment with exactly 1 edge?"
-steamrot::NodeDescriptor is_terminal_fragment =
-    agm::and_(agm::is_fragment, agm::is_terminal);
+descriptors::NodeDescriptor is_terminal_fragment =
+    descriptors::and_(descriptors::is_fragment, descriptors::is_terminal);
 
 // Lift to work in a ContextualNodeDescriptor context
-steamrot::ContextualNodeDescriptor cnd =
-    steamrot::descriptors::lift(is_terminal_fragment);
+descriptors::ContextualNodeDescriptor cnd =
+    descriptors::lift(is_terminal_fragment);
 ```
 
 ---
@@ -393,7 +401,7 @@ steamrot::ContextualNodeDescriptor cnd =
 ## Testing Descriptors
 
 All descriptor tests live in
-`tests/unit/logic/analysis_grimoire_machina.test.cpp`.
+`tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp`.
 
 ### Using CheckNodeDescriptorForAllScenarios
 
@@ -404,13 +412,15 @@ This helper runs a `NodeDescriptor` against every pre-built topology stored in
 insertion order. Mismatching the order silently flips expected values.
 
 ```cpp
+namespace descriptors = steamrot::logic::descriptors;
+
 TEST_CASE("my_descriptor tests", "[unit][analysis][grimoire_machina]") {
   steamrot::tests::TestPartLibrary lib =
       steamrot::tests::TestPartLibrary::Create();
 
   SECTION("Analyses all ScaffoldScenarios correctly") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
-        agm::my_descriptor,
+        descriptors::my_descriptor,
         {// fragments first, then joints, per scenario
          .linear_chain   = {/* 2 fragments */ true, false,
                             /* 1 joint    */ false},
@@ -438,13 +448,15 @@ TEST_CASE("my_descriptor tests", "[unit][analysis][grimoire_machina]") {
 Use `PartLibraryBuilder` for topologies not covered by the standard scenarios:
 
 ```cpp
+namespace descriptors = steamrot::logic::descriptors;
+
 steamrot::tests::PartLibraryBuilder builder{lib};
 // fragment[0].socket[0] → joint[0].socket[0]
 steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
     {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
-steamrot::PartGraph graph = agm::build_part_graph(result.scaffold);
+steamrot::PartGraph graph = descriptors::build_part_graph(result.scaffold);
 
-REQUIRE(agm::my_descriptor(graph.nodes[0]));
+REQUIRE(descriptors::my_descriptor(graph.nodes[0]));
 ```
 
 ### Testing ContextualNodeDescriptors and ChainDescriptors
@@ -452,7 +464,10 @@ REQUIRE(agm::my_descriptor(graph.nodes[0]));
 Pass graph + node:
 
 ```cpp
-steamrot::ContextualNodeDescriptor cnd = agm::is_connected_to(agm::is_fragment);
+namespace descriptors = steamrot::logic::descriptors;
+
+descriptors::ContextualNodeDescriptor cnd =
+    descriptors::is_connected_to(descriptors::is_fragment);
 REQUIRE(cnd(graph, graph.nodes[1]));
 ```
 
@@ -461,9 +476,11 @@ REQUIRE(cnd(graph, graph.nodes[1]));
 Pass the whole graph:
 
 ```cpp
-steamrot::GraphDescriptor gd =
-    steamrot::descriptors::any_node_satisfies(
-        steamrot::descriptors::lift(agm::is_terminal));
+namespace descriptors = steamrot::logic::descriptors;
+
+descriptors::GraphDescriptor gd =
+    descriptors::any_node_satisfies(
+        descriptors::lift(descriptors::is_terminal));
 REQUIRE(gd(graph));
 ```
 
@@ -481,7 +498,8 @@ write a factory function that returns a descriptor by value:
 NodeDescriptor has_exactly_n_edges(size_t n);
 
 // Use
-steamrot::NodeDescriptor has_two = agm::has_exactly_n_edges(2);
+namespace descriptors = steamrot::logic::descriptors;
+descriptors::NodeDescriptor has_two = descriptors::has_exactly_n_edges(2);
 ```
 
 ### Named constant descriptors
@@ -507,7 +525,7 @@ piece independently testable.
 
 The following are planned but not yet implemented:
 
-1. **ChainDescriptorBuilder DFS traversal** (`descriptor_ops.h` TODO)  
+1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO)  
    The builder captures the step list but `End()` always returns `false`. A
    depth-first walk from the anchor node, matching each step predicate in order,
    needs to be written. Cycle detection (mark visited nodes) and branching
@@ -515,7 +533,7 @@ The following are planned but not yet implemented:
 
 2. **ContextualNodeDescriptor modifier library**  
    Common factories (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not
-   yet declared in `analysis_grimoire_machina.h`. Add them as needed following
+   yet declared in `descriptors_node_descriptors.h`. Add them as needed following
    the `ContextualNodeDescriptor` pattern above.
 
 3. **GraphDescriptor consumption in Logic**  
@@ -570,9 +588,9 @@ The following are planned but not yet implemented:
 
 - [ ] Chose the correct descriptor level using the decision flowchart
 - [ ] Checked whether existing descriptors can be composed instead
-- [ ] Declared the descriptor in `analysis_grimoire_machina.h`
-- [ ] Defined the descriptor in `analysis_grimoire_machina.cpp`
-- [ ] Added a `TEST_CASE` in `analysis_grimoire_machina.test.cpp`
+- [ ] Declared the descriptor in `descriptors_node_descriptors.h` (or appropriate level header)
+- [ ] Defined the descriptor in `descriptors_node_descriptors.cpp` (or appropriate level source)
+- [ ] Added a `TEST_CASE` in `descriptors/descriptors_node_descriptors.test.cpp`
 - [ ] Used `CheckNodeDescriptorForAllScenarios` for named constants
 - [ ] Verified arrays are fragments-first, then joints
 - [ ] Built and all tests pass
