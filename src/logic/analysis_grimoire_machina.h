@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "ChainDescriptorBuilder.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraph.h"
 #include "descriptor_ops.h"
@@ -102,11 +103,12 @@ extern const NodeDescriptor is_terminal;
 /////////////////////////////////////////////////
 /// Predicate combinators
 ///
-/// Brought in from descriptor_ops.h. Work uniformly across NodeDescriptor,
-/// ContextualNodeDescriptor, ChainDescriptor, and GraphDescriptor.
+/// Brought in from descriptor_ops.h (steamrot::descriptors namespace).
+/// Work uniformly across NodeDescriptor, ContextualNodeDescriptor,
+/// ChainDescriptor, and GraphDescriptor.
 /////////////////////////////////////////////////
-using steamrot::and_;
-using steamrot::not_;
-using steamrot::or_;
+using steamrot::descriptors::and_;
+using steamrot::descriptors::not_;
+using steamrot::descriptors::or_;
 
 } // namespace steamrot::logic::analysis::grimoire_machina

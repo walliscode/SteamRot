@@ -158,8 +158,9 @@ using EdgeDescriptor = std::function<bool(const PartEdge &)>;
 /// Use when the predicate needs to examine neighbouring nodes via the graph
 /// but does not need to walk further than one hop from the anchor.
 ///
-/// Obtain instances from the modifier free functions in @c descriptor_ops.h
-/// (e.g. @c is_connected_to, @c exactly_n_of).
+/// Obtain instances from the modifier free functions in
+/// @c steamrot::descriptors (see @c descriptor_ops.h),
+/// e.g. @c is_connected_to, @c exactly_n_of.
 /////////////////////////////////////////////////
 using ContextualNodeDescriptor =
     std::function<bool(const PartGraph &, const PartNode &)>;
@@ -173,7 +174,8 @@ using ContextualNodeDescriptor =
 /// 3-node linear chain begin here?") rather than a question about the
 /// start node alone.
 ///
-/// Build instances with @c ChainDescriptorBuilder in @c descriptor_ops.h.
+/// Build instances with @c steamrot::logic::ChainDescriptorBuilder
+/// (see @c ChainDescriptorBuilder.h in @c src/logic/).
 /////////////////////////////////////////////////
 using ChainDescriptor =
     std::function<bool(const PartGraph &, const PartNode &)>;
@@ -182,8 +184,8 @@ using ChainDescriptor =
 /// @brief Predicate for the whole graph with no anchor node.
 ///
 /// Any callable with signature @c bool(const PartGraph&) qualifies.
-/// Derive instances via @c any_node_satisfies() or @c all_nodes_satisfy()
-/// in @c descriptor_ops.h.
+/// Derive instances via @c steamrot::descriptors::any_node_satisfies() or
+/// @c steamrot::descriptors::all_nodes_satisfy() in @c descriptor_ops.h.
 ///
 /// @c GraphDescriptor is the terminal type in the hierarchy — it is only
 /// consumed by Logic/Action classes and is never passed back into a modifier.

@@ -20,10 +20,12 @@ narrowest to broadest scope:
 | `ChainDescriptor` | `bool(const PartGraph&, const PartNode&)` | Multi-hop walk from one anchor |
 | `GraphDescriptor` | `bool(const PartGraph&)` | Whole graph, no anchor |
 
-All four type aliases live in `src/types/entity/PartGraph.h`.
-The generic operations (`lift`, `and_`, `or_`, `not_`, `any_node_satisfies`,
-`all_nodes_satisfy`, `ChainDescriptorBuilder`) live in
-`src/types/entity/descriptor_ops.h`.
+All four type aliases live in `src/types/entity/PartGraph.h` in the `steamrot` namespace.
+The lifting utilities, graph queries, and generic combinators (`lift`, `and_`, `or_`,
+`not_`, `any_node_satisfies`, `all_nodes_satisfy`) live in
+`src/types/entity/descriptor_ops.h` under the `steamrot::descriptors` namespace.
+`ChainDescriptorBuilder` lives in `src/logic/ChainDescriptorBuilder.h` under the
+`steamrot::logic` namespace.
 
 ---
 
@@ -69,8 +71,9 @@ Key rules:
 | `NodeDescriptor` constants/factories | `src/logic/analysis_grimoire_machina.cpp` |
 | `ContextualNodeDescriptor` modifiers | `src/logic/analysis_grimoire_machina.cpp` |
 | `ChainDescriptor` (via builder) | `src/logic/analysis_grimoire_machina.cpp` |
-| `GraphDescriptor` | Derived in the Logic/Action layer via `any_node_satisfies` |
-| Generic infrastructure | `src/types/entity/descriptor_ops.h` (header-only) |
+| `GraphDescriptor` | Derived in the Logic/Action layer via `steamrot::descriptors::any_node_satisfies` |
+| Lifting / combinators / graph queries | `src/types/entity/descriptor_ops.h` — `steamrot::descriptors` namespace |
+| `ChainDescriptorBuilder` | `src/logic/ChainDescriptorBuilder.h` — `steamrot::logic` namespace |
 
 Declare new descriptors in the matching `.h` file and define them in the `.cpp`.
 Follow the `extern const NodeDescriptor name;` pattern for named predicates,
@@ -174,13 +177,13 @@ A chain descriptor answers a structural question about a walk from one node.
 
 ### 6a. Use ChainDescriptorBuilder
 
-`ChainDescriptorBuilder` lives in `descriptor_ops.h` and is available via
-the `steamrot` namespace.
+`ChainDescriptorBuilder` lives in `src/logic/ChainDescriptorBuilder.h` in the
+`steamrot::logic` namespace.
 
 ```cpp
 // In analysis_grimoire_machina.cpp
 const ChainDescriptor linear_3_chain =
-    steamrot::ChainDescriptorBuilder{}
+    steamrot::logic::ChainDescriptorBuilder{}
         .StartWith(is_terminal)
         .Then(is_serial)
         .End(is_terminal);
@@ -191,7 +194,7 @@ Declare it in the header as `extern const ChainDescriptor linear_3_chain;`.
 ### 6b. Wait for DFS implementation
 
 `ChainDescriptorBuilder::End()` currently returns a descriptor that always
-returns `false`. The TODO comment in `descriptor_ops.h` marks the DFS
+returns `false`. The TODO comment in `ChainDescriptorBuilder.h` marks the DFS
 traversal work needed. Do not write tests that expect `true` results from
 `ChainDescriptorBuilder` until the traversal is implemented.
 
@@ -200,18 +203,19 @@ traversal work needed. Do not write tests that expect `true` results from
 ## 7. Step-by-step: adding a GraphDescriptor
 
 `GraphDescriptor` is always derived, never written from scratch. Use
-`any_node_satisfies` or `all_nodes_satisfy` from `descriptor_ops.h`:
+`any_node_satisfies` or `all_nodes_satisfy` from `steamrot::descriptors`
+(`src/types/entity/descriptor_ops.h`):
 
 ```cpp
 // "Does the graph contain at least one terminal fragment?"
 GraphDescriptor has_terminal_fragment =
-    steamrot::any_node_satisfies(
-        steamrot::lift(agm::and_(agm::is_terminal, agm::is_fragment)));
+    steamrot::descriptors::any_node_satisfies(
+        steamrot::descriptors::lift(agm::and_(agm::is_terminal, agm::is_fragment)));
 
 // "Are all nodes either fragments or joints?" (always true by construction)
 GraphDescriptor all_known_types =
-    steamrot::all_nodes_satisfy(
-        steamrot::lift(agm::or_(agm::is_fragment, agm::is_joint)));
+    steamrot::descriptors::all_nodes_satisfy(
+        steamrot::descriptors::lift(agm::or_(agm::is_fragment, agm::is_joint)));
 ```
 
 `GraphDescriptor` instances are consumed in Logic/Action classes (e.g.
@@ -276,7 +280,8 @@ REQUIRE(cnd(graph, graph.nodes[0]));
 
 ```cpp
 steamrot::GraphDescriptor gd =
-    steamrot::any_node_satisfies(steamrot::lift(agm::is_terminal));
+    steamrot::descriptors::any_node_satisfies(
+        steamrot::descriptors::lift(agm::is_terminal));
 REQUIRE(gd(graph));
 ```
 
@@ -291,16 +296,18 @@ REQUIRE(gd(graph));
 
 | Operation | Signature | Purpose |
 |---|---|---|
-| `lift(nd)` | `NodeDescriptor → ContextualNodeDescriptor` | Ignore the graph, apply nd to the node |
-| `lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Same as lift but typed as ChainDescriptor |
-| `any_node_satisfies(cd)` | `ChainDescriptor → GraphDescriptor` | True if any node satisfies cd |
-| `all_nodes_satisfy(cd)` | `ChainDescriptor → GraphDescriptor` | True if every node satisfies cd |
-| `and_(a, b)` | `Desc × Desc → Desc` | Both must be true; works at any level |
-| `or_(a, b)` | `Desc × Desc → Desc` | Either must be true; works at any level |
-| `not_(a)` | `Desc → Desc` | Negate; works at any level |
+| `steamrot::descriptors::lift(nd)` | `NodeDescriptor → ContextualNodeDescriptor` | Ignore the graph, apply nd to the node |
+| `steamrot::descriptors::lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Same as lift but typed as ChainDescriptor |
+| `steamrot::descriptors::any_node_satisfies(cd)` | `ChainDescriptor → GraphDescriptor` | True if any node satisfies cd |
+| `steamrot::descriptors::all_nodes_satisfy(cd)` | `ChainDescriptor → GraphDescriptor` | True if every node satisfies cd |
+| `agm::and_(a, b)` | `Desc × Desc → Desc` | Both must be true; works at any level |
+| `agm::or_(a, b)` | `Desc × Desc → Desc` | Either must be true; works at any level |
+| `agm::not_(a)` | `Desc → Desc` | Negate; works at any level |
 
 `and_`, `or_`, `not_` are templated — both arguments must be the **same**
-descriptor level. Mixing levels is a compile error.
+descriptor level. Mixing levels is a compile error. They live in
+`steamrot::descriptors` and are brought into `agm::` via `using` declarations
+in `analysis_grimoire_machina.h`.
 
 ---
 
@@ -308,7 +315,7 @@ descriptor level. Mixing levels is a compile error.
 
 The following are not yet implemented and represent planned work:
 
-1. **ChainDescriptorBuilder DFS traversal** (`descriptor_ops.h` TODO).
+1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO).
    The builder captures the step list but the `End()` method always returns
    `false`. A depth-first walk from the anchor node, matching each step
    predicate in order, needs to be implemented. Consider handling cycles
@@ -356,13 +363,14 @@ The following are not yet implemented and represent planned work:
 - Node order in `ScaffoldScenarioExpectations` arrays is **fragments first,
   then joints** — mismatching the order silently flips expected values.
 - `ChainDescriptorBuilder::End()` always returns `false` until the DFS
-  traversal is implemented (see section 10).
+  traversal is implemented (see section 10). The TODO is in
+  `src/logic/ChainDescriptorBuilder.h`.
 
 ## Related files
 
-- `src/types/entity/PartGraph.h` — type aliases for all four descriptor levels
-- `src/types/entity/descriptor_ops.h` — lift, combinators, graph queries,
-  ChainDescriptorBuilder
+- `src/types/entity/PartGraph.h` — type aliases for all four descriptor levels (`steamrot` namespace)
+- `src/types/entity/descriptor_ops.h` — lift, combinators, graph queries (`steamrot::descriptors` namespace)
+- `src/logic/ChainDescriptorBuilder.h` — `ChainDescriptorBuilder` class (`steamrot::logic` namespace)
 - `src/logic/analysis_grimoire_machina.h` / `.cpp` — concrete descriptors and
   `build_part_graph`
 - `tests/unit/logic/analysis_grimoire_machina.test.cpp` — descriptor tests

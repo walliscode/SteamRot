@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Generic combinators, lifting utilities, and ChainDescriptorBuilder
-///        for the four-level descriptor hierarchy.
+/// @brief Generic lifting utilities, graph-level query builders, and
+///        combinators for the four-level descriptor hierarchy.
 ///
 /// Descriptor hierarchy (narrowest to broadest scope):
 ///   NodeDescriptor             bool(const PartNode&)
@@ -9,13 +9,17 @@
 ///   ChainDescriptor            bool(const PartGraph&, const PartNode& start)
 ///   GraphDescriptor            bool(const PartGraph&)
 ///
+/// All functions live in steamrot::descriptors.
+///
 /// Use lift() to widen a NodeDescriptor into a ContextualNodeDescriptor or
 /// ChainDescriptor without changing its logic.
 /// Use any_node_satisfies() / all_nodes_satisfy() to derive a GraphDescriptor
 /// from a ChainDescriptor or ContextualNodeDescriptor.
-/// Use ChainDescriptorBuilder to build multi-hop ChainDescriptors.
 /// Use and_(), or_(), not_() as generic combinators across all descriptor
 /// levels.
+///
+/// For building multi-hop ChainDescriptors, see ChainDescriptorBuilder in
+/// src/logic/ChainDescriptorBuilder.h.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -28,9 +32,8 @@
 /////////////////////////////////////////////////
 #include "PartGraph.h"
 #include <utility>
-#include <vector>
 
-namespace steamrot {
+namespace steamrot::descriptors {
 
 /////////////////////////////////////////////////
 /// Lifting utilities
@@ -158,73 +161,4 @@ template <typename Desc> Desc not_(Desc a) {
   };
 }
 
-/////////////////////////////////////////////////
-/// @class ChainDescriptorBuilder
-/// @brief Builds a ChainDescriptor from an ordered list of NodeDescriptor
-///        steps matched against a DFS walk through the PartGraph.
-///
-/// Usage:
-/// @code
-/// ChainDescriptor linear_3 =
-///     ChainDescriptorBuilder{}
-///         .StartWith(is_terminal)
-///         .Then(is_serial)
-///         .End(is_terminal);
-/// @endcode
-///
-/// @note Multi-hop DFS traversal is not yet implemented. The built descriptor
-///       always returns false until the TODO below is resolved.
-/////////////////////////////////////////////////
-class ChainDescriptorBuilder {
-public:
-  /////////////////////////////////////////////////
-  /// @brief Set the predicate for the start node of the chain.
-  ///
-  /// @param nd NodeDescriptor to apply to the first node.
-  /// @return *this for method chaining.
-  /////////////////////////////////////////////////
-  ChainDescriptorBuilder &StartWith(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    return *this;
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Append a predicate for the next node in the walk.
-  ///
-  /// May be called zero or more times between StartWith() and End().
-  ///
-  /// @param nd NodeDescriptor to apply to the next node in the walk.
-  /// @return *this for method chaining.
-  /////////////////////////////////////////////////
-  ChainDescriptorBuilder &Then(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    return *this;
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Append the predicate for the final node and build the descriptor.
-  ///
-  /// @param nd NodeDescriptor to apply to the last node.
-  /// @return ChainDescriptor representing the full walk pattern.
-  /////////////////////////////////////////////////
-  ChainDescriptor End(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    // TODO: implement DFS traversal over the PartGraph using m_steps.
-    // Walk starting from the anchor node, following edges, and verify each
-    // visited node against the corresponding step predicate in order.
-    // Return true only when a complete path matching all steps is found.
-    return [steps = std::move(m_steps)](const PartGraph & /*graph*/,
-                                        const PartNode & /*start*/) -> bool {
-      (void)steps;
-      return false;
-    };
-  }
-
-private:
-  /////////////////////////////////////////////////
-  /// @brief Ordered node predicates from StartWith() through End().
-  /////////////////////////////////////////////////
-  std::vector<NodeDescriptor> m_steps{};
-};
-
-} // namespace steamrot
+} // namespace steamrot::descriptors
