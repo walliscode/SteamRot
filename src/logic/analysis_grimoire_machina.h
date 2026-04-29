@@ -13,8 +13,10 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "ChainDescriptorBuilder.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraph.h"
+#include "descriptor_ops.h"
 #include <cstddef>
 
 namespace steamrot::logic::analysis::grimoire_machina {
@@ -100,46 +102,13 @@ extern const NodeDescriptor is_terminal;
 
 /////////////////////////////////////////////////
 /// Predicate combinators
-/////////////////////////////////////////////////
-
-/////////////////////////////////////////////////
-/// @brief Return a new descriptor that is true when both @p a and @p b are
-/// true.
 ///
-/// @param a First descriptor.
-/// @param b Second descriptor.
-/// @return Combined descriptor returning @c a(x) && b(x).
+/// Brought in from descriptor_ops.h (steamrot::descriptors namespace).
+/// Work uniformly across NodeDescriptor, ContextualNodeDescriptor,
+/// ChainDescriptor, and GraphDescriptor.
 /////////////////////////////////////////////////
-template <typename NodeDescriptor>
-NodeDescriptor and_(NodeDescriptor a, NodeDescriptor b) {
-  return [a = std::move(a), b = std::move(b)](const PartNode &part_node) {
-    return a(part_node) && b(part_node);
-  };
-}
-
-/////////////////////////////////////////////////
-/// @brief Return a new descriptor that is true when either @p a or @p b is
-/// true.
-///
-/// @param a First descriptor.
-/// @param b Second descriptor.
-/// @return Combined descriptor returning @c a(x) || b(x).
-/////////////////////////////////////////////////
-template <typename Descriptor> Descriptor or_(Descriptor a, Descriptor b) {
-  return [a = std::move(a), b = std::move(b)](const PartNode &part_node) {
-    return a(part_node) || b(part_node);
-  };
-}
-
-/////////////////////////////////////////////////
-/// @brief Return a new descriptor that negates @p a.
-///
-/// @param a Descriptor to negate.
-/// @return Descriptor returning @c !a(x).
-/////////////////////////////////////////////////
-template <typename NodeDescriptor> NodeDescriptor not_(NodeDescriptor a) {
-  return
-      [a = std::move(a)](const PartNode &part_node) { return !a(part_node); };
-}
+using steamrot::descriptors::and_;
+using steamrot::descriptors::not_;
+using steamrot::descriptors::or_;
 
 } // namespace steamrot::logic::analysis::grimoire_machina
