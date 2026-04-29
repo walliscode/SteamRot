@@ -11,7 +11,7 @@
 #include "MachinaFormScaffold.h"
 #include "PartGraph.h"
 #include "ViewDirection.h"
-#include "analysis_grimoire_machina.h"
+#include "descriptors_general.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -366,15 +366,14 @@ PartLibraryBuilder::GetScenarioForModification(ScaffoldScenario scenario) {
 
 /////////////////////////////////////////////////
 void CheckNodeDescriptorForAllScenarios(
-    const steamrot::NodeDescriptor &descriptor,
+    const logic::descriptors::NodeDescriptor &descriptor,
     const ScaffoldScenarioExpectations &expected, const TestPartLibrary &lib) {
-  namespace agm = steamrot::logic::analysis::grimoire_machina;
 
   {
     INFO("ScaffoldScenario::LinearChain");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == expected.linear_chain.size());
     for (size_t i = 0; i < expected.linear_chain.size(); ++i) {
       INFO("node index " << i);
@@ -386,7 +385,7 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::Ring");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::Ring);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == expected.ring.size());
     for (size_t i = 0; i < expected.ring.size(); ++i) {
       INFO("node index " << i);
@@ -398,7 +397,7 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::IsolatedPair");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::IsolatedPair);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == expected.isolated_pair.size());
     for (size_t i = 0; i < expected.isolated_pair.size(); ++i) {
       INFO("node index " << i);
@@ -410,7 +409,7 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::SimpleBranch");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::SimpleBranch);
-    steamrot::PartGraph graph = agm::build_part_graph(scaffold);
+    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
     REQUIRE(graph.nodes.size() == expected.simple_branch.size());
     for (size_t i = 0; i < expected.simple_branch.size(); ++i) {
       INFO("node index " << i);

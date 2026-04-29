@@ -47,12 +47,17 @@ add_library(logic
 
   collision_grimoire_machina.cpp
 
-  analysis_grimoire_machina.cpp
+  # descriptors
+  descriptors/ChainDescriptorBuilder.cpp
+  descriptors/descriptors_general.cpp
+  descriptors/descriptors_node_descriptors.cpp
+  descriptors/descriptors_chain_descriptors.cpp
 )
 
 target_include_directories(logic
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/descriptors
 )
 
 target_link_libraries(logic

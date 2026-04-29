@@ -49,7 +49,7 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
-#include "PartGraph.h"
+#include "descriptors_node_descriptors.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <array>
 #include <cstdint>
@@ -290,7 +290,7 @@ struct ScaffoldScenarioExpectations {
 /// @param lib        TestPartLibrary whose scaffold_scenarios are used.
 /////////////////////////////////////////////////
 void CheckNodeDescriptorForAllScenarios(
-    const steamrot::NodeDescriptor &descriptor,
+    const steamrot::logic::descriptors::NodeDescriptor &descriptor,
     const ScaffoldScenarioExpectations &expected, const TestPartLibrary &lib);
 
 /////////////////////////////////////////////////

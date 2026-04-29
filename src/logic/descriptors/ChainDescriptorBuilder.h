@@ -12,9 +12,10 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "PartGraph.h"
+#include "descriptors_node_descriptors.h"
 #include <vector>
 
-namespace steamrot::logic {
+namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
 /// @class ChainDescriptorBuilder
@@ -43,6 +44,13 @@ namespace steamrot::logic {
 ///       always returns false until the TODO below is resolved.
 /////////////////////////////////////////////////
 class ChainDescriptorBuilder {
+
+private:
+  /////////////////////////////////////////////////
+  /// @brief Ordered node predicates from StartWith() through End().
+  /////////////////////////////////////////////////
+  std::vector<NodeDescriptor> m_steps{};
+
 public:
   /////////////////////////////////////////////////
   /// @brief Set the predicate for the start node of the chain.
@@ -50,10 +58,7 @@ public:
   /// @param nd NodeDescriptor to apply to the first node.
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
-  ChainDescriptorBuilder &StartWith(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    return *this;
-  }
+  ChainDescriptorBuilder &StartWith(NodeDescriptor nd);
 
   /////////////////////////////////////////////////
   /// @brief Append a predicate for the next node in the walk.
@@ -63,10 +68,7 @@ public:
   /// @param nd NodeDescriptor to apply to the next node in the walk.
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
-  ChainDescriptorBuilder &Then(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    return *this;
-  }
+  ChainDescriptorBuilder &Then(NodeDescriptor nd);
 
   /////////////////////////////////////////////////
   /// @brief Append the predicate for the final node and build the descriptor.
@@ -74,24 +76,6 @@ public:
   /// @param nd NodeDescriptor to apply to the last node.
   /// @return ChainDescriptor representing the full walk pattern.
   /////////////////////////////////////////////////
-  ChainDescriptor End(NodeDescriptor nd) {
-    m_steps.push_back(std::move(nd));
-    // TODO: implement DFS traversal over the PartGraph using m_steps.
-    // Walk starting from the anchor node, following edges, and verify each
-    // visited node against the corresponding step predicate in order.
-    // Return true only when a complete path matching all steps is found.
-    return [steps = std::move(m_steps)](const PartGraph & /*graph*/,
-                                        const PartNode & /*start*/) -> bool {
-      (void)steps;
-      return false;
-    };
-  }
-
-private:
-  /////////////////////////////////////////////////
-  /// @brief Ordered node predicates from StartWith() through End().
-  /////////////////////////////////////////////////
-  std::vector<NodeDescriptor> m_steps{};
+  ChainDescriptor End(NodeDescriptor nd);
 };
-
-} // namespace steamrot::logic
+} // namespace steamrot::logic::descriptors

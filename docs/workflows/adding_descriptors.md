@@ -41,18 +41,19 @@ structure, with one `PartNode` per part and one `PartEdge` per connection.
 
 There are four descriptor levels, ordered from narrowest to broadest scope:
 
-| Level | Type alias | Signature |
-| --- | --- | --- |
-| Node | `NodeDescriptor` | `bool(const PartNode&)` |
+| Level           | Type alias                 | Signature                                 |
+| --------------- | -------------------------- | ----------------------------------------- |
+| Node            | `NodeDescriptor`           | `bool(const PartNode&)`                   |
 | Contextual node | `ContextualNodeDescriptor` | `bool(const PartGraph&, const PartNode&)` |
-| Chain | `ChainDescriptor` | `bool(const PartGraph&, const PartNode&)` |
-| Graph | `GraphDescriptor` | `bool(const PartGraph&)` |
+| Chain           | `ChainDescriptor`          | `bool(const PartGraph&, const PartNode&)` |
+| Graph           | `GraphDescriptor`          | `bool(const PartGraph&)`                  |
 
-All four aliases live in `src/types/entity/PartGraph.h` in the `steamrot` namespace.
-Generic lifting utilities, graph queries, and combinators live in
-`src/logic/descriptor_ops.h` under the `steamrot::descriptors` namespace.
-The `ChainDescriptorBuilder` class lives in `src/logic/ChainDescriptorBuilder.h`
-under the `steamrot::logic` namespace.
+The four aliases live in their respective files in `src/logic/descriptors/` in
+the `steamrot::logic::descriptors` namespace. Generic lifting utilities, graph
+queries, and combinators live in `src/logic/descriptors/descriptors_general.h`.
+The `ChainDescriptorBuilder` class lives in
+`src/logic/descriptors/ChainDescriptorBuilder.h` under the
+`steamrot::logic::descriptors` namespace.
 
 ---
 
@@ -87,8 +88,8 @@ GraphDescriptor          bool(const PartGraph&)
 - `GraphDescriptor` is **terminal**. It is consumed in Logic/Action classes to
   gate gameplay decisions. Never pass a `GraphDescriptor` into a combinator or
   modifier.
-- Combinators (`and_`, `or_`, `not_`) are generic templates. Both arguments
-  must be the **same descriptor level** — mixing levels is a compile error.
+- Combinators (`and_`, `or_`, `not_`) are generic templates. Both arguments must
+  be the **same descriptor level** — mixing levels is a compile error.
 
 ---
 
@@ -133,24 +134,6 @@ Start: I need to query something about the assembled machine.
 
 ---
 
-## Key Files
-
-| File | Purpose |
-| --- | --- |
-| `src/types/entity/PartGraph.h` | Type aliases for all four descriptor levels (`steamrot` namespace) |
-| `src/logic/descriptor_ops.h` | `lift`, `lift_to_chain`, combinators, graph queries (`steamrot::descriptors` namespace) |
-| `src/logic/ChainDescriptorBuilder.h` | `ChainDescriptorBuilder` class (`steamrot::logic` namespace) |
-| `src/logic/analysis_grimoire_machina.h` | Declarations of concrete descriptors and `build_part_graph` |
-| `src/logic/analysis_grimoire_machina.cpp` | Definitions of concrete descriptors and `build_part_graph` |
-| `tests/unit/logic/analysis_grimoire_machina.test.cpp` | Descriptor unit tests |
-| `tests/unit/logic/part_library.h` / `.cpp` | `TestPartLibrary`, `CheckNodeDescriptorForAllScenarios` |
-
-> **No CMake changes are needed.** All source files are already compiled into
-> the `logic` target; the test file is already listed in
-> `tests/unit/logic/CMakeLists.txt`.
-
----
-
 ## Step-by-Step Workflow
 
 ### Step 1: Choose the Correct Descriptor Level
@@ -160,11 +143,10 @@ above. If in doubt, start with the narrowest level that answers your question.
 
 ### Step 2: Declare the Descriptor
 
-Open `src/logic/analysis_grimoire_machina.h`.
+Open `src/logic/descriptors/descriptors_node_descriptors.h`.
 
-Add your declaration inside the
-`steamrot::logic::analysis::grimoire_machina` namespace, grouped with
-descriptors of the same level:
+Add your declaration inside the `steamrot::logic::descriptors` namespace,
+grouped with descriptors of the same level:
 
 ```cpp
 /////////////////////////////////////////////////
@@ -187,7 +169,7 @@ NodeDescriptor my_factory(size_t n);
 
 ### Step 3: Define the Descriptor
 
-Open `src/logic/analysis_grimoire_machina.cpp`.
+Open `src/logic/descriptors/descriptors_node_descriptors.cpp`.
 
 Add the definition inside the same namespace:
 
@@ -211,7 +193,7 @@ NodeDescriptor my_factory(size_t n) {
 
 ### Step 4: Write Unit Tests
 
-Open `tests/unit/logic/analysis_grimoire_machina.test.cpp`.
+Open `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp`.
 
 Add a `TEST_CASE` using `CheckNodeDescriptorForAllScenarios` (see
 [Testing Descriptors](#testing-descriptors)).
@@ -232,7 +214,7 @@ ctest --preset Debug -R analysis_grimoire_machina
 A `NodeDescriptor` answers a question about **one node's own data** — its type
 (fragment vs joint) or its edge count.
 
-#### Declaration (`analysis_grimoire_machina.h`)
+#### Declaration (`descriptors_node_descriptors.h`)
 
 ```cpp
 /////////////////////////////////////////////////
@@ -251,7 +233,7 @@ NodeDescriptor has_exactly_n_edges(size_t n);
 extern const NodeDescriptor is_terminal;
 ```
 
-#### Definition (`analysis_grimoire_machina.cpp`)
+#### Definition (`descriptors_node_descriptors.cpp`)
 
 ```cpp
 /////////////////////////////////////////////////
@@ -272,7 +254,7 @@ const NodeDescriptor is_terminal = has_maximum_n_edges(1);
 A `ContextualNodeDescriptor` answers a question about **a node and its direct
 neighbours** (depth-1 walk via `graph.edges`).
 
-#### Declaration (`analysis_grimoire_machina.h`)
+#### Declaration (`descriptors_node_descriptors.h`)
 
 ```cpp
 /////////////////////////////////////////////////
@@ -285,7 +267,7 @@ neighbours** (depth-1 walk via `graph.edges`).
 ContextualNodeDescriptor is_connected_to(NodeDescriptor nd);
 ```
 
-#### Definition (`analysis_grimoire_machina.cpp`)
+#### Definition (`descriptors_node_descriptors.cpp`)
 
 ```cpp
 /////////////////////////////////////////////////
@@ -312,9 +294,9 @@ ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
 
 A `ChainDescriptor` answers a structural question about a **multi-hop walk**
 from an anchor node. Use `ChainDescriptorBuilder` from
-`src/logic/ChainDescriptorBuilder.h` (`steamrot::logic` namespace).
+`src/logic/descriptors/ChainDescriptorBuilder.h`.
 
-#### Declaration (`analysis_grimoire_machina.h`)
+#### Declaration (`descriptors_chain_descriptors.h`)
 
 ```cpp
 /////////////////////////////////////////////////
@@ -324,12 +306,12 @@ from an anchor node. Use `ChainDescriptorBuilder` from
 extern const ChainDescriptor linear_3_chain;
 ```
 
-#### Definition (`analysis_grimoire_machina.cpp`)
+#### Definition (`descriptors_chain_descriptors.cpp`)
 
 ```cpp
 /////////////////////////////////////////////////
 // NOTE: ChainDescriptorBuilder::End() always returns false until the
-// DFS traversal is implemented in ChainDescriptorBuilder.h.
+// DFS traversal is implemented in ChainDescriptorBuilder.cpp.
 const ChainDescriptor linear_3_chain =
     steamrot::logic::ChainDescriptorBuilder{}
         .StartWith(is_terminal)
@@ -339,21 +321,21 @@ const ChainDescriptor linear_3_chain =
 
 > ⚠️ **DFS traversal is not yet implemented.** `ChainDescriptorBuilder::End()`
 > currently returns a descriptor that always returns `false`. Do not write tests
-> that expect `true` results until the TODO in `ChainDescriptorBuilder.h` is resolved.
+> that expect `true` results until the TODO in `ChainDescriptorBuilder.h` is
+> resolved.
 
 ---
 
 ### GraphDescriptor
 
 A `GraphDescriptor` answers a question about the **whole graph** — no anchor
-node. Always derive it from `any_node_satisfies` or `all_nodes_satisfy`;
-never write a `GraphDescriptor` lambda from scratch.
+node. Always derive it from `any_node_satisfies` or `all_nodes_satisfy`; never
+write a `GraphDescriptor` lambda from scratch.
 
 #### Where it lives
 
-`GraphDescriptor` instances are typically defined directly in the Logic or
-Action class that consumes them (e.g. `GrimoireMachinaActionLogic`), not in
-`analysis_grimoire_machina`.
+GraphDescriptors are declared in "descriptors_graph_descriptors.h" and defined
+in "descriptors_graph_descriptors.cpp"
 
 #### Example
 
@@ -378,15 +360,15 @@ if (has_terminal_fragment(graph)) {
 
 ## Lifting and Composing Descriptors
 
-| Operation | Input → Output | Purpose |
-| --- | --- | --- |
-| `steamrot::descriptors::lift(nd)` | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
-| `steamrot::descriptors::lift_to_chain(nd)` | `NodeDescriptor` → `ChainDescriptor` | Same, typed as `ChainDescriptor` |
-| `steamrot::descriptors::any_node_satisfies(cd)` | `ChainDescriptor` → `GraphDescriptor` | True if any node satisfies `cd` |
-| `steamrot::descriptors::all_nodes_satisfy(cd)` | `ChainDescriptor` → `GraphDescriptor` | True if every node satisfies `cd` |
-| `steamrot::descriptors::and_(a, b)` | `Desc × Desc` → `Desc` | Both must be true; same level required |
-| `steamrot::descriptors::or_(a, b)` | `Desc × Desc` → `Desc` | Either must be true; same level required |
-| `steamrot::descriptors::not_(a)` | `Desc` → `Desc` | Negate; same level required |
+| Operation                                       | Input → Output                                | Purpose                                               |
+| ----------------------------------------------- | --------------------------------------------- | ----------------------------------------------------- |
+| `steamrot::descriptors::lift(nd)`               | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
+| `steamrot::descriptors::lift_to_chain(nd)`      | `NodeDescriptor` → `ChainDescriptor`          | Same, typed as `ChainDescriptor`                      |
+| `steamrot::descriptors::any_node_satisfies(cd)` | `ChainDescriptor` → `GraphDescriptor`         | True if any node satisfies `cd`                       |
+| `steamrot::descriptors::all_nodes_satisfy(cd)`  | `ChainDescriptor` → `GraphDescriptor`         | True if every node satisfies `cd`                     |
+| `steamrot::descriptors::and_(a, b)`             | `Desc × Desc` → `Desc`                        | Both must be true; same level required                |
+| `steamrot::descriptors::or_(a, b)`              | `Desc × Desc` → `Desc`                        | Either must be true; same level required              |
+| `steamrot::descriptors::not_(a)`                | `Desc` → `Desc`                               | Negate; same level required                           |
 
 > **Note:** When working inside `analysis_grimoire_machina.h/cpp`, the `and_`,
 > `or_`, and `not_` combinators are available as `agm::and_`, `agm::or_`,
@@ -444,12 +426,12 @@ TEST_CASE("my_descriptor tests", "[unit][analysis][grimoire_machina]") {
 
 ### Pre-built scaffold scenarios
 
-| Scenario key | Topology | Node count |
-| --- | --- | --- |
-| `LinearChain` | fragment – joint – fragment (both sockets connected) | 3 |
-| `Ring` | joint – joint – joint (ring of joints) | 3 |
-| `IsolatedPair` | fragment – fragment (no connections) | 2 |
-| `SimpleBranch` | three fragments all connected to one joint | 4 |
+| Scenario key   | Topology                                             | Node count |
+| -------------- | ---------------------------------------------------- | ---------- |
+| `LinearChain`  | fragment – joint – fragment (both sockets connected) | 3          |
+| `Ring`         | joint – joint – joint (ring of joints)               | 3          |
+| `IsolatedPair` | fragment – fragment (no connections)                 | 2          |
+| `SimpleBranch` | three fragments all connected to one joint           | 4          |
 
 ### Building a custom scaffold
 
@@ -515,8 +497,8 @@ extern const NodeDescriptor is_branched;   // at least 3 edges
 
 ### Building on existing descriptors
 
-Prefer composing existing descriptors with `and_`/`or_`/`not_` before writing
-a new lambda from scratch. This keeps the predicate vocabulary small and each
+Prefer composing existing descriptors with `and_`/`or_`/`not_` before writing a
+new lambda from scratch. This keeps the predicate vocabulary small and each
 piece independently testable.
 
 ---
@@ -527,14 +509,14 @@ The following are planned but not yet implemented:
 
 1. **ChainDescriptorBuilder DFS traversal** (`descriptor_ops.h` TODO)  
    The builder captures the step list but `End()` always returns `false`. A
-   depth-first walk from the anchor node, matching each step predicate in
-   order, needs to be written. Cycle detection (mark visited nodes) and
-   branching (match any valid path) should be considered.
+   depth-first walk from the anchor node, matching each step predicate in order,
+   needs to be written. Cycle detection (mark visited nodes) and branching
+   (match any valid path) should be considered.
 
 2. **ContextualNodeDescriptor modifier library**  
-   Common factories (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are
-   not yet declared in `analysis_grimoire_machina.h`. Add them as needed
-   following the `ContextualNodeDescriptor` pattern above.
+   Common factories (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not
+   yet declared in `analysis_grimoire_machina.h`. Add them as needed following
+   the `ContextualNodeDescriptor` pattern above.
 
 3. **GraphDescriptor consumption in Logic**  
    `GrimoireMachinaActionLogic` (or a dedicated analysis step) should evaluate
@@ -542,9 +524,8 @@ The following are planned but not yet implemented:
    machine structurally valid?").
 
 4. **New scaffold scenarios**  
-   Add topologies to `TestPartLibrary` (e.g. `StarTopology`,
-   `LongLinearChain`) as chain and graph descriptors that need richer
-   structures are added.
+   Add topologies to `TestPartLibrary` (e.g. `StarTopology`, `LongLinearChain`)
+   as chain and graph descriptors that need richer structures are added.
 
 5. **EdgeDescriptor integration**  
    `EdgeDescriptor` is declared in `PartGraph.h` but has no concrete instances
@@ -575,13 +556,13 @@ The following are planned but not yet implemented:
 
 ## Troubleshooting
 
-| Symptom | Likely Cause | Fix |
-| --- | --- | --- |
-| `and_()` / `or_()` compile error about deduced types | Both arguments must be the same descriptor level | Use `lift()` to promote the narrower argument |
-| `ChainDescriptorBuilder` descriptor always returns `false` | DFS traversal not yet implemented | Do not rely on `ChainDescriptorBuilder` results until the TODO in `ChainDescriptorBuilder.h` is resolved |
-| `CheckNodeDescriptorForAllScenarios` test fails on one scenario | Node order mismatch | Arrays are fragments-first then joints; verify insertion order in `TestPartLibrary` |
-| Segfault in descriptor accessing FlatBuffers field | Unguarded access to a null optional field | Guard all string, vector, and nested-table accesses: `if (data->field()) ...` |
-| Custom scaffold node index unexpected | `PartLibraryBuilder` insertion order | Fragments are inserted first (indices 0…F-1), joints follow (indices F…F+J-1) |
+| Symptom                                                         | Likely Cause                                     | Fix                                                                                                      |
+| --------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `and_()` / `or_()` compile error about deduced types            | Both arguments must be the same descriptor level | Use `lift()` to promote the narrower argument                                                            |
+| `ChainDescriptorBuilder` descriptor always returns `false`      | DFS traversal not yet implemented                | Do not rely on `ChainDescriptorBuilder` results until the TODO in `ChainDescriptorBuilder.h` is resolved |
+| `CheckNodeDescriptorForAllScenarios` test fails on one scenario | Node order mismatch                              | Arrays are fragments-first then joints; verify insertion order in `TestPartLibrary`                      |
+| Segfault in descriptor accessing FlatBuffers field              | Unguarded access to a null optional field        | Guard all string, vector, and nested-table accesses: `if (data->field()) ...`                            |
+| Custom scaffold node index unexpected                           | `PartLibraryBuilder` insertion order             | Fragments are inserted first (indices 0…F-1), joints follow (indices F…F+J-1)                            |
 
 ---
 
