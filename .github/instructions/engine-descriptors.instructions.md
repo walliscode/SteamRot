@@ -15,10 +15,10 @@ narrowest to broadest scope:
 
 | Type | Signature | Scope |
 |---|---|---|
-| `NodeDescriptor` | `bool(const PartNode&)` | One node's own data |
-| `ContextualNodeDescriptor` | `bool(const PartGraph&, const PartNode&)` | One node + its direct neighbours |
-| `ChainDescriptor` | `bool(const PartGraph&, const PartNode&)` | Multi-hop walk from one anchor |
-| `GraphDescriptor` | `bool(const PartGraph&)` | Whole graph, no anchor |
+| `NodeDescriptor` | `NodeDescriptorResult(const PartNode&)` | One node's own data |
+| `ContextualNodeDescriptor` | `NodeDescriptorResult(const PartGraph&, const PartNode&)` | One node + its direct neighbours |
+| `ChainDescriptor` | `ChainDescriptorResult(const PartGraph&, const PartNode&)` | Multi-hop walk from one anchor |
+| `GraphDescriptor` | `GraphDescriptorResult(const PartGraph&)` | Whole graph, no anchor |
 
 All four type aliases live in their respective files in `src/logic/descriptors/`
 in the `steamrot::logic::descriptors` namespace:
@@ -39,13 +39,13 @@ under the `steamrot::logic::descriptors` namespace.
 Does your predicate need MORE than one node?
 │
 ├── No  ──────────────────────────────────►  NodeDescriptor
-│                                            bool(const PartNode&)
+│                                            NodeDescriptorResult(const PartNode&)
 └── Yes
      │
      ├── Only the immediate neighbours
      │   (depth 1, read via graph.edges)?
      │    └──────────────────────────────►  ContextualNodeDescriptor
-     │                                      bool(const PartGraph&, const PartNode&)
+     │                                      NodeDescriptorResult(const PartGraph&, const PartNode&)
      │
      ├── A walk or path through multiple
      │   hops (DFS/BFS traversal needed)?
@@ -118,14 +118,14 @@ In `src/logic/descriptors/descriptors_node_descriptors.cpp`:
 
 ```cpp
 /////////////////////////////////////////////////
-const NodeDescriptor my_new_descriptor = [](const PartNode &node) -> bool {
-  return /* your condition */;
+const NodeDescriptor my_new_descriptor = [](const PartNode &node) -> NodeDescriptorResult {
+  return NodeDescriptorResult{/* your condition */};
 };
 
 /////////////////////////////////////////////////
 NodeDescriptor my_factory(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return /* your condition involving n */;
+  return [n](const PartNode &node) -> NodeDescriptorResult {
+    return NodeDescriptorResult{/* your condition involving n */};
   };
 }
 ```
@@ -159,7 +159,7 @@ ContextualNodeDescriptor is_connected_to(NodeDescriptor nd);
 ```cpp
 ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
   return [nd = std::move(nd)](const PartGraph &graph,
-                               const PartNode &node) -> bool {
+                               const PartNode &node) -> NodeDescriptorResult {
     for (size_t edge_idx : node.edge_indices) {
       const PartEdge &edge = graph.edges[edge_idx];
       const uint32_t neighbour_id =
@@ -167,9 +167,9 @@ ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
       auto it = graph.node_index_by_id.find(neighbour_id);
       if (it != graph.node_index_by_id.end() &&
           nd(graph.nodes[it->second]))
-        return true;
+        return NodeDescriptorResult{true};
     }
-    return false;
+    return NodeDescriptorResult{false};
   };
 }
 ```
@@ -388,6 +388,7 @@ The following are not yet implemented and represent planned work:
 ## Related files
 
 - `src/types/entity/PartGraph.h` — `PartNode`, `PartEdge`, `PartGraph` structs (no type aliases; those live in `src/logic/descriptors/`)
+- `src/types/logic/DescriptorResult.h` — `DescriptorResult` base struct, `NodeDescriptorResult`, `ChainDescriptorResult`, `GraphDescriptorResult`
 - `src/logic/descriptors/descriptors_node_descriptors.h` / `.cpp` — `NodeDescriptor`, `ContextualNodeDescriptor`, `lift`, and concrete node-level predicates (`steamrot::logic::descriptors` namespace)
 - `src/logic/descriptors/descriptors_chain_descriptors.h` / `.cpp` — `ChainDescriptor`, `lift_to_chain`, and concrete chain predicates
 - `src/logic/descriptors/descriptors_graph_descriptors.h` — `GraphDescriptor`, `any_node_satisfies`, `all_nodes_satisfy`

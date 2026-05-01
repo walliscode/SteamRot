@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "PartGraph.h"
+#include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
 #include <vector>
 
