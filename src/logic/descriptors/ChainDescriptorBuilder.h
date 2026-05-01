@@ -11,8 +11,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "PartGraph.h"
-#include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
 #include <vector>
 
@@ -135,17 +133,5 @@ public:
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
   ChainDescriptorBuilder &WhileIsTrue(NodeDescriptor nd);
-
-  /////////////////////////////////////////////////
-  /// @brief Append the predicate for the final node and build the descriptor.
-  ///
-  /// Adds a @c ChainStepKind::Sequence step and performs a DFS from the anchor
-  /// node, matching each step in order. Returns a @c ChainDescriptor that
-  /// evaluates to @c true when a path satisfying all steps is found.
-  ///
-  /// @param nd NodeDescriptor to apply to the last node.
-  /// @return ChainDescriptor representing the full walk pattern.
-  /////////////////////////////////////////////////
-  ChainDescriptor End(NodeDescriptor nd);
 };
 } // namespace steamrot::logic::descriptors
