@@ -11,7 +11,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
+#include <expected>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -99,16 +101,19 @@ private:
   /////////////////////////////////////////////////
   std::vector<ChainStep> m_steps{};
 
+  /////////////////////////////////////////////////
+  /// @brief Flag to prevent modification of the builder after End() is called.
+  /////////////////////////////////////////////////
+  bool m_build_finalised{false};
+
 public:
   /////////////////////////////////////////////////
-  /// @brief Set the predicate for the start node of the chain.
+  /// @brief Return an immutable reference to the steps added so far
   ///
-  /// Adds a @c ChainStepKind::Sequence step that must match exactly once.
-  ///
-  /// @param nd NodeDescriptor to apply to the first node.
-  /// @return *this for method chaining.
+  /// @return a const reference to the vector of ChainSteps added to this
+  /// builder.
   /////////////////////////////////////////////////
-  ChainDescriptorBuilder &StartWith(NodeDescriptor nd);
+  const std::vector<ChainStep> &GetSteps() const { return m_steps; }
 
   /////////////////////////////////////////////////
   /// @brief Append a predicate for the next node in the walk.
@@ -133,5 +138,20 @@ public:
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
   ChainDescriptorBuilder &WhileIsTrue(NodeDescriptor nd);
+
+  /////////////////////////////////////////////////
+  /// @brief Validates the state of the builder, just before building the
+  /// descriptor.
+  /////////////////////////////////////////////////
+  std::string Validate() const;
+
+  /////////////////////////////////////////////////
+  /// @brief Returns a ChainDescriptor containing the steps added to this
+  /// builder.
+  ///
+  /// If an error occurs during validation of the steps, returns a string
+  /// describing the error instead.
+  /////////////////////////////////////////////////
+  std::expected<ChainDescriptor, std::string> Build();
 };
 } // namespace steamrot::logic::descriptors
