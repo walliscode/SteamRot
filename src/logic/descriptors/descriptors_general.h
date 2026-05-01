@@ -57,9 +57,11 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
 /// @return Combined descriptor returning a(...) && b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc and_(Desc a, Desc b) {
-  return [a = std::move(a), b = std::move(b)](auto &&...args) -> bool {
-    return a(std::forward<decltype(args)>(args)...) &&
-           b(std::forward<decltype(args)>(args)...);
+  return [a = std::move(a), b = std::move(b)](auto &&...args) {
+    auto ra = a(std::forward<decltype(args)>(args)...);
+    return std::decay_t<decltype(ra)>{
+        static_cast<bool>(ra) &&
+        static_cast<bool>(b(std::forward<decltype(args)>(args)...))};
   };
 }
 
@@ -72,9 +74,11 @@ template <typename Desc> Desc and_(Desc a, Desc b) {
 /// @return Combined descriptor returning a(...) || b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc or_(Desc a, Desc b) {
-  return [a = std::move(a), b = std::move(b)](auto &&...args) -> bool {
-    return a(std::forward<decltype(args)>(args)...) ||
-           b(std::forward<decltype(args)>(args)...);
+  return [a = std::move(a), b = std::move(b)](auto &&...args) {
+    auto ra = a(std::forward<decltype(args)>(args)...);
+    return std::decay_t<decltype(ra)>{
+        static_cast<bool>(ra) ||
+        static_cast<bool>(b(std::forward<decltype(args)>(args)...))};
   };
 }
 
@@ -86,8 +90,9 @@ template <typename Desc> Desc or_(Desc a, Desc b) {
 /// @return Descriptor returning !a(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc not_(Desc a) {
-  return [a = std::move(a)](auto &&...args) -> bool {
-    return !a(std::forward<decltype(args)>(args)...);
+  return [a = std::move(a)](auto &&...args) {
+    auto ra = a(std::forward<decltype(args)>(args)...);
+    return std::decay_t<decltype(ra)>{!static_cast<bool>(ra)};
   };
 }
 } // namespace steamrot::logic::descriptors

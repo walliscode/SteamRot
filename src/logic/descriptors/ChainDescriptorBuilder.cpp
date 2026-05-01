@@ -29,9 +29,9 @@ ChainDescriptor ChainDescriptorBuilder::End(NodeDescriptor nd) {
   // visited node against the corresponding step predicate in order.
   // Return true only when a complete path matching all steps is found.
   return [steps = std::move(m_steps)](const PartGraph & /*graph*/,
-                                      const PartNode & /*start*/) -> bool {
+                                      const PartNode & /*start*/) -> ChainDescriptorResult {
     (void)steps;
-    return false;
+    return ChainDescriptorResult{false};
   };
 }
 } // namespace steamrot::logic::descriptors

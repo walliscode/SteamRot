@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 
+#include "DescriptorResult.h"
 #include "PartGraph.h"
 #include <functional>
 namespace steamrot::logic::descriptors {
@@ -19,7 +20,8 @@ namespace steamrot::logic::descriptors {
 /////////////////////////////////////////////////
 /// @brief Predicate type for single-node queries on a PartGraph.
 ///
-/// Any callable with signature @c bool(const PartNode&) qualifies.
+/// Any callable with signature
+/// @c NodeDescriptorResult(const PartNode&) qualifies.
 /// @c is_fragment, @c is_joint, and @c has_available_socket in
 /// @c steamrot::logic::analysis::grimoire_machina are declared as
 /// @c const @c NodeDescriptor variables and can be used directly or
@@ -28,16 +30,16 @@ namespace steamrot::logic::descriptors {
 /// Example:
 /// @code
 /// NodeDescriptor predicate = agm::is_fragment;
-/// bool result = predicate(node);
+/// NodeDescriptorResult result = predicate(node);
 /// @endcode
 /////////////////////////////////////////////////
-using NodeDescriptor = std::function<bool(const PartNode &)>;
+using NodeDescriptor = std::function<NodeDescriptorResult(const PartNode &)>;
 
 /////////////////////////////////////////////////
 /// @brief Predicate for a single node with access to the whole graph.
 ///
 /// Any callable with signature
-/// @c bool(const PartGraph&, const PartNode&) qualifies.
+/// @c NodeDescriptorResult(const PartGraph&, const PartNode&) qualifies.
 /// Use when the predicate needs to examine neighbouring nodes via the graph
 /// but does not need to walk further than one hop from the anchor.
 ///
@@ -45,7 +47,7 @@ using NodeDescriptor = std::function<bool(const PartNode &)>;
 /// @c steamrot::descriptors (see @c descriptor_ops.h in @c src/logic/).
 /////////////////////////////////////////////////
 using ContextualNodeDescriptor =
-    std::function<bool(const PartGraph &, const PartNode &)>;
+    std::function<NodeDescriptorResult(const PartGraph &, const PartNode &)>;
 
 /////////////////////////////////////////////////
 /// @brief Lift a NodeDescriptor to a ContextualNodeDescriptor.
@@ -58,9 +60,10 @@ using ContextualNodeDescriptor =
 /// @return ContextualNodeDescriptor that delegates to @p nd.
 /////////////////////////////////////////////////
 inline ContextualNodeDescriptor lift(NodeDescriptor nd) {
-  return
-      [nd = std::move(nd)](const PartGraph & /*graph*/,
-                           const PartNode &node) -> bool { return nd(node); };
+  return [nd = std::move(nd)](const PartGraph & /*graph*/,
+                              const PartNode &node) -> NodeDescriptorResult {
+    return nd(node);
+  };
 }
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
