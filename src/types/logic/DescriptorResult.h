@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #pragma once
 
+#include "PartGraph.h"
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
@@ -63,7 +64,19 @@ struct NodeDescriptorResult : DescriptorResult {};
 /// Inherits DescriptorResult's bool conversion and equality operators.
 /// Reserved for future extension with chain-specific analysis data.
 /////////////////////////////////////////////////
-struct ChainDescriptorResult : DescriptorResult {};
+struct ChainDescriptorResult : DescriptorResult {
+
+  /////////////////////////////////////////////////
+  /// @brief An isograph of the main graph matching the chain pattern
+  /////////////////////////////////////////////////
+  std::vector<PartGraph> valid_subgraphs;
+
+  /////////////////////////////////////////////////
+  /// @brief an isograph of the main graph that partially matches the chain
+  /// pattern but fails at some point
+  /////////////////////////////////////////////////
+  std::vector<PartGraph> invalid_subgraphs;
+};
 
 /////////////////////////////////////////////////
 /// @struct GraphDescriptorResult
