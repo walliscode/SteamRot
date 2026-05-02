@@ -9,6 +9,7 @@
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
 #include <expected>
+#include <unordered_set>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -64,7 +65,7 @@ std::expected<ChainDescriptor, std::string> ChainDescriptorBuilder::Build() {
 void ChainDescriptorBuilder::dfs(
     std::vector<ChainStep>::const_iterator steps_it,
     std::vector<ChainStep>::const_iterator steps_end, uint32_t current_id,
-    std::vector<bool> &visited, const MachinaFormScaffold &scaffold,
+    std::unordered_set<uint32_t> &visited, const MachinaFormScaffold &scaffold,
     std::vector<uint32_t> &current_chain, ChainDescriptorResult &result) {
 
   /////////////////////////////////////////////////
@@ -83,7 +84,7 @@ void ChainDescriptorBuilder::dfs(
   // we may need to think about if we are tying to identify a cycle in the
   // graph, as this could be a valid match for some descriptors (maybe
   // is_visited). this may just be testing specific predicates for now
-  if (current_id < visited.size() && visited[current_id])
+  if (visited.count(current_id))
     return;
 
   /////////////////////////////////////////////////
@@ -114,8 +115,7 @@ void ChainDescriptorBuilder::dfs(
   }
 
   // mark current node as visited
-  if (current_id < visited.size())
-    visited[current_id] = true;
+  visited.insert(current_id);
 
   // find neighbours by iterating the part's sockets
   const SocketMap &sockets = std::visit(
@@ -128,30 +128,28 @@ void ChainDescriptorBuilder::dfs(
 
     const uint32_t neighbour_id = socket.connected_to->peer_part_id;
 
-    // switch on the step kind as this determines how we progress certain
-    // steps in the chain
-    auto next_steps_it = steps_it;
+    // effective_steps_it is the step iterator to pass to the recursive call;
+    // it advances for Sequence steps (one node consumed) but stays on the
+    // current step for WhileIsTrue steps (zero-or-more consumption).
+    auto effective_steps_it = steps_it;
     switch (steps_it->kind) {
     case ChainStepKind::Sequence: {
-      // for a Sequence step, we simply move to the next ChainStep as this
-      // one is satisfied
-      next_steps_it = std::next(steps_it);
+      effective_steps_it = std::next(steps_it);
       break;
     }
     case ChainStepKind::WhileIsTrue: {
-      // for a WhileIsTrue step, we stay on the current ChainStep
+      // stay on the current step
       break;
     }
     }
 
     // call the dfs function recursively
-    dfs(next_steps_it, steps_end, neighbour_id, visited, scaffold,
+    dfs(effective_steps_it, steps_end, neighbour_id, visited, scaffold,
         current_chain, result);
   }
 
-  // unset current node as visited before backtracking
-  if (current_id < visited.size())
-    visited[current_id] = false;
+  // unmark current node before backtracking
+  visited.erase(current_id);
 
   return;
 }
