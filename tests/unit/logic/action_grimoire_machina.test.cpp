@@ -16,6 +16,26 @@
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
+namespace {
+
+/////////////////////////////////////////////////
+/// @brief Require that no socket in any part of @p scaffold has
+/// @c connected_to set. Used by place_next_piece guard tests to verify that
+/// a rejected placement left the scaffold unmodified.
+/////////////////////////////////////////////////
+void require_no_connections(const steamrot::MachinaFormScaffold &scaffold) {
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
+}
+
+} // namespace
+
 TEST_CASE("InitialiseActiveMachinaForm adds a new MachinaForm to the "
           "GrimoireMachina active form",
 
@@ -1546,14 +1566,7 @@ TEST_CASE("place_next_piece does nothing when scaffold parts map is empty",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.empty());
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
@@ -1574,14 +1587,7 @@ TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
@@ -1608,14 +1614,7 @@ TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
@@ -1642,14 +1641,7 @@ TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
@@ -1674,14 +1666,7 @@ TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
@@ -1706,14 +1691,7 @@ TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE(
@@ -1740,14 +1718,7 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 TEST_CASE(
@@ -1774,14 +1745,7 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  for (const auto &[part_id, variant] : scaffold.parts) {
-    std::visit(
-        [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
-            REQUIRE_FALSE(socket.connected_to.has_value());
-        },
-        variant);
-  }
+  require_no_connections(scaffold);
 }
 
 /////////////////////////////////////////////////
