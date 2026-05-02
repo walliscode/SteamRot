@@ -67,9 +67,9 @@ struct PartNode {
 
 /////////////////////////////////////////////////
 /// @struct PartEdge
-/// @brief Non-owning view of a single Connection in a MachinaFormScaffold.
+/// @brief Non-owning view of a connection between two sockets derived from
+/// @c SocketData::connected_to entries in a MachinaFormScaffold.
 ///
-/// Mirrors the endpoint fields of @c Connection for direct access.
 /// The source @c MachinaFormScaffold must outlive this edge.
 /////////////////////////////////////////////////
 struct PartEdge {
@@ -109,7 +109,7 @@ struct PartGraph {
   std::vector<PartNode> nodes;
 
   /////////////////////////////////////////////////
-  /// @brief One edge per Connection in the scaffold.
+  /// @brief One edge per connected socket pair in the scaffold.
   /////////////////////////////////////////////////
   std::vector<PartEdge> edges;
 

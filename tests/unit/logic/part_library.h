@@ -422,9 +422,9 @@ public:
   /// All raw pointers in the instances point into the library's storage — the
   /// library must outlive the returned scaffold.
   ///
-  /// Typical usage: call MakeScaffoldWithParts to obtain a scaffold, then push
-  /// Connection values into @c scaffold.connections to build connected or ring
-  /// scenarios. For scenarios that need connections, prefer
+  /// Typical usage: call MakeScaffoldWithParts to obtain a scaffold, then set
+  /// @c SocketData::connected_to on individual sockets to build connected or
+  /// ring scenarios. For scenarios that need connections, prefer
   /// MakeConnectedScaffold which handles all wiring automatically.
   ///
   /// @param fragment_names Names of Fragments to include, in order.
@@ -444,8 +444,8 @@ public:
   /// map-walking or ID hunting is needed in tests.
   ///
   /// For every connection in @p connections the method:
-  ///   - Appends a Connection to the scaffold's @c connections vector.
-  ///   - Marks both endpoint sockets as @c SocketState::Connected.
+  ///   - Sets @c SocketData::connected_to on both endpoint sockets
+  ///     (reciprocally) and marks them as @c SocketState::Connected.
   ///
   /// Fails the test (via FAIL) if any part index or socket index in a
   /// ConnectionSpec is out of range.

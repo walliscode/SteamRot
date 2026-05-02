@@ -106,14 +106,14 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 
 /////////////////////////////////////////////////
 /// @brief Place the current ghost item onto the scaffold as the next piece,
-/// creating a Connection when both the ghost and the scaffold have sockets
+/// creating a connection when both the ghost and the scaffold have sockets
 /// ready to connect.
 ///
 /// Calls @ref check_MrGhost_for_connection_readiness and
 /// @ref check_PartMap_for_connection_readiness. If both return a value the
-/// ghost instance is copied into @p scaffold (with a new stable ID) and a
-/// Connection between the two ready sockets is created via
-/// @ref create_connection and appended to @p scaffold.connections.
+/// ghost instance is copied into @p scaffold (with a new stable ID) and the
+/// connection is recorded directly on both sockets via
+/// @ref create_connection (setting @c SocketData::connected_to on each end).
 ///
 /// By convention connections are only between a FragmentInstance and a
 /// JointInstance. Does nothing if the ghost and the PartMap part have the same
@@ -165,19 +165,21 @@ void process_subscribers(
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Creates and returns a Connection between specific SocketData on two
-/// PartInstances. returns an error string if object creation fails
+/// @brief Creates a connection between specific SocketData on two
+/// PartInstances by setting @c SocketData::connected_to on both ends
+/// symmetrically and marking both sockets as @c SocketState::Connected.
+/// Returns an error string if validation fails.
 ///
-/// Connections are ,by convention, only between a JointInstance and a
+/// Connections are, by convention, only between a JointInstance and a
 /// FragmentInstance.
 /// @param fragment FragmentInstance to connect.
 /// @param socket_index_a Socket index of the FragmentInstance to connect.
 /// @param joint JointInstance to connect.
 /// @param socket_index_b Socket index of the JointInstance to connect.
-/// @return Connection struct representing the connection between the specified
-/// sockets. return by value
+/// @return @c std::monostate on success, or an error string if either part
+/// has no sockets or an index is out of range.
 /////////////////////////////////////////////////
-std::expected<Connection, std::string>
+std::expected<std::monostate, std::string>
 create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
                   JointInstance &joint_instance, size_t socket_index_b);
 

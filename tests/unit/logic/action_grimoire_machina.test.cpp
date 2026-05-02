@@ -1229,7 +1229,7 @@ TEST_CASE("create_connection tests",
             "range.");
   }
 
-  SECTION("create_connection returns a valid Connection when given valid "
+  SECTION("create_connection returns a valid result when given valid "
           "inputs") {
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance("fragment_one_socket");
@@ -1239,12 +1239,16 @@ TEST_CASE("create_connection tests",
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 0, joint_instance, 1);
     REQUIRE(connection_result.has_value());
-    steamrot::Connection connection = connection_result.value();
 
-    REQUIRE(connection.socket_a.part_id == frag_instance.id);
-    REQUIRE(connection.socket_a.socket_index == 0);
-    REQUIRE(connection.socket_b.part_id == joint_instance.id);
-    REQUIRE(connection.socket_b.socket_index == 1);
+    REQUIRE(frag_instance.sockets.at(0).connected_to.has_value());
+    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_part_id ==
+            joint_instance.id);
+    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_socket_index == 1u);
+
+    REQUIRE(joint_instance.sockets.at(1).connected_to.has_value());
+    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_part_id ==
+            frag_instance.id);
+    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_socket_index == 0u);
   }
 
   SECTION("create_connection changes SocketState on connected sockets to "
@@ -1542,7 +1546,14 @@ TEST_CASE("place_next_piece does nothing when scaffold parts map is empty",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.empty());
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
@@ -1563,7 +1574,14 @@ TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
@@ -1590,7 +1608,14 @@ TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
@@ -1617,7 +1642,14 @@ TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
@@ -1642,7 +1674,14 @@ TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
@@ -1667,7 +1706,14 @@ TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE(
@@ -1694,7 +1740,14 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 TEST_CASE(
@@ -1721,7 +1774,14 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &socket : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1836,14 +1896,19 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
                                                               mr_ghost);
 
-  REQUIRE(scaffold.connections.size() == 1);
-  const steamrot::Connection &conn = scaffold.connections.at(0);
-  // socket_a is the newly placed FragmentInstance (id=1, socket index 0)
-  REQUIRE(conn.socket_a.part_id == 1u);
-  REQUIRE(conn.socket_a.socket_index == 0u);
-  // socket_b is the existing JointInstance (id=0, socket index 0)
-  REQUIRE(conn.socket_b.part_id == 0u);
-  REQUIRE(conn.socket_b.socket_index == 0u);
+  REQUIRE(scaffold.parts.size() == 2);
+  // Placed FragmentInstance (id=1): socket[0] connects to existing Joint (id=0, socket 0)
+  const auto &placed_fi =
+      std::get<steamrot::FragmentInstance>(scaffold.parts.at(1));
+  REQUIRE(placed_fi.sockets.at(0).connected_to.has_value());
+  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_part_id == 0u);
+  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_socket_index == 0u);
+  // Existing JointInstance (id=0): socket[0] connects back to placed Fragment (id=1, socket 0)
+  const auto &existing_ji =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(0));
+  REQUIRE(existing_ji.sockets.at(0).connected_to.has_value());
+  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_part_id == 1u);
+  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_socket_index == 0u);
 }
 
 TEST_CASE(
@@ -1869,14 +1934,19 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
                                                               mr_ghost);
 
-  REQUIRE(scaffold.connections.size() == 1);
-  const steamrot::Connection &conn = scaffold.connections.at(0);
-  // socket_a is the existing FragmentInstance (id=0, socket index 1)
-  REQUIRE(conn.socket_a.part_id == 0u);
-  REQUIRE(conn.socket_a.socket_index == 1u);
-  // socket_b is the newly placed JointInstance (id=1, socket index 0)
-  REQUIRE(conn.socket_b.part_id == 1u);
-  REQUIRE(conn.socket_b.socket_index == 0u);
+  REQUIRE(scaffold.parts.size() == 2);
+  // Existing FragmentInstance (id=0): socket[1] connects to placed Joint (id=1, socket 0)
+  const auto &existing_fi =
+      std::get<steamrot::FragmentInstance>(scaffold.parts.at(0));
+  REQUIRE(existing_fi.sockets.at(1).connected_to.has_value());
+  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_part_id == 1u);
+  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_socket_index == 0u);
+  // Placed JointInstance (id=1): socket[0] connects back to existing Fragment (id=0, socket 1)
+  const auto &placed_ji =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(1));
+  REQUIRE(placed_ji.sockets.at(0).connected_to.has_value());
+  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_part_id == 0u);
+  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_socket_index == 1u);
 }
 
 TEST_CASE(

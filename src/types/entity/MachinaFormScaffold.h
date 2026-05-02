@@ -43,6 +43,29 @@ enum class SocketState {
 };
 
 /////////////////////////////////////////////////
+/// @struct SocketConnection
+/// @brief Identifies the peer endpoint of an established socket connection.
+///
+/// When a socket's @c state is @c SocketState::Connected, its
+/// @c SocketData::connected_to field holds a @c SocketConnection that names
+/// the peer part by stable ID and the peer socket by index. Both ends of a
+/// connection store a reciprocal @c SocketConnection so the graph can be
+/// traversed from either direction without a central connection list.
+/////////////////////////////////////////////////
+struct SocketConnection {
+  /////////////////////////////////////////////////
+  /// @brief Stable ID of the peer PartInstance (matches
+  /// JointInstance::id or FragmentInstance::id).
+  /////////////////////////////////////////////////
+  uint32_t peer_part_id{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Index into the peer instance's sockets vector.
+  /////////////////////////////////////////////////
+  size_t peer_socket_index{0};
+};
+
+/////////////////////////////////////////////////
 /// @struct SocketData
 /// @brief Bundles the local position and mutable runtime state for a single
 /// socket on a placed part instance.
@@ -108,6 +131,16 @@ struct SocketData {
   /// @c is_another_socket_near is false.
   /////////////////////////////////////////////////
   std::optional<uint8_t> proximity_scale{std::nullopt};
+
+  /////////////////////////////////////////////////
+  /// @brief When @c state is @c SocketState::Connected, holds the peer
+  /// endpoint of this connection. @c std::nullopt otherwise.
+  ///
+  /// Both ends of every connection store a reciprocal @c SocketConnection so
+  /// the graph can be traversed from either direction without a central
+  /// connection list.
+  /////////////////////////////////////////////////
+  std::optional<SocketConnection> connected_to{std::nullopt};
 };
 
 /////////////////////////////////////////////////
@@ -244,50 +277,6 @@ struct FragmentInstance : public PartInstance {
   std::vector<SocketData> sockets;
 };
 
-/////////////////////////////////////////////////
-/// @struct Connection
-/// @brief Represents a connection between two sockets on the scaffold.
-///
-/// Each endpoint identifies a placed instance by its stable ID (not its
-/// vector index, so connections survive reordering or deletion of other
-/// parts) and the socket within that instance by index.
-/////////////////////////////////////////////////
-struct Connection {
-  /////////////////////////////////////////////////
-  /// @struct Endpoint
-  /// @brief One end of a Connection.
-  /////////////////////////////////////////////////
-  struct Endpoint {
-    /////////////////////////////////////////////////
-    /// @brief Create an Endpoint with the given part ID and socket index.
-    ///
-    /// @param part_id stable ID of the PartInstance owning the socket at this
-    /// endpoint
-    /// @param socket_index vector index of the socket within that
-    /// PartInstance's @c sockets vector
-    /////////////////////////////////////////////////
-    explicit Endpoint(uint32_t part_id, size_t socket_index)
-        : part_id{part_id}, socket_index{socket_index} {}
-
-    /////////////////////////////////////////////////
-    /// @brief Stable instance ID (matches JointInstance::id or
-    /// FragmentInstance::id).
-    /////////////////////////////////////////////////
-    uint32_t part_id{0};
-
-    /////////////////////////////////////////////////
-    /// @brief Index into that instance's sockets vector.
-    /////////////////////////////////////////////////
-    size_t socket_index{0};
-  };
-
-  explicit Connection(Endpoint socket_a, Endpoint socket_b)
-      : socket_a{socket_a}, socket_b{socket_b} {}
-
-  Endpoint socket_a;
-  Endpoint socket_b;
-};
-
 /// using helpers ///
 using PartMap =
     std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
@@ -321,11 +310,6 @@ struct MachinaFormScaffold {
   /// invalidate references or iterators to other elements.
   /////////////////////////////////////////////////
   PartMap parts;
-
-  /////////////////////////////////////////////////
-  /// @brief All connections between sockets on the scaffold.
-  /////////////////////////////////////////////////
-  std::vector<Connection> connections;
 
   // Boolean States //
 

@@ -320,25 +320,26 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
     const uint32_t id_a = result.part_ids[spec.part_index_a];
     const uint32_t id_b = result.part_ids[spec.part_index_b];
 
-    auto mark_connected = [&result](uint32_t part_id, size_t socket_index) {
+    auto set_connected = [&result](uint32_t part_id, size_t socket_index,
+                                   uint32_t peer_part_id,
+                                   size_t peer_socket_index) {
       auto &variant = result.scaffold.parts.at(part_id);
       std::visit(
-          [part_id, socket_index](auto &instance) {
+          [part_id, socket_index, peer_part_id,
+           peer_socket_index](auto &instance) {
             if (socket_index >= instance.sockets.size())
               FAIL("socket_index ("
                    << socket_index << ") out of range for part " << part_id
                    << " (sockets=" << instance.sockets.size() << ")");
             instance.sockets[socket_index].state = SocketState::Connected;
+            instance.sockets[socket_index].connected_to =
+                SocketConnection{peer_part_id, peer_socket_index};
           },
           variant);
     };
 
-    mark_connected(id_a, spec.socket_index_a);
-    mark_connected(id_b, spec.socket_index_b);
-
-    result.scaffold.connections.emplace_back(
-        Connection{Connection::Endpoint{id_a, spec.socket_index_a},
-                   Connection::Endpoint{id_b, spec.socket_index_b}});
+    set_connected(id_a, spec.socket_index_a, id_b, spec.socket_index_b);
+    set_connected(id_b, spec.socket_index_b, id_a, spec.socket_index_a);
   }
 
   return result;

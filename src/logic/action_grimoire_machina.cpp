@@ -166,8 +166,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
 
     auto connection_result = create_connection(
         placed_fi, ghost_socket_index.value(), existing_ji, partmap_socket_idx);
-    if (connection_result.has_value())
-      scaffold.connections.push_back(connection_result.value());
+    static_cast<void>(connection_result);
 
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
     const JointInstance &ghost_ji =
@@ -192,8 +191,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     auto connection_result =
         create_connection(existing_fi, partmap_socket_idx, placed_ji,
                           ghost_socket_index.value());
-    if (connection_result.has_value())
-      scaffold.connections.push_back(connection_result.value());
+    static_cast<void>(connection_result);
   }
 }
 
@@ -267,7 +265,7 @@ void process_subscribers(
   }
 }
 /////////////////////////////////////////////////
-std::expected<Connection, std::string>
+std::expected<std::monostate, std::string>
 create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
                   JointInstance &joint_instance, size_t socket_index_b) {
 
@@ -281,13 +279,16 @@ create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
         "Connection creation failed: one or both socket indices are out of "
         "range.");
 
-  // modify the socket data on the FragmentInstance and JointInstance to reflect
-  // the new connection
+  // Mark both sockets as Connected and store the reciprocal peer reference.
   fragment_instance.sockets[socket_index_a].state = SocketState::Connected;
-  joint_instance.sockets[socket_index_b].state = SocketState::Connected;
+  fragment_instance.sockets[socket_index_a].connected_to =
+      SocketConnection{joint_instance.id, socket_index_b};
 
-  return Connection{Connection::Endpoint{fragment_instance.id, socket_index_a},
-                    Connection::Endpoint{joint_instance.id, socket_index_b}};
+  joint_instance.sockets[socket_index_b].state = SocketState::Connected;
+  joint_instance.sockets[socket_index_b].connected_to =
+      SocketConnection{fragment_instance.id, socket_index_a};
+
+  return std::monostate{};
 }
 
 /////////////////////////////////////////////////
