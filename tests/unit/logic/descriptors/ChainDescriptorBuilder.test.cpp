@@ -15,7 +15,8 @@ using namespace steamrot::logic::descriptors;
 // Helper function to create a simple NodeDescriptor for testing
 steamrot::logic::descriptors::NodeDescriptor make_test_predicate() {
 
-  return [](const steamrot::PartNode &)
+  return [](const steamrot::MachinaFormScaffold & /*scaffold*/,
+            uint32_t /*id*/)
              -> steamrot::logic::descriptors::NodeDescriptorResult {
     return steamrot::logic::descriptors::NodeDescriptorResult{true};
   };

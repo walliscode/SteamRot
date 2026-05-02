@@ -275,12 +275,11 @@ struct ScaffoldScenarioExpectations {
 /// @brief Run a NodeDescriptor against every ScaffoldScenario and assert
 ///        exact per-node results.
 ///
-/// Builds a PartGraph from each pre-wired scenario in @p lib, applies
-/// @p descriptor to every node, and CHECKs the result against the
-/// corresponding entry in @p expected.  A REQUIRE guards that each graph's
-/// node count matches the expected array size before the per-node CHECKs
-/// run, so a mismatch is reported immediately rather than causing an
-/// out-of-bounds access.
+/// Iterates each pre-wired scenario in @p lib, applies @p descriptor to every
+/// part, and CHECKs the result against the corresponding entry in @p expected.
+/// A REQUIRE guards that each scaffold's part count matches the expected array
+/// size before the per-node CHECKs run, so a mismatch is reported immediately
+/// rather than causing an out-of-bounds access.
 ///
 /// Must be called from within a Catch2 TEST_CASE (or SECTION) because it
 /// uses the CHECK and REQUIRE macros.

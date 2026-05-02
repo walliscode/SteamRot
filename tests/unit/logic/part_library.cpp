@@ -9,9 +9,7 @@
 /////////////////////////////////////////////////
 #include "part_library.h"
 #include "MachinaFormScaffold.h"
-#include "PartGraph.h"
 #include "ViewDirection.h"
-#include "descriptors_general.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -334,6 +332,7 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
             instance.sockets.at(socket_id).state = SocketState::Connected;
             instance.sockets.at(socket_id).connected_to =
                 SocketConnection{peer_part_id, peer_socket_id};
+            ++instance.connection_count;
           },
           variant);
     };
@@ -374,11 +373,12 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::LinearChain");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
-    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == expected.linear_chain.size());
-    for (size_t i = 0; i < expected.linear_chain.size(); ++i) {
+    REQUIRE(scaffold.parts.size() == expected.linear_chain.size());
+    size_t i = 0;
+    for (const auto &[id, variant] : scaffold.parts) {
       INFO("node index " << i);
-      CHECK(descriptor(graph.nodes[i]) == expected.linear_chain[i]);
+      CHECK(descriptor(scaffold, id) == expected.linear_chain[i]);
+      ++i;
     }
   }
 
@@ -386,11 +386,12 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::Ring");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::Ring);
-    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == expected.ring.size());
-    for (size_t i = 0; i < expected.ring.size(); ++i) {
+    REQUIRE(scaffold.parts.size() == expected.ring.size());
+    size_t i = 0;
+    for (const auto &[id, variant] : scaffold.parts) {
       INFO("node index " << i);
-      CHECK(descriptor(graph.nodes[i]) == expected.ring[i]);
+      CHECK(descriptor(scaffold, id) == expected.ring[i]);
+      ++i;
     }
   }
 
@@ -398,11 +399,12 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::IsolatedPair");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::IsolatedPair);
-    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == expected.isolated_pair.size());
-    for (size_t i = 0; i < expected.isolated_pair.size(); ++i) {
+    REQUIRE(scaffold.parts.size() == expected.isolated_pair.size());
+    size_t i = 0;
+    for (const auto &[id, variant] : scaffold.parts) {
       INFO("node index " << i);
-      CHECK(descriptor(graph.nodes[i]) == expected.isolated_pair[i]);
+      CHECK(descriptor(scaffold, id) == expected.isolated_pair[i]);
+      ++i;
     }
   }
 
@@ -410,11 +412,12 @@ void CheckNodeDescriptorForAllScenarios(
     INFO("ScaffoldScenario::SimpleBranch");
     const steamrot::MachinaFormScaffold &scaffold =
         lib.scaffold_scenarios.at(ScaffoldScenario::SimpleBranch);
-    steamrot::PartGraph graph = logic::descriptors::build_part_graph(scaffold);
-    REQUIRE(graph.nodes.size() == expected.simple_branch.size());
-    for (size_t i = 0; i < expected.simple_branch.size(); ++i) {
+    REQUIRE(scaffold.parts.size() == expected.simple_branch.size());
+    size_t i = 0;
+    for (const auto &[id, variant] : scaffold.parts) {
       INFO("node index " << i);
-      CHECK(descriptor(graph.nodes[i]) == expected.simple_branch[i]);
+      CHECK(descriptor(scaffold, id) == expected.simple_branch[i]);
+      ++i;
     }
   }
 }

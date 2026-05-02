@@ -287,6 +287,9 @@ create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
   joint_instance.sockets.at(socket_id_b).connected_to =
       SocketConnection{fragment_instance.id, socket_id_a};
 
+  ++fragment_instance.connection_count;
+  ++joint_instance.connection_count;
+
   return std::monostate{};
 }
 
@@ -363,37 +366,20 @@ check_PartMap_for_connection_readiness(const PartMap &part_map) {
 
   // cycle through all parts in the PartMap and check their sockets
   for (const auto &[id, part] : part_map) {
+    const SocketMap &sockets = std::visit(
+        [](const auto &inst) -> const SocketMap & { return inst.sockets; },
+        part);
 
-    // check if the part is a FragmentInstance and if any of its sockets are
-    // ready
-    if (std::holds_alternative<FragmentInstance>(part)) {
-      const FragmentInstance &fi = std::get<FragmentInstance>(part);
+    auto it = std::find_if(sockets.begin(), sockets.end(),
+                           [](const auto &entry) {
+                             return check_socket_for_connection_readiness(
+                                 entry.second);
+                           });
 
-      auto it = std::find_if(fi.sockets.begin(), fi.sockets.end(),
-                             [](const auto &entry) {
-                               return check_socket_for_connection_readiness(
-                                   entry.second);
-                             });
-
-      // if successful, return the part id and stable socket ID of the first
-      // ready socket
-      if (it != fi.sockets.end())
-        return std::make_pair(id, it->first);
-
-    } else if (std::holds_alternative<JointInstance>(part)) {
-      const JointInstance &ji = std::get<JointInstance>(part);
-
-      auto it = std::find_if(ji.sockets.begin(), ji.sockets.end(),
-                             [](const auto &entry) {
-                               return check_socket_for_connection_readiness(
-                                   entry.second);
-                             });
-
-      // if successful, return the part id and stable socket ID of the first
-      // ready socket
-      if (it != ji.sockets.end())
-        return std::make_pair(id, it->first);
-    }
+    // if successful, return the part id and stable socket ID of the first
+    // ready socket
+    if (it != sockets.end())
+      return std::make_pair(id, it->first);
   }
 
   return std::nullopt;

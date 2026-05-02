@@ -12,26 +12,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "PartGraph.h"
 
 namespace steamrot::logic::descriptors {
-
-/////////////////////////////////////////////////
-/// @brief Build a PartGraph from a MachinaFormScaffold.
-///
-/// Single O(N+S) pass: creates one PartNode per part (populating
-/// @c node_index_by_id), then for each socket that has @c connected_to set
-/// emits one PartEdge when the current part's ID is lower than the peer's ID
-/// (deduplication — each connection appears on both endpoints). The edge
-/// index is pushed into both endpoint nodes' @c edge_indices. All nodes and
-/// edges hold non-owning pointers into @p scaffold, which must outlive the
-/// returned PartGraph.
-///
-/// @param scaffold Source scaffold to build the graph from.
-/// @return PartGraph with one node per part, one edge per connected socket
-///         pair, and fully populated @c node_index_by_id and @c edge_indices.
-/////////////////////////////////////////////////
-PartGraph build_part_graph(const MachinaFormScaffold &scaffold);
 
 ////////////////////////////////////////////////
 /// Lifting utilities
