@@ -23,13 +23,11 @@ namespace steamrot::logic::descriptors {
 /// @brief Identifies the flow-control behaviour of a single ChainStep.
 ///
 /// Add new enumerators here to introduce additional flow-control strategies.
-/// The builder's @c End() method dispatches on this value during DFS
 /// traversal.
 /////////////////////////////////////////////////
 enum class ChainStepKind {
   /////////////////////////////////////////////////
   /// Consume exactly one node that satisfies the predicate.
-  /// Used by @c StartWith(), @c Then(), and @c End().
   /////////////////////////////////////////////////
   Sequence,
 
@@ -64,34 +62,6 @@ struct ChainStep {
 /// @class ChainDescriptorBuilder
 /// @brief Builds a ChainDescriptor from an ordered list of ChainSteps matched
 ///        against a DFS walk through the PartGraph.
-///
-/// Each step is added via @c StartWith(), @c Then(), @c WhileIsTrue(), and
-/// finally @c End(), which finalises the step list and returns the descriptor.
-///
-/// Usage (from outside the `steamrot::logic` namespace):
-/// @code
-/// ChainDescriptor linear_3 =
-///     steamrot::logic::descriptors::ChainDescriptorBuilder{}
-///         .StartWith(is_terminal)
-///         .Then(is_serial)
-///         .End(is_terminal);
-/// @endcode
-///
-/// Usage (from within `steamrot::logic::descriptors` or via a `using`
-/// declaration):
-/// @code
-/// ChainDescriptor linear_3 =
-///     ChainDescriptorBuilder{}
-///         .StartWith(is_terminal)
-///         .Then(is_serial)
-///         .End(is_terminal);
-///
-/// ChainDescriptor variable_middle =
-///     ChainDescriptorBuilder{}
-///         .StartWith(is_terminal)
-///         .WhileIsTrue(is_serial)
-///         .End(is_terminal);
-/// @endcode
 /////////////////////////////////////////////////
 class ChainDescriptorBuilder {
 
@@ -153,5 +123,19 @@ public:
   /// describing the error instead.
   /////////////////////////////////////////////////
   std::expected<ChainDescriptor, std::string> Build();
+
+  /////////////////////////////////////////////////
+  /// @brief
+  ///
+  /// This is currently for subgraph matching using ChainDescriptors
+  ///
+  /// @param current_step_predicate [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
+  void dfs(std::vector<ChainStep>::const_iterator steps_it,
+           std::vector<ChainStep>::const_iterator steps_end,
+           const PartNode &current_node, std::vector<bool> &visited,
+           const PartGraph &main_graph, PartGraph &current_chain,
+           ChainDescriptorResult &result);
 };
 } // namespace steamrot::logic::descriptors
