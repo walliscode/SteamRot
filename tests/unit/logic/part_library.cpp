@@ -320,26 +320,26 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
     const uint32_t id_a = result.part_ids[spec.part_index_a];
     const uint32_t id_b = result.part_ids[spec.part_index_b];
 
-    auto set_connected = [&result](uint32_t part_id, size_t socket_index,
+    auto set_connected = [&result](uint32_t part_id, uint32_t socket_id,
                                    uint32_t peer_part_id,
-                                   size_t peer_socket_index) {
+                                   uint32_t peer_socket_id) {
       auto &variant = result.scaffold.parts.at(part_id);
       std::visit(
-          [part_id, socket_index, peer_part_id,
-           peer_socket_index](auto &instance) {
-            if (socket_index >= instance.sockets.size())
-              FAIL("socket_index ("
-                   << socket_index << ") out of range for part " << part_id
+          [part_id, socket_id, peer_part_id,
+           peer_socket_id](auto &instance) {
+            if (!instance.sockets.count(socket_id))
+              FAIL("socket_id ("
+                   << socket_id << ") not found for part " << part_id
                    << " (sockets=" << instance.sockets.size() << ")");
-            instance.sockets[socket_index].state = SocketState::Connected;
-            instance.sockets[socket_index].connected_to =
-                SocketConnection{peer_part_id, peer_socket_index};
+            instance.sockets.at(socket_id).state = SocketState::Connected;
+            instance.sockets.at(socket_id).connected_to =
+                SocketConnection{peer_part_id, peer_socket_id};
           },
           variant);
     };
 
-    set_connected(id_a, spec.socket_index_a, id_b, spec.socket_index_b);
-    set_connected(id_b, spec.socket_index_b, id_a, spec.socket_index_a);
+    set_connected(id_a, spec.socket_id_a, id_b, spec.socket_id_b);
+    set_connected(id_b, spec.socket_id_b, id_a, spec.socket_id_a);
   }
 
   return result;

@@ -191,11 +191,11 @@ TEST_CASE("initialize_joint_socket_positions tests",
     steamrot::logic::positioning::grimoire_machina::
         initialize_joint_socket_positions(instance);
 
-    REQUIRE_THAT(instance.sockets[0].local_position,
+    REQUIRE_THAT(instance.sockets.at(0).local_position,
                  steamrot::tests::EqualsVector2f({0.f, 10.f}, 0.001f));
-    REQUIRE_THAT(instance.sockets[1].local_position,
+    REQUIRE_THAT(instance.sockets.at(1).local_position,
                  steamrot::tests::EqualsVector2f({-10.f, 0.f}, 0.001f));
-    REQUIRE_THAT(instance.sockets[2].local_position,
+    REQUIRE_THAT(instance.sockets.at(2).local_position,
                  steamrot::tests::EqualsVector2f({0.f, -10.f}, 0.001f));
   }
 

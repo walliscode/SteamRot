@@ -173,15 +173,15 @@ void process_subscribers(
 /// Connections are, by convention, only between a JointInstance and a
 /// FragmentInstance.
 /// @param fragment FragmentInstance to connect.
-/// @param socket_index_a Socket index of the FragmentInstance to connect.
+/// @param socket_id_a Stable socket ID of the FragmentInstance to connect.
 /// @param joint JointInstance to connect.
-/// @param socket_index_b Socket index of the JointInstance to connect.
+/// @param socket_id_b Stable socket ID of the JointInstance to connect.
 /// @return @c std::monostate on success, or an error string if either part
-/// has no sockets or an index is out of range.
+/// has no sockets or a socket ID is not found.
 /////////////////////////////////////////////////
 std::expected<std::monostate, std::string>
-create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
-                  JointInstance &joint_instance, size_t socket_index_b);
+create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
+                  JointInstance &joint_instance, uint32_t socket_id_b);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the given SocketData is in a state that allows it to
@@ -199,7 +199,7 @@ bool check_socket_for_connection_readiness(const SocketData &socket);
 ///
 /// @param mr_ghost MrGhost instance living on the Scene
 /////////////////////////////////////////////////
-std::optional<size_t>
+std::optional<uint32_t>
 check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
@@ -210,7 +210,6 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 ///
 /// @param part_map PartMap to check
 /////////////////////////////////////////////////
-std::optional<std::pair<uint32_t, size_t>>
+std::optional<std::pair<uint32_t, uint32_t>>
 check_PartMap_for_connection_readiness(const PartMap &part_map);
-;
 } // namespace steamrot::logic::action::grimoire_machina

@@ -29,12 +29,11 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
   // Emit each edge exactly once by only processing the side with the lower
   // part ID, then push the edge index into both endpoint nodes' edge_indices.
   for (const auto &[id, variant] : scaffold.parts) {
-    const std::vector<SocketData> *sockets{nullptr};
+    const SocketMap *sockets{nullptr};
     std::visit([&sockets](const auto &instance) { sockets = &instance.sockets; },
                variant);
 
-    for (size_t socket_idx = 0; socket_idx < sockets->size(); ++socket_idx) {
-      const SocketData &socket = (*sockets)[socket_idx];
+    for (const auto &[socket_id, socket] : *sockets) {
       if (!socket.connected_to.has_value())
         continue;
 
@@ -44,7 +43,7 @@ PartGraph build_part_graph(const MachinaFormScaffold &scaffold) {
 
       const size_t edge_idx = graph.edges.size();
       graph.edges.push_back(
-          {id, socket_idx, peer_id, socket.connected_to->peer_socket_index});
+          {id, socket_id, peer_id, socket.connected_to->peer_socket_id});
 
       auto it_a = graph.node_index_by_id.find(id);
       if (it_a != graph.node_index_by_id.end())

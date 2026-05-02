@@ -181,9 +181,9 @@ struct ConnectionSpec {
   size_t part_index_a{0};
 
   /////////////////////////////////////////////////
-  /// @brief Index into the first part's sockets vector.
+  /// @brief Stable socket ID on the first part's sockets map.
   /////////////////////////////////////////////////
-  size_t socket_index_a{0};
+  uint32_t socket_id_a{0};
 
   /////////////////////////////////////////////////
   /// @brief Insertion-order index of the second part.
@@ -191,9 +191,9 @@ struct ConnectionSpec {
   size_t part_index_b{0};
 
   /////////////////////////////////////////////////
-  /// @brief Index into the second part's sockets vector.
+  /// @brief Stable socket ID on the second part's sockets map.
   /////////////////////////////////////////////////
-  size_t socket_index_b{0};
+  uint32_t socket_id_b{0};
 };
 
 /////////////////////////////////////////////////

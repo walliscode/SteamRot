@@ -22,7 +22,7 @@ namespace steamrot::logic::positioning::grimoire_machina {
 /// even-spread algorithm.
 ///
 /// Calls @c compute_socket_local_positions_even_spread internally and writes
-/// the resulting positions back into @c instance.sockets[i].local_position.
+/// the resulting positions back into @c instance.sockets[id].local_position.
 /// This must be called after construction to give the sockets their correct
 /// positions.
 ///

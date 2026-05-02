@@ -60,9 +60,10 @@ struct SocketConnection {
   uint32_t peer_part_id{0};
 
   /////////////////////////////////////////////////
-  /// @brief Index into the peer instance's sockets vector.
+  /// @brief Stable ID of the connected socket on the peer instance (matches
+  /// the key in the peer instance's @c sockets map).
   /////////////////////////////////////////////////
-  size_t peer_socket_index{0};
+  uint32_t peer_socket_id{0};
 };
 
 /////////////////////////////////////////////////
@@ -143,13 +144,16 @@ struct SocketData {
   std::optional<SocketConnection> connected_to{std::nullopt};
 };
 
+/// using helpers ///
+using SocketMap = std::map<uint32_t, SocketData>;
+
 /////////////////////////////////////////////////
 /// @struct PartInstance
 /// @brief Common base for all placed instances on the MachinaFormScaffold.
 ///
 /// Holds the stable unique ID and the world-space transform shared by every
 /// placed part. Socket data (position + state) is held in the concrete
-/// subtype's @c sockets vector, which is fully initialised at construction.
+/// subtype's @c sockets map, which is fully initialised at construction.
 /////////////////////////////////////////////////
 struct PartInstance {
   /////////////////////////////////////////////////
@@ -178,12 +182,12 @@ struct PartInstance {
 /// @brief A placed instance of a Joint on the MachinaFormScaffold.
 ///
 /// Derives from PartInstance and adds Joint-specific runtime state.
-/// The @c sockets vector is sized to @c joint_ptr->socket_config.socket_count
+/// The @c sockets map is sized to @c joint_ptr->socket_config.socket_count
 /// at construction, with all positions zero-initialised. Call
 /// @c initialize_joint_socket_positions() to populate the positions using the
 /// even-spread algorithm before the instance is rendered or hit-tested.
-/// World-space position of socket i is obtained via:
-///   transform.transformPoint(sockets[i].local_position)
+/// World-space position of socket id is obtained via:
+///   transform.transformPoint(sockets[id].local_position)
 /////////////////////////////////////////////////
 struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
@@ -202,8 +206,8 @@ struct JointInstance : public PartInstance {
       : PartInstance{initial_transform}, joint{joint_ptr} {
     if (!joint_ptr)
       return;
-    sockets.resize(joint_ptr->socket_config.socket_count,
-                   SocketData{sf::Vector2f{0.f, 0.f}});
+    for (uint32_t i = 0; i < static_cast<uint32_t>(joint_ptr->socket_config.socket_count); ++i)
+      sockets.emplace(i, SocketData{sf::Vector2f{0.f, 0.f}});
   }
 
   /////////////////////////////////////////////////
@@ -213,17 +217,17 @@ struct JointInstance : public PartInstance {
 
   /////////////////////////////////////////////////
   /// @brief Per-socket data (local position + mutable state) for this Joint
-  /// instance.
+  /// instance, keyed by stable socket ID.
   ///
   /// Sized at construction; positions are zero-initialised. Call
   /// @c initialize_joint_socket_positions() to populate positions via the
   /// even-spread algorithm. Positioning Logic may subsequently update
-  /// @c sockets[i].local_position to reposition individual sockets (e.g. to
+  /// @c sockets[id].local_position to reposition individual sockets (e.g. to
   /// apply socket ring rotation). Apply the instance's transform to
-  /// @c sockets[i].local_position to obtain the world-space position of socket
-  /// @c i.
+  /// @c sockets[id].local_position to obtain the world-space position of socket
+  /// @c id.
   /////////////////////////////////////////////////
-  std::vector<SocketData> sockets;
+  SocketMap sockets;
 };
 
 /////////////////////////////////////////////////
@@ -232,9 +236,9 @@ struct JointInstance : public PartInstance {
 ///
 /// Derives from PartInstance and adds Fragment-specific runtime state.
 /// All socket data (local position + runtime state) is stored in the @c sockets
-/// vector, which is fully initialised at construction from the Fragment
-/// definition's socket positions. World position of socket i is obtained via:
-///   transform.transformPoint(sockets[i].local_position)
+/// map, which is fully initialised at construction from the Fragment
+/// definition's socket positions. World position of socket id is obtained via:
+///   transform.transformPoint(sockets[id].local_position)
 /////////////////////////////////////////////////
 struct FragmentInstance : public PartInstance {
   /////////////////////////////////////////////////
@@ -252,10 +256,8 @@ struct FragmentInstance : public PartInstance {
                    sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, fragment{fragment_ptr} {
     if (fragment_ptr) {
-      sockets.reserve(fragment_ptr->sockets.size());
-      for (const auto &pos : fragment_ptr->sockets) {
-        sockets.emplace_back(pos);
-      }
+      for (uint32_t i = 0; i < static_cast<uint32_t>(fragment_ptr->sockets.size()); ++i)
+        sockets.emplace(i, SocketData{fragment_ptr->sockets[i]});
     }
   }
 
@@ -266,15 +268,15 @@ struct FragmentInstance : public PartInstance {
 
   /////////////////////////////////////////////////
   /// @brief Per-socket data (local position + mutable state) for this Fragment
-  /// instance.
+  /// instance, keyed by stable socket ID.
   ///
   /// Fully initialised from the Fragment definition at construction. Fragment
   /// socket positions are static (derived from the Part definition) and are not
   /// changed after construction. Apply the instance's transform to
-  /// @c sockets[i].local_position to obtain the world-space position of socket
-  /// @c i.
+  /// @c sockets[id].local_position to obtain the world-space position of socket
+  /// @c id.
   /////////////////////////////////////////////////
-  std::vector<SocketData> sockets;
+  SocketMap sockets;
 };
 
 /// using helpers ///

@@ -27,7 +27,7 @@ void require_no_connections(const steamrot::MachinaFormScaffold &scaffold) {
   for (const auto &[part_id, variant] : scaffold.parts) {
     std::visit(
         [](const auto &instance) {
-          for (const auto &socket : instance.sockets)
+          for (const auto &[sid, socket] : instance.sockets)
             REQUIRE_FALSE(socket.connected_to.has_value());
         },
         variant);
@@ -182,11 +182,8 @@ TEST_CASE("FragmentInstance constructor initialises socket states to Available",
 
   steamrot::FragmentInstance instance{&fragment};
 
-  REQUIRE(instance.sockets[0].state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets[1].state == steamrot::SocketState::Available);
-}
-
-TEST_CASE("FragmentInstance id defaults to zero",
+  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
   fragment.sockets = {{0.f, 0.f}};
@@ -252,8 +249,8 @@ TEST_CASE("JointInstance constructor initialises socket states to Available",
 
   steamrot::JointInstance instance{&joint};
 
-  REQUIRE(instance.sockets[0].state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets[1].state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
 }
 
 TEST_CASE("JointInstance id defaults to zero",
@@ -319,12 +316,12 @@ TEST_CASE("JointInstance constructor zero-initialises socket positions",
 
   // Positions are zero-initialised at construction; call
   // initialize_joint_socket_positions() to populate them.
-  REQUIRE(instance.sockets[0].local_position.x == 0.f);
-  REQUIRE(instance.sockets[0].local_position.y == 0.f);
-  REQUIRE(instance.sockets[1].local_position.x == 0.f);
-  REQUIRE(instance.sockets[1].local_position.y == 0.f);
-  REQUIRE(instance.sockets[2].local_position.x == 0.f);
-  REQUIRE(instance.sockets[2].local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(0).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(0).local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(1).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(1).local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(2).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(2).local_position.y == 0.f);
 }
 
 /////////////////////////////////////////////////
@@ -1263,12 +1260,12 @@ TEST_CASE("create_connection tests",
     REQUIRE(frag_instance.sockets.at(0).connected_to.has_value());
     REQUIRE(frag_instance.sockets.at(0).connected_to->peer_part_id ==
             joint_instance.id);
-    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_socket_index == 1u);
+    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_socket_id == 1u);
 
     REQUIRE(joint_instance.sockets.at(1).connected_to.has_value());
     REQUIRE(joint_instance.sockets.at(1).connected_to->peer_part_id ==
             frag_instance.id);
-    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_socket_index == 0u);
+    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_socket_id == 0u);
   }
 
   SECTION("create_connection changes SocketState on connected sockets to "
@@ -1866,13 +1863,13 @@ TEST_CASE(
       std::get<steamrot::FragmentInstance>(scaffold.parts.at(1));
   REQUIRE(placed_fi.sockets.at(0).connected_to.has_value());
   REQUIRE(placed_fi.sockets.at(0).connected_to->peer_part_id == 0u);
-  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_socket_index == 0u);
+  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_socket_id == 0u);
   // Existing JointInstance (id=0): socket[0] connects back to placed Fragment (id=1, socket 0)
   const auto &existing_ji =
       std::get<steamrot::JointInstance>(scaffold.parts.at(0));
   REQUIRE(existing_ji.sockets.at(0).connected_to.has_value());
   REQUIRE(existing_ji.sockets.at(0).connected_to->peer_part_id == 1u);
-  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_socket_index == 0u);
+  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_socket_id == 0u);
 }
 
 TEST_CASE(
@@ -1904,13 +1901,13 @@ TEST_CASE(
       std::get<steamrot::FragmentInstance>(scaffold.parts.at(0));
   REQUIRE(existing_fi.sockets.at(1).connected_to.has_value());
   REQUIRE(existing_fi.sockets.at(1).connected_to->peer_part_id == 1u);
-  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_socket_index == 0u);
+  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_socket_id == 0u);
   // Placed JointInstance (id=1): socket[0] connects back to existing Fragment (id=0, socket 1)
   const auto &placed_ji =
       std::get<steamrot::JointInstance>(scaffold.parts.at(1));
   REQUIRE(placed_ji.sockets.at(0).connected_to.has_value());
   REQUIRE(placed_ji.sockets.at(0).connected_to->peer_part_id == 0u);
-  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_socket_index == 1u);
+  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_socket_id == 1u);
 }
 
 TEST_CASE(

@@ -82,22 +82,22 @@ void draw_joint_instance(sf::RenderTexture &texture,
 /////////////////////////////////////////////////
 void draw_fragment_instance_sockets(sf::RenderTexture &texture,
                                     FragmentInstance &fragment_instance) {
-  for (size_t i = 0; i < fragment_instance.sockets.size(); ++i) {
+  for (auto &[socket_id, socket] : fragment_instance.sockets) {
     const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        fragment_instance.sockets[i].local_position);
-    draw_socket(texture, world_pos, fragment_instance.sockets[i]);
+        socket.local_position);
+    draw_socket(texture, world_pos, socket);
   }
 }
 
 /////////////////////////////////////////////////
 void draw_joint_instance_sockets(sf::RenderTexture &texture,
                                  JointInstance &joint_instance) {
-  for (size_t i = 0; i < joint_instance.sockets.size(); ++i) {
+  for (auto &[socket_id, socket] : joint_instance.sockets) {
     // transform the socket's local position to get its world position, then
     // draw
     const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        joint_instance.sockets[i].local_position);
-    draw_socket(texture, world_pos, joint_instance.sockets[i]);
+        socket.local_position);
+    draw_socket(texture, world_pos, socket);
   }
 }
 

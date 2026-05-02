@@ -79,9 +79,10 @@ struct PartEdge {
   uint32_t part_id_a{0};
 
   /////////////////////////////////////////////////
-  /// @brief Socket index within the first endpoint's instance.
+  /// @brief Stable socket ID within the first endpoint's instance (map key in
+  /// its @c sockets SocketMap).
   /////////////////////////////////////////////////
-  size_t socket_index_a{0};
+  uint32_t socket_id_a{0};
 
   /////////////////////////////////////////////////
   /// @brief Stable ID of the second endpoint's part instance.
@@ -89,9 +90,10 @@ struct PartEdge {
   uint32_t part_id_b{0};
 
   /////////////////////////////////////////////////
-  /// @brief Socket index within the second endpoint's instance.
+  /// @brief Stable socket ID within the second endpoint's instance (map key in
+  /// its @c sockets SocketMap).
   /////////////////////////////////////////////////
-  size_t socket_index_b{0};
+  uint32_t socket_id_b{0};
 };
 
 /////////////////////////////////////////////////

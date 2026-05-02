@@ -22,8 +22,8 @@ void initialize_joint_socket_positions(JointInstance &instance) {
   compute_socket_local_positions_even_spread(
       instance.joint->socket_config, instance.joint->origin, positions);
 
-  for (size_t i = 0; i < positions.size(); ++i) {
-    instance.sockets[i].local_position = positions[i];
+  for (auto &[socket_id, socket] : instance.sockets) {
+    socket.local_position = positions[socket_id];
   }
 }
 
