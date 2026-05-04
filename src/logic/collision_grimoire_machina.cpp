@@ -73,14 +73,14 @@ void apply_if_better(SocketData &socket, float distance, bool ready) {
 } // namespace
 
 /////////////////////////////////////////////////
-void reset_socket_proximity_state(PartMap &part_map) {
-  for (auto &[id, variant] : part_map) {
+void reset_socket_proximity_state(PartGraph &part_graph) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *fi = std::get_if<FragmentInstance>(&variant)) {
-      for (SocketData &s : fi->sockets)
-        reset_socket(s);
+      for (auto &[socket_id, socket_data] : fi->sockets)
+        reset_socket(socket_data);
     } else if (auto *ji = std::get_if<JointInstance>(&variant)) {
-      for (SocketData &s : ji->sockets)
-        reset_socket(s);
+      for (auto &[socket_id, socket_data] : ji->sockets)
+        reset_socket(socket_data);
     }
   }
 }
@@ -117,8 +117,9 @@ void check_socket_collisions(SocketData &socket_data,
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
                              JointInstance &joint_instance) {
-  for (SocketData &fragment_socket : fragment_instance.sockets) {
-    for (SocketData &joint_socket : joint_instance.sockets) {
+  for (auto &[fragment_socket_id, fragment_socket] :
+       fragment_instance.sockets) {
+    for (auto &[joint_socket_id, joint_socket] : joint_instance.sockets) {
       check_socket_collisions(fragment_socket, fragment_instance.transform,
                               joint_socket, joint_instance.transform);
     }
@@ -127,14 +128,14 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
-                             PartMap &part_map) {
+                             PartGraph &part_graph) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
-  for (SocketData &s : fragment_instance.sockets)
-    reset_socket(s);
-  reset_socket_proximity_state(part_map);
+  for (auto &[socket_id, socket_data] : fragment_instance.sockets)
+    reset_socket(socket_data);
+  reset_socket_proximity_state(part_graph);
 
-  for (auto &[id, variant] : part_map) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *joint_instance = std::get_if<JointInstance>(&variant)) {
       check_socket_collisions(fragment_instance, *joint_instance);
     }
@@ -142,14 +143,14 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 }
 
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance, PartMap &part_map) {
+void check_socket_collisions(JointInstance &joint_instance, PartGraph &part_graph) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
-  for (SocketData &s : joint_instance.sockets)
-    reset_socket(s);
-  reset_socket_proximity_state(part_map);
+  for (auto &[socket_id, socket_data] : joint_instance.sockets)
+    reset_socket(socket_data);
+  reset_socket_proximity_state(part_graph);
 
-  for (auto &[id, variant] : part_map) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *fragment_instance = std::get_if<FragmentInstance>(&variant)) {
       check_socket_collisions(*fragment_instance, joint_instance);
     }

@@ -19,16 +19,16 @@
 namespace steamrot::logic::collision::grimoire_machina {
 
 /////////////////////////////////////////////////
-/// @brief Reset proximity state on every socket in the PartMap.
+/// @brief Reset proximity state on every socket in the PartGraph.
 ///
 /// Clears @c is_another_socket_near, @c is_ready_to_connect, and
-/// @c distance_to_nearest_socket on all sockets of every part in @p part_map.
+/// @c distance_to_nearest_socket on all sockets of every part in @p part_graph.
 /// Must be called at the start of each full collision pass so that stale state
 /// from the previous tick does not bleed into the new results.
 ///
-/// @param part_map PartMap whose socket proximity state should be cleared.
+/// @param part_graph PartGraph whose socket proximity state should be cleared.
 /////////////////////////////////////////////////
-void reset_socket_proximity_state(PartMap &part_map);
+void reset_socket_proximity_state(PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief Check for a collision between two individual sockets, writing state
@@ -67,34 +67,34 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 
 /////////////////////////////////////////////////
 /// @brief Check for collisions between a FragmentInstance's sockets and every
-///        JointInstance in the PartMap, keeping only the most-proximal
+///        JointInstance in the PartGraph, keeping only the most-proximal
 ///        candidate per socket.
 ///
 /// Resets all proximity state on both the @p fragment_instance sockets and all
-/// PartMap sockets before iterating, so that each call produces a clean result
+/// PartGraph sockets before iterating, so that each call produces a clean result
 /// independent of any prior state. Only Fragment–Joint pairs are evaluated;
 /// Fragment–Fragment collisions are not checked here.
 ///
 /// @param fragment_instance FragmentInstance whose sockets are tested.
-/// @param part_map          PartMap containing the candidate JointInstances.
+/// @param part_graph          PartGraph containing the candidate JointInstances.
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
-                             PartMap &part_map);
+                             PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief Check for collisions between a JointInstance's sockets and every
-///        FragmentInstance in the PartMap, keeping only the most-proximal
+///        FragmentInstance in the PartGraph, keeping only the most-proximal
 ///        candidate per socket.
 ///
 /// Resets all proximity state on both the @p joint_instance sockets and all
-/// PartMap sockets before iterating, so that each call produces a clean result
+/// PartGraph sockets before iterating, so that each call produces a clean result
 /// independent of any prior state. Only Joint–Fragment pairs are evaluated;
 /// Joint–Joint collisions are not checked here.
 ///
 /// @param joint_instance JointInstance whose sockets are tested.
-/// @param part_map       PartMap containing the candidate FragmentInstances.
+/// @param part_graph       PartGraph containing the candidate FragmentInstances.
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance, PartMap &part_map);
+void check_socket_collisions(JointInstance &joint_instance, PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief wrapper function to check for collisions between the active ghost

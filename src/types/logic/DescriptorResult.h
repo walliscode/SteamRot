@@ -8,7 +8,8 @@
 /////////////////////////////////////////////////
 #pragma once
 
-#include "PartGraph.h"
+#include <cstdint>
+#include <vector>
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
@@ -67,15 +68,16 @@ struct NodeDescriptorResult : DescriptorResult {};
 struct ChainDescriptorResult : DescriptorResult {
 
   /////////////////////////////////////////////////
-  /// @brief An isograph of the main graph matching the chain pattern
+  /// @brief Ordered sets of part IDs (one per match) that satisfy the chain
+  /// pattern from the anchor node.
   /////////////////////////////////////////////////
-  std::vector<PartGraph> valid_subgraphs;
+  std::vector<std::vector<uint32_t>> valid_subgraphs;
 
   /////////////////////////////////////////////////
-  /// @brief an isograph of the main graph that partially matches the chain
-  /// pattern but fails at some point
+  /// @brief Ordered sets of part IDs that partially satisfy the chain pattern
+  /// but fail at some step.
   /////////////////////////////////////////////////
-  std::vector<PartGraph> invalid_subgraphs;
+  std::vector<std::vector<uint32_t>> invalid_subgraphs;
 };
 
 /////////////////////////////////////////////////

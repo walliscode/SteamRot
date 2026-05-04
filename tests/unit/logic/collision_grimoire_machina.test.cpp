@@ -19,7 +19,7 @@
 namespace {
 
 /// @brief Manually reset proximity state on a SocketData.
-///        Simulates what reset_socket_proximity_state() does at PartMap level.
+///        Simulates what reset_socket_proximity_state() does at PartGraph level.
 void reset_socket(steamrot::SocketData &s) {
   s.is_another_socket_near = false;
   s.is_ready_to_connect = false;
@@ -112,7 +112,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE_THAT(socket_two_data.distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(7.07f, 0.01f));
 
-    // reset state (at PartMap level this is handled by
+    // reset state (at PartGraph level this is handled by
     // reset_socket_proximity_state)
     reset_socket(socket_one_data);
     reset_socket(socket_two_data);
@@ -166,7 +166,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
     REQUIRE(socket_two_data.is_another_socket_near == true);
     REQUIRE(socket_two_data.is_ready_to_connect == true);
 
-    // reset state (at PartMap level this is handled by
+    // reset state (at PartGraph level this is handled by
     // reset_socket_proximity_state)
     reset_socket(socket_one_data);
     reset_socket(socket_two_data);
@@ -256,7 +256,7 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
         socket_two_transform);
     REQUIRE(socket_one_data.proximity_scale.has_value());
 
-    // reset state between ticks (simulates per-tick reset in PartMap logic)
+    // reset state between ticks (simulates per-tick reset in PartGraph logic)
     reset_socket(socket_one_data);
     reset_socket(socket_two_data);
 
@@ -283,13 +283,13 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
   steamrot::FragmentInstance fragment_instance =
       builder.MakeFragmentInstance("fragment_one_socket");
   REQUIRE(fragment_instance.sockets.size() == 1);
-  steamrot::SocketData &fragment_socket_data = fragment_instance.sockets[0];
+  steamrot::SocketData &fragment_socket_data = fragment_instance.sockets.at(0);
   fragment_socket_data.local_position = {0.f, 0.f}; // set for easy testing
 
   steamrot::JointInstance joint_instance =
       builder.MakeJointInstance("joint_one_socket");
   REQUIRE(joint_instance.sockets.size() == 1);
-  steamrot::SocketData &joint_socket_data = joint_instance.sockets[0];
+  steamrot::SocketData &joint_socket_data = joint_instance.sockets.at(0);
   joint_socket_data.local_position = {0.f, 0.f}; // set for easy testing
 
   SECTION("sockets do not collide when far apart") {
@@ -300,7 +300,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    steamrot::SocketData &socket_data = fragment_instance.sockets[0];
+    steamrot::SocketData &socket_data = fragment_instance.sockets.at(0);
     REQUIRE(socket_data.state == fragment_socket_data.state);
     REQUIRE(socket_data.is_mouse_over == false);
     REQUIRE(socket_data.is_another_socket_near == false);
@@ -343,7 +343,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    steamrot::SocketData &socket_data = fragment_instance.sockets[0];
+    steamrot::SocketData &socket_data = fragment_instance.sockets.at(0);
     REQUIRE(socket_data.is_another_socket_near == true);
     REQUIRE(socket_data.is_ready_to_connect == false);
     REQUIRE(joint_socket_data.is_another_socket_near == true);
@@ -359,7 +359,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    steamrot::SocketData &socket_data = fragment_instance.sockets[0];
+    steamrot::SocketData &socket_data = fragment_instance.sockets.at(0);
     REQUIRE(socket_data.is_another_socket_near == true);
     REQUIRE(socket_data.is_ready_to_connect == false);
     REQUIRE(joint_socket_data.is_another_socket_near == true);
@@ -391,7 +391,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    steamrot::SocketData &socket_data = fragment_instance.sockets[0];
+    steamrot::SocketData &socket_data = fragment_instance.sockets.at(0);
     REQUIRE(socket_data.is_another_socket_near == true);
     REQUIRE(socket_data.is_ready_to_connect == true);
     REQUIRE(joint_socket_data.is_another_socket_near == true);
@@ -407,7 +407,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance,JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    steamrot::SocketData &socket_data = fragment_instance.sockets[0];
+    steamrot::SocketData &socket_data = fragment_instance.sockets.at(0);
     REQUIRE(socket_data.is_another_socket_near == true);
     REQUIRE(socket_data.is_ready_to_connect == true);
     REQUIRE(joint_socket_data.is_another_socket_near == true);
@@ -442,16 +442,18 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
   steamrot::FragmentInstance fragment_instance =
       builder.MakeFragmentInstance("fragment_two_sockets");
   REQUIRE(fragment_instance.sockets.size() == 2);
-  steamrot::SocketData &fragment_socket_data_one = fragment_instance.sockets[0];
-  steamrot::SocketData &fragment_socket_data_two = fragment_instance.sockets[1];
+  steamrot::SocketData &fragment_socket_data_one =
+      fragment_instance.sockets.at(0);
+  steamrot::SocketData &fragment_socket_data_two =
+      fragment_instance.sockets.at(1);
   fragment_socket_data_one.local_position = {0.f, 0.f};  // set for easy testing
   fragment_socket_data_two.local_position = {10.f, 0.f}; // set for easy testing
 
   steamrot::JointInstance joint_instance =
       builder.MakeJointInstance("joint_two_sockets");
   REQUIRE(joint_instance.sockets.size() == 2);
-  steamrot::SocketData &joint_socket_data_one = joint_instance.sockets[0];
-  steamrot::SocketData &joint_socket_data_two = joint_instance.sockets[1];
+  steamrot::SocketData &joint_socket_data_one = joint_instance.sockets.at(0);
+  steamrot::SocketData &joint_socket_data_two = joint_instance.sockets.at(1);
   joint_socket_data_one.local_position = {0.f, 0.f};  // set for easy testing
   joint_socket_data_two.local_position = {10.f, 0.f}; // set for easy testing
 
@@ -463,13 +465,13 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
         fragment_instance, joint_instance);
     // assert
-    for (steamrot::SocketData &socket_data : fragment_instance.sockets) {
+    for (const auto &[socket_id, socket_data] : fragment_instance.sockets) {
       REQUIRE(socket_data.state == steamrot::SocketState::Available);
       REQUIRE(socket_data.is_mouse_over == false);
       REQUIRE(socket_data.is_another_socket_near == false);
       REQUIRE(socket_data.is_ready_to_connect == false);
     }
-    for (steamrot::SocketData &socket_data : joint_instance.sockets) {
+    for (const auto &[socket_id, socket_data] : joint_instance.sockets) {
       REQUIRE(socket_data.state == steamrot::SocketState::Available);
       REQUIRE(socket_data.is_mouse_over == false);
       REQUIRE(socket_data.is_another_socket_near == false);
@@ -557,12 +559,12 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
   //   F[2](20,0) ↔ J[2](25,0)  = 5   → near (tie; J[1] visited first)
   //
   // Expected: only the F[0]–J[0] pair is ready to connect.
-  fragment_instance.sockets[0].local_position = {0.f, 0.f};
-  fragment_instance.sockets[1].local_position = {10.f, 0.f};
-  fragment_instance.sockets[2].local_position = {20.f, 0.f};
-  joint_instance.sockets[0].local_position = {1.f, 0.f};
-  joint_instance.sockets[1].local_position = {15.f, 0.f};
-  joint_instance.sockets[2].local_position = {25.f, 0.f};
+  fragment_instance.sockets.at(0).local_position = {0.f, 0.f};
+  fragment_instance.sockets.at(1).local_position = {10.f, 0.f};
+  fragment_instance.sockets.at(2).local_position = {20.f, 0.f};
+  joint_instance.sockets.at(0).local_position = {1.f, 0.f};
+  joint_instance.sockets.at(1).local_position = {15.f, 0.f};
+  joint_instance.sockets.at(2).local_position = {25.f, 0.f};
 
   SECTION("three sockets: only the nearest pair is ready to connect") {
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
@@ -570,57 +572,60 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
 
     // only F[0] ↔ J[0] pair should be ready to connect
     int fragment_ready_count = 0;
-    for (const steamrot::SocketData &s : fragment_instance.sockets)
-      if (s.is_ready_to_connect)
+    for (const auto &[socket_id, socket_data] : fragment_instance.sockets) {
+      if (socket_data.is_ready_to_connect)
         fragment_ready_count++;
+    }
 
     int joint_ready_count = 0;
-    for (const steamrot::SocketData &s : joint_instance.sockets)
-      if (s.is_ready_to_connect)
+    for (const auto &[socket_id, socket_data] : joint_instance.sockets) {
+      if (socket_data.is_ready_to_connect)
         joint_ready_count++;
+    }
 
     REQUIRE(fragment_ready_count == 1);
     REQUIRE(joint_ready_count == 1);
 
     // verify it is specifically F[0] and J[0]
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(fragment_instance.sockets[1].is_ready_to_connect == false);
-    REQUIRE(fragment_instance.sockets[2].is_ready_to_connect == false);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(joint_instance.sockets[1].is_ready_to_connect == false);
-    REQUIRE(joint_instance.sockets[2].is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(fragment_instance.sockets.at(1).is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(2).is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(joint_instance.sockets.at(1).is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(2).is_ready_to_connect == false);
 
-    // non-ready sockets in proximity should still reflect their best candidate
-    REQUIRE(fragment_instance.sockets[1].is_another_socket_near == true);
-    REQUIRE(fragment_instance.sockets[2].is_another_socket_near == true);
-    REQUIRE(joint_instance.sockets[1].is_another_socket_near == true);
+    // non-ready sockets in proximity should still reflect their best
+    // candidate
+    REQUIRE(fragment_instance.sockets.at(1).is_another_socket_near == true);
+    REQUIRE(fragment_instance.sockets.at(2).is_another_socket_near == true);
+    REQUIRE(joint_instance.sockets.at(1).is_another_socket_near == true);
   }
 }
 
-TEST_CASE("reset_socket_proximity_state(PartMap) tests",
+TEST_CASE("reset_socket_proximity_state(PartGraph) tests",
           "[unit][collision_grimoire_machina]") {
   steamrot::tests::TestPartLibrary part_library =
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder(part_library);
 
-  SECTION("does not throw on an empty PartMap") {
-    steamrot::PartMap empty_map;
+  SECTION("does not throw on an empty PartGraph") {
+    steamrot::PartGraph empty_map;
     REQUIRE_NOTHROW(steamrot::logic::collision::grimoire_machina::
                         reset_socket_proximity_state(empty_map));
   }
 
-  SECTION("clears proximity state on all sockets in the PartMap") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_one_socket"}, {"joint_one_socket"});
+  SECTION("clears proximity state on all sockets in the PartGraph") {
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_one_socket"}, {"joint_one_socket"});
 
     // manually set proximity state on every socket
-    for (auto &[id, variant] : part_map) {
+    for (auto &[id, variant] : part_graph) {
       auto visit = [](auto &instance) {
-        for (steamrot::SocketData &s : instance.sockets) {
-          s.is_another_socket_near = true;
-          s.is_ready_to_connect = true;
-          s.distance_to_nearest_socket = 3.f;
-          s.proximity_scale = uint8_t{200};
+        for (auto &[socket_id, socket_data] : instance.sockets) {
+          socket_data.is_another_socket_near = true;
+          socket_data.is_ready_to_connect = true;
+          socket_data.distance_to_nearest_socket = 3.f;
+          socket_data.proximity_scale = uint8_t{200};
         }
       };
       if (auto *fi = std::get_if<steamrot::FragmentInstance>(&variant))
@@ -631,16 +636,16 @@ TEST_CASE("reset_socket_proximity_state(PartMap) tests",
 
     // act
     steamrot::logic::collision::grimoire_machina::reset_socket_proximity_state(
-        part_map);
+        part_graph);
 
     // assert — all sockets should be back to default
-    for (auto &[id, variant] : part_map) {
+    for (auto &[id, variant] : part_graph) {
       auto check = [](const auto &instance) {
-        for (const steamrot::SocketData &s : instance.sockets) {
-          REQUIRE(s.is_another_socket_near == false);
-          REQUIRE(s.is_ready_to_connect == false);
-          REQUIRE(s.distance_to_nearest_socket == std::nullopt);
-          REQUIRE(s.proximity_scale == std::nullopt);
+        for (const auto &[socket_id, socket_data] : instance.sockets) {
+          REQUIRE(socket_data.is_another_socket_near == false);
+          REQUIRE(socket_data.is_ready_to_connect == false);
+          REQUIRE(socket_data.distance_to_nearest_socket == std::nullopt);
+          REQUIRE(socket_data.proximity_scale == std::nullopt);
         }
       };
       if (const auto *fi = std::get_if<steamrot::FragmentInstance>(&variant))
@@ -651,7 +656,7 @@ TEST_CASE("reset_socket_proximity_state(PartMap) tests",
   }
 }
 
-TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
+TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
           "[unit][collision_grimoire_machina]") {
   steamrot::tests::TestPartLibrary part_library =
       steamrot::tests::TestPartLibrary::Create();
@@ -661,67 +666,67 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
   steamrot::FragmentInstance fragment_instance =
       builder.MakeFragmentInstance("fragment_one_socket");
   REQUIRE(fragment_instance.sockets.size() == 1);
-  fragment_instance.sockets[0].local_position = {0.f, 0.f};
+  fragment_instance.sockets.at(0).local_position = {0.f, 0.f};
 
-  SECTION("does not throw on empty PartMap") {
-    steamrot::PartMap empty_map;
+  SECTION("does not throw on empty PartGraph") {
+    steamrot::PartGraph empty_map;
     REQUIRE_NOTHROW(
         steamrot::logic::collision::grimoire_machina::check_socket_collisions(
             fragment_instance, empty_map));
-    REQUIRE(fragment_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("no collision when joint socket is far away") {
-    steamrot::PartMap part_map = builder.MakePartMap({}, {"joint_one_socket"});
+    steamrot::PartGraph part_graph = builder.MakePartGraph({}, {"joint_one_socket"});
     steamrot::JointInstance &ji =
-        std::get<steamrot::JointInstance>(part_map.begin()->second);
-    ji.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::JointInstance>(part_graph.begin()->second);
+    ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.transform.translate({100.f, 0.f}); // world pos (100,0) — distance 100
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
+        fragment_instance, part_graph);
 
-    REQUIRE(fragment_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(ji.sockets[0].is_another_socket_near == false);
-    REQUIRE(ji.sockets[0].is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(ji.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == false);
   }
 
-  SECTION(
-      "is_another_socket_near is true when joint socket is within proximity") {
-    steamrot::PartMap part_map = builder.MakePartMap({}, {"joint_one_socket"});
+  SECTION("is_another_socket_near is true when joint socket is within "
+          "proximity") {
+    steamrot::PartGraph part_graph = builder.MakePartGraph({}, {"joint_one_socket"});
     steamrot::JointInstance &ji =
-        std::get<steamrot::JointInstance>(part_map.begin()->second);
-    ji.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::JointInstance>(part_graph.begin()->second);
+    ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.transform.translate(
         {5.f, 5.f}); // distance ≈ 7.07, within proximity (10)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
+        fragment_instance, part_graph);
 
-    REQUIRE(fragment_instance.sockets[0].is_another_socket_near == true);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(ji.sockets[0].is_another_socket_near == true);
-    REQUIRE(ji.sockets[0].is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(ji.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("is_ready_to_connect is true when joint socket is within connection "
           "threshold") {
-    steamrot::PartMap part_map = builder.MakePartMap({}, {"joint_one_socket"});
+    steamrot::PartGraph part_graph = builder.MakePartGraph({}, {"joint_one_socket"});
     steamrot::JointInstance &ji =
-        std::get<steamrot::JointInstance>(part_map.begin()->second);
-    ji.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::JointInstance>(part_graph.begin()->second);
+    ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.transform.translate(
         {1.f, 1.f}); // distance ≈ 1.41, within connection (2.5)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
+        fragment_instance, part_graph);
 
-    REQUIRE(fragment_instance.sockets[0].is_another_socket_near == true);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(ji.sockets[0].is_another_socket_near == true);
-    REQUIRE(ji.sockets[0].is_ready_to_connect == true);
+    REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(ji.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == true);
   }
 
   SECTION("most proximal joint wins when two joints are within range") {
@@ -729,74 +734,74 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartMap) tests",
     // therefore iteration order: lower ID is visited first by std::map).
     steamrot::JointInstance joint_far =
         builder.MakeJointInstance("joint_one_socket");
-    joint_far.sockets[0].local_position = {0.f, 0.f};
+    joint_far.sockets.at(0).local_position = {0.f, 0.f};
     joint_far.transform.translate({8.f, 0.f}); // distance 8 — proximity only
 
     steamrot::JointInstance joint_near =
         builder.MakeJointInstance("joint_one_socket");
-    joint_near.sockets[0].local_position = {0.f, 0.f};
+    joint_near.sockets.at(0).local_position = {0.f, 0.f};
     joint_near.transform.translate({1.f, 0.f}); // distance 1 — ready to connect
 
     // joint_far gets the lower ID → visited first
     const uint32_t far_id = joint_far.id;
     const uint32_t near_id = joint_near.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(far_id, std::move(joint_far));
-    part_map.emplace(near_id, std::move(joint_near));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(far_id, std::move(joint_far));
+    part_graph.emplace(near_id, std::move(joint_near));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
+        fragment_instance, part_graph);
 
     // fragment socket must reflect the nearest candidate
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == true);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == true);
     REQUIRE(
-        fragment_instance.sockets[0].distance_to_nearest_socket.has_value());
+        fragment_instance.sockets.at(0).distance_to_nearest_socket.has_value());
     REQUIRE_THAT(
-        fragment_instance.sockets[0].distance_to_nearest_socket.value(),
+        fragment_instance.sockets.at(0).distance_to_nearest_socket.value(),
         Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
 
     // near joint socket must be ready to connect
     const steamrot::JointInstance &near_ref =
-        std::get<steamrot::JointInstance>(part_map.at(near_id));
-    REQUIRE(near_ref.sockets[0].is_ready_to_connect == true);
+        std::get<steamrot::JointInstance>(part_graph.at(near_id));
+    REQUIRE(near_ref.sockets.at(0).is_ready_to_connect == true);
 
     // far joint socket must be proximity-only (not ready)
     const steamrot::JointInstance &far_ref =
-        std::get<steamrot::JointInstance>(part_map.at(far_id));
-    REQUIRE(far_ref.sockets[0].is_another_socket_near == true);
-    REQUIRE(far_ref.sockets[0].is_ready_to_connect == false);
+        std::get<steamrot::JointInstance>(part_graph.at(far_id));
+    REQUIRE(far_ref.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(far_ref.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("stale state from a previous tick is cleared at the start of each "
           "call") {
-    steamrot::PartMap part_map = builder.MakePartMap({}, {"joint_one_socket"});
+    steamrot::PartGraph part_graph = builder.MakePartGraph({}, {"joint_one_socket"});
     steamrot::JointInstance &ji =
-        std::get<steamrot::JointInstance>(part_map.begin()->second);
-    ji.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::JointInstance>(part_graph.begin()->second);
+    ji.sockets.at(0).local_position = {0.f, 0.f};
 
     // first tick: sockets close — state is set
     ji.transform.translate({1.f, 1.f});
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(ji.sockets[0].is_ready_to_connect == true);
+        fragment_instance, part_graph);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == true);
 
     // second tick: joint moves far away
     ji.transform = sf::Transform::Identity;
     ji.transform.translate({100.f, 0.f});
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fragment_instance, part_map);
+        fragment_instance, part_graph);
 
     // stale state must have been cleared by the internal reset
-    REQUIRE(fragment_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(fragment_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(ji.sockets[0].is_another_socket_near == false);
-    REQUIRE(ji.sockets[0].is_ready_to_connect == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(ji.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == false);
   }
 }
 
 TEST_CASE(
-    "check_socket_collisions(FragmentInstance, PartMap) multi-socket tests",
+    "check_socket_collisions(FragmentInstance, PartGraph) multi-socket tests",
     "[unit][collision_grimoire_machina]") {
   steamrot::tests::TestPartLibrary part_library =
       steamrot::tests::TestPartLibrary::Create();
@@ -804,7 +809,7 @@ TEST_CASE(
 
   SECTION("two fragment sockets: each finds its own nearest joint candidate") {
     // Fragment sockets at world (0,0) and (20,0).
-    // Two joints in PartMap with sockets at world (1,0) and (19,0).
+    // Two joints in PartGraph with sockets at world (1,0) and (19,0).
     //
     // Distances:
     //   F[0](0,0)  ↔ J_a[0](1,0)  = 1   → ready
@@ -817,33 +822,33 @@ TEST_CASE(
     steamrot::FragmentInstance fi =
         builder.MakeFragmentInstance("fragment_two_sockets");
     REQUIRE(fi.sockets.size() == 2);
-    fi.sockets[0].local_position = {0.f, 0.f};
-    fi.sockets[1].local_position = {20.f, 0.f};
+    fi.sockets.at(0).local_position = {0.f, 0.f};
+    fi.sockets.at(1).local_position = {20.f, 0.f};
 
     steamrot::JointInstance joint_a =
         builder.MakeJointInstance("joint_one_socket");
-    joint_a.sockets[0].local_position = {0.f, 0.f};
+    joint_a.sockets.at(0).local_position = {0.f, 0.f};
     joint_a.transform.translate({1.f, 0.f});
 
     steamrot::JointInstance joint_b =
         builder.MakeJointInstance("joint_one_socket");
-    joint_b.sockets[0].local_position = {0.f, 0.f};
+    joint_b.sockets.at(0).local_position = {0.f, 0.f};
     joint_b.transform.translate({19.f, 0.f});
 
     const uint32_t a_id = joint_a.id;
     const uint32_t b_id = joint_b.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(a_id, std::move(joint_a));
-    part_map.emplace(b_id, std::move(joint_b));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(a_id, std::move(joint_a));
+    part_graph.emplace(b_id, std::move(joint_b));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fi, part_map);
+        fi, part_graph);
 
-    REQUIRE(fi.sockets[0].is_ready_to_connect == true);
-    REQUIRE_THAT(fi.sockets[0].distance_to_nearest_socket.value(),
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE_THAT(fi.sockets.at(0).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
-    REQUIRE(fi.sockets[1].is_ready_to_connect == true);
-    REQUIRE_THAT(fi.sockets[1].distance_to_nearest_socket.value(),
+    REQUIRE(fi.sockets.at(1).is_ready_to_connect == true);
+    REQUIRE_THAT(fi.sockets.at(1).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
   }
 
@@ -854,46 +859,46 @@ TEST_CASE(
     steamrot::FragmentInstance fi =
         builder.MakeFragmentInstance("fragment_two_sockets");
     REQUIRE(fi.sockets.size() == 2);
-    fi.sockets[0].local_position = {0.f, 0.f};
-    fi.sockets[1].local_position = {20.f, 0.f};
+    fi.sockets.at(0).local_position = {0.f, 0.f};
+    fi.sockets.at(1).local_position = {20.f, 0.f};
 
     steamrot::JointInstance joint_far =
         builder.MakeJointInstance("joint_one_socket");
-    joint_far.sockets[0].local_position = {0.f, 0.f};
+    joint_far.sockets.at(0).local_position = {0.f, 0.f};
     joint_far.transform.translate({8.f, 0.f}); // distance 8 from F[0]
 
     steamrot::JointInstance joint_near =
         builder.MakeJointInstance("joint_one_socket");
-    joint_near.sockets[0].local_position = {0.f, 0.f};
+    joint_near.sockets.at(0).local_position = {0.f, 0.f};
     joint_near.transform.translate({1.f, 0.f}); // distance 1 from F[0]
 
     const uint32_t far_id = joint_far.id; // lower ID → visited first
     const uint32_t near_id = joint_near.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(far_id, std::move(joint_far));
-    part_map.emplace(near_id, std::move(joint_near));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(far_id, std::move(joint_far));
+    part_graph.emplace(near_id, std::move(joint_near));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fi, part_map);
+        fi, part_graph);
 
     // F[0] records the nearest joint (distance 1, ready)
-    REQUIRE(fi.sockets[0].is_ready_to_connect == true);
-    REQUIRE_THAT(fi.sockets[0].distance_to_nearest_socket.value(),
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE_THAT(fi.sockets.at(0).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
 
     // F[1] has no candidate in range
-    REQUIRE(fi.sockets[1].is_another_socket_near == false);
-    REQUIRE(fi.sockets[1].is_ready_to_connect == false);
+    REQUIRE(fi.sockets.at(1).is_another_socket_near == false);
+    REQUIRE(fi.sockets.at(1).is_ready_to_connect == false);
 
     // near joint is ready, far joint is proximity-only
     const steamrot::JointInstance &near_ref =
-        std::get<steamrot::JointInstance>(part_map.at(near_id));
-    REQUIRE(near_ref.sockets[0].is_ready_to_connect == true);
+        std::get<steamrot::JointInstance>(part_graph.at(near_id));
+    REQUIRE(near_ref.sockets.at(0).is_ready_to_connect == true);
 
     const steamrot::JointInstance &far_ref =
-        std::get<steamrot::JointInstance>(part_map.at(far_id));
-    REQUIRE(far_ref.sockets[0].is_another_socket_near == true);
-    REQUIRE(far_ref.sockets[0].is_ready_to_connect == false);
+        std::get<steamrot::JointInstance>(part_graph.at(far_id));
+    REQUIRE(far_ref.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(far_ref.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("three fragment sockets: only one pair ready to connect") {
@@ -917,46 +922,46 @@ TEST_CASE(
     steamrot::FragmentInstance fi =
         builder.MakeFragmentInstance("fragment_three_sockets");
     REQUIRE(fi.sockets.size() == 3);
-    fi.sockets[0].local_position = {0.f, 0.f};
-    fi.sockets[1].local_position = {10.f, 0.f};
-    fi.sockets[2].local_position = {20.f, 0.f};
+    fi.sockets.at(0).local_position = {0.f, 0.f};
+    fi.sockets.at(1).local_position = {10.f, 0.f};
+    fi.sockets.at(2).local_position = {20.f, 0.f};
 
     steamrot::JointInstance joint_0 =
         builder.MakeJointInstance("joint_one_socket");
-    joint_0.sockets[0].local_position = {0.f, 0.f};
+    joint_0.sockets.at(0).local_position = {0.f, 0.f};
     joint_0.transform.translate({1.f, 0.f});
 
     steamrot::JointInstance joint_1 =
         builder.MakeJointInstance("joint_one_socket");
-    joint_1.sockets[0].local_position = {0.f, 0.f};
+    joint_1.sockets.at(0).local_position = {0.f, 0.f};
     joint_1.transform.translate({15.f, 0.f});
 
     steamrot::JointInstance joint_2 =
         builder.MakeJointInstance("joint_one_socket");
-    joint_2.sockets[0].local_position = {0.f, 0.f};
+    joint_2.sockets.at(0).local_position = {0.f, 0.f};
     joint_2.transform.translate({25.f, 0.f});
 
     const uint32_t id_0 = joint_0.id;
     const uint32_t id_1 = joint_1.id;
     const uint32_t id_2 = joint_2.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(id_0, std::move(joint_0));
-    part_map.emplace(id_1, std::move(joint_1));
-    part_map.emplace(id_2, std::move(joint_2));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(id_0, std::move(joint_0));
+    part_graph.emplace(id_1, std::move(joint_1));
+    part_graph.emplace(id_2, std::move(joint_2));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        fi, part_map);
+        fi, part_graph);
 
     // count ready sockets on each side — only one pair should be ready
     int fragment_ready = 0;
-    for (const steamrot::SocketData &s : fi.sockets)
-      if (s.is_ready_to_connect)
+    for (const auto &[id, socket_data] : fi.sockets)
+      if (socket_data.is_ready_to_connect)
         fragment_ready++;
 
     int joint_ready = 0;
-    for (const auto &[id, variant] : part_map) {
+    for (const auto &[id, variant] : part_graph) {
       if (const auto *ji = std::get_if<steamrot::JointInstance>(&variant))
-        if (ji->sockets[0].is_ready_to_connect)
+        if (ji->sockets.at(0).is_ready_to_connect)
           joint_ready++;
     }
 
@@ -964,26 +969,26 @@ TEST_CASE(
     REQUIRE(joint_ready == 1);
 
     // the ready pair must be F[0] and J[0]
-    REQUIRE(fi.sockets[0].is_ready_to_connect == true);
-    REQUIRE(fi.sockets[1].is_ready_to_connect == false);
-    REQUIRE(fi.sockets[2].is_ready_to_connect == false);
-    REQUIRE(std::get<steamrot::JointInstance>(part_map.at(id_0))
-                .sockets[0]
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(fi.sockets.at(1).is_ready_to_connect == false);
+    REQUIRE(fi.sockets.at(2).is_ready_to_connect == false);
+    REQUIRE(std::get<steamrot::JointInstance>(part_graph.at(id_0))
+                .sockets.at(0)
                 .is_ready_to_connect == true);
-    REQUIRE(std::get<steamrot::JointInstance>(part_map.at(id_1))
-                .sockets[0]
+    REQUIRE(std::get<steamrot::JointInstance>(part_graph.at(id_1))
+                .sockets.at(0)
                 .is_ready_to_connect == false);
-    REQUIRE(std::get<steamrot::JointInstance>(part_map.at(id_2))
-                .sockets[0]
+    REQUIRE(std::get<steamrot::JointInstance>(part_graph.at(id_2))
+                .sockets.at(0)
                 .is_ready_to_connect == false);
 
     // non-ready sockets still reflect proximity state where applicable
-    REQUIRE(fi.sockets[1].is_another_socket_near == true);
-    REQUIRE(fi.sockets[2].is_another_socket_near == true);
+    REQUIRE(fi.sockets.at(1).is_another_socket_near == true);
+    REQUIRE(fi.sockets.at(2).is_another_socket_near == true);
   }
 }
 
-TEST_CASE("check_socket_collisions(JointInstance, PartMap) tests",
+TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
           "[unit][collision_grimoire_machina]") {
   steamrot::tests::TestPartLibrary part_library =
       steamrot::tests::TestPartLibrary::Create();
@@ -993,70 +998,70 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) tests",
   steamrot::JointInstance joint_instance =
       builder.MakeJointInstance("joint_one_socket");
   REQUIRE(joint_instance.sockets.size() == 1);
-  joint_instance.sockets[0].local_position = {0.f, 0.f};
+  joint_instance.sockets.at(0).local_position = {0.f, 0.f};
 
-  SECTION("does not throw on empty PartMap") {
-    steamrot::PartMap empty_map;
+  SECTION("does not throw on empty PartGraph") {
+    steamrot::PartGraph empty_map;
     REQUIRE_NOTHROW(
         steamrot::logic::collision::grimoire_machina::check_socket_collisions(
             joint_instance, empty_map));
-    REQUIRE(joint_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("no collision when fragment socket is far away") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_one_socket"}, {});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_one_socket"}, {});
     steamrot::FragmentInstance &fi =
-        std::get<steamrot::FragmentInstance>(part_map.begin()->second);
-    fi.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::FragmentInstance>(part_graph.begin()->second);
+    fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.transform.translate({100.f, 0.f}); // world pos (100,0) — distance 100
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
+        joint_instance, part_graph);
 
-    REQUIRE(joint_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(fi.sockets[0].is_another_socket_near == false);
-    REQUIRE(fi.sockets[0].is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(fi.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("is_another_socket_near is true when fragment socket is within "
           "proximity") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_one_socket"}, {});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_one_socket"}, {});
     steamrot::FragmentInstance &fi =
-        std::get<steamrot::FragmentInstance>(part_map.begin()->second);
-    fi.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::FragmentInstance>(part_graph.begin()->second);
+    fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.transform.translate(
         {5.f, 5.f}); // distance ≈ 7.07, within proximity (10)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
+        joint_instance, part_graph);
 
-    REQUIRE(joint_instance.sockets[0].is_another_socket_near == true);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(fi.sockets[0].is_another_socket_near == true);
-    REQUIRE(fi.sockets[0].is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(fi.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("is_ready_to_connect is true when fragment socket is within "
           "connection threshold") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_one_socket"}, {});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_one_socket"}, {});
     steamrot::FragmentInstance &fi =
-        std::get<steamrot::FragmentInstance>(part_map.begin()->second);
-    fi.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::FragmentInstance>(part_graph.begin()->second);
+    fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.transform.translate(
         {1.f, 1.f}); // distance ≈ 1.41, within connection (2.5)
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
+        joint_instance, part_graph);
 
-    REQUIRE(joint_instance.sockets[0].is_another_socket_near == true);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(fi.sockets[0].is_another_socket_near == true);
-    REQUIRE(fi.sockets[0].is_ready_to_connect == true);
+    REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(fi.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == true);
   }
 
   SECTION("most proximal fragment wins when two fragments are within range") {
@@ -1064,71 +1069,73 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) tests",
     // visited first by std::map).
     steamrot::FragmentInstance frag_far =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_far.sockets[0].local_position = {0.f, 0.f};
+    frag_far.sockets.at(0).local_position = {0.f, 0.f};
     frag_far.transform.translate({8.f, 0.f}); // distance 8 — proximity only
 
     steamrot::FragmentInstance frag_near =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_near.sockets[0].local_position = {0.f, 0.f};
+    frag_near.sockets.at(0).local_position = {0.f, 0.f};
     frag_near.transform.translate({1.f, 0.f}); // distance 1 — ready to connect
 
     const uint32_t far_id = frag_far.id; // lower ID → visited first
     const uint32_t near_id = frag_near.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(far_id, std::move(frag_far));
-    part_map.emplace(near_id, std::move(frag_near));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(far_id, std::move(frag_far));
+    part_graph.emplace(near_id, std::move(frag_near));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
+        joint_instance, part_graph);
 
     // joint socket must reflect the nearest candidate
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(joint_instance.sockets[0].distance_to_nearest_socket.has_value());
-    REQUIRE_THAT(joint_instance.sockets[0].distance_to_nearest_socket.value(),
-                 Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(
+        joint_instance.sockets.at(0).distance_to_nearest_socket.has_value());
+    REQUIRE_THAT(
+        joint_instance.sockets.at(0).distance_to_nearest_socket.value(),
+        Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
 
     // near fragment socket must be ready to connect
     const steamrot::FragmentInstance &near_ref =
-        std::get<steamrot::FragmentInstance>(part_map.at(near_id));
-    REQUIRE(near_ref.sockets[0].is_ready_to_connect == true);
+        std::get<steamrot::FragmentInstance>(part_graph.at(near_id));
+    REQUIRE(near_ref.sockets.at(0).is_ready_to_connect == true);
 
     // far fragment socket must be proximity-only (not ready)
     const steamrot::FragmentInstance &far_ref =
-        std::get<steamrot::FragmentInstance>(part_map.at(far_id));
-    REQUIRE(far_ref.sockets[0].is_another_socket_near == true);
-    REQUIRE(far_ref.sockets[0].is_ready_to_connect == false);
+        std::get<steamrot::FragmentInstance>(part_graph.at(far_id));
+    REQUIRE(far_ref.sockets.at(0).is_another_socket_near == true);
+    REQUIRE(far_ref.sockets.at(0).is_ready_to_connect == false);
   }
 
   SECTION("stale state from a previous tick is cleared at the start of each "
           "call") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_one_socket"}, {});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_one_socket"}, {});
     steamrot::FragmentInstance &fi =
-        std::get<steamrot::FragmentInstance>(part_map.begin()->second);
-    fi.sockets[0].local_position = {0.f, 0.f};
+        std::get<steamrot::FragmentInstance>(part_graph.begin()->second);
+    fi.sockets.at(0).local_position = {0.f, 0.f};
 
     // first tick: sockets close — state is set
     fi.transform.translate({1.f, 1.f});
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == true);
-    REQUIRE(fi.sockets[0].is_ready_to_connect == true);
+        joint_instance, part_graph);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == true);
 
     // second tick: fragment moves far away
     fi.transform = sf::Transform::Identity;
     fi.transform.translate({100.f, 0.f});
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        joint_instance, part_map);
+        joint_instance, part_graph);
 
     // stale state must have been cleared by the internal reset
-    REQUIRE(joint_instance.sockets[0].is_another_socket_near == false);
-    REQUIRE(joint_instance.sockets[0].is_ready_to_connect == false);
-    REQUIRE(fi.sockets[0].is_another_socket_near == false);
-    REQUIRE(fi.sockets[0].is_ready_to_connect == false);
+    REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == false);
+    REQUIRE(fi.sockets.at(0).is_another_socket_near == false);
+    REQUIRE(fi.sockets.at(0).is_ready_to_connect == false);
   }
 }
 
-TEST_CASE("check_socket_collisions(JointInstance, PartMap) multi-socket tests",
+TEST_CASE("check_socket_collisions(JointInstance, PartGraph) multi-socket tests",
           "[unit][collision_grimoire_machina]") {
   steamrot::tests::TestPartLibrary part_library =
       steamrot::tests::TestPartLibrary::Create();
@@ -1136,36 +1143,36 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) multi-socket tests",
 
   SECTION("two joint sockets: each finds its own nearest fragment candidate") {
     // Joint sockets at world (0,0) and (20,0).
-    // Two fragments in PartMap with sockets at world (1,0) and (19,0).
+    // Two fragments in PartGraph with sockets at world (1,0) and (19,0).
     steamrot::JointInstance ji = builder.MakeJointInstance("joint_two_sockets");
     REQUIRE(ji.sockets.size() == 2);
-    ji.sockets[0].local_position = {0.f, 0.f};
-    ji.sockets[1].local_position = {20.f, 0.f};
+    ji.sockets.at(0).local_position = {0.f, 0.f};
+    ji.sockets.at(1).local_position = {20.f, 0.f};
 
     steamrot::FragmentInstance frag_a =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_a.sockets[0].local_position = {0.f, 0.f};
+    frag_a.sockets.at(0).local_position = {0.f, 0.f};
     frag_a.transform.translate({1.f, 0.f});
 
     steamrot::FragmentInstance frag_b =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_b.sockets[0].local_position = {0.f, 0.f};
+    frag_b.sockets.at(0).local_position = {0.f, 0.f};
     frag_b.transform.translate({19.f, 0.f});
 
     const uint32_t a_id = frag_a.id;
     const uint32_t b_id = frag_b.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(a_id, std::move(frag_a));
-    part_map.emplace(b_id, std::move(frag_b));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(a_id, std::move(frag_a));
+    part_graph.emplace(b_id, std::move(frag_b));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        ji, part_map);
+        ji, part_graph);
 
-    REQUIRE(ji.sockets[0].is_ready_to_connect == true);
-    REQUIRE_THAT(ji.sockets[0].distance_to_nearest_socket.value(),
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE_THAT(ji.sockets.at(0).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
-    REQUIRE(ji.sockets[1].is_ready_to_connect == true);
-    REQUIRE_THAT(ji.sockets[1].distance_to_nearest_socket.value(),
+    REQUIRE(ji.sockets.at(1).is_ready_to_connect == true);
+    REQUIRE_THAT(ji.sockets.at(1).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
   }
 
@@ -1175,36 +1182,36 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) multi-socket tests",
     // J[0] should prefer frag_near; J[1] has no candidate in range.
     steamrot::JointInstance ji = builder.MakeJointInstance("joint_two_sockets");
     REQUIRE(ji.sockets.size() == 2);
-    ji.sockets[0].local_position = {0.f, 0.f};
-    ji.sockets[1].local_position = {20.f, 0.f};
+    ji.sockets.at(0).local_position = {0.f, 0.f};
+    ji.sockets.at(1).local_position = {20.f, 0.f};
 
     steamrot::FragmentInstance frag_far =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_far.sockets[0].local_position = {0.f, 0.f};
+    frag_far.sockets.at(0).local_position = {0.f, 0.f};
     frag_far.transform.translate({8.f, 0.f});
 
     steamrot::FragmentInstance frag_near =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_near.sockets[0].local_position = {0.f, 0.f};
+    frag_near.sockets.at(0).local_position = {0.f, 0.f};
     frag_near.transform.translate({1.f, 0.f});
 
     const uint32_t far_id = frag_far.id;
     const uint32_t near_id = frag_near.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(far_id, std::move(frag_far));
-    part_map.emplace(near_id, std::move(frag_near));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(far_id, std::move(frag_far));
+    part_graph.emplace(near_id, std::move(frag_near));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        ji, part_map);
+        ji, part_graph);
 
     // J[0] records nearest fragment (distance 1, ready)
-    REQUIRE(ji.sockets[0].is_ready_to_connect == true);
-    REQUIRE_THAT(ji.sockets[0].distance_to_nearest_socket.value(),
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE_THAT(ji.sockets.at(0).distance_to_nearest_socket.value(),
                  Catch::Matchers::WithinAbsMatcher(1.f, 0.01f));
 
     // J[1] has no candidate in range
-    REQUIRE(ji.sockets[1].is_another_socket_near == false);
-    REQUIRE(ji.sockets[1].is_ready_to_connect == false);
+    REQUIRE(ji.sockets.at(1).is_another_socket_near == false);
+    REQUIRE(ji.sockets.at(1).is_ready_to_connect == false);
   }
 
   SECTION("three joint sockets: only one pair ready to connect") {
@@ -1216,46 +1223,46 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) multi-socket tests",
     steamrot::JointInstance ji =
         builder.MakeJointInstance("joint_three_sockets");
     REQUIRE(ji.sockets.size() == 3);
-    ji.sockets[0].local_position = {0.f, 0.f};
-    ji.sockets[1].local_position = {10.f, 0.f};
-    ji.sockets[2].local_position = {20.f, 0.f};
+    ji.sockets.at(0).local_position = {0.f, 0.f};
+    ji.sockets.at(1).local_position = {10.f, 0.f};
+    ji.sockets.at(2).local_position = {20.f, 0.f};
 
     steamrot::FragmentInstance frag_0 =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_0.sockets[0].local_position = {0.f, 0.f};
+    frag_0.sockets.at(0).local_position = {0.f, 0.f};
     frag_0.transform.translate({1.f, 0.f});
 
     steamrot::FragmentInstance frag_1 =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_1.sockets[0].local_position = {0.f, 0.f};
+    frag_1.sockets.at(0).local_position = {0.f, 0.f};
     frag_1.transform.translate({15.f, 0.f});
 
     steamrot::FragmentInstance frag_2 =
         builder.MakeFragmentInstance("fragment_one_socket");
-    frag_2.sockets[0].local_position = {0.f, 0.f};
+    frag_2.sockets.at(0).local_position = {0.f, 0.f};
     frag_2.transform.translate({25.f, 0.f});
 
     const uint32_t id_0 = frag_0.id;
     const uint32_t id_1 = frag_1.id;
     const uint32_t id_2 = frag_2.id;
-    steamrot::PartMap part_map;
-    part_map.emplace(id_0, std::move(frag_0));
-    part_map.emplace(id_1, std::move(frag_1));
-    part_map.emplace(id_2, std::move(frag_2));
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(id_0, std::move(frag_0));
+    part_graph.emplace(id_1, std::move(frag_1));
+    part_graph.emplace(id_2, std::move(frag_2));
 
     steamrot::logic::collision::grimoire_machina::check_socket_collisions(
-        ji, part_map);
+        ji, part_graph);
 
     // only one joint socket should be ready to connect
     int joint_ready = 0;
-    for (const steamrot::SocketData &s : ji.sockets)
-      if (s.is_ready_to_connect)
+    for (const auto &[id, socket_data] : ji.sockets)
+      if (socket_data.is_ready_to_connect)
         joint_ready++;
 
     int frag_ready = 0;
-    for (const auto &[id, variant] : part_map) {
+    for (const auto &[id, variant] : part_graph) {
       if (const auto *fi = std::get_if<steamrot::FragmentInstance>(&variant))
-        if (fi->sockets[0].is_ready_to_connect)
+        if (fi->sockets.at(0).is_ready_to_connect)
           frag_ready++;
     }
 
@@ -1263,21 +1270,21 @@ TEST_CASE("check_socket_collisions(JointInstance, PartMap) multi-socket tests",
     REQUIRE(frag_ready == 1);
 
     // specifically J[0] and F[0] (frag_0)
-    REQUIRE(ji.sockets[0].is_ready_to_connect == true);
-    REQUIRE(ji.sockets[1].is_ready_to_connect == false);
-    REQUIRE(ji.sockets[2].is_ready_to_connect == false);
-    REQUIRE(std::get<steamrot::FragmentInstance>(part_map.at(id_0))
-                .sockets[0]
+    REQUIRE(ji.sockets.at(0).is_ready_to_connect == true);
+    REQUIRE(ji.sockets.at(1).is_ready_to_connect == false);
+    REQUIRE(ji.sockets.at(2).is_ready_to_connect == false);
+    REQUIRE(std::get<steamrot::FragmentInstance>(part_graph.at(id_0))
+                .sockets.at(0)
                 .is_ready_to_connect == true);
-    REQUIRE(std::get<steamrot::FragmentInstance>(part_map.at(id_1))
-                .sockets[0]
+    REQUIRE(std::get<steamrot::FragmentInstance>(part_graph.at(id_1))
+                .sockets.at(0)
                 .is_ready_to_connect == false);
-    REQUIRE(std::get<steamrot::FragmentInstance>(part_map.at(id_2))
-                .sockets[0]
+    REQUIRE(std::get<steamrot::FragmentInstance>(part_graph.at(id_2))
+                .sockets.at(0)
                 .is_ready_to_connect == false);
 
     // non-ready joint sockets still reflect proximity state where applicable
-    REQUIRE(ji.sockets[1].is_another_socket_near == true);
-    REQUIRE(ji.sockets[2].is_another_socket_near == true);
+    REQUIRE(ji.sockets.at(1).is_another_socket_near == true);
+    REQUIRE(ji.sockets.at(2).is_another_socket_near == true);
   }
 }

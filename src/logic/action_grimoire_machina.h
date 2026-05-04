@@ -106,24 +106,24 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 
 /////////////////////////////////////////////////
 /// @brief Place the current ghost item onto the scaffold as the next piece,
-/// creating a Connection when both the ghost and the scaffold have sockets
+/// creating a connection when both the ghost and the scaffold have sockets
 /// ready to connect.
 ///
 /// Calls @ref check_MrGhost_for_connection_readiness and
-/// @ref check_PartMap_for_connection_readiness. If both return a value the
-/// ghost instance is copied into @p scaffold (with a new stable ID) and a
-/// Connection between the two ready sockets is created via
-/// @ref create_connection and appended to @p scaffold.connections.
+/// @ref check_PartGraph_for_connection_readiness. If both return a value the
+/// ghost instance is copied into @p scaffold (with a new stable ID) and the
+/// connection is recorded directly on both sockets via
+/// @ref create_connection (setting @c SocketData::connected_to on each end).
 ///
 /// By convention connections are only between a FragmentInstance and a
-/// JointInstance. Does nothing if the ghost and the PartMap part have the same
+/// JointInstance. Does nothing if the ghost and the PartGraph part have the same
 /// type (both Fragment or both Joint).
 ///
 /// Does nothing if:
 ///   - @p scaffold.parts is empty (use @ref place_first_piece instead),
 ///   - the ghost instance is monostate or its part pointer is null,
 ///   - either readiness check returns @c std::nullopt, or
-///   - the ghost type and the ready PartMap part type are the same.
+///   - the ghost type and the ready PartGraph part type are the same.
 ///
 /// @param scaffold  The active MachinaFormScaffold to place the piece on.
 /// @param mr_ghost  Current ghost state carrying the instance and its
@@ -165,21 +165,23 @@ void process_subscribers(
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Creates and returns a Connection between specific SocketData on two
-/// PartInstances. returns an error string if object creation fails
+/// @brief Creates a connection between specific SocketData on two
+/// PartInstances by setting @c SocketData::connected_to on both ends
+/// symmetrically and marking both sockets as @c SocketState::Connected.
+/// Returns an error string if validation fails.
 ///
-/// Connections are ,by convention, only between a JointInstance and a
+/// Connections are, by convention, only between a JointInstance and a
 /// FragmentInstance.
 /// @param fragment FragmentInstance to connect.
-/// @param socket_index_a Socket index of the FragmentInstance to connect.
+/// @param socket_id_a Stable socket ID of the FragmentInstance to connect.
 /// @param joint JointInstance to connect.
-/// @param socket_index_b Socket index of the JointInstance to connect.
-/// @return Connection struct representing the connection between the specified
-/// sockets. return by value
+/// @param socket_id_b Stable socket ID of the JointInstance to connect.
+/// @return @c std::monostate on success, or an error string if either part
+/// has no sockets or a socket ID is not found.
 /////////////////////////////////////////////////
-std::expected<Connection, std::string>
-create_connection(FragmentInstance &fragment_instance, size_t socket_index_a,
-                  JointInstance &joint_instance, size_t socket_index_b);
+std::expected<std::monostate, std::string>
+create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
+                  JointInstance &joint_instance, uint32_t socket_id_b);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the given SocketData is in a state that allows it to
@@ -197,7 +199,7 @@ bool check_socket_for_connection_readiness(const SocketData &socket);
 ///
 /// @param mr_ghost MrGhost instance living on the Scene
 /////////////////////////////////////////////////
-std::optional<size_t>
+std::optional<uint32_t>
 check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
@@ -206,9 +208,8 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 /// first ready socket, or std::nullopt if no sockets are ready.
 ///
 ///
-/// @param part_map PartMap to check
+/// @param part_graph PartGraph to check
 /////////////////////////////////////////////////
-std::optional<std::pair<uint32_t, size_t>>
-check_PartMap_for_connection_readiness(const PartMap &part_map);
-;
+std::optional<std::pair<uint32_t, uint32_t>>
+check_PartGraph_for_connection_readiness(const PartGraph &part_graph);
 } // namespace steamrot::logic::action::grimoire_machina

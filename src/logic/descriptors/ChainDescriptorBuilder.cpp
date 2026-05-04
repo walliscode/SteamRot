@@ -9,6 +9,7 @@
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
 #include <expected>
+#include <unordered_set>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -54,18 +55,18 @@ std::expected<ChainDescriptor, std::string> ChainDescriptorBuilder::Build() {
 
   // stand in implementation: just return a descriptor that always returns false
   // for now
-  return [](const PartGraph &graph,
-            const PartNode &start_node) -> ChainDescriptorResult {
+  return [](const PartGraph & /*parts*/,
+            uint32_t /*start_id*/) -> ChainDescriptorResult {
     return ChainDescriptorResult{false};
   };
 }
+
 /////////////////////////////////////////////////
 void ChainDescriptorBuilder::dfs(
     std::vector<ChainStep>::const_iterator steps_it,
-    std::vector<ChainStep>::const_iterator steps_end,
-    const PartNode &current_node, std::vector<bool> &visited,
-    const PartGraph &main_graph, PartGraph &current_chain,
-    ChainDescriptorResult &result) {
+    std::vector<ChainStep>::const_iterator steps_end, uint32_t current_id,
+    std::unordered_set<uint32_t> &visited, const PartGraph &parts,
+    std::vector<uint32_t> &current_chain, ChainDescriptorResult &result) {
 
   /////////////////////////////////////////////////
   /// CHECKING END CONDITIONS
@@ -75,7 +76,7 @@ void ChainDescriptorBuilder::dfs(
   // match. This ignores any current nodes as we've satisfied all the predicates
   // in the chain, so we can store the result
   if (steps_it == steps_end) {
-    // store the current chain as a valid subgraph in the result
+    // store the current chain part IDs as a valid subgraph in the result
     result.valid_subgraphs.push_back(current_chain);
     return;
   }
@@ -83,7 +84,7 @@ void ChainDescriptorBuilder::dfs(
   // we may need to think about if we are tying to identify a cycle in the
   // graph, as this could be a valid match for some descriptors (maybe
   // is_visited). this may just be testing specific predicates for now
-  if (visited[current_node.id])
+  if (visited.count(current_id))
     return;
 
   /////////////////////////////////////////////////
@@ -95,7 +96,7 @@ void ChainDescriptorBuilder::dfs(
 
   // match current step predicate against current node, if it fails, return
   // false
-  if (!current_predicate(current_node)) {
+  if (!current_predicate(parts, current_id)) {
 
     // switch on the step kind to determine how to handle failure of the current
     // step
@@ -106,7 +107,7 @@ void ChainDescriptorBuilder::dfs(
       return;
     }
     case ChainStepKind::WhileIsTrue: {
-      dfs(std::next(steps_it), steps_end, current_node, visited, main_graph,
+      dfs(std::next(steps_it), steps_end, current_id, visited, parts,
           current_chain, result);
       return;
     }
@@ -114,41 +115,41 @@ void ChainDescriptorBuilder::dfs(
   }
 
   // mark current node as visited
-  visited[current_node.id] = true;
+  visited.insert(current_id);
 
-  // recursively visit adjacent nodes for the next step in the chain
-  for (const auto &edge_index : current_node.edge_indices) {
+  // find neighbours by iterating the part's sockets
+  const SocketMap &sockets = std::visit(
+      [](const auto &inst) -> const SocketMap & { return inst.sockets; },
+      parts.at(current_id));
 
-    // get the adjacent node from the main graph using the adjacent node ID
-    const PartEdge &edge = main_graph.edges[edge_index];
-    const uint32_t neighbour_id =
-        (edge.part_id_a == current_node.id) ? edge.part_id_b : edge.part_id_a;
-    const PartNode &adjacent_node =
-        main_graph.nodes[main_graph.node_index_by_id.at(neighbour_id)];
+  for (const auto &[socket_id, socket] : sockets) {
+    if (!socket.connected_to.has_value())
+      continue;
 
-    // switch on the step kind as this determines how we progress certain
-    // steps in the chain
+    const uint32_t neighbour_id = socket.connected_to->peer_part_id;
+
+    // effective_steps_it is the step iterator to pass to the recursive call;
+    // it advances for Sequence steps (one node consumed) but stays on the
+    // current step for WhileIsTrue steps (zero-or-more consumption).
+    auto effective_steps_it = steps_it;
     switch (steps_it->kind) {
     case ChainStepKind::Sequence: {
-      // for a Sequence step, we simply move to the next ChainStep as this
-      // one is satisfied
-      steps_it = std::next(steps_it);
+      effective_steps_it = std::next(steps_it);
       break;
     }
     case ChainStepKind::WhileIsTrue: {
-
-      // for a WhileIsTrue step, we stay on the current ChainStep
+      // stay on the current step
       break;
     }
     }
 
     // call the dfs function recursively
-    dfs(steps_it, steps_end, adjacent_node, visited, main_graph, current_chain,
-        result);
+    dfs(effective_steps_it, steps_end, neighbour_id, visited, parts,
+        current_chain, result);
   }
 
-  // unset current node as visited before backtracking
-  visited[current_node.id] = false;
+  // unmark current node before backtracking
+  visited.erase(current_id);
 
   return;
 }

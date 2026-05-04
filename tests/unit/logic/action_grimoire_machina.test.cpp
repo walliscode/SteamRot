@@ -16,6 +16,26 @@
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
+namespace {
+
+/////////////////////////////////////////////////
+/// @brief Require that no socket in any part of @p scaffold has
+/// @c connected_to set. Used by place_next_piece guard tests to verify that
+/// a rejected placement left the scaffold unmodified.
+/////////////////////////////////////////////////
+void require_no_connections(const steamrot::MachinaFormScaffold &scaffold) {
+  for (const auto &[part_id, variant] : scaffold.parts) {
+    std::visit(
+        [](const auto &instance) {
+          for (const auto &[sid, socket] : instance.sockets)
+            REQUIRE_FALSE(socket.connected_to.has_value());
+        },
+        variant);
+  }
+}
+
+} // namespace
+
 TEST_CASE("InitialiseActiveMachinaForm adds a new MachinaForm to the "
           "GrimoireMachina active form",
 
@@ -162,8 +182,8 @@ TEST_CASE("FragmentInstance constructor initialises socket states to Available",
 
   steamrot::FragmentInstance instance{&fragment};
 
-  REQUIRE(instance.sockets[0].state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets[1].state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
 }
 
 TEST_CASE("FragmentInstance id defaults to zero",
@@ -232,8 +252,8 @@ TEST_CASE("JointInstance constructor initialises socket states to Available",
 
   steamrot::JointInstance instance{&joint};
 
-  REQUIRE(instance.sockets[0].state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets[1].state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
 }
 
 TEST_CASE("JointInstance id defaults to zero",
@@ -299,12 +319,12 @@ TEST_CASE("JointInstance constructor zero-initialises socket positions",
 
   // Positions are zero-initialised at construction; call
   // initialize_joint_socket_positions() to populate them.
-  REQUIRE(instance.sockets[0].local_position.x == 0.f);
-  REQUIRE(instance.sockets[0].local_position.y == 0.f);
-  REQUIRE(instance.sockets[1].local_position.x == 0.f);
-  REQUIRE(instance.sockets[1].local_position.y == 0.f);
-  REQUIRE(instance.sockets[2].local_position.x == 0.f);
-  REQUIRE(instance.sockets[2].local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(0).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(0).local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(1).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(1).local_position.y == 0.f);
+  REQUIRE(instance.sockets.at(2).local_position.x == 0.f);
+  REQUIRE(instance.sockets.at(2).local_position.y == 0.f);
 }
 
 /////////////////////////////////////////////////
@@ -1224,12 +1244,12 @@ TEST_CASE("create_connection tests",
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 5, joint_instance, 5);
     REQUIRE_FALSE(connection_result.has_value());
-    REQUIRE(connection_result.error() ==
-            "Connection creation failed: one or both socket indices are out of "
-            "range.");
+    REQUIRE(
+        connection_result.error() ==
+        "Connection creation failed: one or both socket IDs are not found.");
   }
 
-  SECTION("create_connection returns a valid Connection when given valid "
+  SECTION("create_connection returns a valid result when given valid "
           "inputs") {
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance("fragment_one_socket");
@@ -1239,12 +1259,16 @@ TEST_CASE("create_connection tests",
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 0, joint_instance, 1);
     REQUIRE(connection_result.has_value());
-    steamrot::Connection connection = connection_result.value();
 
-    REQUIRE(connection.socket_a.part_id == frag_instance.id);
-    REQUIRE(connection.socket_a.socket_index == 0);
-    REQUIRE(connection.socket_b.part_id == joint_instance.id);
-    REQUIRE(connection.socket_b.socket_index == 1);
+    REQUIRE(frag_instance.sockets.at(0).connected_to.has_value());
+    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_part_id ==
+            joint_instance.id);
+    REQUIRE(frag_instance.sockets.at(0).connected_to->peer_socket_id == 1u);
+
+    REQUIRE(joint_instance.sockets.at(1).connected_to.has_value());
+    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_part_id ==
+            frag_instance.id);
+    REQUIRE(joint_instance.sockets.at(1).connected_to->peer_socket_id == 0u);
   }
 
   SECTION("create_connection changes SocketState on connected sockets to "
@@ -1421,42 +1445,43 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
   }
 }
 
-TEST_CASE("check_PartMap_for_connection_readiness tests",
-          "[unit][actions][grimoire_machina][check_PartMap_for_connection_"
+TEST_CASE("check_PartGraph_for_connection_readiness tests",
+          "[unit][actions][grimoire_machina][check_PartGraph_for_connection_"
           "readiness]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);
 
-  SECTION("check_PartMap_for_connection_readiness returns std::nullopt for "
-          "empty PartMap") {
-    steamrot::PartMap part_map;
+  SECTION("check_PartGraph_for_connection_readiness returns std::nullopt for "
+          "empty PartGraph") {
+    steamrot::PartGraph part_graph;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
 
     REQUIRE_FALSE(result);
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns std::nullopt when no "
-          "parts have available sockets") {
+  SECTION(
+      "check_PartGraph_for_connection_readiness returns std::nullopt when no "
+      "parts have available sockets") {
 
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_no_socket"}, {"joint_no_socket"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_no_socket"}, {"joint_no_socket"});
 
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
 
     REQUIRE_FALSE(result);
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+  SECTION("check_PartGraph_for_connection_readiness returns the id of a "
           "FragmentInstance with "
           "available sockets") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_two_sockets"}, {"joint_no_socket"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_two_sockets"}, {"joint_no_socket"});
 
     // get the Fragment at id 0
-    auto &part = part_map.at(0);
+    auto &part = part_graph.at(0);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part));
     auto &frag_instance = std::get<steamrot::FragmentInstance>(part);
     // set its only socket to available and ready
@@ -1464,7 +1489,7 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
     frag_instance.sockets.at(1).is_ready_to_connect = true;
 
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     REQUIRE(result.value().first ==
             0); // the id of the part with available sockets
@@ -1473,20 +1498,20 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
         1); // the index of the first available and ready socket on that part
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+  SECTION("check_PartGraph_for_connection_readiness returns the id of a "
           "JointInstance with "
           "available sockets") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_no_socket"}, {"joint_two_sockets"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_no_socket"}, {"joint_two_sockets"});
     // get the Joint at id 1
-    auto &part = part_map.at(1);
+    auto &part = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::JointInstance>(part));
     auto &joint_instance = std::get<steamrot::JointInstance>(part);
     // set its first socket to available and ready
     joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
     joint_instance.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     REQUIRE(result.value().first ==
             1); // the id of the part with available sockets
@@ -1496,24 +1521,24 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
   }
 
   SECTION(
-      "check_PartMap_for_connection_readiness returns the id of a part with "
+      "check_PartGraph_for_connection_readiness returns the id of a part with "
       "available sockets when multiple parts have available sockets") {
-    steamrot::PartMap part_map = builder.MakePartMap(
+    steamrot::PartGraph part_graph = builder.MakePartGraph(
         {"fragment_two_sockets", "fragment_one_socket"}, {"joint_no_socket"});
     // set the first Fragment's socket 1 to available and ready
-    auto &part0 = part_map.at(0);
+    auto &part0 = part_graph.at(0);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part0));
     auto &frag_instance0 = std::get<steamrot::FragmentInstance>(part0);
     frag_instance0.sockets.at(1).state = steamrot::SocketState::Available;
     frag_instance0.sockets.at(1).is_ready_to_connect = true;
     // set the second Fragment's socket 0 to available and ready
-    auto &part1 = part_map.at(1);
+    auto &part1 = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part1));
     auto &frag_instance1 = std::get<steamrot::FragmentInstance>(part1);
     frag_instance1.sockets.at(0).state = steamrot::SocketState::Available;
     frag_instance1.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     // the result should be the first part with available sockets, which is the
     // Fragment at id 0
@@ -1542,7 +1567,7 @@ TEST_CASE("place_next_piece does nothing when scaffold parts map is empty",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.empty());
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
@@ -1563,7 +1588,7 @@ TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
@@ -1580,8 +1605,7 @@ TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
 
   steamrot::MrGhost mr_ghost;
   steamrot::FragmentInstance null_fi{nullptr};
-  null_fi.sockets.push_back(
-      steamrot::SocketData{sf::Vector2f{0.f, 0.f}});
+  null_fi.sockets.insert({0, steamrot::SocketData{sf::Vector2f{0.f, 0.f}}});
   null_fi.sockets.at(0).state = steamrot::SocketState::Available;
   null_fi.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = null_fi;
@@ -1590,7 +1614,7 @@ TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
@@ -1607,8 +1631,7 @@ TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
 
   steamrot::MrGhost mr_ghost;
   steamrot::JointInstance null_ji{nullptr};
-  null_ji.sockets.push_back(
-      steamrot::SocketData{sf::Vector2f{0.f, 0.f}});
+  null_ji.sockets.insert({0, steamrot::SocketData{sf::Vector2f{0.f, 0.f}}});
   null_ji.sockets.at(0).state = steamrot::SocketState::Available;
   null_ji.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = null_ji;
@@ -1617,7 +1640,7 @@ TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
@@ -1642,10 +1665,10 @@ TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
+TEST_CASE("place_next_piece does nothing when PartGraph has no ready sockets",
           "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
@@ -1667,11 +1690,11 @@ TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE(
-    "place_next_piece does nothing when ghost and PartMap part are both "
+    "place_next_piece does nothing when ghost and PartGraph part are both "
     "FragmentInstances",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
@@ -1694,11 +1717,11 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 TEST_CASE(
-    "place_next_piece does nothing when ghost and PartMap part are both "
+    "place_next_piece does nothing when ghost and PartGraph part are both "
     "JointInstances",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
@@ -1721,7 +1744,7 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 1);
-  REQUIRE(scaffold.connections.empty());
+  require_no_connections(scaffold);
 }
 
 /////////////////////////////////////////////////
@@ -1730,7 +1753,7 @@ TEST_CASE(
 
 TEST_CASE(
     "place_next_piece places a FragmentInstance when ghost is Fragment and "
-    "PartMap has a ready Joint",
+    "PartGraph has a ready Joint",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
@@ -1753,12 +1776,12 @@ TEST_CASE(
                                                               mr_ghost);
 
   REQUIRE(scaffold.parts.size() == 2);
-  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
-      scaffold.parts.at(1)));
+  REQUIRE(
+      std::holds_alternative<steamrot::FragmentInstance>(scaffold.parts.at(1)));
 }
 
 TEST_CASE(
-    "place_next_piece places a JointInstance when ghost is Joint and PartMap "
+    "place_next_piece places a JointInstance when ghost is Joint and PartGraph "
     "has a ready Fragment",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
@@ -1836,20 +1859,26 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
                                                               mr_ghost);
 
-  REQUIRE(scaffold.connections.size() == 1);
-  const steamrot::Connection &conn = scaffold.connections.at(0);
-  // socket_a is the newly placed FragmentInstance (id=1, socket index 0)
-  REQUIRE(conn.socket_a.part_id == 1u);
-  REQUIRE(conn.socket_a.socket_index == 0u);
-  // socket_b is the existing JointInstance (id=0, socket index 0)
-  REQUIRE(conn.socket_b.part_id == 0u);
-  REQUIRE(conn.socket_b.socket_index == 0u);
+  REQUIRE(scaffold.parts.size() == 2);
+  // Placed FragmentInstance (id=1): socket[0] connects to existing Joint (id=0,
+  // socket 0)
+  const auto &placed_fi =
+      std::get<steamrot::FragmentInstance>(scaffold.parts.at(1));
+  REQUIRE(placed_fi.sockets.at(0).connected_to.has_value());
+  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_part_id == 0u);
+  REQUIRE(placed_fi.sockets.at(0).connected_to->peer_socket_id == 0u);
+  // Existing JointInstance (id=0): socket[0] connects back to placed Fragment
+  // (id=1, socket 0)
+  const auto &existing_ji =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(0));
+  REQUIRE(existing_ji.sockets.at(0).connected_to.has_value());
+  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_part_id == 1u);
+  REQUIRE(existing_ji.sockets.at(0).connected_to->peer_socket_id == 0u);
 }
 
-TEST_CASE(
-    "place_next_piece: connection endpoints are correct when Joint ghost "
-    "connects to existing Fragment",
-    "[unit][actions][grimoire_machina][place_next_piece]") {
+TEST_CASE("place_next_piece: connection endpoints are correct when Joint ghost "
+          "connects to existing Fragment",
+          "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);
@@ -1869,19 +1898,25 @@ TEST_CASE(
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
                                                               mr_ghost);
 
-  REQUIRE(scaffold.connections.size() == 1);
-  const steamrot::Connection &conn = scaffold.connections.at(0);
-  // socket_a is the existing FragmentInstance (id=0, socket index 1)
-  REQUIRE(conn.socket_a.part_id == 0u);
-  REQUIRE(conn.socket_a.socket_index == 1u);
-  // socket_b is the newly placed JointInstance (id=1, socket index 0)
-  REQUIRE(conn.socket_b.part_id == 1u);
-  REQUIRE(conn.socket_b.socket_index == 0u);
+  REQUIRE(scaffold.parts.size() == 2);
+  // Existing FragmentInstance (id=0): socket[1] connects to placed Joint (id=1,
+  // socket 0)
+  const auto &existing_fi =
+      std::get<steamrot::FragmentInstance>(scaffold.parts.at(0));
+  REQUIRE(existing_fi.sockets.at(1).connected_to.has_value());
+  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_part_id == 1u);
+  REQUIRE(existing_fi.sockets.at(1).connected_to->peer_socket_id == 0u);
+  // Placed JointInstance (id=1): socket[0] connects back to existing Fragment
+  // (id=0, socket 1)
+  const auto &placed_ji =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(1));
+  REQUIRE(placed_ji.sockets.at(0).connected_to.has_value());
+  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_part_id == 0u);
+  REQUIRE(placed_ji.sockets.at(0).connected_to->peer_socket_id == 1u);
 }
 
-TEST_CASE(
-    "place_next_piece marks connected sockets as SocketState::Connected",
-    "[unit][actions][grimoire_machina][place_next_piece]") {
+TEST_CASE("place_next_piece marks connected sockets as SocketState::Connected",
+          "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);

@@ -121,16 +121,16 @@ void CheckMouseOver(sf::Vector2f world_mouse,
                     FragmentInstance &fragment_instance) {
 
   // cycle through all sockets in the fragment and check if any are hovered
-  for (size_t i = 0; i < fragment_instance.sockets.size(); ++i) {
+  for (auto &[socket_id, socket] : fragment_instance.sockets) {
 
     // get the world position of the socket by applying the fragment's transform
     // to the socket's local position
     const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        fragment_instance.sockets[i].local_position);
+        socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(world_mouse, world_pos, fragment_instance.sockets[i]);
+    CheckMouseOver(world_mouse, world_pos, socket);
   }
 }
 
@@ -138,16 +138,16 @@ void CheckMouseOver(sf::Vector2f world_mouse,
 void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 
   // cycle through all sockets in the joint and check if any are hovered
-  for (size_t i = 0; i < joint_instance.sockets.size(); ++i) {
+  for (auto &[socket_id, socket] : joint_instance.sockets) {
 
     // get the world position of the socket by applying the joint's transform
     // to the stored local socket position
     const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        joint_instance.sockets[i].local_position);
+        socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
-    CheckMouseOver(world_mouse, world_pos, joint_instance.sockets[i]);
+    CheckMouseOver(world_mouse, world_pos, socket);
   }
 }
 

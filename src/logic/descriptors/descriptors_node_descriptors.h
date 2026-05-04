@@ -13,7 +13,9 @@
 /////////////////////////////////////////////////
 
 #include "DescriptorResult.h"
-#include "PartGraph.h"
+#include "MachinaFormScaffold.h"
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 namespace steamrot::logic::descriptors {
 
@@ -21,50 +23,44 @@ namespace steamrot::logic::descriptors {
 /// @brief Predicate type for single-node queries on a PartGraph.
 ///
 /// Any callable with signature
-/// @c NodeDescriptorResult(const PartNode&) qualifies.
-/// @c is_fragment, @c is_joint, and @c has_available_socket in
-/// @c steamrot::logic::analysis::grimoire_machina are declared as
-/// @c const @c NodeDescriptor variables and can be used directly or
-/// assigned to other @c NodeDescriptor instances.
+/// @c NodeDescriptorResult(const PartGraph&, uint32_t part_id)
+/// qualifies. @c is_fragment, @c is_joint, and the edge-count helpers are
+/// declared as @c const @c NodeDescriptor variables and can be used directly
+/// or assigned to other @c NodeDescriptor instances.
 ///
 /// Example:
 /// @code
-/// NodeDescriptor predicate = agm::is_fragment;
-/// NodeDescriptorResult result = predicate(node);
+/// NodeDescriptor predicate = descriptors::is_fragment;
+/// NodeDescriptorResult result = predicate(scaffold.parts, id);
 /// @endcode
 /////////////////////////////////////////////////
-using NodeDescriptor = std::function<NodeDescriptorResult(const PartNode &)>;
+using NodeDescriptor =
+    std::function<NodeDescriptorResult(const PartGraph &, uint32_t)>;
 
 /////////////////////////////////////////////////
-/// @brief Predicate for a single node with access to the whole graph.
+/// @brief Predicate for a single node with full access to the PartGraph.
 ///
 /// Any callable with signature
-/// @c NodeDescriptorResult(const PartGraph&, const PartNode&) qualifies.
-/// Use when the predicate needs to examine neighbouring nodes via the graph
-/// but does not need to walk further than one hop from the anchor.
-///
-/// Obtain instances from the modifier free functions in
-/// @c steamrot::descriptors (see @c descriptor_ops.h in @c src/logic/).
+/// @c NodeDescriptorResult(const PartGraph&, uint32_t part_id)
+/// qualifies. Semantically distinct from @c NodeDescriptor: use
+/// @c ContextualNodeDescriptor when the predicate examines neighbouring
+/// nodes via socket traversal, and @c NodeDescriptor when it examines only
+/// the named node's own data.
 /////////////////////////////////////////////////
 using ContextualNodeDescriptor =
-    std::function<NodeDescriptorResult(const PartGraph &, const PartNode &)>;
+    std::function<NodeDescriptorResult(const PartGraph &, uint32_t)>;
 
 /////////////////////////////////////////////////
 /// @brief Lift a NodeDescriptor to a ContextualNodeDescriptor.
 ///
-/// The PartGraph argument is ignored; the wrapped descriptor is applied to
-/// the node alone. Use when a function requires a ContextualNodeDescriptor
-/// but you only need to examine the node's own data.
+/// Both types share the same signature; this is an identity conversion
+/// used to make the semantic promotion explicit at call sites.
 ///
 /// @param nd NodeDescriptor to lift.
-/// @return ContextualNodeDescriptor that delegates to @p nd.
+/// @return ContextualNodeDescriptor wrapping @p nd.
 /////////////////////////////////////////////////
-inline ContextualNodeDescriptor lift(NodeDescriptor nd) {
-  return [nd = std::move(nd)](const PartGraph & /*graph*/,
-                              const PartNode &node) -> NodeDescriptorResult {
-    return nd(node);
-  };
-}
+inline ContextualNodeDescriptor lift(NodeDescriptor nd) { return nd; }
+
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
 /// FragmentInstance.
@@ -79,16 +75,16 @@ extern const NodeDescriptor is_joint;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has exactly
-/// @p n PartEdges (i.e., exactly @p n connected sockets).
+/// @p n connections (i.e., exactly @p n connected sockets).
 ///
-/// @param n Number of edges.
-/// @return NodeDescriptor returning true when edges count == n.
+/// @param n Number of connections.
+/// @return NodeDescriptor returning true when connection_count == n.
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n);
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has exactly
-/// 2 PartEdges
+/// 2 connections.
 ///
 /// serial is used to indicate part of a serial chain
 /////////////////////////////////////////////////
@@ -96,26 +92,26 @@ extern const NodeDescriptor is_serial;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at least
-/// @p n PartEdges (i.e., at least @p n connected sockets).
+/// @p n connections (i.e., at least @p n connected sockets).
 ///
-/// @param n Minimum number of edges.
-/// @return NodeDescriptor returning true when edges count >= n.
+/// @param n Minimum number of connections.
+/// @return NodeDescriptor returning true when connection_count >= n.
 /////////////////////////////////////////////////
 NodeDescriptor has_minimum_n_edges(size_t n);
 
 /////////////////////////////////////////////////
 /// @brief A NodeDescriptor that returns true when the node has at least 3
-/// PartEdges (i.e., at least 3 connected sockets), indicating a "branching"
+/// connections (i.e., at least 3 connected sockets), indicating a "branching"
 /// point
 /////////////////////////////////////////////////
 extern const NodeDescriptor is_branched;
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at
-/// most @p n PartEdges (i.e., at most @p n connected sockets).
+/// most @p n connections (i.e., at most @p n connected sockets).
 ///
-/// @param n Maximum number of edges.
-/// @return NodeDescriptor returning true when edges count <= n.
+/// @param n Maximum number of connections.
+/// @return NodeDescriptor returning true when connection_count <= n.
 /////////////////////////////////////////////////
 NodeDescriptor has_maximum_n_edges(size_t n);
 

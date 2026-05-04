@@ -27,12 +27,12 @@
 /// corresponding entry in a ScaffoldScenarioExpectations value.
 ///
 /// PartLibraryBuilder wraps a TestPartLibrary reference and provides
-/// convenience methods to create FragmentInstances, JointInstances, PartMaps,
+/// convenience methods to create FragmentInstances, JointInstances, PartGraphs,
 /// and fully-connected scaffolds backed by the library's storage.
 ///
 /// ⚠ Instances produced by PartLibraryBuilder hold raw pointers into the
 /// TestPartLibrary they were built from. The library must outlive any
-/// instances, PartMaps, or ScaffoldResults it produces. This applies to the
+/// instances, PartGraphs, or ScaffoldResults it produces. This applies to the
 /// pre-built scaffold_scenarios as well — do not extract a scenario from the
 /// library and use it after the library is destroyed, as scenarios hold raw
 /// pointers into the library's part storage.
@@ -181,9 +181,9 @@ struct ConnectionSpec {
   size_t part_index_a{0};
 
   /////////////////////////////////////////////////
-  /// @brief Index into the first part's sockets vector.
+  /// @brief Stable socket ID on the first part's sockets map.
   /////////////////////////////////////////////////
-  size_t socket_index_a{0};
+  uint32_t socket_id_a{0};
 
   /////////////////////////////////////////////////
   /// @brief Insertion-order index of the second part.
@@ -191,9 +191,9 @@ struct ConnectionSpec {
   size_t part_index_b{0};
 
   /////////////////////////////////////////////////
-  /// @brief Index into the second part's sockets vector.
+  /// @brief Stable socket ID on the second part's sockets map.
   /////////////////////////////////////////////////
-  size_t socket_index_b{0};
+  uint32_t socket_id_b{0};
 };
 
 /////////////////////////////////////////////////
@@ -275,12 +275,11 @@ struct ScaffoldScenarioExpectations {
 /// @brief Run a NodeDescriptor against every ScaffoldScenario and assert
 ///        exact per-node results.
 ///
-/// Builds a PartGraph from each pre-wired scenario in @p lib, applies
-/// @p descriptor to every node, and CHECKs the result against the
-/// corresponding entry in @p expected.  A REQUIRE guards that each graph's
-/// node count matches the expected array size before the per-node CHECKs
-/// run, so a mismatch is reported immediately rather than causing an
-/// out-of-bounds access.
+/// Iterates each pre-wired scenario in @p lib, applies @p descriptor to every
+/// part, and CHECKs the result against the corresponding entry in @p expected.
+/// A REQUIRE guards that each scaffold's part count matches the expected array
+/// size before the per-node CHECKs run, so a mismatch is reported immediately
+/// rather than causing an out-of-bounds access.
 ///
 /// Must be called from within a Catch2 TEST_CASE (or SECTION) because it
 /// uses the CHECK and REQUIRE macros.
@@ -295,10 +294,10 @@ void CheckNodeDescriptorForAllScenarios(
 
 /////////////////////////////////////////////////
 /// @class PartLibraryBuilder
-/// @brief Creates instances and PartMaps from a TestPartLibrary.
+/// @brief Creates instances and PartGraphs from a TestPartLibrary.
 ///
 /// Wraps a TestPartLibrary reference and exposes convenience methods for
-/// constructing FragmentInstances, JointInstances, PartMaps, and
+/// constructing FragmentInstances, JointInstances, PartGraphs, and
 /// fully-connected scaffolds in tests. Each builder maintains its own ID
 /// counter so IDs are unique within a single builder's lifetime.
 ///
@@ -314,8 +313,8 @@ void CheckNodeDescriptorForAllScenarios(
 /// FragmentInstance fi = builder.MakeFragmentInstance("fragment_one_socket");
 /// JointInstance    ji = builder.MakeJointInstance("joint_two_sockets");
 ///
-/// // Build a PartMap from a named subset
-/// PartMap parts = builder.MakePartMap({"fragment_no_socket"},
+/// // Build a PartGraph from a named subset
+/// PartGraph parts = builder.MakePartGraph({"fragment_no_socket"},
 ///                                     {"joint_one_socket"});
 ///
 /// // Build a scaffold with connections (no ID hunting, no socket patching)
@@ -394,20 +393,20 @@ public:
                     sf::Transform initial_transform = sf::Transform::Identity);
 
   /////////////////////////////////////////////////
-  /// @brief Build a PartMap from named Fragments and Joints in the library.
+  /// @brief Build a PartGraph from named Fragments and Joints in the library.
   ///
   /// Fragment instances are inserted first (in order), then Joint instances.
   /// Each entry is assigned a monotonically increasing ID from this builder's
   /// internal counter.
   ///
   /// All raw pointers in the returned instances point into the library's
-  /// storage — the library must outlive the PartMap.
+  /// storage — the library must outlive the PartGraph.
   ///
   /// @param fragment_names Names of Fragments to include, in order.
   /// @param joint_names    Names of Joints to include, in order.
-  /// @return PartMap keyed by stable instance IDs.
+  /// @return PartGraph keyed by stable instance IDs.
   /////////////////////////////////////////////////
-  PartMap MakePartMap(const std::vector<std::string> &fragment_names,
+  PartGraph MakePartGraph(const std::vector<std::string> &fragment_names,
                       const std::vector<std::string> &joint_names);
 
   /////////////////////////////////////////////////
@@ -422,9 +421,9 @@ public:
   /// All raw pointers in the instances point into the library's storage — the
   /// library must outlive the returned scaffold.
   ///
-  /// Typical usage: call MakeScaffoldWithParts to obtain a scaffold, then push
-  /// Connection values into @c scaffold.connections to build connected or ring
-  /// scenarios. For scenarios that need connections, prefer
+  /// Typical usage: call MakeScaffoldWithParts to obtain a scaffold, then set
+  /// @c SocketData::connected_to on individual sockets to build connected or
+  /// ring scenarios. For scenarios that need connections, prefer
   /// MakeConnectedScaffold which handles all wiring automatically.
   ///
   /// @param fragment_names Names of Fragments to include, in order.
@@ -444,8 +443,8 @@ public:
   /// map-walking or ID hunting is needed in tests.
   ///
   /// For every connection in @p connections the method:
-  ///   - Appends a Connection to the scaffold's @c connections vector.
-  ///   - Marks both endpoint sockets as @c SocketState::Connected.
+  ///   - Sets @c SocketData::connected_to on both endpoint sockets
+  ///     (reciprocally) and marks them as @c SocketState::Connected.
   ///
   /// Fails the test (via FAIL) if any part index or socket index in a
   /// ConnectionSpec is out of range.

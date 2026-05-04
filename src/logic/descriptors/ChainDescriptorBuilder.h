@@ -14,6 +14,7 @@
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
 #include <expected>
+#include <unordered_set>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -129,13 +130,19 @@ public:
   ///
   /// This is currently for subgraph matching using ChainDescriptors
   ///
-  /// @param current_step_predicate [TODO:parameter]
-  /// @return [TODO:return]
+  /// @param steps_it    Iterator to the current step in the walk pattern.
+  /// @param steps_end   Past-the-end iterator for the steps sequence.
+  /// @param current_id  Stable part ID of the node being evaluated.
+  /// @param visited     Set of part IDs already on the current path (cycle guard).
+  /// @param parts       The PartGraph being traversed.
+  /// @param current_chain  Part IDs on the current candidate path.
+  /// @param result      Accumulates matched and rejected subgraph ID lists.
   /////////////////////////////////////////////////
   void dfs(std::vector<ChainStep>::const_iterator steps_it,
            std::vector<ChainStep>::const_iterator steps_end,
-           const PartNode &current_node, std::vector<bool> &visited,
-           const PartGraph &main_graph, PartGraph &current_chain,
+           uint32_t current_id, std::unordered_set<uint32_t> &visited,
+           const PartGraph &parts,
+           std::vector<uint32_t> &current_chain,
            ChainDescriptorResult &result);
 };
 } // namespace steamrot::logic::descriptors

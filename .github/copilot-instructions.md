@@ -27,6 +27,13 @@ to the focused instruction file that matches your current task.
 5. **Read `README.md`** at the repo root to understand the current project
    state before making changes.
 
+6. **Descriptor work requires a documentation update.** Whenever you add,
+   change, or remove a descriptor type alias, signature, concrete predicate,
+   or test pattern, you **must** also update
+   `docs/workflows/adding_descriptors.md` to match. Load
+   [`instructions/engine-descriptors.instructions.md`](.github/instructions/engine-descriptors.instructions.md)
+   before starting any descriptors task.
+
 ---
 
 ## Using the Instruction System
@@ -46,6 +53,7 @@ to the focused instruction file that matches your current task.
 | Writing or organising tests | `instructions/testing-overview.instructions.md` *(coming soon)* |
 | Data-driven tests (`test_data.fbs`, JSON fixture files) | `instructions/testing-data-driven.instructions.md` *(coming soon)* |
 | Assets, `PathProvider`, `data/` layout | `instructions/assets-data-files.instructions.md` *(coming soon)* |
+| Descriptors (`NodeDescriptor`, `ChainDescriptor`, `GraphDescriptor`, `PartGraph`) | [`instructions/engine-descriptors.instructions.md`](.github/instructions/engine-descriptors.instructions.md) |
 | Adding or updating instruction files themselves | [`instructions/meta-workflows.instructions.md`](.github/instructions/meta-workflows.instructions.md) |
 
 ### Step 2 — No matching workflow?
