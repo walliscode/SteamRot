@@ -95,31 +95,40 @@ void process_logic_events(Subscriber &subscriber,
 /////////////////////////////////////////////////
 void place_first_piece(GrimoireMachina &grimoire_machina,
                        const MrGhost &mr_ghost) {
-
+  // if no active scaffold, return
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
     return;
 
+  // if scaffold already has pieces, return
   if (!scaffold->parts.empty())
     return;
 
+  // deal with FragmentInstance selection
   if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
     const FragmentInstance &ghost_fi =
         std::get<FragmentInstance>(mr_ghost.m_instance);
+    // if the Fragment pointer is null, return
     if (!ghost_fi.fragment)
       return;
 
+    // create a new FragmentInstance from the ghost selection, assign it the
+    // next available stable ID, and add it to the scaffold's PartMap
     FragmentInstance instance{ghost_fi};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
     scaffold->parts.emplace(id, std::move(instance));
 
+    // deal with JointInstance selection
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
     const JointInstance &ghost_ji =
         std::get<JointInstance>(mr_ghost.m_instance);
+    // if the Joint pointer is null, return
     if (!ghost_ji.joint)
       return;
 
+    // create a new JointInstance from the ghost selection, assign it the next
+    // available stable ID, and add it to the scaffold's PartMap
     JointInstance instance{ghost_ji};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
@@ -188,9 +197,8 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     FragmentInstance &existing_fi =
         std::get<FragmentInstance>(scaffold.parts.at(partmap_part_id));
 
-    auto connection_result =
-        create_connection(existing_fi, partmap_socket_id, placed_ji,
-                          ghost_socket_index.value());
+    auto connection_result = create_connection(
+        existing_fi, partmap_socket_id, placed_ji, ghost_socket_index.value());
     static_cast<void>(connection_result);
   }
 }
@@ -370,11 +378,10 @@ check_PartMap_for_connection_readiness(const PartMap &part_map) {
         [](const auto &inst) -> const SocketMap & { return inst.sockets; },
         part);
 
-    auto it = std::find_if(sockets.begin(), sockets.end(),
-                           [](const auto &entry) {
-                             return check_socket_for_connection_readiness(
-                                 entry.second);
-                           });
+    auto it =
+        std::find_if(sockets.begin(), sockets.end(), [](const auto &entry) {
+          return check_socket_for_connection_readiness(entry.second);
+        });
 
     // if successful, return the part id and stable socket ID of the first
     // ready socket
