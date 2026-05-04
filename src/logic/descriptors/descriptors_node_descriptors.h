@@ -20,10 +20,10 @@
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
-/// @brief Predicate type for single-node queries on a MachinaFormScaffold.
+/// @brief Predicate type for single-node queries on a PartGraph.
 ///
 /// Any callable with signature
-/// @c NodeDescriptorResult(const MachinaFormScaffold&, uint32_t part_id)
+/// @c NodeDescriptorResult(const PartGraph&, uint32_t part_id)
 /// qualifies. @c is_fragment, @c is_joint, and the edge-count helpers are
 /// declared as @c const @c NodeDescriptor variables and can be used directly
 /// or assigned to other @c NodeDescriptor instances.
@@ -31,24 +31,24 @@ namespace steamrot::logic::descriptors {
 /// Example:
 /// @code
 /// NodeDescriptor predicate = descriptors::is_fragment;
-/// NodeDescriptorResult result = predicate(scaffold, id);
+/// NodeDescriptorResult result = predicate(scaffold.parts, id);
 /// @endcode
 /////////////////////////////////////////////////
 using NodeDescriptor =
-    std::function<NodeDescriptorResult(const MachinaFormScaffold &, uint32_t)>;
+    std::function<NodeDescriptorResult(const PartGraph &, uint32_t)>;
 
 /////////////////////////////////////////////////
-/// @brief Predicate for a single node with full access to the scaffold.
+/// @brief Predicate for a single node with full access to the PartGraph.
 ///
 /// Any callable with signature
-/// @c NodeDescriptorResult(const MachinaFormScaffold&, uint32_t part_id)
+/// @c NodeDescriptorResult(const PartGraph&, uint32_t part_id)
 /// qualifies. Semantically distinct from @c NodeDescriptor: use
 /// @c ContextualNodeDescriptor when the predicate examines neighbouring
 /// nodes via socket traversal, and @c NodeDescriptor when it examines only
 /// the named node's own data.
 /////////////////////////////////////////////////
 using ContextualNodeDescriptor =
-    std::function<NodeDescriptorResult(const MachinaFormScaffold &, uint32_t)>;
+    std::function<NodeDescriptorResult(const PartGraph &, uint32_t)>;
 
 /////////////////////////////////////////////////
 /// @brief Lift a NodeDescriptor to a ContextualNodeDescriptor.

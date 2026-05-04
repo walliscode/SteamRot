@@ -274,7 +274,7 @@ struct FragmentInstance : public PartInstance {
 };
 
 /// using helpers ///
-using PartMap =
+using PartGraph =
     std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
 
 /////////////////////////////////////////////////
@@ -305,7 +305,7 @@ struct MachinaFormScaffold {
   /// Using std::map gives node-stable storage: insertions and erasures never
   /// invalidate references or iterators to other elements.
   /////////////////////////////////////////////////
-  PartMap parts;
+  PartGraph parts;
 
   // Boolean States //
 

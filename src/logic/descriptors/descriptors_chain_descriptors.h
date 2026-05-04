@@ -22,7 +22,7 @@ namespace steamrot::logic::descriptors {
 /// @brief Predicate for a multi-hop walk starting from one anchor node.
 ///
 /// Any callable with signature
-/// @c ChainDescriptorResult(const PartMap&, uint32_t part_id)
+/// @c ChainDescriptorResult(const PartGraph&, uint32_t part_id)
 /// qualifies. The distinction from @c ContextualNodeDescriptor is semantic:
 /// a @c ChainDescriptor answers a structural question about a subgraph
 /// reachable from the start node (e.g. "does a 3-node linear chain begin
@@ -32,7 +32,7 @@ namespace steamrot::logic::descriptors {
 /// (see @c ChainDescriptorBuilder.h in @c src/logic/).
 /////////////////////////////////////////////////
 using ChainDescriptor =
-    std::function<ChainDescriptorResult(const PartMap &, uint32_t)>;
+    std::function<ChainDescriptorResult(const PartGraph &, uint32_t)>;
 
 /////////////////////////////////////////////////
 /// @brief Lift a NodeDescriptor to a ChainDescriptor.
@@ -46,9 +46,9 @@ using ChainDescriptor =
 /// @return ChainDescriptor that delegates to @p nd.
 /////////////////////////////////////////////////
 inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
-  return [nd = std::move(nd)](const &PartMap part_map,
-                              uint32_t id) -> ChainDescriptorResult {
-    return ChainDescriptorResult{static_cast<bool>(nd(part_map, id))};
+  return [nd = std::move(nd)](const PartGraph &parts,
+                               uint32_t id) -> ChainDescriptorResult {
+    return ChainDescriptorResult{static_cast<bool>(nd(parts, id))};
   };
 }
 } // namespace steamrot::logic::descriptors

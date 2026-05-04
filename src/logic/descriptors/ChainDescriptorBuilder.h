@@ -62,7 +62,7 @@ struct ChainStep {
 /////////////////////////////////////////////////
 /// @class ChainDescriptorBuilder
 /// @brief Builds a ChainDescriptor from an ordered list of ChainSteps matched
-///        against a DFS walk through the MachinaFormScaffold.
+///        against a DFS walk through the PartGraph.
 /////////////////////////////////////////////////
 class ChainDescriptorBuilder {
 
@@ -134,14 +134,14 @@ public:
   /// @param steps_end   Past-the-end iterator for the steps sequence.
   /// @param current_id  Stable part ID of the node being evaluated.
   /// @param visited     Set of part IDs already on the current path (cycle guard).
-  /// @param scaffold    The scaffold being traversed.
+  /// @param parts       The PartGraph being traversed.
   /// @param current_chain  Part IDs on the current candidate path.
   /// @param result      Accumulates matched and rejected subgraph ID lists.
   /////////////////////////////////////////////////
   void dfs(std::vector<ChainStep>::const_iterator steps_it,
            std::vector<ChainStep>::const_iterator steps_end,
            uint32_t current_id, std::unordered_set<uint32_t> &visited,
-           const MachinaFormScaffold &scaffold,
+           const PartGraph &parts,
            std::vector<uint32_t> &current_chain,
            ChainDescriptorResult &result);
 };

@@ -1445,42 +1445,42 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
   }
 }
 
-TEST_CASE("check_PartMap_for_connection_readiness tests",
-          "[unit][actions][grimoire_machina][check_PartMap_for_connection_"
+TEST_CASE("check_PartGraph_for_connection_readiness tests",
+          "[unit][actions][grimoire_machina][check_PartGraph_for_connection_"
           "readiness]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);
 
-  SECTION("check_PartMap_for_connection_readiness returns std::nullopt for "
-          "empty PartMap") {
-    steamrot::PartMap part_map;
+  SECTION("check_PartGraph_for_connection_readiness returns std::nullopt for "
+          "empty PartGraph") {
+    steamrot::PartGraph part_graph;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
 
     REQUIRE_FALSE(result);
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns std::nullopt when no "
+  SECTION("check_PartGraph_for_connection_readiness returns std::nullopt when no "
           "parts have available sockets") {
 
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_no_socket"}, {"joint_no_socket"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_no_socket"}, {"joint_no_socket"});
 
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
 
     REQUIRE_FALSE(result);
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+  SECTION("check_PartGraph_for_connection_readiness returns the id of a "
           "FragmentInstance with "
           "available sockets") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_two_sockets"}, {"joint_no_socket"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_two_sockets"}, {"joint_no_socket"});
 
     // get the Fragment at id 0
-    auto &part = part_map.at(0);
+    auto &part = part_graph.at(0);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part));
     auto &frag_instance = std::get<steamrot::FragmentInstance>(part);
     // set its only socket to available and ready
@@ -1488,7 +1488,7 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
     frag_instance.sockets.at(1).is_ready_to_connect = true;
 
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     REQUIRE(result.value().first ==
             0); // the id of the part with available sockets
@@ -1497,20 +1497,20 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
         1); // the index of the first available and ready socket on that part
   }
 
-  SECTION("check_PartMap_for_connection_readiness returns the id of a "
+  SECTION("check_PartGraph_for_connection_readiness returns the id of a "
           "JointInstance with "
           "available sockets") {
-    steamrot::PartMap part_map =
-        builder.MakePartMap({"fragment_no_socket"}, {"joint_two_sockets"});
+    steamrot::PartGraph part_graph =
+        builder.MakePartGraph({"fragment_no_socket"}, {"joint_two_sockets"});
     // get the Joint at id 1
-    auto &part = part_map.at(1);
+    auto &part = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::JointInstance>(part));
     auto &joint_instance = std::get<steamrot::JointInstance>(part);
     // set its first socket to available and ready
     joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
     joint_instance.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     REQUIRE(result.value().first ==
             1); // the id of the part with available sockets
@@ -1520,24 +1520,24 @@ TEST_CASE("check_PartMap_for_connection_readiness tests",
   }
 
   SECTION(
-      "check_PartMap_for_connection_readiness returns the id of a part with "
+      "check_PartGraph_for_connection_readiness returns the id of a part with "
       "available sockets when multiple parts have available sockets") {
-    steamrot::PartMap part_map = builder.MakePartMap(
+    steamrot::PartGraph part_graph = builder.MakePartGraph(
         {"fragment_two_sockets", "fragment_one_socket"}, {"joint_no_socket"});
     // set the first Fragment's socket 1 to available and ready
-    auto &part0 = part_map.at(0);
+    auto &part0 = part_graph.at(0);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part0));
     auto &frag_instance0 = std::get<steamrot::FragmentInstance>(part0);
     frag_instance0.sockets.at(1).state = steamrot::SocketState::Available;
     frag_instance0.sockets.at(1).is_ready_to_connect = true;
     // set the second Fragment's socket 0 to available and ready
-    auto &part1 = part_map.at(1);
+    auto &part1 = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part1));
     auto &frag_instance1 = std::get<steamrot::FragmentInstance>(part1);
     frag_instance1.sockets.at(0).state = steamrot::SocketState::Available;
     frag_instance1.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
-        check_PartMap_for_connection_readiness(part_map);
+        check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     // the result should be the first part with available sockets, which is the
     // Fragment at id 0
@@ -1667,7 +1667,7 @@ TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
   require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
+TEST_CASE("place_next_piece does nothing when PartGraph has no ready sockets",
           "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
@@ -1692,7 +1692,7 @@ TEST_CASE("place_next_piece does nothing when PartMap has no ready sockets",
   require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when ghost and PartMap part are both "
+TEST_CASE("place_next_piece does nothing when ghost and PartGraph part are both "
           "FragmentInstances",
           "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
@@ -1718,7 +1718,7 @@ TEST_CASE("place_next_piece does nothing when ghost and PartMap part are both "
   require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when ghost and PartMap part are both "
+TEST_CASE("place_next_piece does nothing when ghost and PartGraph part are both "
           "JointInstances",
           "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
@@ -1750,7 +1750,7 @@ TEST_CASE("place_next_piece does nothing when ghost and PartMap part are both "
 
 TEST_CASE(
     "place_next_piece places a FragmentInstance when ghost is Fragment and "
-    "PartMap has a ready Joint",
+    "PartGraph has a ready Joint",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
@@ -1778,7 +1778,7 @@ TEST_CASE(
 }
 
 TEST_CASE(
-    "place_next_piece places a JointInstance when ghost is Joint and PartMap "
+    "place_next_piece places a JointInstance when ghost is Joint and PartGraph "
     "has a ready Fragment",
     "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{

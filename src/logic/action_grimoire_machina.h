@@ -110,20 +110,20 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 /// ready to connect.
 ///
 /// Calls @ref check_MrGhost_for_connection_readiness and
-/// @ref check_PartMap_for_connection_readiness. If both return a value the
+/// @ref check_PartGraph_for_connection_readiness. If both return a value the
 /// ghost instance is copied into @p scaffold (with a new stable ID) and the
 /// connection is recorded directly on both sockets via
 /// @ref create_connection (setting @c SocketData::connected_to on each end).
 ///
 /// By convention connections are only between a FragmentInstance and a
-/// JointInstance. Does nothing if the ghost and the PartMap part have the same
+/// JointInstance. Does nothing if the ghost and the PartGraph part have the same
 /// type (both Fragment or both Joint).
 ///
 /// Does nothing if:
 ///   - @p scaffold.parts is empty (use @ref place_first_piece instead),
 ///   - the ghost instance is monostate or its part pointer is null,
 ///   - either readiness check returns @c std::nullopt, or
-///   - the ghost type and the ready PartMap part type are the same.
+///   - the ghost type and the ready PartGraph part type are the same.
 ///
 /// @param scaffold  The active MachinaFormScaffold to place the piece on.
 /// @param mr_ghost  Current ghost state carrying the instance and its
@@ -208,8 +208,8 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 /// first ready socket, or std::nullopt if no sockets are ready.
 ///
 ///
-/// @param part_map PartMap to check
+/// @param part_graph PartGraph to check
 /////////////////////////////////////////////////
 std::optional<std::pair<uint32_t, uint32_t>>
-check_PartMap_for_connection_readiness(const PartMap &part_map);
+check_PartGraph_for_connection_readiness(const PartGraph &part_graph);
 } // namespace steamrot::logic::action::grimoire_machina

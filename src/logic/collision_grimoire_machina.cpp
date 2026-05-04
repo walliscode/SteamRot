@@ -73,8 +73,8 @@ void apply_if_better(SocketData &socket, float distance, bool ready) {
 } // namespace
 
 /////////////////////////////////////////////////
-void reset_socket_proximity_state(PartMap &part_map) {
-  for (auto &[id, variant] : part_map) {
+void reset_socket_proximity_state(PartGraph &part_graph) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *fi = std::get_if<FragmentInstance>(&variant)) {
       for (auto &[socket_id, socket_data] : fi->sockets)
         reset_socket(socket_data);
@@ -128,14 +128,14 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
-                             PartMap &part_map) {
+                             PartGraph &part_graph) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
   for (auto &[socket_id, socket_data] : fragment_instance.sockets)
     reset_socket(socket_data);
-  reset_socket_proximity_state(part_map);
+  reset_socket_proximity_state(part_graph);
 
-  for (auto &[id, variant] : part_map) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *joint_instance = std::get_if<JointInstance>(&variant)) {
       check_socket_collisions(fragment_instance, *joint_instance);
     }
@@ -143,14 +143,14 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 }
 
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance, PartMap &part_map) {
+void check_socket_collisions(JointInstance &joint_instance, PartGraph &part_graph) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
   for (auto &[socket_id, socket_data] : joint_instance.sockets)
     reset_socket(socket_data);
-  reset_socket_proximity_state(part_map);
+  reset_socket_proximity_state(part_graph);
 
-  for (auto &[id, variant] : part_map) {
+  for (auto &[id, variant] : part_graph) {
     if (auto *fragment_instance = std::get_if<FragmentInstance>(&variant)) {
       check_socket_collisions(*fragment_instance, joint_instance);
     }

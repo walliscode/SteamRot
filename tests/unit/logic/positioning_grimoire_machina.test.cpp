@@ -17,7 +17,7 @@
 TEST_CASE("position_first_part_of_machina_form tests",
           "[positioning_grimoire_machina]") {
   // Arrange
-  steamrot::PartMap parts;
+  steamrot::PartGraph parts;
 
   SECTION("Does not throw when parts is empty") {
     // Act & Assert

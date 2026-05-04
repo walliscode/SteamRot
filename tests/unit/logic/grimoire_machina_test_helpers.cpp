@@ -234,8 +234,8 @@ MakeGrimoireWithJointAndSocket(const std::string &name) {
 }
 
 /////////////////////////////////////////////////
-PartMapFragmentFixture MakePartMapWithSingleFragmentInstance() {
-  PartMapFragmentFixture fixture;
+PartGraphFragmentFixture MakePartGraphWithSingleFragmentInstance() {
+  PartGraphFragmentFixture fixture;
   fixture.fragment =
       std::make_unique<steamrot::Fragment>(MakeFragmentWithOriginTriangle());
 
@@ -247,8 +247,8 @@ PartMapFragmentFixture MakePartMapWithSingleFragmentInstance() {
 }
 
 /////////////////////////////////////////////////
-PartMapJointFixture MakePartMapWithSingleJointInstance() {
-  PartMapJointFixture fixture;
+PartGraphJointFixture MakePartGraphWithSingleJointInstance() {
+  PartGraphJointFixture fixture;
   fixture.joint =
       std::make_unique<steamrot::Joint>(MakeJointWithOriginTriangle());
 

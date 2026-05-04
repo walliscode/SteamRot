@@ -219,56 +219,56 @@ steamrot::GrimoireMachina
 MakeGrimoireWithJointAndSocket(const std::string &name);
 
 /////////////////////////////////////////////////
-/// PartMap fixture structs
+/// PartGraph fixture structs
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
-/// @struct PartMapFragmentFixture
-/// @brief Owns a Fragment definition and a PartMap containing one
+/// @struct PartGraphFragmentFixture
+/// @brief Owns a Fragment definition and a PartGraph containing one
 ///        FragmentInstance that points into the owned Fragment.
 ///
 /// Keeps the Fragment definition alive for the lifetime of the fixture so
 /// that the raw pointer inside the FragmentInstance remains valid.
 /////////////////////////////////////////////////
-struct PartMapFragmentFixture {
+struct PartGraphFragmentFixture {
   std::unique_ptr<steamrot::Fragment> fragment;
-  steamrot::PartMap parts;
+  steamrot::PartGraph parts;
 };
 
 /////////////////////////////////////////////////
-/// @struct PartMapJointFixture
-/// @brief Owns a Joint definition and a PartMap containing one JointInstance
+/// @struct PartGraphJointFixture
+/// @brief Owns a Joint definition and a PartGraph containing one JointInstance
 ///        that points into the owned Joint.
 ///
 /// Keeps the Joint definition alive for the lifetime of the fixture so that
 /// the raw pointer inside the JointInstance remains valid.
 /////////////////////////////////////////////////
-struct PartMapJointFixture {
+struct PartGraphJointFixture {
   std::unique_ptr<steamrot::Joint> joint;
-  steamrot::PartMap parts;
+  steamrot::PartGraph parts;
 };
 
 /////////////////////////////////////////////////
-/// PartMap factory functions
+/// PartGraph factory functions
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
-/// @brief Build a PartMapFragmentFixture containing a single fully-configured
+/// @brief Build a PartGraphFragmentFixture containing a single fully-configured
 ///        FragmentInstance at key 0. The Fragment has an origin-aligned
 ///        triangle Front view and one socket at local position (5, 5).
 ///
-/// @return Fixture owning the Fragment definition and the PartMap.
+/// @return Fixture owning the Fragment definition and the PartGraph.
 /////////////////////////////////////////////////
-PartMapFragmentFixture MakePartMapWithSingleFragmentInstance();
+PartGraphFragmentFixture MakePartGraphWithSingleFragmentInstance();
 
 /////////////////////////////////////////////////
-/// @brief Build a PartMapJointFixture containing a single fully-configured
+/// @brief Build a PartGraphJointFixture containing a single fully-configured
 ///        JointInstance at key 0. The Joint has an origin-aligned triangle
 ///        Front view, a one-socket SocketConfig (radius 5, full-circle arc),
 ///        and socket positions initialised via the even-spread algorithm.
 ///
-/// @return Fixture owning the Joint definition and the PartMap.
+/// @return Fixture owning the Joint definition and the PartGraph.
 /////////////////////////////////////////////////
-PartMapJointFixture MakePartMapWithSingleJointInstance();
+PartGraphJointFixture MakePartGraphWithSingleJointInstance();
 
 } // namespace steamrot::tests

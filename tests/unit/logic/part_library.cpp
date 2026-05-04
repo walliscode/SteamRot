@@ -250,10 +250,10 @@ PartLibraryBuilder::MakeJointInstance(const std::string &name,
 }
 
 /////////////////////////////////////////////////
-PartMap
-PartLibraryBuilder::MakePartMap(const std::vector<std::string> &fragment_names,
+PartGraph
+PartLibraryBuilder::MakePartGraph(const std::vector<std::string> &fragment_names,
                                 const std::vector<std::string> &joint_names) {
-  PartMap parts;
+  PartGraph parts;
 
   for (const auto &name : fragment_names) {
     FragmentInstance instance = MakeFragmentInstance(name);
@@ -371,52 +371,52 @@ void CheckNodeDescriptorForAllScenarios(
 
   {
     INFO("ScaffoldScenario::LinearChain");
-    const steamrot::MachinaFormScaffold &scaffold =
-        lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
-    REQUIRE(scaffold.parts.size() == expected.linear_chain.size());
+    const steamrot::PartGraph &parts =
+        lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain).parts;
+    REQUIRE(parts.size() == expected.linear_chain.size());
     size_t i = 0;
-    for (const auto &[id, variant] : scaffold.parts) {
+    for (const auto &[id, variant] : parts) {
       INFO("node index " << i);
-      CHECK(descriptor(scaffold, id) == expected.linear_chain[i]);
+      CHECK(descriptor(parts, id) == expected.linear_chain[i]);
       ++i;
     }
   }
 
   {
     INFO("ScaffoldScenario::Ring");
-    const steamrot::MachinaFormScaffold &scaffold =
-        lib.scaffold_scenarios.at(ScaffoldScenario::Ring);
-    REQUIRE(scaffold.parts.size() == expected.ring.size());
+    const steamrot::PartGraph &parts =
+        lib.scaffold_scenarios.at(ScaffoldScenario::Ring).parts;
+    REQUIRE(parts.size() == expected.ring.size());
     size_t i = 0;
-    for (const auto &[id, variant] : scaffold.parts) {
+    for (const auto &[id, variant] : parts) {
       INFO("node index " << i);
-      CHECK(descriptor(scaffold, id) == expected.ring[i]);
+      CHECK(descriptor(parts, id) == expected.ring[i]);
       ++i;
     }
   }
 
   {
     INFO("ScaffoldScenario::IsolatedPair");
-    const steamrot::MachinaFormScaffold &scaffold =
-        lib.scaffold_scenarios.at(ScaffoldScenario::IsolatedPair);
-    REQUIRE(scaffold.parts.size() == expected.isolated_pair.size());
+    const steamrot::PartGraph &parts =
+        lib.scaffold_scenarios.at(ScaffoldScenario::IsolatedPair).parts;
+    REQUIRE(parts.size() == expected.isolated_pair.size());
     size_t i = 0;
-    for (const auto &[id, variant] : scaffold.parts) {
+    for (const auto &[id, variant] : parts) {
       INFO("node index " << i);
-      CHECK(descriptor(scaffold, id) == expected.isolated_pair[i]);
+      CHECK(descriptor(parts, id) == expected.isolated_pair[i]);
       ++i;
     }
   }
 
   {
     INFO("ScaffoldScenario::SimpleBranch");
-    const steamrot::MachinaFormScaffold &scaffold =
-        lib.scaffold_scenarios.at(ScaffoldScenario::SimpleBranch);
-    REQUIRE(scaffold.parts.size() == expected.simple_branch.size());
+    const steamrot::PartGraph &parts =
+        lib.scaffold_scenarios.at(ScaffoldScenario::SimpleBranch).parts;
+    REQUIRE(parts.size() == expected.simple_branch.size());
     size_t i = 0;
-    for (const auto &[id, variant] : scaffold.parts) {
+    for (const auto &[id, variant] : parts) {
       INFO("node index " << i);
-      CHECK(descriptor(scaffold, id) == expected.simple_branch[i]);
+      CHECK(descriptor(parts, id) == expected.simple_branch[i]);
       ++i;
     }
   }

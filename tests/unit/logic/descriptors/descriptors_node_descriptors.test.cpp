@@ -73,9 +73,9 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
     int fragment_count = 0;
     int joint_count = 0;
     for (const auto &[id, variant] : scaffold.parts) {
-      if (descriptors::is_fragment(scaffold, id))
+      if (descriptors::is_fragment(scaffold.parts, id))
         ++fragment_count;
-      if (descriptors::is_joint(scaffold, id))
+      if (descriptors::is_joint(scaffold.parts, id))
         ++joint_count;
     }
     REQUIRE(fragment_count == 1);
@@ -121,9 +121,9 @@ TEST_CASE("predicate combinators compose correctly",
       descriptors::not_(descriptors::is_fragment);
 
   for (const auto &[id, variant] : scaffold.parts) {
-    REQUIRE_FALSE(is_both(scaffold, id));
-    REQUIRE(is_either(scaffold, id));
-    REQUIRE(not_fragment(scaffold, id) == descriptors::is_joint(scaffold, id));
+    REQUIRE_FALSE(is_both(scaffold.parts, id));
+    REQUIRE(is_either(scaffold.parts, id));
+    REQUIRE(not_fragment(scaffold.parts, id) == descriptors::is_joint(scaffold.parts, id));
   }
 
   SECTION("Analyses all ScaffoldScenarios correctly for and_(is_fragment, "
@@ -177,9 +177,9 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
     REQUIRE(scaffold.parts.size() == 2);
     // No connections, so both parts have 0 edges.
     for (const auto &[id, variant] : scaffold.parts) {
-      REQUIRE(has_0(scaffold, id));
-      REQUIRE_FALSE(has_1(scaffold, id));
-      REQUIRE_FALSE(has_2(scaffold, id));
+      REQUIRE(has_0(scaffold.parts, id));
+      REQUIRE_FALSE(has_1(scaffold.parts, id));
+      REQUIRE_FALSE(has_2(scaffold.parts, id));
     }
   }
 
@@ -189,9 +189,9 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
     REQUIRE(result.scaffold.parts.size() == 2);
     // The fragment and the joint each have 1 edge.
     for (const auto &id : result.part_ids) {
-      REQUIRE_FALSE(has_0(result.scaffold, id));
-      REQUIRE(has_1(result.scaffold, id));
-      REQUIRE_FALSE(has_2(result.scaffold, id));
+      REQUIRE_FALSE(has_0(result.scaffold.parts, id));
+      REQUIRE(has_1(result.scaffold.parts, id));
+      REQUIRE_FALSE(has_2(result.scaffold.parts, id));
     }
   }
 
@@ -202,15 +202,15 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
          {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // fragment[0] and fragment[1] have 1 edge each; joint[0] has 2 edges.
-    REQUIRE_FALSE(has_0(result.scaffold, result.part_ids[0]));
-    REQUIRE_FALSE(has_0(result.scaffold, result.part_ids[1]));
-    REQUIRE_FALSE(has_0(result.scaffold, result.part_ids[2]));
-    REQUIRE(has_1(result.scaffold, result.part_ids[0]));
-    REQUIRE(has_1(result.scaffold, result.part_ids[1]));
-    REQUIRE_FALSE(has_1(result.scaffold, result.part_ids[2]));
-    REQUIRE_FALSE(has_2(result.scaffold, result.part_ids[0]));
-    REQUIRE_FALSE(has_2(result.scaffold, result.part_ids[1]));
-    REQUIRE(has_2(result.scaffold, result.part_ids[2]));
+    REQUIRE_FALSE(has_0(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE_FALSE(has_0(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE_FALSE(has_0(result.scaffold.parts, result.part_ids[2]));
+    REQUIRE(has_1(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE(has_1(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE_FALSE(has_1(result.scaffold.parts, result.part_ids[2]));
+    REQUIRE_FALSE(has_2(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE_FALSE(has_2(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE(has_2(result.scaffold.parts, result.part_ids[2]));
   }
 
   SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_0_edges") {
@@ -279,9 +279,9 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
     REQUIRE(scaffold.parts.size() == 2);
     // No connections: both parts satisfy min_0, but not min_1 or min_2.
     for (const auto &[id, variant] : scaffold.parts) {
-      REQUIRE(min_0(scaffold, id));
-      REQUIRE_FALSE(min_1(scaffold, id));
-      REQUIRE_FALSE(min_2(scaffold, id));
+      REQUIRE(min_0(scaffold.parts, id));
+      REQUIRE_FALSE(min_1(scaffold.parts, id));
+      REQUIRE_FALSE(min_2(scaffold.parts, id));
     }
   }
 
@@ -291,9 +291,9 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
     REQUIRE(result.scaffold.parts.size() == 2);
     // Both parts have 1 edge: satisfy min_0 and min_1, but not min_2.
     for (const auto &id : result.part_ids) {
-      REQUIRE(min_0(result.scaffold, id));
-      REQUIRE(min_1(result.scaffold, id));
-      REQUIRE_FALSE(min_2(result.scaffold, id));
+      REQUIRE(min_0(result.scaffold.parts, id));
+      REQUIRE(min_1(result.scaffold.parts, id));
+      REQUIRE_FALSE(min_2(result.scaffold.parts, id));
     }
   }
 
@@ -304,15 +304,15 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
          {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // fragment[0] and fragment[1] each have 1 edge; joint[0] has 2 edges.
-    REQUIRE(min_0(result.scaffold, result.part_ids[0]));
-    REQUIRE(min_0(result.scaffold, result.part_ids[1]));
-    REQUIRE(min_0(result.scaffold, result.part_ids[2]));
-    REQUIRE(min_1(result.scaffold, result.part_ids[0]));
-    REQUIRE(min_1(result.scaffold, result.part_ids[1]));
-    REQUIRE(min_1(result.scaffold, result.part_ids[2]));
-    REQUIRE_FALSE(min_2(result.scaffold, result.part_ids[0]));
-    REQUIRE_FALSE(min_2(result.scaffold, result.part_ids[1]));
-    REQUIRE(min_2(result.scaffold, result.part_ids[2]));
+    REQUIRE(min_0(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE(min_0(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE(min_0(result.scaffold.parts, result.part_ids[2]));
+    REQUIRE(min_1(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE(min_1(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE(min_1(result.scaffold.parts, result.part_ids[2]));
+    REQUIRE_FALSE(min_2(result.scaffold.parts, result.part_ids[0]));
+    REQUIRE_FALSE(min_2(result.scaffold.parts, result.part_ids[1]));
+    REQUIRE(min_2(result.scaffold.parts, result.part_ids[2]));
   }
 }
 
@@ -357,27 +357,27 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
 
   // act & assert
   const std::vector<uint32_t> &part_ids = scaffold_result.part_ids;
-  const steamrot::MachinaFormScaffold &scaffold = scaffold_result.scaffold;
-  REQUIRE(scaffold.parts.size() == 5);
+  const steamrot::PartGraph &parts = scaffold_result.scaffold.parts;
+  REQUIRE(parts.size() == 5);
   // fragment[0] has 2 edges, fragment[1] has 1 edge, joint[2] has 2 edges,
   // joint[3] has 1 edge, and joint[4] has 0 edges
-  REQUIRE_FALSE(max_0(scaffold, part_ids[0]));
-  REQUIRE_FALSE(max_0(scaffold, part_ids[1]));
-  REQUIRE_FALSE(max_0(scaffold, part_ids[2]));
-  REQUIRE_FALSE(max_0(scaffold, part_ids[3]));
-  REQUIRE(max_0(scaffold, part_ids[4]));
+  REQUIRE_FALSE(max_0(parts, part_ids[0]));
+  REQUIRE_FALSE(max_0(parts, part_ids[1]));
+  REQUIRE_FALSE(max_0(parts, part_ids[2]));
+  REQUIRE_FALSE(max_0(parts, part_ids[3]));
+  REQUIRE(max_0(parts, part_ids[4]));
 
-  REQUIRE_FALSE(max_1(scaffold, part_ids[0]));
-  REQUIRE(max_1(scaffold, part_ids[1]));
-  REQUIRE_FALSE(max_1(scaffold, part_ids[2]));
-  REQUIRE(max_1(scaffold, part_ids[3]));
-  REQUIRE(max_1(scaffold, part_ids[4]));
+  REQUIRE_FALSE(max_1(parts, part_ids[0]));
+  REQUIRE(max_1(parts, part_ids[1]));
+  REQUIRE_FALSE(max_1(parts, part_ids[2]));
+  REQUIRE(max_1(parts, part_ids[3]));
+  REQUIRE(max_1(parts, part_ids[4]));
 
-  REQUIRE(max_2(scaffold, part_ids[0]));
-  REQUIRE(max_2(scaffold, part_ids[1]));
-  REQUIRE(max_2(scaffold, part_ids[2]));
-  REQUIRE(max_2(scaffold, part_ids[3]));
-  REQUIRE(max_2(scaffold, part_ids[4]));
+  REQUIRE(max_2(parts, part_ids[0]));
+  REQUIRE(max_2(parts, part_ids[1]));
+  REQUIRE(max_2(parts, part_ids[2]));
+  REQUIRE(max_2(parts, part_ids[3]));
+  REQUIRE(max_2(parts, part_ids[4]));
 
   SECTION("Analyses all ScaffoldScenarios correctly for has_maximum_0_edges") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
@@ -425,7 +425,7 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
          {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // joint[0] has 2 edges, so it should not be terminal
-    REQUIRE(not_terminal(result.scaffold, result.part_ids[2]));
+    REQUIRE(not_terminal(result.scaffold.parts, result.part_ids[2]));
   }
   SECTION("Returns true for nodes with 0 or 1 edge") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
@@ -435,7 +435,7 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
     // fragment[1] has 0 edges, fragment[0] and joint[0] each have 1 edge —
     // all three are terminal
     for (const auto &id : result.part_ids) {
-      REQUIRE(descriptors::is_terminal(result.scaffold, id));
+      REQUIRE(descriptors::is_terminal(result.scaffold.parts, id));
     }
   }
 

@@ -66,7 +66,7 @@ void compute_socket_local_positions_even_spread(
 }
 
 /////////////////////////////////////////////////
-void position_first_part_of_machina_form_scaffold(PartMap &parts) {
+void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
   // check that parts is not empty, if not return early
   if (parts.empty()) {
     return;
@@ -121,7 +121,7 @@ void position_first_part_of_machina_form_scaffold(PartMap &parts) {
 }
 
 /////////////////////////////////////////////////
-void position_machina_form_scaffold(PartMap &parts) {
+void position_machina_form_scaffold(PartGraph &parts) {
   // if parts is empty, return early
   if (parts.empty())
     return;

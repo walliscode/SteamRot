@@ -113,7 +113,7 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
       return;
 
     // create a new FragmentInstance from the ghost selection, assign it the
-    // next available stable ID, and add it to the scaffold's PartMap
+    // next available stable ID, and add it to the scaffold's PartGraph
     FragmentInstance instance{ghost_fi};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
@@ -128,7 +128,7 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
       return;
 
     // create a new JointInstance from the ghost selection, assign it the next
-    // available stable ID, and add it to the scaffold's PartMap
+    // available stable ID, and add it to the scaffold's PartGraph
     JointInstance instance{ghost_ji};
     const uint32_t id = scaffold->next_id++;
     instance.id = id;
@@ -146,12 +146,12 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
   if (!ghost_socket_index.has_value())
     return;
 
-  auto partmap_result = check_PartMap_for_connection_readiness(scaffold.parts);
-  if (!partmap_result.has_value())
+  auto partgraph_result = check_PartGraph_for_connection_readiness(scaffold.parts);
+  if (!partgraph_result.has_value())
     return;
 
-  const uint32_t partmap_part_id = partmap_result.value().first;
-  const uint32_t partmap_socket_id = partmap_result.value().second;
+  const uint32_t partgraph_part_id = partgraph_result.value().first;
+  const uint32_t partgraph_socket_id = partgraph_result.value().second;
 
   if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
     const FragmentInstance &ghost_fi =
@@ -160,7 +160,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
       return;
 
     if (!std::holds_alternative<JointInstance>(
-            scaffold.parts.at(partmap_part_id)))
+            scaffold.parts.at(partgraph_part_id)))
       return;
 
     FragmentInstance instance{ghost_fi};
@@ -171,10 +171,10 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     FragmentInstance &placed_fi =
         std::get<FragmentInstance>(scaffold.parts.at(new_id));
     JointInstance &existing_ji =
-        std::get<JointInstance>(scaffold.parts.at(partmap_part_id));
+        std::get<JointInstance>(scaffold.parts.at(partgraph_part_id));
 
     auto connection_result = create_connection(
-        placed_fi, ghost_socket_index.value(), existing_ji, partmap_socket_id);
+        placed_fi, ghost_socket_index.value(), existing_ji, partgraph_socket_id);
     static_cast<void>(connection_result);
 
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
@@ -184,7 +184,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
       return;
 
     if (!std::holds_alternative<FragmentInstance>(
-            scaffold.parts.at(partmap_part_id)))
+            scaffold.parts.at(partgraph_part_id)))
       return;
 
     JointInstance instance{ghost_ji};
@@ -195,10 +195,10 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     JointInstance &placed_ji =
         std::get<JointInstance>(scaffold.parts.at(new_id));
     FragmentInstance &existing_fi =
-        std::get<FragmentInstance>(scaffold.parts.at(partmap_part_id));
+        std::get<FragmentInstance>(scaffold.parts.at(partgraph_part_id));
 
     auto connection_result = create_connection(
-        existing_fi, partmap_socket_id, placed_ji, ghost_socket_index.value());
+        existing_fi, partgraph_socket_id, placed_ji, ghost_socket_index.value());
     static_cast<void>(connection_result);
   }
 }
@@ -366,14 +366,14 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost) {
 }
 
 std::optional<std::pair<uint32_t, uint32_t>>
-check_PartMap_for_connection_readiness(const PartMap &part_map) {
+check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
 
   // return false if empty
-  if (part_map.empty())
+  if (part_graph.empty())
     return std::nullopt;
 
-  // cycle through all parts in the PartMap and check their sockets
-  for (const auto &[id, part] : part_map) {
+  // cycle through all parts in the PartGraph and check their sockets
+  for (const auto &[id, part] : part_graph) {
     const SocketMap &sockets = std::visit(
         [](const auto &inst) -> const SocketMap & { return inst.sockets; },
         part);

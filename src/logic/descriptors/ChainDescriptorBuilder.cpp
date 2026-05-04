@@ -55,7 +55,7 @@ std::expected<ChainDescriptor, std::string> ChainDescriptorBuilder::Build() {
 
   // stand in implementation: just return a descriptor that always returns false
   // for now
-  return [](const MachinaFormScaffold & /*scaffold*/,
+  return [](const PartGraph & /*parts*/,
             uint32_t /*start_id*/) -> ChainDescriptorResult {
     return ChainDescriptorResult{false};
   };
@@ -65,7 +65,7 @@ std::expected<ChainDescriptor, std::string> ChainDescriptorBuilder::Build() {
 void ChainDescriptorBuilder::dfs(
     std::vector<ChainStep>::const_iterator steps_it,
     std::vector<ChainStep>::const_iterator steps_end, uint32_t current_id,
-    std::unordered_set<uint32_t> &visited, const MachinaFormScaffold &scaffold,
+    std::unordered_set<uint32_t> &visited, const PartGraph &parts,
     std::vector<uint32_t> &current_chain, ChainDescriptorResult &result) {
 
   /////////////////////////////////////////////////
@@ -96,7 +96,7 @@ void ChainDescriptorBuilder::dfs(
 
   // match current step predicate against current node, if it fails, return
   // false
-  if (!current_predicate(scaffold, current_id)) {
+  if (!current_predicate(parts, current_id)) {
 
     // switch on the step kind to determine how to handle failure of the current
     // step
@@ -107,7 +107,7 @@ void ChainDescriptorBuilder::dfs(
       return;
     }
     case ChainStepKind::WhileIsTrue: {
-      dfs(std::next(steps_it), steps_end, current_id, visited, scaffold,
+      dfs(std::next(steps_it), steps_end, current_id, visited, parts,
           current_chain, result);
       return;
     }
@@ -120,7 +120,7 @@ void ChainDescriptorBuilder::dfs(
   // find neighbours by iterating the part's sockets
   const SocketMap &sockets = std::visit(
       [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-      scaffold.parts.at(current_id));
+      parts.at(current_id));
 
   for (const auto &[socket_id, socket] : sockets) {
     if (!socket.connected_to.has_value())
@@ -144,7 +144,7 @@ void ChainDescriptorBuilder::dfs(
     }
 
     // call the dfs function recursively
-    dfs(effective_steps_it, steps_end, neighbour_id, visited, scaffold,
+    dfs(effective_steps_it, steps_end, neighbour_id, visited, parts,
         current_chain, result);
   }
 
