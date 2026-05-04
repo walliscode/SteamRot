@@ -8,14 +8,14 @@
 /////////////////////////////////////////////////
 #include "descriptors_node_descriptors.h"
 #include "MachinaFormScaffold.h"
+#include "descriptors_general.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
 namespace descriptors = steamrot::logic::descriptors;
 
-TEST_CASE("empty scaffold has no parts",
-          "[unit][analysis][grimoire_machina]") {
+TEST_CASE("empty scaffold has no parts", "[unit][analysis][grimoire_machina]") {
   steamrot::MachinaFormScaffold scaffold;
   REQUIRE(scaffold.parts.empty());
 }
@@ -123,7 +123,8 @@ TEST_CASE("predicate combinators compose correctly",
   for (const auto &[id, variant] : scaffold.parts) {
     REQUIRE_FALSE(is_both(scaffold.parts, id));
     REQUIRE(is_either(scaffold.parts, id));
-    REQUIRE(not_fragment(scaffold.parts, id) == descriptors::is_joint(scaffold.parts, id));
+    REQUIRE(not_fragment(scaffold.parts, id) ==
+            descriptors::is_joint(scaffold.parts, id));
   }
 
   SECTION("Analyses all ScaffoldScenarios correctly for and_(is_fragment, "

@@ -60,6 +60,7 @@ using ContextualNodeDescriptor =
 /// @return ContextualNodeDescriptor wrapping @p nd.
 /////////////////////////////////////////////////
 inline ContextualNodeDescriptor lift(NodeDescriptor nd) { return nd; }
+
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
 /// FragmentInstance.

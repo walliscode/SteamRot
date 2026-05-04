@@ -1244,9 +1244,9 @@ TEST_CASE("create_connection tests",
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 5, joint_instance, 5);
     REQUIRE_FALSE(connection_result.has_value());
-    REQUIRE(connection_result.error() ==
-            "Connection creation failed: one or both socket indices are out of "
-            "range.");
+    REQUIRE(
+        connection_result.error() ==
+        "Connection creation failed: one or both socket IDs are not found.");
   }
 
   SECTION("create_connection returns a valid result when given valid "
@@ -1461,8 +1461,9 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
     REQUIRE_FALSE(result);
   }
 
-  SECTION("check_PartGraph_for_connection_readiness returns std::nullopt when no "
-          "parts have available sockets") {
+  SECTION(
+      "check_PartGraph_for_connection_readiness returns std::nullopt when no "
+      "parts have available sockets") {
 
     steamrot::PartGraph part_graph =
         builder.MakePartGraph({"fragment_no_socket"}, {"joint_no_socket"});
@@ -1692,9 +1693,10 @@ TEST_CASE("place_next_piece does nothing when PartGraph has no ready sockets",
   require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when ghost and PartGraph part are both "
-          "FragmentInstances",
-          "[unit][actions][grimoire_machina][place_next_piece]") {
+TEST_CASE(
+    "place_next_piece does nothing when ghost and PartGraph part are both "
+    "FragmentInstances",
+    "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);
@@ -1718,9 +1720,10 @@ TEST_CASE("place_next_piece does nothing when ghost and PartGraph part are both 
   require_no_connections(scaffold);
 }
 
-TEST_CASE("place_next_piece does nothing when ghost and PartGraph part are both "
-          "JointInstances",
-          "[unit][actions][grimoire_machina][place_next_piece]") {
+TEST_CASE(
+    "place_next_piece does nothing when ghost and PartGraph part are both "
+    "JointInstances",
+    "[unit][actions][grimoire_machina][place_next_piece]") {
   steamrot::tests::TestPartLibrary library{
       steamrot::tests::TestPartLibrary::Create()};
   steamrot::tests::PartLibraryBuilder builder(library);

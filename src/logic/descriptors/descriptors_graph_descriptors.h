@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "DescriptorResult.h"
 #include "MachinaFormScaffold.h"
-#include "descriptors_chain_descriptors.h"
 #include <functional>
 
 namespace steamrot::logic::descriptors {
@@ -27,40 +26,6 @@ namespace steamrot::logic::descriptors {
 /// only consumed by Logic/Action classes and is never passed back into a
 /// modifier or combinator.
 /////////////////////////////////////////////////
-using GraphDescriptor =
-    std::function<GraphDescriptorResult(const PartGraph &)>;
+using GraphDescriptor = std::function<GraphDescriptorResult(const PartGraph &)>;
 
-/////////////////////////////////////////////////
-/// @brief Build a GraphDescriptor that returns true when at least one part
-///        in the PartGraph satisfies @p cd.
-///
-/// @param cd ChainDescriptor (or ContextualNodeDescriptor) to evaluate.
-/// @return GraphDescriptor returning true if any part satisfies @p cd.
-/////////////////////////////////////////////////
-inline GraphDescriptor any_node_satisfies(ChainDescriptor cd) {
-  return [cd = std::move(cd)](
-             const PartGraph &parts) -> GraphDescriptorResult {
-    for (const auto &[id, variant] : parts)
-      if (cd(parts, id))
-        return GraphDescriptorResult{true};
-    return GraphDescriptorResult{false};
-  };
-}
-
-/////////////////////////////////////////////////
-/// @brief Build a GraphDescriptor that returns true when every part
-///        in the PartGraph satisfies @p cd.
-///
-/// @param cd ChainDescriptor (or ContextualNodeDescriptor) to evaluate.
-/// @return GraphDescriptor returning true if all parts satisfy @p cd.
-/////////////////////////////////////////////////
-inline GraphDescriptor all_nodes_satisfy(ChainDescriptor cd) {
-  return [cd = std::move(cd)](
-             const PartGraph &parts) -> GraphDescriptorResult {
-    for (const auto &[id, variant] : parts)
-      if (!cd(parts, id))
-        return GraphDescriptorResult{false};
-    return GraphDescriptorResult{true};
-  };
-}
 } // namespace steamrot::logic::descriptors
