@@ -35,44 +35,51 @@ the SteamRot engine's `PartGraph` analysis system.
 ## Overview
 
 Descriptors are typed predicates — callable objects stored in `std::function` —
-that answer structural questions about a `PartGraph`. A `PartGraph` is a
-lightweight, non-owning snapshot of a `MachinaFormScaffold` as an adjacency
-structure, with one `PartNode` per part and one `PartEdge` per connection.
+that answer structural questions about a `PartGraph`.
+
+`PartGraph` is a type alias defined in `src/types/entity/MachinaFormScaffold.h`:
+
+```cpp
+using PartGraph = std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
+```
+
+It is exposed as `MachinaFormScaffold::parts`. Descriptors receive the map
+directly (as `const PartGraph&`) rather than the whole scaffold. Call sites
+always pass `scaffold.parts`.
 
 There are four descriptor levels, ordered from narrowest to broadest scope:
 
-| Level           | Type alias                 | Signature                                 |
-| --------------- | -------------------------- | ----------------------------------------- |
-| Node            | `NodeDescriptor`           | `bool(const PartNode&)`                   |
-| Contextual node | `ContextualNodeDescriptor` | `bool(const PartGraph&, const PartNode&)` |
-| Chain           | `ChainDescriptor`          | `bool(const PartGraph&, const PartNode&)` |
-| Graph           | `GraphDescriptor`          | `bool(const PartGraph&)`                  |
+| Level           | Type alias                 | Signature                                    |
+| --------------- | -------------------------- | -------------------------------------------- |
+| Node            | `NodeDescriptor`           | `NodeDescriptorResult(const PartGraph&, uint32_t)` |
+| Contextual node | `ContextualNodeDescriptor` | `NodeDescriptorResult(const PartGraph&, uint32_t)` |
+| Chain           | `ChainDescriptor`          | `ChainDescriptorResult(const PartGraph&, uint32_t)` |
+| Graph           | `GraphDescriptor`          | `GraphDescriptorResult(const PartGraph&)`    |
 
 The four aliases live in their respective files in `src/logic/descriptors/` in
-the `steamrot::logic::descriptors` namespace. Generic lifting utilities, graph
-queries, and combinators live in `src/logic/descriptors/descriptors_general.h`.
-The `ChainDescriptorBuilder` class lives in
-`src/logic/descriptors/ChainDescriptorBuilder.h` under the
-`steamrot::logic::descriptors` namespace.
+the `steamrot::logic::descriptors` namespace. Generic combinators live in
+`src/logic/descriptors/descriptors_general.h`. The `ChainDescriptorBuilder`
+class lives in `src/logic/descriptors/ChainDescriptorBuilder.h` under the
+same namespace.
 
 ---
 
 ## The Descriptor Hierarchy
 
 ```
-NodeDescriptor           bool(const PartNode&)
-       │  examined by
+NodeDescriptor           NodeDescriptorResult(const PartGraph&, uint32_t)
+       │  promoted by
        │    lift()
        ▼
-ContextualNodeDescriptor bool(const PartGraph&, const PartNode&)
-       │  same signature as
+ContextualNodeDescriptor NodeDescriptorResult(const PartGraph&, uint32_t)
+       │  same underlying type as
        │
-ChainDescriptor          bool(const PartGraph&, const PartNode&)
+ChainDescriptor          ChainDescriptorResult(const PartGraph&, uint32_t)
        │  consumed by
        │    any_node_satisfies()
        │    all_nodes_satisfy()
        ▼
-GraphDescriptor          bool(const PartGraph&)
+GraphDescriptor          GraphDescriptorResult(const PartGraph&)
        │
        │  (terminal — never passes back into a modifier)
        ▼
@@ -90,6 +97,8 @@ GraphDescriptor          bool(const PartGraph&)
   modifier.
 - Combinators (`and_`, `or_`, `not_`) are generic templates. Both arguments must
   be the **same descriptor level** — mixing levels is a compile error.
+- Predicates access the part variant via `parts.at(id)` and read
+  `connection_count` from the base `PartInstance` via `std::visit`.
 
 ---
 
@@ -101,7 +110,7 @@ Start: I need to query something about the assembled machine.
 ├─ Does my question need MORE than one node?
 │   │
 │   ├── No ──────────────────────────────────────► NodeDescriptor
-│   │                                               bool(const PartNode&)
+│   │                                               NodeDescriptorResult(const PartGraph&, uint32_t)
 │   │                                               Declare in descriptors_node_descriptors.h
 │   │                                               Define in descriptors_node_descriptors.cpp
 │   │
@@ -109,17 +118,17 @@ Start: I need to query something about the assembled machine.
 │        │
 │        ├── Only direct neighbours (depth 1)?
 │        │    └────────────────────────────────► ContextualNodeDescriptor
-│        │                                        bool(const PartGraph&, const PartNode&)
-│        │                                        Use is_connected_to() pattern (section 5b)
+│        │                                        NodeDescriptorResult(const PartGraph&, uint32_t)
+│        │                                        Walk neighbours via socket.connected_to
 │        │
 │        ├── Multi-hop walk / path matching?
 │        │    └────────────────────────────────► ChainDescriptor
-│        │                                        bool(const PartGraph&, const PartNode&)
-│        │                                        Use ChainDescriptorBuilder (section 6a)
+│        │                                        ChainDescriptorResult(const PartGraph&, uint32_t)
+│        │                                        Use ChainDescriptorBuilder (see section below)
 │        │
 │        └── No anchor — whole machine question?
 │             └────────────────────────────────► GraphDescriptor
-│                                                 bool(const PartGraph&)
+│                                                 GraphDescriptorResult(const PartGraph&)
 │                                                 Derive via any_node_satisfies() or
 │                                                 all_nodes_satisfy()
 │
@@ -131,6 +140,22 @@ Start: I need to query something about the assembled machine.
     └── Yes → GraphDescriptor consumed directly in that class.
               Define there, not in descriptors_graph_descriptors.
 ```
+
+---
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/types/entity/MachinaFormScaffold.h` | `PartGraph` type alias; `JointInstance`, `FragmentInstance`, `PartInstance`, `SocketMap`, `SocketData`, `SocketConnection` |
+| `src/types/logic/DescriptorResult.h` | `NodeDescriptorResult`, `ChainDescriptorResult`, `GraphDescriptorResult` |
+| `src/logic/descriptors/descriptors_node_descriptors.h/.cpp` | `NodeDescriptor`, `ContextualNodeDescriptor`, `lift`, concrete predicates |
+| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp` | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates |
+| `src/logic/descriptors/descriptors_graph_descriptors.h` | `GraphDescriptor`, `any_node_satisfies`, `all_nodes_satisfy` |
+| `src/logic/descriptors/descriptors_general.h` | `and_`, `or_`, `not_` combinators |
+| `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp` | `ChainDescriptorBuilder` class |
+| `tests/unit/logic/part_library.h/.cpp` | `TestPartLibrary`, `PartLibraryBuilder`, `CheckNodeDescriptorForAllScenarios` |
+| `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests |
 
 ---
 
@@ -171,12 +196,17 @@ NodeDescriptor my_factory(size_t n);
 
 Open `src/logic/descriptors/descriptors_node_descriptors.cpp`.
 
-Add the definition inside the same namespace:
+Add the definition inside the same namespace. All predicates access the part
+variant via `parts.at(id)` and read `connection_count` from `PartInstance`:
 
 ```cpp
 /////////////////////////////////////////////////
-const NodeDescriptor my_descriptor = [](const PartNode &node) -> bool {
-  return /* your condition */;
+const NodeDescriptor my_descriptor =
+    [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+  const size_t count = std::visit(
+      [](const auto &inst) -> size_t { return inst.connection_count; },
+      parts.at(id));
+  return NodeDescriptorResult{/* your condition using count or variant type */};
 };
 ```
 
@@ -185,8 +215,11 @@ For a factory:
 ```cpp
 /////////////////////////////////////////////////
 NodeDescriptor my_factory(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return /* your condition involving n */;
+  return [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+    const size_t count = std::visit(
+        [](const auto &inst) -> size_t { return inst.connection_count; },
+        parts.at(id));
+    return NodeDescriptorResult{count == n};
   };
 }
 ```
@@ -212,17 +245,17 @@ ctest --preset Debug -R descriptors_node_descriptors
 ### NodeDescriptor
 
 A `NodeDescriptor` answers a question about **one node's own data** — its type
-(fragment vs joint) or its edge count.
+(fragment vs joint) or its `connection_count`.
 
 #### Declaration (`descriptors_node_descriptors.h`)
 
 ```cpp
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node has exactly
-/// @p n PartEdges.
+/// @p n connections.
 ///
-/// @param n Number of edges.
-/// @return NodeDescriptor returning true when edges count == n.
+/// @param n Number of connections.
+/// @return NodeDescriptor returning true when connection_count == n.
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n);
 
@@ -238,8 +271,11 @@ extern const NodeDescriptor is_terminal;
 ```cpp
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n) {
-  return [n](const PartNode &node) -> bool {
-    return node.edge_indices.size() == n;
+  return [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+    const size_t count = std::visit(
+        [](const auto &inst) -> size_t { return inst.connection_count; },
+        parts.at(id));
+    return NodeDescriptorResult{count == n};
   };
 }
 
@@ -252,7 +288,8 @@ const NodeDescriptor is_terminal = has_maximum_n_edges(1);
 ### ContextualNodeDescriptor
 
 A `ContextualNodeDescriptor` answers a question about **a node and its direct
-neighbours** (depth-1 walk via `graph.edges`).
+neighbours**. Neighbours are reached by iterating the part's `SocketMap` and
+following `SocketData::connected_to`.
 
 #### Declaration (`descriptors_node_descriptors.h`)
 
@@ -269,21 +306,24 @@ ContextualNodeDescriptor is_connected_to(NodeDescriptor nd);
 
 #### Definition (`descriptors_node_descriptors.cpp`)
 
+Walk the part's sockets; for each connected socket follow `connected_to.peer_part_id`:
+
 ```cpp
 /////////////////////////////////////////////////
 ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
-  return [nd = std::move(nd)](const PartGraph &graph,
-                               const PartNode &node) -> bool {
-    for (size_t edge_idx : node.edge_indices) {
-      const PartEdge &edge = graph.edges[edge_idx];
-      const uint32_t neighbour_id =
-          (edge.part_id_a == node.id) ? edge.part_id_b : edge.part_id_a;
-      auto it = graph.node_index_by_id.find(neighbour_id);
-      if (it != graph.node_index_by_id.end() &&
-          nd(graph.nodes[it->second]))
-        return true;
+  return [nd = std::move(nd)](const PartGraph &parts,
+                               uint32_t id) -> NodeDescriptorResult {
+    const auto &sockets = std::visit(
+        [](const auto &inst) -> const SocketMap & { return inst.sockets; },
+        parts.at(id));
+    for (const auto &[socket_id, socket_data] : sockets) {
+      if (!socket_data.connected_to.has_value())
+        continue;
+      const uint32_t peer_id = socket_data.connected_to->peer_part_id;
+      if (parts.count(peer_id) && nd(parts, peer_id))
+        return NodeDescriptorResult{true};
     }
-    return false;
+    return NodeDescriptorResult{false};
   };
 }
 ```
@@ -311,7 +351,7 @@ extern const ChainDescriptor linear_3_chain;
 ```cpp
 /////////////////////////////////////////////////
 // NOTE: ChainDescriptorBuilder::End() always returns false until the
-// DFS traversal is implemented in ChainDescriptorBuilder.cpp.
+// DFS traversal is fully implemented in ChainDescriptorBuilder.cpp.
 const ChainDescriptor linear_3_chain =
     steamrot::logic::descriptors::ChainDescriptorBuilder{}
         .StartWith(is_terminal)
@@ -319,7 +359,7 @@ const ChainDescriptor linear_3_chain =
         .End(is_terminal);
 ```
 
-> ⚠️ **DFS traversal is not yet implemented.** `ChainDescriptorBuilder::End()`
+> ⚠️ **DFS traversal is not yet fully implemented.** `ChainDescriptorBuilder::End()`
 > currently returns a descriptor that always returns `false`. Do not write tests
 > that expect `true` results until the TODO in `ChainDescriptorBuilder.h` is
 > resolved.
@@ -334,30 +374,30 @@ write a `GraphDescriptor` lambda from scratch.
 
 #### Where it lives
 
-GraphDescriptors are declared in "descriptors_graph_descriptors.h" and defined
-in "descriptors_graph_descriptors.cpp"
+`GraphDescriptor`s are declared in `descriptors_graph_descriptors.h` and defined
+in `descriptors_graph_descriptors.cpp`. Both iterate `const PartGraph&` directly.
 
 #### Example
 
 ```cpp
+namespace descriptors = steamrot::logic::descriptors;
+
 // "Does the graph contain at least one terminal fragment?"
-steamrot::logic::descriptors::GraphDescriptor has_terminal_fragment =
-    steamrot::logic::descriptors::any_node_satisfies(
-        steamrot::logic::descriptors::lift(
-            steamrot::logic::descriptors::and_(
-                steamrot::logic::descriptors::is_terminal,
-                steamrot::logic::descriptors::is_fragment)));
+descriptors::GraphDescriptor has_terminal_fragment =
+    descriptors::any_node_satisfies(
+        descriptors::lift(descriptors::and_(
+            descriptors::is_terminal,
+            descriptors::is_fragment)));
 
 // "Are all nodes either a fragment or a joint?"
-steamrot::logic::descriptors::GraphDescriptor all_known_types =
-    steamrot::logic::descriptors::all_nodes_satisfy(
-        steamrot::logic::descriptors::lift(
-            steamrot::logic::descriptors::or_(
-                steamrot::logic::descriptors::is_fragment,
-                steamrot::logic::descriptors::is_joint)));
+descriptors::GraphDescriptor all_known_types =
+    descriptors::all_nodes_satisfy(
+        descriptors::lift(descriptors::or_(
+            descriptors::is_fragment,
+            descriptors::is_joint)));
 
-// Evaluate
-if (has_terminal_fragment(graph)) {
+// Evaluate against scaffold.parts
+if (has_terminal_fragment(scaffold.parts)) {
   // gate some gameplay action
 }
 ```
@@ -366,28 +406,25 @@ if (has_terminal_fragment(graph)) {
 
 ## Lifting and Composing Descriptors
 
-| Operation                                                          | Input → Output                                | Purpose                                               |
-| ------------------------------------------------------------------ | --------------------------------------------- | ----------------------------------------------------- |
-| `steamrot::logic::descriptors::lift(nd)`                           | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
-| `steamrot::logic::descriptors::lift_to_chain(nd)`                  | `NodeDescriptor` → `ChainDescriptor`          | Same, typed as `ChainDescriptor`                      |
-| `steamrot::logic::descriptors::any_node_satisfies(cd)`             | `ChainDescriptor` → `GraphDescriptor`         | True if any node satisfies `cd`                       |
-| `steamrot::logic::descriptors::all_nodes_satisfy(cd)`              | `ChainDescriptor` → `GraphDescriptor`         | True if every node satisfies `cd`                     |
-| `steamrot::logic::descriptors::and_(a, b)`                         | `Desc × Desc` → `Desc`                        | Both must be true; same level required                |
-| `steamrot::logic::descriptors::or_(a, b)`                          | `Desc × Desc` → `Desc`                        | Either must be true; same level required              |
-| `steamrot::logic::descriptors::not_(a)`                            | `Desc` → `Desc`                               | Negate; same level required                           |
+| Operation                                              | Input → Output                                | Purpose                                               |
+| ------------------------------------------------------ | --------------------------------------------- | ----------------------------------------------------- |
+| `lift(nd)`                                             | `NodeDescriptor` → `ContextualNodeDescriptor` | Promote narrower descriptor without duplicating logic |
+| `lift_to_chain(nd)`                                    | `NodeDescriptor` → `ChainDescriptor`          | Same, typed as `ChainDescriptor`                      |
+| `any_node_satisfies(cd)`                               | `ChainDescriptor` → `GraphDescriptor`         | True if any part in the `PartGraph` satisfies `cd`    |
+| `all_nodes_satisfy(cd)`                                | `ChainDescriptor` → `GraphDescriptor`         | True if every part in the `PartGraph` satisfies `cd`  |
+| `and_(a, b)`                                           | `Desc × Desc` → `Desc`                        | Both must be true; same level required                |
+| `or_(a, b)`                                            | `Desc × Desc` → `Desc`                        | Either must be true; same level required              |
+| `not_(a)`                                              | `Desc` → `Desc`                               | Negate; same level required                           |
 
-> **Note:** All combinators and lifting utilities live in the
-> `steamrot::logic::descriptors` namespace (defined in
-> `src/logic/descriptors/descriptors_general.h` and the individual type headers).
-> Use `namespace descriptors = steamrot::logic::descriptors;` for brevity in
-> implementation files.
+All utilities live in `steamrot::logic::descriptors`. Use
+`namespace descriptors = steamrot::logic::descriptors;` for brevity.
 
 ### Example: composing without declaring a new descriptor
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
 
-// "Is this node a fragment with exactly 1 edge?"
+// "Is this node a fragment with exactly 1 connection?"
 descriptors::NodeDescriptor is_terminal_fragment =
     descriptors::and_(descriptors::is_fragment, descriptors::is_terminal);
 
@@ -406,7 +443,8 @@ All descriptor tests live in
 ### Using CheckNodeDescriptorForAllScenarios
 
 This helper runs a `NodeDescriptor` against every pre-built topology stored in
-`TestPartLibrary` and `CHECK`s per-node results.
+`TestPartLibrary` and `CHECK`s per-node results. Pass `scaffold.parts` (the
+`PartGraph`) to each descriptor call.
 
 **Node order within each array is fragments first, then joints**, matching
 insertion order. Mismatching the order silently flips expected values.
@@ -445,7 +483,9 @@ TEST_CASE("my_descriptor tests", "[unit][analysis][grimoire_machina]") {
 
 ### Building a custom scaffold
 
-Use `PartLibraryBuilder` for topologies not covered by the standard scenarios:
+Use `PartLibraryBuilder` for topologies not covered by the standard scenarios.
+The `ConnectionSpec` fields are `{part_index_a, socket_id_a, part_index_b, socket_id_b}`
+(fragments are inserted before joints in the resulting `part_ids` vector):
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
@@ -454,26 +494,26 @@ steamrot::tests::PartLibraryBuilder builder{lib};
 // fragment[0].socket[0] → joint[0].socket[0]
 steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
     {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
-steamrot::PartGraph graph = descriptors::build_part_graph(result.scaffold);
 
-REQUIRE(descriptors::my_descriptor(graph.nodes[0]));
+// Pass scaffold.parts (the PartGraph) to descriptors:
+REQUIRE(descriptors::my_descriptor(result.scaffold.parts, result.part_ids[0]));
 ```
 
 ### Testing ContextualNodeDescriptors and ChainDescriptors
 
-Pass graph + node:
+Pass `parts` and the part ID:
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
 
 descriptors::ContextualNodeDescriptor cnd =
     descriptors::is_connected_to(descriptors::is_fragment);
-REQUIRE(cnd(graph, graph.nodes[1]));
+REQUIRE(cnd(result.scaffold.parts, result.part_ids[1]));
 ```
 
 ### Testing GraphDescriptors
 
-Pass the whole graph:
+Pass the whole `PartGraph`:
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
@@ -481,7 +521,7 @@ namespace descriptors = steamrot::logic::descriptors;
 descriptors::GraphDescriptor gd =
     descriptors::any_node_satisfies(
         descriptors::lift(descriptors::is_terminal));
-REQUIRE(gd(graph));
+REQUIRE(gd(result.scaffold.parts));
 ```
 
 ---
@@ -490,8 +530,8 @@ REQUIRE(gd(graph));
 
 ### Parameterised descriptors (factories)
 
-When the descriptor logic depends on a runtime value (count, threshold, name),
-write a factory function that returns a descriptor by value:
+When the descriptor logic depends on a runtime value (count, threshold), write a
+factory function that returns a descriptor by value:
 
 ```cpp
 // Declaration
@@ -508,9 +548,9 @@ When the descriptor has a fixed, well-understood meaning, declare it as an
 `extern const` and give it a descriptive verb-phrase name:
 
 ```cpp
-extern const NodeDescriptor is_terminal;   // at most 1 edge
-extern const NodeDescriptor is_serial;     // exactly 2 edges
-extern const NodeDescriptor is_branched;   // at least 3 edges
+extern const NodeDescriptor is_terminal;   // at most 1 connection
+extern const NodeDescriptor is_serial;     // exactly 2 connections
+extern const NodeDescriptor is_branched;   // at least 3 connections
 ```
 
 ### Building on existing descriptors
@@ -525,31 +565,31 @@ piece independently testable.
 
 The following are planned but not yet implemented:
 
-1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO)  
+1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO)
    The builder captures the step list but `End()` always returns `false`. A
-   depth-first walk from the anchor node, matching each step predicate in order,
-   needs to be written. Cycle detection (mark visited nodes) and branching
-   (match any valid path) should be considered.
+   depth-first walk from the anchor node (via `SocketData::connected_to`),
+   matching each step predicate in order, needs to be written. Cycle detection
+   (via `std::unordered_set<uint32_t>` visited set) and branching (match any
+   valid path) should be considered.
 
-2. **ContextualNodeDescriptor modifier library**  
+2. **ContextualNodeDescriptor modifier library**
    Common factories (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not
    yet declared in `descriptors_node_descriptors.h`. Add them as needed following
    the `ContextualNodeDescriptor` pattern above.
 
-3. **GraphDescriptor consumption in Logic**  
+3. **GraphDescriptor consumption in Logic**
    `GrimoireMachinaActionLogic` (or a dedicated analysis step) should evaluate
    `GraphDescriptor` instances to gate gameplay actions (e.g. "is the assembled
    machine structurally valid?").
 
-4. **New scaffold scenarios**  
+4. **New scaffold scenarios**
    Add topologies to `TestPartLibrary` (e.g. `StarTopology`, `LongLinearChain`)
    as chain and graph descriptors that need richer structures are added.
 
-5. **EdgeDescriptor integration**  
-   `EdgeDescriptor` is declared in `PartGraph.h` but has no concrete instances
-   or tests. Future modifiers could accept edge predicates to express
+5. **EdgeDescriptor integration**
+   A future `EdgeDescriptor` type alias could be added to express
    connection-type constraints (e.g. "connected via a fragment-to-joint edge
-   only").
+   only"). It would operate on `SocketData` or `SocketConnection` directly.
 
 ---
 
@@ -569,6 +609,8 @@ The following are planned but not yet implemented:
   the free functions that use them.
 - **Never pass a `GraphDescriptor` into a combinator or modifier.** It is the
   terminal type and has no meaningful further composition.
+- **Always pass `scaffold.parts`** (the `PartGraph`) to descriptor call sites,
+  never the whole `MachinaFormScaffold`.
 
 ---
 
@@ -580,7 +622,8 @@ The following are planned but not yet implemented:
 | `ChainDescriptorBuilder` descriptor always returns `false`      | DFS traversal not yet implemented                | Do not rely on `ChainDescriptorBuilder` results until the TODO in `ChainDescriptorBuilder.h` is resolved |
 | `CheckNodeDescriptorForAllScenarios` test fails on one scenario | Node order mismatch                              | Arrays are fragments-first then joints; verify insertion order in `TestPartLibrary`                      |
 | Segfault in descriptor accessing FlatBuffers field              | Unguarded access to a null optional field        | Guard all string, vector, and nested-table accesses: `if (data->field()) ...`                            |
-| Custom scaffold node index unexpected                           | `PartLibraryBuilder` insertion order             | Fragments are inserted first (indices 0…F-1), joints follow (indices F…F+J-1)                            |
+| Custom scaffold node index unexpected                           | `PartLibraryBuilder` insertion order             | Fragments are inserted first (`part_ids[0..F-1]`), joints follow (`part_ids[F..F+J-1]`)                 |
+| Linker error: undefined reference to descriptor                 | `extern const` declared but not defined          | Add the definition in the corresponding `.cpp` file                                                      |
 
 ---
 
@@ -588,9 +631,11 @@ The following are planned but not yet implemented:
 
 - [ ] Chose the correct descriptor level using the decision flowchart
 - [ ] Checked whether existing descriptors can be composed instead
-- [ ] Declared the descriptor in `descriptors_node_descriptors.h` (or appropriate level header)
-- [ ] Defined the descriptor in `descriptors_node_descriptors.cpp` (or appropriate level source)
-- [ ] Added a `TEST_CASE` in `descriptors/descriptors_node_descriptors.test.cpp`
+- [ ] Declared the descriptor in the appropriate level header (`descriptors_node_descriptors.h`, etc.)
+- [ ] Defined the descriptor in the appropriate level source (lambda takes `(const PartGraph&, uint32_t)`)
+- [ ] Added a `TEST_CASE` in `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp`
 - [ ] Used `CheckNodeDescriptorForAllScenarios` for named constants
 - [ ] Verified arrays are fragments-first, then joints
+- [ ] All descriptor call sites pass `scaffold.parts` (not `scaffold`)
 - [ ] Built and all tests pass
+- [ ] Updated `docs/workflows/adding_descriptors.md` if the descriptor API changed
