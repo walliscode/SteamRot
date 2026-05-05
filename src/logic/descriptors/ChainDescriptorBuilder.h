@@ -33,8 +33,10 @@ enum class ChainStepKind {
   Sequence,
 
   /////////////////////////////////////////////////
-  /// Consume zero or more consecutive nodes that satisfy the predicate,
+  /// Consume one or more consecutive nodes that satisfy the predicate,
   /// then pass the first non-matching node to the next step.
+  /// At least one node must be consumed; if the predicate fails immediately
+  /// (zero nodes matched) the chain is rejected from that anchor.
   /// Used by @c WhileIsTrue().
   /////////////////////////////////////////////////
   WhileIsTrue,
@@ -98,12 +100,14 @@ public:
   ChainDescriptorBuilder &Then(NodeDescriptor nd);
 
   /////////////////////////////////////////////////
-  /// @brief Append a repeating predicate that matches zero or more consecutive
+  /// @brief Append a repeating predicate that matches one or more consecutive
   ///        nodes while @p nd holds.
   ///
-  /// Adds a @c ChainStepKind::WhileIsTrue step. The DFS walk consumes nodes
-  /// satisfying @p nd until the first node that does not satisfy it, then
-  /// passes that node to the subsequent step.
+  /// Adds a @c ChainStepKind::WhileIsTrue step. At least one node must satisfy
+  /// @p nd before the step can exit. The DFS walk consumes nodes satisfying
+  /// @p nd until the first node that does not satisfy it, then passes that
+  /// node to the subsequent step. If @p nd fails on the very first candidate
+  /// node (zero nodes consumed), the chain is rejected from that anchor.
   ///
   /// @param nd NodeDescriptor evaluated repeatedly during the walk.
   /// @return *this for method chaining.
@@ -130,19 +134,22 @@ public:
   ///
   /// This is currently for subgraph matching using ChainDescriptors
   ///
-  /// @param steps_it    Iterator to the current step in the walk pattern.
-  /// @param steps_end   Past-the-end iterator for the steps sequence.
-  /// @param current_id  Stable part ID of the node being evaluated.
-  /// @param visited     Set of part IDs already on the current path (cycle guard).
-  /// @param parts       The PartGraph being traversed.
-  /// @param current_chain  Part IDs on the current candidate path.
-  /// @param result      Accumulates matched and rejected subgraph ID lists.
+  /// @param steps_it      Iterator to the current step in the walk pattern.
+  /// @param steps_end     Past-the-end iterator for the steps sequence.
+  /// @param current_id    Stable part ID of the node being evaluated.
+  /// @param visited       Set of part IDs already on the current path (cycle guard).
+  /// @param parts         The PartGraph being traversed.
+  /// @param current_chain Part IDs on the current candidate path.
+  /// @param result        Accumulates matched and rejected subgraph ID lists.
+  /// @param while_consumed True when at least one node has already been consumed
+  ///                       by the current @c WhileIsTrue step.
   /////////////////////////////////////////////////
-  void dfs(std::vector<ChainStep>::const_iterator steps_it,
-           std::vector<ChainStep>::const_iterator steps_end,
-           uint32_t current_id, std::unordered_set<uint32_t> &visited,
-           const PartGraph &parts,
-           std::vector<uint32_t> &current_chain,
-           ChainDescriptorResult &result);
+  static void dfs(std::vector<ChainStep>::const_iterator steps_it,
+                  std::vector<ChainStep>::const_iterator steps_end,
+                  uint32_t current_id, std::unordered_set<uint32_t> &visited,
+                  const PartGraph &parts,
+                  std::vector<uint32_t> &current_chain,
+                  ChainDescriptorResult &result,
+                  bool while_consumed = false);
 };
 } // namespace steamrot::logic::descriptors

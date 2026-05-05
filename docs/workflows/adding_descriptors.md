@@ -350,19 +350,21 @@ extern const ChainDescriptor linear_3_chain;
 
 ```cpp
 /////////////////////////////////////////////////
-// NOTE: ChainDescriptorBuilder::End() always returns false until the
-// DFS traversal is fully implemented in ChainDescriptorBuilder.cpp.
 const ChainDescriptor linear_3_chain =
     steamrot::logic::descriptors::ChainDescriptorBuilder{}
-        .StartWith(is_terminal)
-        .Then(is_serial)
-        .End(is_terminal);
+        .Then(is_terminal)
+        .WhileIsTrue(is_serial)
+        .Then(is_terminal)
+        .Build()
+        .value();
 ```
 
-> ⚠️ **DFS traversal is not yet fully implemented.** `ChainDescriptorBuilder::End()`
-> currently returns a descriptor that always returns `false`. Do not write tests
-> that expect `true` results until the TODO in `ChainDescriptorBuilder.h` is
-> resolved.
+**`WhileIsTrue` semantics — one or more:** a `WhileIsTrue(pred)` step requires
+at least one node to satisfy `pred` before it can exit. If `pred` fails on the
+very first candidate node, the whole chain is rejected from that anchor. When
+`pred` passes one or more nodes and then fails (or the walk reaches a dead end
+with no more steps remaining), the step exits and the failing node is handed to
+the next step.
 
 ---
 
