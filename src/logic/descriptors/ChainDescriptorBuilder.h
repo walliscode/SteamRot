@@ -119,9 +119,12 @@ public:
   /// @brief Returns a ChainDescriptor containing the steps added to this
   /// builder.
   ///
+  /// The optional @p name is stamped on the descriptor and appears in
+  /// ScopeBegin/ScopeEnd trace events. If omitted the descriptor is unnamed.
+  ///
   /// If an error occurs during validation of the steps, returns a string
   /// describing the error instead.
   /////////////////////////////////////////////////
-  std::expected<ChainDescriptor, std::string> Build();
+  std::expected<ChainDescriptor, std::string> Build(std::string name = "");
 };
 } // namespace steamrot::logic::descriptors
