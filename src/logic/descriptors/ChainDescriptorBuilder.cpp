@@ -79,6 +79,10 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   /////////////////////////////////////////////////
 
   if (steps_it == steps_end) {
+    // All N step predicates have been satisfied by the preceding N nodes.
+    // current_id is the first node encountered AFTER all steps are matched;
+    // it is not evaluated against any predicate and is not part of the chain.
+    // valid_subgraphs records only the N nodes that passed the predicates.
     result.valid_subgraphs.push_back(context.current_chain);
     return;
   }
@@ -107,7 +111,12 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
         result.invalid_subgraphs.push_back(context.current_chain);
         return;
       }
-      // Reset flag for any subsequent WhileIsTrue step.
+      // Reset the flag so that a subsequent WhileIsTrue step on this path
+      // independently requires at least one consumption of its own.
+      // Note: this flag is shared across all recursive calls for the current
+      // DFS path — paths explored after backtracking start with the flag
+      // already modified. A per-step design would be cleaner but requires
+      // more invasive changes.
       context.at_least_one_while_loop_consumed = false;
       depth_first_search(std::next(steps_it), steps_end, context, current_id,
                          parts, result);

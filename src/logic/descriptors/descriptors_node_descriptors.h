@@ -66,7 +66,7 @@ public:
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<F>, NodeDescriptor>>>
   NodeDescriptor(F &&fn) // NOLINT(google-explicit-constructor)
-      : m_name(""), m_fn(std::forward<F>(fn)) {}
+      : m_fn(std::forward<F>(fn)) {}
 
   /////////////////////////////////////////////////
   /// @brief Evaluate the predicate and record trace events.
