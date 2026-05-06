@@ -14,6 +14,34 @@
 
 namespace steamrot::logic::descriptors {
 namespace {
+
+/////////////////////////////////////////////////
+/// @class DFSContext
+/// @brief A struct to hold the state of the depth-first search when evaluating
+/// a ChainDescriptor.
+///
+/// The main goal of this struct is to keep the depth-first search function
+/// signature clean and manageable
+/////////////////////////////////////////////////
+struct DFSContext {
+  /////////////////////////////////////////////////
+  /// @brief a set of part IDs that have already been visited on the current
+  /// path
+  /////////////////////////////////////////////////
+  std::unordered_set<uint32_t> visited;
+
+  /////////////////////////////////////////////////
+  /// @brief The current path of part IDs being evaluated as a candidate
+  /// subgraph match.
+  /////////////////////////////////////////////////
+  std::vector<uint32_t> current_chain;
+
+  /////////////////////////////////////////////////
+  /// @brief Bool determining whether at least one node has been consumed in any
+  /// While style step.
+  /////////////////////////////////////////////////
+  bool at_least_one_while_loop_consumed{false};
+};
 /////////////////////////////////////////////////
 /// @brief
 ///
@@ -30,11 +58,8 @@ namespace {
 /////////////////////////////////////////////////
 void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
                         std::vector<ChainStep>::const_iterator steps_end,
-                        uint32_t current_id,
-                        std::unordered_set<uint32_t> &visited,
-                        const PartGraph &parts,
-                        std::vector<uint32_t> &current_chain,
-                        bool while_consumed, ChainDescriptorResult &result) {
+                        DFSContext &context, uint32_t current_id,
+                        const PartGraph &parts, ChainDescriptorResult &result) {
 
   /////////////////////////////////////////////////
   /// CHECKING END CONDITIONS
@@ -45,14 +70,14 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   // the predicates in the chain, so we can store the result
   if (steps_it == steps_end) {
     // store the current chain part IDs as a valid subgraph in the result
-    result.valid_subgraphs.push_back(current_chain);
+    result.valid_subgraphs.push_back(context.current_chain);
     return;
   }
   // if current node has already been visited, return false to avoid cycles
   // we may need to think about if we are tying to identify a cycle in the
   // graph, as this could be a valid match for some descriptors (maybe
   // is_visited). this may just be testing specific predicates for now
-  if (visited.count(current_id))
+  if (context.visited.count(current_id))
     return;
 
   /////////////////////////////////////////////////
@@ -70,20 +95,20 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
     // current step
     switch (steps_it->kind) {
     case ChainStepKind::Sequence: {
-      result.invalid_subgraphs.push_back(current_chain);
+      result.invalid_subgraphs.push_back(context.current_chain);
       // for a Sequence step, we simply return as this chain has failed
       return;
     }
     case ChainStepKind::WhileIsTrue: {
       // WhileIsTrue requires at least one node to have been consumed before it
       // can exit. Reject the path if nothing was consumed yet.
-      if (!while_consumed) {
-        result.invalid_subgraphs.push_back(current_chain);
+      if (!context.at_least_one_while_loop_consumed) {
+        result.invalid_subgraphs.push_back(context.current_chain);
         return;
       }
       // Pass the failing node to the next step (exit the while loop).
-      depth_first_search(std::next(steps_it), steps_end, current_id, visited,
-                         parts, current_chain, false, result);
+      depth_first_search(std::next(steps_it), steps_end, context, current_id,
+                         parts, result);
 
       return;
     }
@@ -91,7 +116,7 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   }
 
   // mark current node as visited
-  visited.insert(current_id);
+  context.visited.insert(current_id);
 
   // find neighbours by iterating the part's sockets
   const SocketMap &sockets = std::visit(
@@ -110,7 +135,7 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
 
     // skip already-visited neighbours to avoid redundant cycles and to allow
     // accurate dead-end detection below
-    if (visited.count(neighbour_id))
+    if (context.visited.count(neighbour_id))
       continue;
 
     any_unvisited_neighbour = true;
@@ -130,12 +155,12 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
     }
 
     // call the dfs function recursively
-    depth_first_search(effective_steps_it, steps_end, neighbour_id, visited,
-                       parts, current_chain, false, result);
+    depth_first_search(effective_steps_it, steps_end, context, neighbour_id,
+                       parts, result);
   }
 
   // unmark current node before backtracking
-  visited.erase(current_id);
+  context.visited.erase(current_id);
 
   return;
 }
@@ -192,12 +217,11 @@ std::expected<ChainDescriptor, std::string> ChainDescriptorBuilder::Build() {
         ChainDescriptorResult result{false};
 
         // create the depth first search state variables
-        std::unordered_set<uint32_t> visited;
-        std::vector<uint32_t> current_chain;
+        DFSContext context;
 
         // call the depth first search function to evaluate the chain descriptor
-        depth_first_search(steps.cbegin(), steps.cend(), start_id, visited,
-                           parts, current_chain, false, result);
+        depth_first_search(steps.cbegin(), steps.cend(), context, start_id,
+                           parts, result);
 
         // check the result and see if any valid subgraphs were found, if so set
         // result to true
