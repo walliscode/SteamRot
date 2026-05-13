@@ -12,8 +12,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include <string>
 
-#include <algorithm>
 namespace steamrot::logic::descriptors {
 
 ////////////////////////////////////////////////
@@ -31,6 +31,11 @@ namespace steamrot::logic::descriptors {
 /// ChainDescriptor, and GraphDescriptor. Template deduction ensures that
 /// both arguments must be the same descriptor level; mixing levels is a
 /// compile error.
+///
+/// Each combinator:
+///  - Composes a synthesised name from the inputs (e.g. "(a AND b)").
+///  - Evaluates both operands (no short-circuit) and merges their traces
+///    into the returned result's @c m_trace.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -42,12 +47,18 @@ namespace steamrot::logic::descriptors {
 /// @return Combined descriptor returning a(...) && b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc and_(Desc a, Desc b) {
-  return [a = std::move(a), b = std::move(b)](auto &&...args) {
-    auto ra = a(std::forward<decltype(args)>(args)...);
-    return std::decay_t<decltype(ra)>{
-        static_cast<bool>(ra) &&
-        static_cast<bool>(b(std::forward<decltype(args)>(args)...))};
-  };
+  std::string name = "(" + a.GetName() + " AND " + b.GetName() + ")";
+  return Desc{std::move(name),
+              typename Desc::FnType{
+                  [fa = std::move(a), fb = std::move(b)](auto &&...args) {
+                    auto ra = fa(std::forward<decltype(args)>(args)...);
+                    auto rb = fb(std::forward<decltype(args)>(args)...);
+                    std::decay_t<decltype(ra)> result{static_cast<bool>(ra) &&
+                                                      static_cast<bool>(rb)};
+                    Merge(result.m_trace, std::move(ra.m_trace));
+                    Merge(result.m_trace, std::move(rb.m_trace));
+                    return result;
+                  }}};
 }
 
 /////////////////////////////////////////////////
@@ -59,12 +70,18 @@ template <typename Desc> Desc and_(Desc a, Desc b) {
 /// @return Combined descriptor returning a(...) || b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc or_(Desc a, Desc b) {
-  return [a = std::move(a), b = std::move(b)](auto &&...args) {
-    auto ra = a(std::forward<decltype(args)>(args)...);
-    return std::decay_t<decltype(ra)>{
-        static_cast<bool>(ra) ||
-        static_cast<bool>(b(std::forward<decltype(args)>(args)...))};
-  };
+  std::string name = "(" + a.GetName() + " OR " + b.GetName() + ")";
+  return Desc{std::move(name),
+              typename Desc::FnType{
+                  [fa = std::move(a), fb = std::move(b)](auto &&...args) {
+                    auto ra = fa(std::forward<decltype(args)>(args)...);
+                    auto rb = fb(std::forward<decltype(args)>(args)...);
+                    std::decay_t<decltype(ra)> result{static_cast<bool>(ra) ||
+                                                      static_cast<bool>(rb)};
+                    Merge(result.m_trace, std::move(ra.m_trace));
+                    Merge(result.m_trace, std::move(rb.m_trace));
+                    return result;
+                  }}};
 }
 
 /////////////////////////////////////////////////
@@ -75,9 +92,13 @@ template <typename Desc> Desc or_(Desc a, Desc b) {
 /// @return Descriptor returning !a(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc not_(Desc a) {
-  return [a = std::move(a)](auto &&...args) {
-    auto ra = a(std::forward<decltype(args)>(args)...);
-    return std::decay_t<decltype(ra)>{!static_cast<bool>(ra)};
-  };
+  std::string name = "NOT " + a.GetName();
+  return Desc{std::move(name),
+              typename Desc::FnType{[fa = std::move(a)](auto &&...args) {
+                auto ra = fa(std::forward<decltype(args)>(args)...);
+                std::decay_t<decltype(ra)> result{!static_cast<bool>(ra)};
+                Merge(result.m_trace, std::move(ra.m_trace));
+                return result;
+              }}};
 }
 } // namespace steamrot::logic::descriptors

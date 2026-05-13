@@ -49,14 +49,20 @@ always pass `scaffold.parts`.
 
 There are four descriptor levels, ordered from narrowest to broadest scope:
 
-| Level           | Type alias                 | Signature                                    |
+| Level           | Class                      | Signature                                    |
 | --------------- | -------------------------- | -------------------------------------------- |
 | Node            | `NodeDescriptor`           | `NodeDescriptorResult(const PartGraph&, uint32_t)` |
 | Contextual node | `ContextualNodeDescriptor` | `NodeDescriptorResult(const PartGraph&, uint32_t)` |
 | Chain           | `ChainDescriptor`          | `ChainDescriptorResult(const PartGraph&, uint32_t)` |
 | Graph           | `GraphDescriptor`          | `GraphDescriptorResult(const PartGraph&)`    |
 
-The four aliases live in their respective files in `src/logic/descriptors/` in
+`NodeDescriptor`, `ChainDescriptor`, and `GraphDescriptor` are thin **wrapper
+classes** (not `std::function` aliases). Each carries a stable string name and
+an `operator()` that emits `AnalysisEvent` records into the result's
+`AnalysisTrace m_trace`. `ContextualNodeDescriptor` is a type alias for
+`NodeDescriptor`.
+
+The four classes live in their respective files in `src/logic/descriptors/` in
 the `steamrot::logic::descriptors` namespace. Generic combinators live in
 `src/logic/descriptors/descriptors_general.h`. The `ChainDescriptorBuilder`
 class lives in `src/logic/descriptors/ChainDescriptorBuilder.h` under the
@@ -67,19 +73,19 @@ same namespace.
 ## The Descriptor Hierarchy
 
 ```
-NodeDescriptor           NodeDescriptorResult(const PartGraph&, uint32_t)
+NodeDescriptor           class; NodeDescriptorResult(const PartGraph&, uint32_t)
        │  promoted by
        │    lift()
        ▼
-ContextualNodeDescriptor NodeDescriptorResult(const PartGraph&, uint32_t)
-       │  same underlying type as
-       │
-ChainDescriptor          ChainDescriptorResult(const PartGraph&, uint32_t)
+ContextualNodeDescriptor type alias for NodeDescriptor
+       │  lifted to chain by
+       │    lift_to_chain()
+ChainDescriptor          class; ChainDescriptorResult(const PartGraph&, uint32_t)
        │  consumed by
        │    any_node_satisfies()
        │    all_nodes_satisfy()
        ▼
-GraphDescriptor          GraphDescriptorResult(const PartGraph&)
+GraphDescriptor          class; GraphDescriptorResult(const PartGraph&)
        │
        │  (terminal — never passes back into a modifier)
        ▼
@@ -88,10 +94,11 @@ GraphDescriptor          GraphDescriptorResult(const PartGraph&)
 
 **Key properties:**
 
-- `ContextualNodeDescriptor` and `ChainDescriptor` share the same underlying
-  `std::function` type. The distinction is semantic: contextual descriptors
-  examine the anchor node and its direct neighbours; chain descriptors walk
-  multiple hops from the anchor.
+- `ContextualNodeDescriptor` is a type alias for `NodeDescriptor`. The
+  distinction is semantic: contextual descriptors examine the anchor node and
+  its direct neighbours; node descriptors examine only the anchor's own data.
+- `ChainDescriptor` answers a question about a multi-hop DFS walk from the
+  anchor. Build instances with `ChainDescriptorBuilder`.
 - `GraphDescriptor` is **terminal**. It is consumed in Logic/Action classes to
   gate gameplay decisions. Never pass a `GraphDescriptor` into a combinator or
   modifier.
@@ -148,12 +155,15 @@ Start: I need to query something about the assembled machine.
 | File | Purpose |
 |------|---------|
 | `src/types/entity/MachinaFormScaffold.h` | `PartGraph` type alias; `JointInstance`, `FragmentInstance`, `PartInstance`, `SocketMap`, `SocketData`, `SocketConnection` |
-| `src/types/logic/DescriptorResult.h` | `NodeDescriptorResult`, `ChainDescriptorResult`, `GraphDescriptorResult` |
-| `src/logic/descriptors/descriptors_node_descriptors.h/.cpp` | `NodeDescriptor`, `ContextualNodeDescriptor`, `lift`, concrete predicates |
-| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp` | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates |
-| `src/logic/descriptors/descriptors_graph_descriptors.h` | `GraphDescriptor`, `any_node_satisfies`, `all_nodes_satisfy` |
+| `src/types/logic/AnalysisEvent.h` | `TraceEventKind`, `ScopeKind`, `AnalysisEvent`, `AnalysisTrace`, `Merge()` |
+| `src/types/logic/DescriptorResult.h` | `NodeDescriptorResult` (+ `m_reason`), `ChainDescriptorResult`, `GraphDescriptorResult`, `DescriptorResult` (base with `m_trace`) |
+| `src/logic/descriptors/descriptors_node_descriptors.h/.cpp` | `NodeDescriptor` class, `ContextualNodeDescriptor` alias, `lift`, concrete predicates |
+| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp` | `ChainDescriptor` class, `lift_to_chain`, concrete chain predicates |
+| `src/logic/descriptors/descriptors_graph_descriptors.h` | `GraphDescriptor` class, `any_node_satisfies`, `all_nodes_satisfy` |
 | `src/logic/descriptors/descriptors_general.h` | `and_`, `or_`, `not_` combinators |
-| `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp` | `ChainDescriptorBuilder` class |
+| `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp` | `ChainDescriptorBuilder` class (DFS with trace emission) |
+| `src/logic/descriptors/DescriptorFormatter.h` | `DescriptorFormatter` abstract base |
+| `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp` | Terminal plain-text trace renderer |
 | `tests/unit/logic/part_library.h/.cpp` | `TestPartLibrary`, `PartLibraryBuilder`, `CheckNodeDescriptorForAllScenarios` |
 | `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests |
 
@@ -196,18 +206,22 @@ NodeDescriptor my_factory(size_t n);
 
 Open `src/logic/descriptors/descriptors_node_descriptors.cpp`.
 
-Add the definition inside the same namespace. All predicates access the part
-variant via `parts.at(id)` and read `connection_count` from `PartInstance`:
+Add the definition inside the same namespace. Named constants pass the predicate
+name as the first constructor argument. Named factory functions synthesise the
+name from the parameter. Each lambda's `NodeDescriptorResult` carries a
+`m_reason` string explaining the outcome:
 
 ```cpp
 /////////////////////////////////////////////////
-const NodeDescriptor my_descriptor =
+const NodeDescriptor my_descriptor{
+    "my_descriptor",
     [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
   const size_t count = std::visit(
       [](const auto &inst) -> size_t { return inst.connection_count; },
       parts.at(id));
-  return NodeDescriptorResult{/* your condition using count or variant type */};
-};
+  const bool ok = /* your condition */;
+  return NodeDescriptorResult{ok, ok ? "passes because ..." : "fails because ..."};
+}};
 ```
 
 For a factory:
@@ -215,12 +229,16 @@ For a factory:
 ```cpp
 /////////////////////////////////////////////////
 NodeDescriptor my_factory(size_t n) {
-  return [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-    const size_t count = std::visit(
-        [](const auto &inst) -> size_t { return inst.connection_count; },
-        parts.at(id));
-    return NodeDescriptorResult{count == n};
-  };
+  return NodeDescriptor{
+      "my_factory(" + std::to_string(n) + ")",
+      [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const size_t count = std::visit(
+            [](const auto &inst) -> size_t { return inst.connection_count; },
+            parts.at(id));
+        return NodeDescriptorResult{count == n,
+            "connection_count=" + std::to_string(count) +
+            ", expected==" + std::to_string(n)};
+      }};
 }
 ```
 
@@ -237,6 +255,66 @@ Add a `TEST_CASE` using `CheckNodeDescriptorForAllScenarios` (see
 cmake --build --preset Debug
 ctest --preset Debug -R descriptors_node_descriptors
 ```
+
+---
+
+## Analysis Trace System
+
+Every descriptor evaluation populates an `AnalysisTrace` (a
+`std::vector<AnalysisEvent>`) in the result's `m_trace` field (inherited from
+`DescriptorResult`).
+
+### Event kinds
+
+| `TraceEventKind` | When emitted | Key fields |
+|---|---|---|
+| `NodeEval` | Before testing a predicate | `depth`, `part_id`, `predicate_name` |
+| `NodeResult` | After the predicate test | `depth`, `part_id`, `predicate_name`, `result`, `reason` |
+| `MovingToNeighbour` | DFS traverses an edge | `depth`, `from_id`, `to_id`, `socket_id` |
+| `Backtracking` | DFS returns from a neighbour | `depth`, `from_id` |
+| `ScopeBegin` | Chain evaluation starts | `depth=0`, `scope_name`, `scope_kind`, `anchor_id` |
+| `ScopeEnd` | Chain evaluation ends | `depth=0`, `scope_name`, `scope_kind`, `result` |
+
+The `depth` field lets any renderer reconstruct indentation without recursive
+data structures.
+
+### Rendering the trace
+
+Use `TerminalDescriptorFormatter` from
+`src/logic/descriptors/TerminalDescriptorFormatter.h` to produce a
+human-readable string:
+
+```cpp
+#include "TerminalDescriptorFormatter.h"
+
+steamrot::logic::descriptors::TerminalDescriptorFormatter fmt;
+std::string output = fmt.Format(result.m_trace);
+// Output (example):
+// [CHAIN] my_chain  anchor=node#2
+//   [EVAL]  node#2  predicate=is_terminal
+//   [PASS]  node#2  is_terminal  "connection_count=1, expected<=1"
+//   [MOVE]  node#2 -> node#4  socket=0
+//     [EVAL]  node#4  predicate=is_serial
+//     [FAIL]  node#4  is_serial  "connection_count=3, expected==2"
+//   [BACK]  <- node#4
+// [FAIL] my_chain
+```
+
+Provide a name when calling `Build()` to make the trace output readable:
+
+```cpp
+auto result = ChainDescriptorBuilder{}
+    .Then(is_terminal)
+    .Then(is_serial)
+    .Then(is_terminal)
+    .Build("linear_3_chain");
+```
+
+### `DescriptorFormatter` base class
+
+All formatters derive from `DescriptorFormatter`
+(`src/logic/descriptors/DescriptorFormatter.h`). Add new output targets by
+subclassing and implementing `Format(const AnalysisTrace&) const`.
 
 ---
 
@@ -271,12 +349,17 @@ extern const NodeDescriptor is_terminal;
 ```cpp
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n) {
-  return [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-    const size_t count = std::visit(
-        [](const auto &inst) -> size_t { return inst.connection_count; },
-        parts.at(id));
-    return NodeDescriptorResult{count == n};
-  };
+  return NodeDescriptor{
+      "has_exactly_n_edges(" + std::to_string(n) + ")",
+      [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const size_t count = std::visit(
+            [](const auto &inst) -> size_t { return inst.connection_count; },
+            parts.at(id));
+        return NodeDescriptorResult{
+            count == n,
+            "connection_count=" + std::to_string(count) +
+                ", expected==" + std::to_string(n)};
+      }};
 }
 
 /////////////////////////////////////////////////
@@ -565,31 +648,28 @@ piece independently testable.
 
 The following are planned but not yet implemented:
 
-1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO)
-   The builder captures the step list but `End()` always returns `false`. A
-   depth-first walk from the anchor node (via `SocketData::connected_to`),
-   matching each step predicate in order, needs to be written. Cycle detection
-   (via `std::unordered_set<uint32_t>` visited set) and branching (match any
-   valid path) should be considered.
-
-2. **ContextualNodeDescriptor modifier library**
+1. **ContextualNodeDescriptor modifier library**
    Common factories (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not
    yet declared in `descriptors_node_descriptors.h`. Add them as needed following
    the `ContextualNodeDescriptor` pattern above.
 
-3. **GraphDescriptor consumption in Logic**
+2. **GraphDescriptor consumption in Logic**
    `GrimoireMachinaActionLogic` (or a dedicated analysis step) should evaluate
    `GraphDescriptor` instances to gate gameplay actions (e.g. "is the assembled
    machine structurally valid?").
 
-4. **New scaffold scenarios**
+3. **New scaffold scenarios**
    Add topologies to `TestPartLibrary` (e.g. `StarTopology`, `LongLinearChain`)
    as chain and graph descriptors that need richer structures are added.
 
-5. **EdgeDescriptor integration**
+4. **EdgeDescriptor integration**
    A future `EdgeDescriptor` type alias could be added to express
    connection-type constraints (e.g. "connected via a fragment-to-joint edge
    only"). It would operate on `SocketData` or `SocketConnection` directly.
+
+5. **Additional trace formatter targets**
+   `DescriptorFormatter` subclasses for JSON, HTML, or ImGui debug overlay
+   can be added without changing any descriptor code.
 
 ---
 
@@ -619,11 +699,11 @@ The following are planned but not yet implemented:
 | Symptom                                                         | Likely Cause                                     | Fix                                                                                                      |
 | --------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
 | `and_()` / `or_()` compile error about deduced types            | Both arguments must be the same descriptor level | Use `lift()` to promote the narrower argument                                                            |
-| `ChainDescriptorBuilder` descriptor always returns `false`      | DFS traversal not yet implemented                | Do not rely on `ChainDescriptorBuilder` results until the TODO in `ChainDescriptorBuilder.h` is resolved |
 | `CheckNodeDescriptorForAllScenarios` test fails on one scenario | Node order mismatch                              | Arrays are fragments-first then joints; verify insertion order in `TestPartLibrary`                      |
 | Segfault in descriptor accessing FlatBuffers field              | Unguarded access to a null optional field        | Guard all string, vector, and nested-table accesses: `if (data->field()) ...`                            |
 | Custom scaffold node index unexpected                           | `PartLibraryBuilder` insertion order             | Fragments are inserted first (`part_ids[0..F-1]`), joints follow (`part_ids[F..F+J-1]`)                 |
 | Linker error: undefined reference to descriptor                 | `extern const` declared but not defined          | Add the definition in the corresponding `.cpp` file                                                      |
+| Trace is empty after evaluation                                 | Descriptor constructed without a name            | Pass the predicate name as the first constructor argument                                                |
 
 ---
 
