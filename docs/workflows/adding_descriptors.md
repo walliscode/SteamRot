@@ -24,6 +24,7 @@ the SteamRot engine's `PartGraph` analysis system.
   - [GraphDescriptor](#graphdescriptor)
 - [Lifting and Composing Descriptors](#lifting-and-composing-descriptors)
 - [Testing Descriptors](#testing-descriptors)
+- [TDD Workflow: Building a ChainDescriptor](#tdd-workflow-building-a-chaindescriptor)
 - [Common Patterns](#common-patterns)
 - [Future Implementation Notes](#future-implementation-notes)
 - [Best Practices](#best-practices)
@@ -419,6 +420,18 @@ A `ChainDescriptor` answers a structural question about a **multi-hop walk**
 from an anchor node. Use `ChainDescriptorBuilder` from
 `src/logic/descriptors/ChainDescriptorBuilder.h`.
 
+#### Builder API
+
+| Method | Step kind | Meaning |
+|---|---|---|
+| `.Then(nd)` | `Sequence` | Match exactly one node satisfying `nd`, then advance to the next step |
+| `.WhileIsTrue(nd)` | `WhileIsTrue` | Match zero or more consecutive nodes satisfying `nd`, stop at the first failure |
+| `.Build(name)` | — | Returns `std::expected<ChainDescriptor, std::string>` |
+
+`Build()` returns an error string if called more than once on the same builder.
+Always pass a descriptive `name` — it appears in `ScopeBegin`/`ScopeEnd` trace
+events.
+
 #### Declaration (`descriptors_chain_descriptors.h`)
 
 ```cpp
@@ -431,21 +444,35 @@ extern const ChainDescriptor linear_3_chain;
 
 #### Definition (`descriptors_chain_descriptors.cpp`)
 
+Use an immediately-invoked lambda to unwrap the `std::expected` return from
+`Build()` safely at static-initialisation time:
+
 ```cpp
 /////////////////////////////////////////////////
-// NOTE: ChainDescriptorBuilder::End() always returns false until the
-// DFS traversal is fully implemented in ChainDescriptorBuilder.cpp.
-const ChainDescriptor linear_3_chain =
-    steamrot::logic::descriptors::ChainDescriptorBuilder{}
-        .StartWith(is_terminal)
-        .Then(is_serial)
-        .End(is_terminal);
+const ChainDescriptor linear_3_chain = [] {
+  auto result = ChainDescriptorBuilder{}
+      .Then(is_terminal)
+      .Then(is_serial)
+      .Then(is_terminal)
+      .Build("linear_3_chain");
+  // Build() only fails if the builder has already been consumed.
+  // An unconsumed fresh builder always succeeds.
+  return result.value();
+}();
 ```
 
-> ⚠️ **DFS traversal is not yet fully implemented.** `ChainDescriptorBuilder::End()`
-> currently returns a descriptor that always returns `false`. Do not write tests
-> that expect `true` results until the TODO in `ChainDescriptorBuilder.h` is
-> resolved.
+For a local variable in a test or Logic function, `REQUIRE(result.has_value())`
+is idiomatic instead:
+
+```cpp
+auto build_result = ChainDescriptorBuilder{}
+    .Then(is_terminal)
+    .Then(is_serial)
+    .Then(is_terminal)
+    .Build("linear_3_chain");
+REQUIRE(build_result.has_value());
+ChainDescriptor linear_3_chain = build_result.value();
+```
 
 ---
 
@@ -555,6 +582,57 @@ TEST_CASE("my_descriptor tests", "[unit][analysis][grimoire_machina]") {
 }
 ```
 
+### Verifying trace output with AnalysisTraceBuilder and TraceEqualsMatcher
+
+`AnalysisTraceBuilder` (declared in `tests/matchers/AnalysisTraceBuilder.h`)
+builds an expected `AnalysisTrace` programmatically — one method call per event
+kind. `TraceEqualsMatcher` (declared in `tests/matchers/TraceEqualsMatcher.h`)
+accepts any `DescriptorFormatter` subclass and formats both the expected and
+actual traces with the **same formatter instance** before comparing them. This
+means the expected side automatically tracks any future formatting changes.
+
+On mismatch, `describe()` shows both formatted outputs and identifies the first
+diverging line.
+
+```cpp
+#include "AnalysisTraceBuilder.h"
+#include "TraceEqualsMatcher.h"
+#include "TerminalDescriptorFormatter.h"
+
+namespace descriptors = steamrot::logic::descriptors;
+
+// Build a single-node scaffold
+steamrot::tests::PartLibraryBuilder builder{lib};
+auto result = builder.MakeConnectedScaffold({"fragment_one_socket"}, {}, {});
+const uint32_t frag_id = result.part_ids[0];
+
+// Run the descriptor
+auto nd_result = descriptors::is_fragment(result.scaffold.parts, frag_id);
+REQUIRE(nd_result.m_result == true);
+
+// Build expected trace
+descriptors::TerminalDescriptorFormatter fmt;
+steamrot::tests::AnalysisTraceBuilder trace_builder;
+trace_builder
+    .NodeEval(frag_id, "is_fragment")
+    .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
+
+REQUIRE_THAT(nd_result.m_trace,
+             steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
+```
+
+Available builder methods:
+
+| Method | Event emitted |
+|---|---|
+| `.NodeEval(part_id, predicate_name, depth=0)` | `TraceEventKind::NodeEval` |
+| `.NodeResult(part_id, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult` |
+| `.MovingToNeighbour(from_id, to_id, socket_id, depth=0)` | `TraceEventKind::MovingToNeighbour` |
+| `.Backtracking(from_id, depth=0)` | `TraceEventKind::Backtracking` |
+| `.ScopeBegin(name, kind, depth=0, anchor_id=nullopt)` | `TraceEventKind::ScopeBegin` |
+| `.ScopeEnd(name, kind, result, depth=0)` | `TraceEventKind::ScopeEnd` |
+| `.Build()` | Returns a copy of the accumulated `AnalysisTrace` |
+
 ### Pre-built scaffold scenarios
 
 | Scenario key   | Topology                                             | Node count |
@@ -606,6 +684,246 @@ descriptors::GraphDescriptor gd =
         descriptors::lift(descriptors::is_terminal));
 REQUIRE(gd(result.scaffold.parts));
 ```
+
+---
+
+## TDD Workflow: Building a ChainDescriptor
+
+This section walks through the recommended test-driven approach for creating a
+new named `ChainDescriptor`. The goal is to write tests first — watching them
+fail — then add each piece of the implementation until all tests pass.
+
+### Overview
+
+A `ChainDescriptor` built with `ChainDescriptorBuilder` uses a depth-first
+search (DFS) from an anchor node. Each `Then(nd)` step must match exactly one
+node; `WhileIsTrue(nd)` matches zero or more consecutive nodes until `nd` first
+fails. The DFS records every evaluation as an `AnalysisTrace` in the result's
+`m_trace`. Use `AnalysisTraceBuilder` + `TraceEqualsMatcher` to assert the
+expected trace without hardcoding formatted strings.
+
+The typical fail → pass cycle for one `ChainDescriptor`:
+
+```
+1. Build the test scaffold that matches the desired topology
+2. Write a test asserting the boolean result (FAIL: descriptor doesn't exist)
+3. Declare the descriptor in the header (FAIL: linker)
+4. Define the descriptor with the builder (PASS: boolean result)
+5. Add a trace assertion to verify the DFS events (FAIL: wrong trace shape)
+6. Fix the trace expectation in the test (PASS: both boolean and trace)
+```
+
+### Step 1 — Design the topology you want to detect
+
+Decide on the chain pattern. For this example:
+**a 3-node linear chain starting at a terminal node: terminal → serial → terminal**.
+
+Verify that a matching scaffold exists. The `LinearChain` scenario has exactly
+this structure (fragment–joint–fragment with both connections wired).
+
+### Step 2 — Write a failing boolean test
+
+Open `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` (or
+a new dedicated test file for chain descriptors). Write the test **before** declaring
+or defining the descriptor:
+
+```cpp
+TEST_CASE("linear_3_chain ChainDescriptor — boolean result",
+          "[unit][analysis][grimoire_machina][chain]") {
+  namespace descriptors = steamrot::logic::descriptors;
+  steamrot::tests::TestPartLibrary lib = steamrot::tests::TestPartLibrary::Create();
+
+  // Use the pre-built LinearChain scenario: fragment–joint–fragment
+  const steamrot::MachinaFormScaffold &scaffold =
+      lib.scaffold_scenarios.at(steamrot::tests::ScaffoldScenario::LinearChain);
+
+  // anchor on each node — only the two terminal fragments should match
+  // the chain when anchored at their end.
+  // (These ASSERTs will fail until the descriptor is implemented.)
+  for (const auto &[id, variant] : scaffold.parts) {
+    const bool is_frag = std::holds_alternative<steamrot::FragmentInstance>(variant);
+    ChainDescriptorResult chain_result =
+        descriptors::linear_3_chain(scaffold.parts, id);
+    if (is_frag) {
+      REQUIRE(chain_result.m_result == true);
+    } else {
+      REQUIRE(chain_result.m_result == false);
+    }
+  }
+}
+```
+
+Build — this will fail to compile because `linear_3_chain` is not yet declared.
+
+### Step 3 — Declare the descriptor
+
+Open `src/logic/descriptors/descriptors_chain_descriptors.h`. Add the declaration
+inside the `steamrot::logic::descriptors` namespace:
+
+```cpp
+/////////////////////////////////////////////////
+/// @brief ChainDescriptor that returns true when the anchor starts a
+///        3-node linear chain: terminal → serial → terminal.
+/////////////////////////////////////////////////
+extern const ChainDescriptor linear_3_chain;
+```
+
+Build again — this will fail with a linker error because the definition is missing.
+
+### Step 4 — Define the descriptor
+
+Open `src/logic/descriptors/descriptors_chain_descriptors.cpp`. Add the definition:
+
+```cpp
+/////////////////////////////////////////////////
+const ChainDescriptor linear_3_chain = [] {
+  auto result = ChainDescriptorBuilder{}
+      .Then(is_terminal)
+      .Then(is_serial)
+      .Then(is_terminal)
+      .Build("linear_3_chain");
+  return result.value();
+}();
+```
+
+Build and run the boolean test — it should now **pass**.
+
+```bash
+cmake --build --preset Debug
+ctest --preset Debug -R "linear_3_chain"
+```
+
+### Step 5 — Add a trace assertion (write it failing first)
+
+Add a second `SECTION` (or separate `TEST_CASE`) that verifies the trace produced
+when the DFS succeeds from a terminal-fragment anchor.
+
+First, print the actual trace to understand what the DFS emits, then encode it
+as an `AnalysisTraceBuilder` expectation. Running the descriptor with
+`TerminalDescriptorFormatter::Format()` on the actual trace gives you the ground
+truth:
+
+```cpp
+// Temporary debug — remove after capturing expected trace
+descriptors::TerminalDescriptorFormatter fmt;
+const auto &[anchor_id, anchor_variant] = *scaffold.parts.begin();
+ChainDescriptorResult debug_result =
+    descriptors::linear_3_chain(scaffold.parts, anchor_id);
+std::cout << fmt.Format(debug_result.m_trace);
+```
+
+Once you know the anchor ID and the trace shape, encode the expectation:
+
+```cpp
+SECTION("Trace matches expected DFS events from a terminal-fragment anchor") {
+  namespace descriptors = steamrot::logic::descriptors;
+  descriptors::TerminalDescriptorFormatter fmt;
+
+  // anchor_id = first fragment in the LinearChain scenario
+  // The LinearChain scenario inserts: frag0, frag1, joint0.
+  // Insertion-order IDs come from part_ids; for the pre-built scenario
+  // the IDs are stable across test runs.
+  const steamrot::MachinaFormScaffold &scaffold =
+      lib.scaffold_scenarios.at(steamrot::tests::ScaffoldScenario::LinearChain);
+
+  // Identify the fragment IDs and joint ID from the map
+  std::vector<uint32_t> frag_ids, joint_ids;
+  for (const auto &[id, v] : scaffold.parts) {
+    if (std::holds_alternative<steamrot::FragmentInstance>(v))
+      frag_ids.push_back(id);
+    else
+      joint_ids.push_back(id);
+  }
+  REQUIRE(frag_ids.size() == 2);
+  REQUIRE(joint_ids.size() == 1);
+
+  const uint32_t anchor = frag_ids[0];
+  const uint32_t serial = joint_ids[0];
+  const uint32_t far_end = frag_ids[1];
+
+  ChainDescriptorResult result =
+      descriptors::linear_3_chain(scaffold.parts, anchor);
+  REQUIRE(result.m_result == true);
+
+  // Build expected trace. Depths: ScopeBegin=0, anchor=1, serial=2, far_end=3.
+  steamrot::tests::AnalysisTraceBuilder builder;
+  builder
+    .ScopeBegin("linear_3_chain", descriptors::ScopeKind::Chain, 0u, anchor)
+    // Step 1: anchor satisfies is_terminal
+    .NodeEval(anchor, "has_maximum_n_edges(1)", 1u)
+    .NodeResult(anchor, "has_maximum_n_edges(1)", true,
+                "connection_count=1, expected<=1", 1u)
+    // DFS moves to the serial joint via socket 0 (or 1 — depends on socket map order)
+    .MovingToNeighbour(anchor, serial, 0u, 1u)  // adjust socket_id if needed
+    // Step 2: serial joint satisfies is_serial
+    .NodeEval(serial, "has_exactly_n_edges(2)", 2u)
+    .NodeResult(serial, "has_exactly_n_edges(2)", true,
+                "connection_count=2, expected==2", 2u)
+    // DFS moves to far-end fragment
+    .MovingToNeighbour(serial, far_end, /*socket_id*/1u, 2u)
+    // Step 3: far-end fragment satisfies is_terminal
+    .NodeEval(far_end, "has_maximum_n_edges(1)", 3u)
+    .NodeResult(far_end, "has_maximum_n_edges(1)", true,
+                "connection_count=1, expected<=1", 3u)
+    // All steps matched — no more steps to consume, DFS returns
+    .Backtracking(far_end, 2u)
+    .Backtracking(serial, 1u)
+    .ScopeEnd("linear_3_chain", descriptors::ScopeKind::Chain, true, 0u);
+
+  REQUIRE_THAT(result.m_trace, steamrot::tests::EqualsTrace(builder.Build(), fmt));
+}
+```
+
+> **Tip:** socket IDs and the exact DFS traversal order depend on the order keys
+> appear in `SocketMap` (a `std::map<uint32_t, SocketData>`, so sorted by
+> socket ID). If the first `REQUIRE_THAT` fails, use the debug print above to
+> read the actual trace and update the builder calls to match. The matcher's
+> `describe()` output highlights the first diverging line, making this fast.
+
+Build and run:
+
+```bash
+cmake --build --preset Debug
+ctest --preset Debug -R "linear_3_chain"
+```
+
+The trace test may fail on the first run if the socket IDs or depth values differ
+from your estimate — adjust the `AnalysisTraceBuilder` calls until all
+`REQUIRE_THAT` lines pass.
+
+### Step 6 — Test nodes that should NOT match
+
+Add a section confirming that the descriptor returns `false` when anchored at the
+central joint (which is serial, not terminal):
+
+```cpp
+SECTION("Returns false when anchored at the serial joint") {
+  namespace descriptors = steamrot::logic::descriptors;
+
+  std::vector<uint32_t> joint_ids;
+  for (const auto &[id, v] : scaffold.parts)
+    if (std::holds_alternative<steamrot::JointInstance>(v))
+      joint_ids.push_back(id);
+
+  ChainDescriptorResult result =
+      descriptors::linear_3_chain(scaffold.parts, joint_ids[0]);
+  REQUIRE(result.m_result == false);
+}
+```
+
+### Summary checklist for ChainDescriptor TDD
+
+- [ ] Designed the target topology and identified a matching scaffold (or built a
+      custom one with `PartLibraryBuilder`)
+- [ ] Wrote a failing boolean test before declaring the descriptor
+- [ ] Declared `extern const ChainDescriptor my_chain` in
+      `descriptors_chain_descriptors.h`
+- [ ] Defined `my_chain` in `descriptors_chain_descriptors.cpp` using
+      `ChainDescriptorBuilder` with a descriptive `name` passed to `Build()`
+- [ ] Boolean test passes
+- [ ] Added a trace assertion using `AnalysisTraceBuilder` + `TraceEqualsMatcher`
+- [ ] Verified that anchoring at non-matching nodes returns `false`
+- [ ] All tests pass (`ctest --preset Debug -R my_chain`)
 
 ---
 
@@ -714,8 +1032,10 @@ The following are planned but not yet implemented:
 - [ ] Declared the descriptor in the appropriate level header (`descriptors_node_descriptors.h`, etc.)
 - [ ] Defined the descriptor in the appropriate level source (lambda takes `(const PartGraph&, uint32_t)`)
 - [ ] Added a `TEST_CASE` in `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp`
-- [ ] Used `CheckNodeDescriptorForAllScenarios` for named constants
+- [ ] Used `CheckNodeDescriptorForAllScenarios` for named `NodeDescriptor` constants
 - [ ] Verified arrays are fragments-first, then joints
+- [ ] For `ChainDescriptor`: passed a descriptive `name` to `Build()` so trace events are labelled
+- [ ] For `ChainDescriptor`: added a trace assertion using `AnalysisTraceBuilder` + `TraceEqualsMatcher`
 - [ ] All descriptor call sites pass `scaffold.parts` (not `scaffold`)
 - [ ] Built and all tests pass
 - [ ] Updated `docs/workflows/adding_descriptors.md` if the descriptor API changed
