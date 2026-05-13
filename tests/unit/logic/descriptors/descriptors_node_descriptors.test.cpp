@@ -8,9 +8,13 @@
 /////////////////////////////////////////////////
 #include "descriptors_node_descriptors.h"
 #include "MachinaFormScaffold.h"
+#include "TerminalDescriptorFormatter.h"
+#include "AnalysisTraceBuilder.h"
+#include "TraceEqualsMatcher.h"
 #include "descriptors_general.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 #include <vector>
 
 namespace descriptors = steamrot::logic::descriptors;
@@ -449,4 +453,61 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
          .simple_branch = {true, true, true, false}},
         lib);
   }
+}
+
+TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a fragment node",
+          "[unit][analysis][grimoire_machina][formatter]") {
+  // Arrange: single fragment with a predictable part ID.
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+  steamrot::tests::ScaffoldResult result =
+      builder.MakeConnectedScaffold({"fragment_one_socket"}, {}, {});
+  const uint32_t frag_id = result.part_ids[0];
+
+  // Act: run the descriptor and capture the trace.
+  const descriptors::NodeDescriptorResult nd_result =
+      descriptors::is_fragment(result.scaffold.parts, frag_id);
+
+  // Assert: the boolean result is correct.
+  REQUIRE(nd_result.m_result == true);
+
+  // Assert: the formatted trace matches the expected output produced by
+  // AnalysisTraceBuilder, ensuring the formatter round-trips correctly.
+  descriptors::TerminalDescriptorFormatter fmt;
+  steamrot::tests::AnalysisTraceBuilder trace_builder;
+  trace_builder
+      .NodeEval(frag_id, "is_fragment")
+      .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
+
+  REQUIRE_THAT(nd_result.m_trace,
+               steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
+}
+
+TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a joint node",
+          "[unit][analysis][grimoire_machina][formatter]") {
+  // Arrange: single joint.
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+  steamrot::tests::ScaffoldResult result =
+      builder.MakeConnectedScaffold({}, {"joint_one_socket"}, {});
+  const uint32_t joint_id = result.part_ids[0];
+
+  // Act: run the descriptor on a joint node — expected to return false.
+  const descriptors::NodeDescriptorResult nd_result =
+      descriptors::is_fragment(result.scaffold.parts, joint_id);
+
+  // Assert: the boolean result is false for a joint.
+  REQUIRE(nd_result.m_result == false);
+
+  // Assert: trace matches expected.
+  descriptors::TerminalDescriptorFormatter fmt;
+  steamrot::tests::AnalysisTraceBuilder trace_builder;
+  trace_builder
+      .NodeEval(joint_id, "is_fragment")
+      .NodeResult(joint_id, "is_fragment", false, "node holds JointInstance");
+
+  REQUIRE_THAT(nd_result.m_trace,
+               steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
 }

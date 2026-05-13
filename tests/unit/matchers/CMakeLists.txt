@@ -15,6 +15,7 @@ add_executable(test_matchers
   SceneCollectionDataEqualsMatcher.test.cpp
   EngineSnapshotEqualsMatcher.test.cpp
   Vector2fEqualsMatcher.test.cpp
+  TraceEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers
@@ -23,6 +24,7 @@ PRIVATE
   matchers
   entity
   events
+  logic
 )
 
 catch_discover_tests(test_matchers)

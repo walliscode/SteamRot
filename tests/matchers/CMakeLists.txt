@@ -18,6 +18,8 @@ add_library(matchers
   EngineSnapshotEqualsMatcher.cpp
   Vector2fEqualsMatcher.cpp
   PixelImageEqualsMatcher.cpp
+  AnalysisTraceBuilder.cpp
+  TraceEqualsMatcher.cpp
 )
 
 target_include_directories(matchers
@@ -34,4 +36,5 @@ PUBLIC
   conmat
   magic_enum
   SFML::Graphics
+  logic
 )
