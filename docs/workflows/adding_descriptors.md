@@ -804,7 +804,7 @@ as an `AnalysisTraceBuilder` expectation. Running the descriptor with
 truth:
 
 ```cpp
-// Temporary debug — remove after capturing expected trace
+// Temporary debug step — remove this after capturing the expected trace shape
 descriptors::TerminalDescriptorFormatter fmt;
 const auto &[anchor_id, anchor_variant] = *scaffold.parts.begin();
 ChainDescriptorResult debug_result =
@@ -853,8 +853,8 @@ SECTION("Trace matches expected DFS events from a terminal-fragment anchor") {
     .NodeEval(anchor, "has_maximum_n_edges(1)", 1u)
     .NodeResult(anchor, "has_maximum_n_edges(1)", true,
                 "connection_count=1, expected<=1", 1u)
-    // DFS moves to the serial joint via socket 0 (or 1 — depends on socket map order)
-    .MovingToNeighbour(anchor, serial, 0u, 1u)  // adjust socket_id if needed
+    // DFS moves to the serial joint; socket_id depends on SocketMap insertion order
+    .MovingToNeighbour(anchor, serial, 0u, 1u)  // socket_id may need adjustment based on SocketMap order
     // Step 2: serial joint satisfies is_serial
     .NodeEval(serial, "has_exactly_n_edges(2)", 2u)
     .NodeResult(serial, "has_exactly_n_edges(2)", true,
