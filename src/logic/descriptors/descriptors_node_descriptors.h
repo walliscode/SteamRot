@@ -44,7 +44,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Underlying callable type.
   /////////////////////////////////////////////////
-  using FnType = std::function<NodeDescriptorResult(const PartGraph &, uint32_t)>;
+  using FnType = std::function<NodeDescriptorResult(const PartGraph &part_graph,
+                                                    uint32_t part_id)>;
 
   NodeDescriptor() = default;
 
@@ -62,9 +63,8 @@ public:
   /// Enabled only for types other than @c NodeDescriptor itself so as not
   /// to shadow the copy/move constructors.
   /////////////////////////////////////////////////
-  template <typename F,
-            typename = std::enable_if_t<
-                !std::is_same_v<std::decay_t<F>, NodeDescriptor>>>
+  template <typename F, typename = std::enable_if_t<
+                            !std::is_same_v<std::decay_t<F>, NodeDescriptor>>>
   NodeDescriptor(F &&fn) // NOLINT(google-explicit-constructor)
       : m_fn(std::forward<F>(fn)) {}
 

@@ -12,8 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-
-#include "DescriptorResult.h"
+#include <string>
 
 namespace steamrot::logic::descriptors {
 
@@ -48,19 +47,18 @@ namespace steamrot::logic::descriptors {
 /// @return Combined descriptor returning a(...) && b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc and_(Desc a, Desc b) {
-  std::string name =
-      "(" + a.GetName() + " AND " + b.GetName() + ")";
+  std::string name = "(" + a.GetName() + " AND " + b.GetName() + ")";
   return Desc{std::move(name),
-              typename Desc::FnType{[fa = std::move(a),
-                                     fb = std::move(b)](auto &&...args) {
-                auto ra = fa(std::forward<decltype(args)>(args)...);
-                auto rb = fb(std::forward<decltype(args)>(args)...);
-                std::decay_t<decltype(ra)> result{static_cast<bool>(ra) &&
-                                                  static_cast<bool>(rb)};
-                Merge(result.m_trace, std::move(ra.m_trace));
-                Merge(result.m_trace, std::move(rb.m_trace));
-                return result;
-              }}};
+              typename Desc::FnType{
+                  [fa = std::move(a), fb = std::move(b)](auto &&...args) {
+                    auto ra = fa(std::forward<decltype(args)>(args)...);
+                    auto rb = fb(std::forward<decltype(args)>(args)...);
+                    std::decay_t<decltype(ra)> result{static_cast<bool>(ra) &&
+                                                      static_cast<bool>(rb)};
+                    Merge(result.m_trace, std::move(ra.m_trace));
+                    Merge(result.m_trace, std::move(rb.m_trace));
+                    return result;
+                  }}};
 }
 
 /////////////////////////////////////////////////
@@ -72,19 +70,18 @@ template <typename Desc> Desc and_(Desc a, Desc b) {
 /// @return Combined descriptor returning a(...) || b(...).
 /////////////////////////////////////////////////
 template <typename Desc> Desc or_(Desc a, Desc b) {
-  std::string name =
-      "(" + a.GetName() + " OR " + b.GetName() + ")";
+  std::string name = "(" + a.GetName() + " OR " + b.GetName() + ")";
   return Desc{std::move(name),
-              typename Desc::FnType{[fa = std::move(a),
-                                     fb = std::move(b)](auto &&...args) {
-                auto ra = fa(std::forward<decltype(args)>(args)...);
-                auto rb = fb(std::forward<decltype(args)>(args)...);
-                std::decay_t<decltype(ra)> result{static_cast<bool>(ra) ||
-                                                  static_cast<bool>(rb)};
-                Merge(result.m_trace, std::move(ra.m_trace));
-                Merge(result.m_trace, std::move(rb.m_trace));
-                return result;
-              }}};
+              typename Desc::FnType{
+                  [fa = std::move(a), fb = std::move(b)](auto &&...args) {
+                    auto ra = fa(std::forward<decltype(args)>(args)...);
+                    auto rb = fb(std::forward<decltype(args)>(args)...);
+                    std::decay_t<decltype(ra)> result{static_cast<bool>(ra) ||
+                                                      static_cast<bool>(rb)};
+                    Merge(result.m_trace, std::move(ra.m_trace));
+                    Merge(result.m_trace, std::move(rb.m_trace));
+                    return result;
+                  }}};
 }
 
 /////////////////////////////////////////////////
