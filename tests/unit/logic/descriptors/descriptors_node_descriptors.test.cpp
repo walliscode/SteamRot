@@ -7,9 +7,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "descriptors_node_descriptors.h"
+#include "AnalysisTraceBuilder.h"
 #include "MachinaFormScaffold.h"
 #include "TerminalDescriptorFormatter.h"
-#include "AnalysisTraceBuilder.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_general.h"
 #include "part_library.h"
@@ -455,8 +455,9 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
   }
 }
 
-TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a fragment node",
-          "[unit][analysis][grimoire_machina][formatter]") {
+TEST_CASE(
+    "TerminalDescriptorFormatter sense check — is_fragment on a fragment node",
+    "[unit][analysis][grimoire_machina][formatter]") {
   // Arrange: single fragment with a predictable part ID.
   steamrot::tests::TestPartLibrary lib =
       steamrot::tests::TestPartLibrary::Create();
@@ -476,16 +477,16 @@ TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a fragment
   // AnalysisTraceBuilder, ensuring the formatter round-trips correctly.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder
-      .NodeEval(frag_id, "is_fragment")
+  trace_builder.NodeEval(frag_id, "is_fragment")
       .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
 
   REQUIRE_THAT(nd_result.m_trace,
                steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
 }
 
-TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a joint node",
-          "[unit][analysis][grimoire_machina][formatter]") {
+TEST_CASE(
+    "TerminalDescriptorFormatter sense check — is_fragment on a joint node",
+    "[unit][analysis][grimoire_machina][formatter]") {
   // Arrange: single joint.
   steamrot::tests::TestPartLibrary lib =
       steamrot::tests::TestPartLibrary::Create();
@@ -504,8 +505,7 @@ TEST_CASE("TerminalDescriptorFormatter sense check — is_fragment on a joint no
   // Assert: trace matches expected.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder
-      .NodeEval(joint_id, "is_fragment")
+  trace_builder.NodeEval(joint_id, "is_fragment")
       .NodeResult(joint_id, "is_fragment", false, "node holds JointInstance");
 
   REQUIRE_THAT(nd_result.m_trace,

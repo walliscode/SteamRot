@@ -40,9 +40,8 @@ namespace steamrot::tests {
 ///              steamrot::tests::EqualsTrace(expected_trace, fmt));
 /// @endcode
 /////////////////////////////////////////////////
-class TraceEqualsMatcher
-    : public Catch::Matchers::MatcherBase<
-          steamrot::logic::descriptors::AnalysisTrace> {
+class TraceEqualsMatcher : public Catch::Matchers::MatcherBase<
+                               steamrot::logic::descriptors::AnalysisTrace> {
 public:
   /////////////////////////////////////////////////
   /// @brief Construct a matcher with an expected trace and a formatter.
@@ -64,8 +63,8 @@ public:
   /// @param actual The @c AnalysisTrace produced by the descriptor under test.
   /// @return @c true if the formatted outputs match exactly.
   /////////////////////////////////////////////////
-  bool match(const steamrot::logic::descriptors::AnalysisTrace &actual)
-      const override;
+  bool match(
+      const steamrot::logic::descriptors::AnalysisTrace &actual) const override;
 
   /////////////////////////////////////////////////
   /// @brief Return a description for Catch2 failure output.
@@ -89,9 +88,9 @@ private:
 /// @param formatter Formatter to use for comparison.
 /// @return @c TraceEqualsMatcher instance.
 /////////////////////////////////////////////////
-inline TraceEqualsMatcher
-EqualsTrace(const steamrot::logic::descriptors::AnalysisTrace &expected,
-            const steamrot::logic::descriptors::DescriptorFormatter &formatter) {
+inline TraceEqualsMatcher EqualsTrace(
+    const steamrot::logic::descriptors::AnalysisTrace &expected,
+    const steamrot::logic::descriptors::DescriptorFormatter &formatter) {
   return TraceEqualsMatcher(expected, formatter);
 }
 

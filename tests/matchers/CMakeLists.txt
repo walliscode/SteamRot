@@ -17,7 +17,6 @@ add_library(matchers
   SceneCollectionDataEqualsMatcher.cpp
   EngineSnapshotEqualsMatcher.cpp
   Vector2fEqualsMatcher.cpp
-  PixelImageEqualsMatcher.cpp
   AnalysisTraceBuilder.cpp
   TraceEqualsMatcher.cpp
 )
