@@ -23,7 +23,7 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyChainSteps() {
   AnalysisEvent ev{};
-  ev.kind = TraceEventKind::EmtpyChainSteps;
+  ev.kind = TraceEventKind::EmptyChainSteps;
   m_trace.push_back(std::move(ev));
   return *this;
 }

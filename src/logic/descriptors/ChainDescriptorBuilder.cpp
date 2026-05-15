@@ -272,7 +272,7 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           // set up EmptyChainSteps event in the trace to explain why the result
           // is false
           AnalysisEvent empty_steps_event{};
-          empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
+          empty_steps_event.kind = TraceEventKind::EmptyChainSteps;
           context.trace.push_back(std::move(empty_steps_event));
 
           AnalysisEvent scope_end{};

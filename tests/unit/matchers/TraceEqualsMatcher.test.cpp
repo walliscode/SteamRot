@@ -101,7 +101,7 @@ TEST_CASE("AnalysisTraceBuilder::EmptyChainSteps appends correct event",
 
   const AnalysisTrace trace = builder.Build();
   REQUIRE(trace.size() == 1);
-  REQUIRE(trace[0].kind == TraceEventKind::EmtpyChainSteps);
+  REQUIRE(trace[0].kind == TraceEventKind::EmptyChainSteps);
 }
 
 TEST_CASE("AnalysisTraceBuilder::ValidSubgraphIsolated appends correct event",
