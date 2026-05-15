@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
-#include <expected>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -98,6 +97,9 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
 
   // Evaluate the predicate; this stamps NodeEval + NodeResult into the result.
   auto pred_result = current_predicate(parts, current_id, context.depth);
+
+  // pass the predicates trace as an R value, the context takes ownership of it
+  // and merges it into the overall trace
   Merge(context.trace, std::move(pred_result.m_trace));
 
   if (!pred_result) {
@@ -198,35 +200,32 @@ ChainDescriptorBuilder &ChainDescriptorBuilder::WhileIsTrue(NodeDescriptor nd) {
 }
 
 /////////////////////////////////////////////////
-std::string ChainDescriptorBuilder::Validate() const {
-  std::string error_message;
-  if (m_build_finalised) {
-    error_message += "Cannot modify builder after Build() has been called. ";
-  }
-  return error_message;
-}
-
-/////////////////////////////////////////////////
-std::expected<ChainDescriptor, std::string>
-ChainDescriptorBuilder::Build(std::string name) {
-
-  std::string validation_error = Validate();
-  if (!validation_error.empty()) {
-    return std::unexpected(validation_error);
-  }
-
-  m_build_finalised = true;
+ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
 
   std::vector<ChainStep> steps = m_steps;
 
   return ChainDescriptor{
       name,
-      [steps = std::move(steps),
-       chain_name = std::move(name)](const PartGraph &parts,
-                                     uint32_t start_id) -> ChainDescriptorResult {
+      [steps = std::move(steps), chain_name = std::move(name)](
+          const PartGraph &parts, uint32_t start_id) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
         DFSContext context;
 
+        // Check for empty PartGraph
+        if (parts.empty()) {
+
+          // this is automatically a failed result
+          result.m_result = false;
+
+          // set up EmtpyGraph event in the trace
+          AnalysisEvent empty_graph_event{};
+          empty_graph_event.kind = TraceEventKind::EmtpyPartGraph;
+          context.trace.push_back(std::move(empty_graph_event));
+          result.m_trace = std::move(context.trace);
+
+          // return early since there's no graph to traverse
+          return result;
+        }
         // ScopeBegin
         AnalysisEvent scope_begin{};
         scope_begin.kind = TraceEventKind::ScopeBegin;

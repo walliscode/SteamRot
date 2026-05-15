@@ -25,6 +25,9 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   const std::string indent = Indent(ev.depth);
 
   switch (ev.kind) {
+  case TraceEventKind::EmtpyPartGraph: {
+    return indent + "[EMPTY] part graph is empty";
+  }
   case TraceEventKind::ScopeBegin: {
     std::string line = indent + "[";
     switch (ev.scope_kind) {
@@ -68,8 +71,8 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   }
 
   case TraceEventKind::MovingToNeighbour: {
-    return indent + "[MOVE]  node#" + std::to_string(ev.from_id) +
-           " -> node#" + std::to_string(ev.to_id) +
+    return indent + "[MOVE]  node#" + std::to_string(ev.from_id) + " -> node#" +
+           std::to_string(ev.to_id) +
            "  socket=" + std::to_string(ev.socket_id);
   }
 
@@ -84,7 +87,8 @@ std::string FormatEvent(const AnalysisEvent &ev) {
 } // namespace
 
 /////////////////////////////////////////////////
-std::string TerminalDescriptorFormatter::Format(const AnalysisTrace &trace) const {
+std::string
+TerminalDescriptorFormatter::Format(const AnalysisTrace &trace) const {
   std::string output;
   output.reserve(trace.size() * 40);
   for (const AnalysisEvent &ev : trace) {

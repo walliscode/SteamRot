@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
-#include <expected>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -110,12 +109,6 @@ public:
   ChainDescriptorBuilder &WhileIsTrue(NodeDescriptor nd);
 
   /////////////////////////////////////////////////
-  /// @brief Validates the state of the builder, just before building the
-  /// descriptor.
-  /////////////////////////////////////////////////
-  std::string Validate() const;
-
-  /////////////////////////////////////////////////
   /// @brief Returns a ChainDescriptor containing the steps added to this
   /// builder.
   ///
@@ -125,6 +118,6 @@ public:
   /// If an error occurs during validation of the steps, returns a string
   /// describing the error instead.
   /////////////////////////////////////////////////
-  std::expected<ChainDescriptor, std::string> Build(std::string name = "");
+  ChainDescriptor Build(std::string name = "");
 };
 } // namespace steamrot::logic::descriptors

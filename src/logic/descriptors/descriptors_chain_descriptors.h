@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <functional>
 #include <string>
-#include <type_traits>
 
 namespace steamrot::logic::descriptors {
 
@@ -53,15 +52,6 @@ public:
   /////////////////////////////////////////////////
   ChainDescriptor(std::string name, FnType fn)
       : m_name(std::move(name)), m_fn(std::move(fn)) {}
-
-  /////////////////////////////////////////////////
-  /// @brief Construct an unnamed descriptor from any compatible callable.
-  /////////////////////////////////////////////////
-  template <typename F,
-            typename = std::enable_if_t<
-                !std::is_same_v<std::decay_t<F>, ChainDescriptor>>>
-  ChainDescriptor(F &&fn) // NOLINT(google-explicit-constructor)
-      : m_fn(std::forward<F>(fn)) {}
 
   /////////////////////////////////////////////////
   /// @brief Evaluate the chain descriptor from @p id as anchor.
@@ -111,11 +101,20 @@ inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
   return ChainDescriptor{
       nd.GetName(),
       [nd = std::move(nd)](const PartGraph &parts,
-                            uint32_t id) -> ChainDescriptorResult {
+                           uint32_t id) -> ChainDescriptorResult {
         auto node_result = nd(parts, id);
         ChainDescriptorResult result{static_cast<bool>(node_result)};
         Merge(result.m_trace, std::move(node_result.m_trace));
         return result;
       }};
 }
+
+/////////////////////////////////////////////////
+/// @brief Checks whether a serial chain can be formed from the provided node
+///
+/// A serial chain is that in which the node has exactly 2 connections and then
+/// finally a terminal node
+/////////////////////////////////////////////////
+extern const ChainDescriptor is_serial_chain;
+
 } // namespace steamrot::logic::descriptors

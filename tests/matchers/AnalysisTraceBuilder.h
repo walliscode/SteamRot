@@ -39,11 +39,19 @@ namespace steamrot::tests {
 ///   .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
 ///
 /// steamrot::logic::descriptors::TerminalDescriptorFormatter fmt;
-/// REQUIRE_THAT(result.m_trace, steamrot::tests::EqualsTrace(builder.Build(), fmt));
+/// REQUIRE_THAT(result.m_trace, steamrot::tests::EqualsTrace(builder.Build(),
+/// fmt));
 /// @endcode
 /////////////////////////////////////////////////
 class AnalysisTraceBuilder {
 public:
+  /////////////////////////////////////////////////
+  /// @brief Append an EmptyPartGraph event.
+  ///
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &EmptyPartGraph();
+
   /////////////////////////////////////////////////
   /// @brief Append a ScopeBegin event.
   ///
@@ -54,8 +62,8 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &
-  ScopeBegin(std::string name,
-             steamrot::logic::descriptors::ScopeKind kind, uint32_t depth = 0,
+  ScopeBegin(std::string name, steamrot::logic::descriptors::ScopeKind kind,
+             uint32_t depth = 0,
              std::optional<uint32_t> anchor_id = std::nullopt);
 
   /////////////////////////////////////////////////
@@ -67,9 +75,9 @@ public:
   /// @param depth  Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
-  AnalysisTraceBuilder &
-  ScopeEnd(std::string name, steamrot::logic::descriptors::ScopeKind kind,
-           bool result, uint32_t depth = 0);
+  AnalysisTraceBuilder &ScopeEnd(std::string name,
+                                 steamrot::logic::descriptors::ScopeKind kind,
+                                 bool result, uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a NodeEval event.
@@ -92,9 +100,9 @@ public:
   /// @param depth          Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
-  AnalysisTraceBuilder &NodeResult(uint32_t part_id,
-                                   std::string predicate_name, bool result,
-                                   std::string reason = {}, uint32_t depth = 0);
+  AnalysisTraceBuilder &NodeResult(uint32_t part_id, std::string predicate_name,
+                                   bool result, std::string reason = {},
+                                   uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a MovingToNeighbour event.
