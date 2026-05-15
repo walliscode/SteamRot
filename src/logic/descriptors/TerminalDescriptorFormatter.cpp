@@ -82,6 +82,10 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   case TraceEventKind::Backtracking: {
     return indent + "[BACK]  <- node#" + std::to_string(ev.from_id);
   }
+
+  case TraceEventKind::ValidSubgraphIsolated: {
+    return indent + "[PASS]  valid subgraph is isolated";
+  }
   }
 
   return indent + "[?]";

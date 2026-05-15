@@ -14,6 +14,8 @@
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
-const ChainDescriptor is_serial_chain =
-    ChainDescriptorBuilder{}.WhileIsTrue(is_serial).Build("is_serial_chain");
+const ChainDescriptor is_serial_chain = ChainDescriptorBuilder{}
+                                            .WhileIsTrue(is_serial)
+                                            .Then(is_terminal)
+                                            .Build("is_serial_chain");
 } // namespace steamrot::logic::descriptors

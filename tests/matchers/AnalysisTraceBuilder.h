@@ -77,7 +77,7 @@ public:
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &ScopeEnd(std::string name,
                                  steamrot::logic::descriptors::ScopeKind kind,
-                                 bool result, uint32_t depth = 0);
+                                 bool result, uint32_t depth);
 
   /////////////////////////////////////////////////
   /// @brief Append a NodeEval event.
@@ -88,7 +88,7 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(uint32_t part_id, std::string predicate_name,
-                                 uint32_t depth = 0);
+                                 uint32_t depth);
 
   /////////////////////////////////////////////////
   /// @brief Append a NodeResult event.
@@ -115,8 +115,7 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &MovingToNeighbour(uint32_t from_id, uint32_t to_id,
-                                          uint32_t socket_id,
-                                          uint32_t depth = 0);
+                                          uint32_t socket_id, uint32_t depth);
 
   /////////////////////////////////////////////////
   /// @brief Append a Backtracking event.
@@ -125,7 +124,9 @@ public:
   /// @param depth   Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
-  AnalysisTraceBuilder &Backtracking(uint32_t from_id, uint32_t depth = 0);
+  AnalysisTraceBuilder &Backtracking(uint32_t from_id, uint32_t depth);
+
+  AnalysisTraceBuilder &ValidSubgraphIsolated();
 
   /////////////////////////////////////////////////
   /// @brief Return a copy of the accumulated trace.

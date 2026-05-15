@@ -153,9 +153,10 @@ extern const NodeDescriptor is_joint;
 /// @p n connections (i.e., exactly @p n connected sockets).
 ///
 /// @param n Number of connections.
+/// @param name Human-readable name for the descriptor, used in trace events.
 /// @return NodeDescriptor returning true when connection_count == n.
 /////////////////////////////////////////////////
-NodeDescriptor has_exactly_n_edges(size_t n);
+NodeDescriptor has_exactly_n_edges(size_t n, std::string name);
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has exactly

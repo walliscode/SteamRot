@@ -27,8 +27,8 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
 
   NodeDescriptorResult result{};
   if (parts.find(id) == parts.end()) {
-    result = NodeDescriptorResult{
-        false, "incorrect key: part_id=" + std::to_string(id)};
+    result = NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                             std::to_string(id)};
   } else {
     result = m_fn(parts, id);
   }
@@ -53,13 +53,12 @@ const NodeDescriptor is_fragment{
     [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
       const auto part_it = parts.find(id);
       if (part_it == parts.end())
-        return NodeDescriptorResult{
-            false, "incorrect key: part_id=" + std::to_string(id)};
+        return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                               std::to_string(id)};
       const bool holds =
           std::holds_alternative<FragmentInstance>(part_it->second);
-      return NodeDescriptorResult{
-          holds,
-          holds ? "node holds FragmentInstance" : "node holds JointInstance"};
+      return NodeDescriptorResult{holds, holds ? "node holds FragmentInstance"
+                                               : "node holds JointInstance"};
     }};
 
 /////////////////////////////////////////////////
@@ -68,35 +67,32 @@ const NodeDescriptor is_joint{
     [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
       const auto part_it = parts.find(id);
       if (part_it == parts.end())
-        return NodeDescriptorResult{
-            false, "incorrect key: part_id=" + std::to_string(id)};
+        return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                               std::to_string(id)};
       const bool holds = std::holds_alternative<JointInstance>(part_it->second);
-      return NodeDescriptorResult{
-          holds,
-          holds ? "node holds JointInstance" : "node holds FragmentInstance"};
+      return NodeDescriptorResult{holds, holds ? "node holds JointInstance"
+                                               : "node holds FragmentInstance"};
     }};
 
 /////////////////////////////////////////////////
-NodeDescriptor has_exactly_n_edges(size_t n) {
+NodeDescriptor has_exactly_n_edges(size_t n, std::string name) {
   return NodeDescriptor{
-      "has_exactly_n_edges(" + std::to_string(n) + ")",
-      [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+      name, [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
         const auto part_it = parts.find(id);
         if (part_it == parts.end())
-          return NodeDescriptorResult{
-              false, "incorrect key: part_id=" + std::to_string(id)};
+          return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                                 std::to_string(id)};
         const size_t count = std::visit(
             [](const auto &inst) -> size_t { return inst.connection_count; },
             part_it->second);
         return NodeDescriptorResult{
-            count == n,
-            "connection_count=" + std::to_string(count) +
-                ", expected==" + std::to_string(n)};
+            count == n, "connection_count=" + std::to_string(count) +
+                            ", expected==" + std::to_string(n)};
       }};
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_serial = has_exactly_n_edges(2);
+const NodeDescriptor is_serial = has_exactly_n_edges(2, "is_serial");
 
 /////////////////////////////////////////////////
 NodeDescriptor has_minimum_n_edges(size_t n) {
@@ -105,15 +101,14 @@ NodeDescriptor has_minimum_n_edges(size_t n) {
       [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
         const auto part_it = parts.find(id);
         if (part_it == parts.end())
-          return NodeDescriptorResult{
-              false, "incorrect key: part_id=" + std::to_string(id)};
+          return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                                 std::to_string(id)};
         const size_t count = std::visit(
             [](const auto &inst) -> size_t { return inst.connection_count; },
             part_it->second);
         return NodeDescriptorResult{
-            count >= n,
-            "connection_count=" + std::to_string(count) +
-                ", expected>=" + std::to_string(n)};
+            count >= n, "connection_count=" + std::to_string(count) +
+                            ", expected>=" + std::to_string(n)};
       }};
 }
 
@@ -127,18 +122,17 @@ NodeDescriptor has_maximum_n_edges(size_t n) {
       [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
         const auto part_it = parts.find(id);
         if (part_it == parts.end())
-          return NodeDescriptorResult{
-              false, "incorrect key: part_id=" + std::to_string(id)};
+          return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                                 std::to_string(id)};
         const size_t count = std::visit(
             [](const auto &inst) -> size_t { return inst.connection_count; },
             part_it->second);
         return NodeDescriptorResult{
-            count <= n,
-            "connection_count=" + std::to_string(count) +
-                ", expected<=" + std::to_string(n)};
+            count <= n, "connection_count=" + std::to_string(count) +
+                            ", expected<=" + std::to_string(n)};
       }};
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_terminal = has_maximum_n_edges(1);
+const NodeDescriptor is_terminal = has_exactly_n_edges(1, "is_terminal");
 } // namespace steamrot::logic::descriptors

@@ -102,7 +102,11 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
   m_trace.push_back(std::move(ev));
   return *this;
 }
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {
 
+  return *this;
+}
 /////////////////////////////////////////////////
 AnalysisTrace AnalysisTraceBuilder::Build() const { return m_trace; }
 
