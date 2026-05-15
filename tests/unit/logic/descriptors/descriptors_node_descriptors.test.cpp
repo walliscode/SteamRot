@@ -120,7 +120,7 @@ TEST_CASE("NodeDescriptor fails with reason for incorrect key",
   REQUIRE_FALSE(result);
   REQUIRE(result.m_reason == "incorrect key: part_id=9999");
 
-  AnalysisTrace expected_trace =
+  steamrot::logic::descriptors::AnalysisTrace expected_trace =
       steamrot::tests::AnalysisTraceBuilder{}
           .NodeEval(kMissingPartId, "is_fragment")
           .NodeResult(kMissingPartId, "is_fragment", false,
@@ -128,8 +128,8 @@ TEST_CASE("NodeDescriptor fails with reason for incorrect key",
           .Build();
 
   REQUIRE_THAT(result.m_trace,
-               steamrot::tests::EqualsTrace(expected_trace,
-                                            descriptors::TerminalDescriptorFormatter{}));
+               steamrot::tests::EqualsTrace(
+                   expected_trace, descriptors::TerminalDescriptorFormatter{}));
 }
 
 TEST_CASE("predicate combinators compose correctly",

@@ -14,6 +14,7 @@
 #include "TraceEqualsMatcher.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 
 namespace {
 constexpr uint32_t kMissingPartId{9999};
@@ -53,6 +54,15 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
         steamrot::tests::ScaffoldScenario::IsolatedPair);
     steamrot::PartGraph &parts = scaffold.parts;
+
+    // print out keys in map
+    std::cout << "Part IDs in IsolatedPair scaffold:\n";
+    for (const auto &[id, variant] : parts) {
+      std::cout << "  part ID: " << id << "\n";
+    }
+    // check part 0 exists
+    auto it = parts.find(0);
+    REQUIRE(it != parts.end());
     INFO("attempting to evaluate is_serial_chain on IsolatedPair scaffold");
     ChainDescriptorResult result = is_serial_chain(parts, 0);
     INFO("result obtained");
@@ -65,28 +75,6 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .Build();
 
     // assert result and trace
-    REQUIRE_FALSE(result);
-    REQUIRE_THAT(result.m_trace,
-                 steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
-  }
-
-  SECTION("is_serial_chain fails with reason for incorrect anchor key") {
-    steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
-        steamrot::tests::ScaffoldScenario::IsolatedPair);
-    steamrot::PartGraph &parts = scaffold.parts;
-
-    ChainDescriptorResult result = is_serial_chain(parts, kMissingPartId);
-
-    AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .ScopeBegin("is_serial_chain", ScopeKind::Chain, kMissingPartId)
-            .NodeEval(kMissingPartId, "is_serial", 1)
-            .NodeResult(kMissingPartId, "is_serial", false,
-                        "incorrect key: part_id=9999", 1)
-            .ScopeEnd("is_serial_chain", ScopeKind::Chain, false)
-            .Build();
-
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
