@@ -298,8 +298,8 @@ void CheckNodeDescriptorForAllScenarios(
 ///
 /// Wraps a TestPartLibrary reference and exposes convenience methods for
 /// constructing FragmentInstances, JointInstances, PartGraphs, and
-/// fully-connected scaffolds in tests. Each builder maintains its own ID
-/// counter so IDs are unique within a single builder's lifetime.
+/// fully-connected scaffolds in tests. IDs are reset to 0 at the start of each
+/// scaffold/graph build call so every new scaffold starts from part ID 0.
 ///
 /// Usage example:
 /// @code
@@ -338,7 +338,7 @@ private:
   TestPartLibrary &m_library;
 
   /////////////////////////////////////////////////
-  /// @brief Monotonically increasing counter for assigning instance IDs.
+  /// @brief Counter for assigning instance IDs during the current build.
   /////////////////////////////////////////////////
   uint32_t m_next_id{0};
 
@@ -396,8 +396,8 @@ public:
   /// @brief Build a PartGraph from named Fragments and Joints in the library.
   ///
   /// Fragment instances are inserted first (in order), then Joint instances.
-  /// Each entry is assigned a monotonically increasing ID from this builder's
-  /// internal counter.
+  /// IDs are reset to 0 at the start of each call, then assigned in insertion
+  /// order within that call.
   ///
   /// All raw pointers in the returned instances point into the library's
   /// storage — the library must outlive the PartGraph.
@@ -414,9 +414,8 @@ public:
   /// connections.
   ///
   /// Fragment instances are added first (in order), then Joint instances.
-  /// Each instance is assigned a monotonically increasing ID from this
-  /// builder's internal counter and the scaffold's @c next_id is advanced to
-  /// match.
+  /// IDs are reset to 0 at the start of each call, then assigned in insertion
+  /// order. The scaffold's @c next_id is advanced to match.
   ///
   /// All raw pointers in the instances point into the library's storage — the
   /// library must outlive the returned scaffold.

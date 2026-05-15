@@ -9,7 +9,6 @@
 #include "HarnessReporter.h"
 #include <conmat.h>
 #include <filesystem>
-#include <format>
 #include <iostream>
 
 /////////////////////////////////////////////////

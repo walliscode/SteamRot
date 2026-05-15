@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
-#include <expected>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -84,6 +83,13 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
     // it is not evaluated against any predicate and is not part of the chain.
     // valid_subgraphs records only the N nodes that passed the predicates.
     result.valid_subgraphs.push_back(context.current_chain);
+
+    // emit ValidSubgraphIsolated event
+    AnalysisEvent valid_event{};
+    valid_event.kind = TraceEventKind::ValidSubgraphIsolated;
+    valid_event.depth = context.depth;
+    context.trace.push_back(std::move(valid_event));
+
     return;
   }
 
@@ -98,6 +104,9 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
 
   // Evaluate the predicate; this stamps NodeEval + NodeResult into the result.
   auto pred_result = current_predicate(parts, current_id, context.depth);
+
+  // pass the predicates trace as an R value, the context takes ownership of it
+  // and merges it into the overall trace
   Merge(context.trace, std::move(pred_result.m_trace));
 
   if (!pred_result) {
@@ -124,8 +133,6 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
     }
     }
   }
-
-  // Predicate passed — record consumption for WhileIsTrue.
   if (steps_it->kind == ChainStepKind::WhileIsTrue) {
     context.at_least_one_while_loop_consumed = true;
   }
@@ -135,9 +142,14 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   context.current_chain.push_back(current_id);
 
   // Iterate connected neighbours.
+  const auto part_it = parts.find(current_id);
+  if (part_it == parts.end()) {
+    result.invalid_subgraphs.push_back(context.current_chain);
+    return;
+  }
   const SocketMap &sockets = std::visit(
       [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-      parts.at(current_id));
+      part_it->second);
 
   for (const auto &[socket_id, socket] : sockets) {
     if (!socket.connected_to.has_value())
@@ -198,36 +210,51 @@ ChainDescriptorBuilder &ChainDescriptorBuilder::WhileIsTrue(NodeDescriptor nd) {
 }
 
 /////////////////////////////////////////////////
-std::string ChainDescriptorBuilder::Validate() const {
-  std::string error_message;
-  if (m_build_finalised) {
-    error_message += "Cannot modify builder after Build() has been called. ";
-  }
-  return error_message;
-}
-
-/////////////////////////////////////////////////
-std::expected<ChainDescriptor, std::string>
-ChainDescriptorBuilder::Build(std::string name) {
-
-  std::string validation_error = Validate();
-  if (!validation_error.empty()) {
-    return std::unexpected(validation_error);
-  }
-
-  m_build_finalised = true;
+ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
 
   std::vector<ChainStep> steps = m_steps;
 
   return ChainDescriptor{
       name,
-      [steps = std::move(steps),
-       chain_name = std::move(name)](const PartGraph &parts,
-                                     uint32_t start_id) -> ChainDescriptorResult {
+      [steps = std::move(steps), chain_name = std::move(name)](
+          const PartGraph &parts, uint32_t start_id) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
         DFSContext context;
 
-        // ScopeBegin
+        // Check for empty PartGraph
+        if (parts.empty()) {
+
+          // this is automatically a failed result
+          result.m_result = false;
+
+          // set up EmtpyGraph event in the trace
+          AnalysisEvent empty_graph_event{};
+          empty_graph_event.kind = TraceEventKind::EmtpyPartGraph;
+          context.trace.push_back(std::move(empty_graph_event));
+          result.m_trace = std::move(context.trace);
+
+          // return early since there's no graph to traverse
+          return result;
+        }
+
+        // Check for empty steps
+        if (steps.empty()) {
+
+          // this is automatically a failed result since a chain with no steps
+          // can't be satisfied
+          result.m_result = false;
+
+          // set up EmptyChainSteps event in the trace to explain why the result
+          // is false
+          AnalysisEvent empty_steps_event{};
+          empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
+          context.trace.push_back(std::move(empty_steps_event));
+          result.m_trace = std::move(context.trace);
+
+          // return early since there's no steps to evaluate
+          return result;
+        }
+
         AnalysisEvent scope_begin{};
         scope_begin.kind = TraceEventKind::ScopeBegin;
         scope_begin.depth = 0;

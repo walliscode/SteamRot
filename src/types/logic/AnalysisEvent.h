@@ -34,12 +34,15 @@ enum class ScopeKind {
 /// @brief Identifies the kind of analysis event recorded in a trace.
 /////////////////////////////////////////////////
 enum class TraceEventKind {
+  EmtpyPartGraph,
+  EmtpyChainSteps,
   NodeEval,
   NodeResult,
   MovingToNeighbour,
   Backtracking,
   ScopeBegin,
   ScopeEnd,
+  ValidSubgraphIsolated
 };
 
 /////////////////////////////////////////////////
@@ -49,14 +52,14 @@ enum class TraceEventKind {
 /// Not all fields are relevant for every event kind. Consult the @c kind
 /// field to determine which fields are populated for a given event.
 ///
-/// | kind               | fields used                                          |
+/// | kind               | fields used |
 /// |--------------------|------------------------------------------------------|
-/// | NodeEval           | depth, part_id, predicate_name                       |
-/// | NodeResult         | depth, part_id, predicate_name, result, reason        |
-/// | MovingToNeighbour  | depth, from_id, to_id, socket_id                     |
-/// | Backtracking       | depth, from_id                                       |
-/// | ScopeBegin         | depth, scope_name, scope_kind, anchor_id (optional)  |
-/// | ScopeEnd           | depth, scope_name, scope_kind, result                 |
+/// | NodeEval           | depth, part_id, predicate_name | | NodeResult |
+/// depth, part_id, predicate_name, result, reason        | | MovingToNeighbour
+/// | depth, from_id, to_id, socket_id                     | | Backtracking |
+/// depth, from_id                                       | | ScopeBegin | depth,
+/// scope_name, scope_kind, anchor_id (optional)  | | ScopeEnd           |
+/// depth, scope_name, scope_kind, result                 |
 /////////////////////////////////////////////////
 struct AnalysisEvent {
   /////////////////////////////////////////////////

@@ -25,6 +25,7 @@ collision_grimoire_machina.test.cpp
 
 # descriptors tests
 descriptors/descriptors_node_descriptors.test.cpp
+descriptors/descriptors_chain_descriptors.test.cpp
 descriptors/ChainDescriptorBuilder.test.cpp
 )
 

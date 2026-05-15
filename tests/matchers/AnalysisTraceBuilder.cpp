@@ -13,10 +13,17 @@ namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
 
 /////////////////////////////////////////////////
+AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
+  AnalysisEvent ev{};
+  ev.kind = TraceEventKind::EmtpyPartGraph;
+  m_trace.push_back(std::move(ev));
+  return *this;
+}
+/////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
-                                  uint32_t depth,
-                                  std::optional<uint32_t> anchor_id) {
+                                 uint32_t depth,
+                                 std::optional<uint32_t> anchor_id) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::ScopeBegin;
   ev.depth = depth;
@@ -29,9 +36,9 @@ AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
-                                                      ScopeKind kind,
-                                                      bool result,
-                                                      uint32_t depth) {
+                                                     ScopeKind kind,
+                                                     bool result,
+                                                     uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::ScopeEnd;
   ev.depth = depth;
@@ -44,8 +51,8 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
-                                                      std::string predicate_name,
-                                                      uint32_t depth) {
+                                                     std::string predicate_name,
+                                                     uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
   ev.depth = depth;
@@ -56,9 +63,10 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::NodeResult(
-    uint32_t part_id, std::string predicate_name, bool result,
-    std::string reason, uint32_t depth) {
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::NodeResult(uint32_t part_id, std::string predicate_name,
+                                 bool result, std::string reason,
+                                 uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeResult;
   ev.depth = depth;
@@ -73,7 +81,7 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::NodeResult(
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::MovingToNeighbour(uint32_t from_id, uint32_t to_id,
-                                         uint32_t socket_id, uint32_t depth) {
+                                        uint32_t socket_id, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
@@ -86,7 +94,7 @@ AnalysisTraceBuilder::MovingToNeighbour(uint32_t from_id, uint32_t to_id,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
-                                                          uint32_t depth) {
+                                                         uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -94,7 +102,11 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
   m_trace.push_back(std::move(ev));
   return *this;
 }
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {
 
+  return *this;
+}
 /////////////////////////////////////////////////
 AnalysisTrace AnalysisTraceBuilder::Build() const { return m_trace; }
 

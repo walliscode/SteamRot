@@ -20,7 +20,6 @@
 #include "entity_memory.h"
 #include "load_scene_data.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 #include <memory>
 
 TEST_CASE("SceneFactory::CreateEmptyScene handles UNKNOWN SceneType",
@@ -288,8 +287,6 @@ TEST_CASE("SceneFactory::ConfigureSceneInfo uses provided UUID",
   steamrot::SceneData scene_data;
   scene_data.scene_info.type = steamrot::SceneType::CRAFTING;
   scene_data.scene_info.id = uuids::uuid_system_generator{}();
-  std::cout << "Generated UUID for test: " << scene_data.scene_info.id
-            << std::endl;
   auto expected_uuid = scene_data.scene_info.id;
 
   // Act

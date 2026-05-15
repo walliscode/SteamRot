@@ -18,6 +18,9 @@
 #include <vector>
 
 namespace descriptors = steamrot::logic::descriptors;
+namespace {
+constexpr uint32_t kMissingPartId{9999};
+}
 
 TEST_CASE("empty scaffold has no parts", "[unit][analysis][grimoire_machina]") {
   steamrot::MachinaFormScaffold scaffold;
@@ -107,6 +110,28 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
   }
 }
 
+TEST_CASE("NodeDescriptor fails with reason for incorrect key",
+          "[unit][analysis][grimoire_machina]") {
+  const steamrot::PartGraph empty_parts{};
+
+  const descriptors::NodeDescriptorResult result =
+      descriptors::is_fragment(empty_parts, kMissingPartId);
+
+  REQUIRE_FALSE(result);
+  REQUIRE(result.m_reason == "incorrect key: part_id=9999");
+
+  steamrot::logic::descriptors::AnalysisTrace expected_trace =
+      steamrot::tests::AnalysisTraceBuilder{}
+          .NodeEval(kMissingPartId, "is_fragment", 0)
+          .NodeResult(kMissingPartId, "is_fragment", false,
+                      "incorrect key: part_id=9999")
+          .Build();
+
+  REQUIRE_THAT(result.m_trace,
+               steamrot::tests::EqualsTrace(
+                   expected_trace, descriptors::TerminalDescriptorFormatter{}));
+}
+
 TEST_CASE("predicate combinators compose correctly",
           "[unit][analysis][grimoire_machina]") {
   steamrot::tests::TestPartLibrary lib =
@@ -170,11 +195,11 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
   steamrot::tests::PartLibraryBuilder builder{lib};
 
   steamrot::logic::descriptors::NodeDescriptor has_0 =
-      descriptors::has_exactly_n_edges(0);
+      descriptors::has_exactly_n_edges(0, "has_exactly_0_edges");
   steamrot::logic::descriptors::NodeDescriptor has_1 =
-      descriptors::has_exactly_n_edges(1);
+      descriptors::has_exactly_n_edges(1, "has_exactly_1_edge");
   steamrot::logic::descriptors::NodeDescriptor has_2 =
-      descriptors::has_exactly_n_edges(2);
+      descriptors::has_exactly_n_edges(2, "has_exactly_2_edges");
 
   SECTION("Nodes with 0 edges") {
     steamrot::MachinaFormScaffold scaffold = builder.MakeScaffoldWithParts(
@@ -220,7 +245,7 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_0_edges") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
-        descriptors::has_exactly_n_edges(0),
+        descriptors::has_exactly_n_edges(0, "has_exactly_0_edges"),
         {.linear_chain = {false, false, false},
          .ring = {false, false, false},
          .isolated_pair = {false, false},
@@ -230,7 +255,7 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_1_edge") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
-        descriptors::has_exactly_n_edges(1),
+        descriptors::has_exactly_n_edges(1, "has_exactly_1_edge"),
         {.linear_chain = {true, true, false},
          .ring = {false, false, false},
          .isolated_pair = {true, true},
@@ -240,7 +265,7 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Analyses all ScaffoldScenarios correctly for has_exactly_2_edges") {
     steamrot::tests::CheckNodeDescriptorForAllScenarios(
-        descriptors::has_exactly_n_edges(2),
+        descriptors::has_exactly_n_edges(2, "has_exactly_2_edges"),
         {.linear_chain = {false, false, true},
          .ring = {true, true, true},
          .isolated_pair = {false, false},
@@ -477,7 +502,7 @@ TEST_CASE(
   // AnalysisTraceBuilder, ensuring the formatter round-trips correctly.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder.NodeEval(frag_id, "is_fragment")
+  trace_builder.NodeEval(frag_id, "is_fragment", 0)
       .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
 
   REQUIRE_THAT(nd_result.m_trace,
@@ -505,7 +530,7 @@ TEST_CASE(
   // Assert: trace matches expected.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder.NodeEval(joint_id, "is_fragment")
+  trace_builder.NodeEval(joint_id, "is_fragment", 0)
       .NodeResult(joint_id, "is_fragment", false, "node holds JointInstance");
 
   REQUIRE_THAT(nd_result.m_trace,
