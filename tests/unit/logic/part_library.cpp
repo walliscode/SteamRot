@@ -252,7 +252,8 @@ PartLibraryBuilder::MakeJointInstance(const std::string &name,
 /////////////////////////////////////////////////
 PartGraph
 PartLibraryBuilder::MakePartGraph(const std::vector<std::string> &fragment_names,
-                                const std::vector<std::string> &joint_names) {
+                                 const std::vector<std::string> &joint_names) {
+  m_next_id = 0;
   PartGraph parts;
 
   for (const auto &name : fragment_names) {
@@ -279,6 +280,7 @@ MachinaFormScaffold PartLibraryBuilder::MakeScaffoldWithParts(
 ScaffoldResult PartLibraryBuilder::BuildScaffoldWithIds(
     const std::vector<std::string> &fragment_names,
     const std::vector<std::string> &joint_names) {
+  m_next_id = 0;
   ScaffoldResult result;
   result.part_ids.reserve(fragment_names.size() + joint_names.size());
 
@@ -419,6 +421,49 @@ void CheckNodeDescriptorForAllScenarios(
       CHECK(descriptor(parts, id) == expected.simple_branch[i]);
       ++i;
     }
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_CASE("PartLibraryBuilder resets IDs between scaffold and graph builds",
+          "[unit][part_library]") {
+  TestPartLibrary lib = TestPartLibrary::Create();
+  PartLibraryBuilder builder{lib};
+
+  SECTION("MakeScaffoldWithParts starts IDs at zero for each call") {
+    MachinaFormScaffold scaffold_a = builder.MakeScaffoldWithParts(
+        {"fragment_one_socket"}, {"joint_one_socket"});
+    MachinaFormScaffold scaffold_b = builder.MakeScaffoldWithParts(
+        {"fragment_one_socket"}, {"joint_one_socket"});
+
+    REQUIRE(scaffold_a.parts.contains(0));
+    REQUIRE(scaffold_b.parts.contains(0));
+    REQUIRE(scaffold_a.next_id == 2u);
+    REQUIRE(scaffold_b.next_id == 2u);
+  }
+
+  SECTION("MakeConnectedScaffold starts IDs at zero for each call") {
+    ScaffoldResult result_a = builder.MakeConnectedScaffold(
+        {"fragment_one_socket"}, {"joint_one_socket"}, {{0, 0, 1, 0}});
+    ScaffoldResult result_b = builder.MakeConnectedScaffold(
+        {"fragment_one_socket"}, {"joint_one_socket"}, {{0, 0, 1, 0}});
+
+    REQUIRE(result_a.part_ids[0] == 0u);
+    REQUIRE(result_b.part_ids[0] == 0u);
+    REQUIRE(result_a.scaffold.next_id == 2u);
+    REQUIRE(result_b.scaffold.next_id == 2u);
+  }
+
+  SECTION("MakePartGraph starts IDs at zero for each call") {
+    PartGraph graph_a =
+        builder.MakePartGraph({"fragment_one_socket"}, {"joint_one_socket"});
+    PartGraph graph_b =
+        builder.MakePartGraph({"fragment_one_socket"}, {"joint_one_socket"});
+
+    REQUIRE(graph_a.contains(0));
+    REQUIRE(graph_b.contains(0));
+    REQUIRE(graph_a.contains(1));
+    REQUIRE(graph_b.contains(1));
   }
 }
 
