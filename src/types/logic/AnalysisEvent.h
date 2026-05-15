@@ -35,6 +35,7 @@ enum class ScopeKind {
 /////////////////////////////////////////////////
 enum class TraceEventKind {
   EmtpyPartGraph,
+  EmtpyChainSteps,
   NodeEval,
   NodeResult,
   MovingToNeighbour,

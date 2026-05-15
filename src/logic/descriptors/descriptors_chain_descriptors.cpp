@@ -9,10 +9,11 @@
 /////////////////////////////////////////////////
 #include "descriptors_chain_descriptors.h"
 #include "ChainDescriptorBuilder.h"
+#include "descriptors_node_descriptors.h"
 
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
 const ChainDescriptor is_serial_chain =
-    ChainDescriptorBuilder{}.Build("is_serial_chain");
+    ChainDescriptorBuilder{}.WhileIsTrue(is_serial).Build("is_serial_chain");
 } // namespace steamrot::logic::descriptors

@@ -9,6 +9,7 @@
 #include "descriptors_chain_descriptors.h"
 #include "AnalysisEvent.h"
 #include "AnalysisTraceBuilder.h"
+#include "MachinaFormScaffold.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "part_library.h"
@@ -35,6 +36,29 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}.EmptyPartGraph().Build();
+
+    // assert result and trace
+    REQUIRE_FALSE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("is_serial_chain evaluates IsolatedPair") {
+    // test predicate
+    steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
+        steamrot::tests::ScaffoldScenario::IsolatedPair);
+    steamrot::PartGraph &parts = scaffold.parts;
+    INFO("attempting to evaluate is_serial_chain on IsolatedPair scaffold");
+    ChainDescriptorResult result = is_serial_chain(parts, 0);
+    INFO("result obtained");
+    // build expected trace
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0)
+            .NodeEval(0, "is_serial")
+            .NodeResult(0, "is_serial", true)
+            .Build();
 
     // assert result and trace
     REQUIRE_FALSE(result);

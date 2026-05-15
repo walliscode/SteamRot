@@ -28,6 +28,9 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   case TraceEventKind::EmtpyPartGraph: {
     return indent + "[EMPTY] part graph is empty";
   }
+  case TraceEventKind::EmtpyChainSteps: {
+    return indent + "[EMPTY] chain has no steps";
+  }
   case TraceEventKind::ScopeBegin: {
     std::string line = indent + "[";
     switch (ev.scope_kind) {

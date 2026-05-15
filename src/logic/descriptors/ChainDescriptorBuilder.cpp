@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
+#include <iostream>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -93,15 +94,27 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   /// EVALUATING CURRENT NODE
   /////////////////////////////////////////////////
 
+  std::cout << "Evaluating node#" << current_id << " against predicate '"
+            << steps_it->predicate.GetName() << "' at depth " << context.depth
+            << std::endl;
   const NodeDescriptor &current_predicate = steps_it->predicate;
 
+  std::cout << "Emitting NodeEval for node#" << current_id
+            << " with predicate '" << current_predicate.GetName()
+            << "' at depth " << context.depth << std::endl;
   // Evaluate the predicate; this stamps NodeEval + NodeResult into the result.
   auto pred_result = current_predicate(parts, current_id, context.depth);
 
+  std::cout << "Predicate '" << current_predicate.GetName() << "' "
+            << (pred_result ? "passed" : "failed") << " for node#" << current_id
+            << std::endl;
   // pass the predicates trace as an R value, the context takes ownership of it
   // and merges it into the overall trace
   Merge(context.trace, std::move(pred_result.m_trace));
 
+  std::cout << "Predicate '" << current_predicate.GetName() << "' "
+            << (pred_result ? "passed" : "failed") << " for node#" << current_id
+            << std::endl;
   if (!pred_result) {
     switch (steps_it->kind) {
     case ChainStepKind::Sequence: {
@@ -126,7 +139,8 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
     }
     }
   }
-
+  std::cout << "Predicate '" << current_predicate.GetName()
+            << "' passed for node#" << current_id << std::endl;
   // Predicate passed — record consumption for WhileIsTrue.
   if (steps_it->kind == ChainStepKind::WhileIsTrue) {
     context.at_least_one_while_loop_consumed = true;
@@ -226,6 +240,27 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           // return early since there's no graph to traverse
           return result;
         }
+
+        // Check for empty steps
+        if (steps.empty()) {
+
+          // this is automatically a failed result since a chain with no steps
+          // can't be satisfied
+          result.m_result = false;
+
+          // set up EmptyChainSteps event in the trace to explain why the result
+          // is false
+          AnalysisEvent empty_steps_event{};
+          empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
+          context.trace.push_back(std::move(empty_steps_event));
+          result.m_trace = std::move(context.trace);
+
+          // return early since there's no steps to evaluate
+          return result;
+        }
+
+        std::cout << "Starting evaluation of chain descriptor '" << chain_name
+                  << "' from anchor node#" << start_id << std::endl;
         // ScopeBegin
         AnalysisEvent scope_begin{};
         scope_begin.kind = TraceEventKind::ScopeBegin;
@@ -241,6 +276,9 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         if (!result.valid_subgraphs.empty()) {
           result.m_result = true;
         }
+        std::cout << "Finished evaluation of chain descriptor '" << chain_name
+                  << "'. Result: " << (result.m_result ? "PASS" : "FAIL")
+                  << std::endl;
 
         // ScopeEnd
         AnalysisEvent scope_end{};
