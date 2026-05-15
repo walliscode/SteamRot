@@ -15,6 +15,10 @@
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
 
+namespace {
+constexpr uint32_t kMissingPartId{9999};
+}
+
 TEST_CASE("ChainDescriptor is_serial_chain") {
 
   using namespace steamrot::logic::descriptors;
@@ -72,14 +76,13 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
         steamrot::tests::ScaffoldScenario::IsolatedPair);
     steamrot::PartGraph &parts = scaffold.parts;
 
-    constexpr uint32_t missing_anchor_id{9999};
-    ChainDescriptorResult result = is_serial_chain(parts, missing_anchor_id);
+    ChainDescriptorResult result = is_serial_chain(parts, kMissingPartId);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .ScopeBegin("is_serial_chain", ScopeKind::Chain, missing_anchor_id)
-            .NodeEval(missing_anchor_id, "is_serial", 1)
-            .NodeResult(missing_anchor_id, "is_serial", false,
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, kMissingPartId)
+            .NodeEval(kMissingPartId, "is_serial", 1)
+            .NodeResult(kMissingPartId, "is_serial", false,
                         "incorrect key: part_id=9999", 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, false)
             .Build();
