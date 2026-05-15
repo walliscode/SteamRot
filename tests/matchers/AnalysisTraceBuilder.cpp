@@ -19,6 +19,14 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
   m_trace.push_back(std::move(ev));
   return *this;
 }
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyChainSteps() {
+  AnalysisEvent ev{};
+  ev.kind = TraceEventKind::EmtpyChainSteps;
+  m_trace.push_back(std::move(ev));
+  return *this;
+}
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
@@ -103,8 +111,12 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
   return *this;
 }
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {
-
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::ValidSubgraphIsolated(uint32_t depth) {
+  AnalysisEvent ev{};
+  ev.kind = TraceEventKind::ValidSubgraphIsolated;
+  ev.depth = depth;
+  m_trace.push_back(std::move(ev));
   return *this;
 }
 /////////////////////////////////////////////////

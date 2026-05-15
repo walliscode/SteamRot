@@ -212,20 +212,33 @@ in the `steamrot::logic::descriptors` namespace.
 // In descriptors_chain_descriptors.cpp
 const ChainDescriptor linear_3_chain =
     steamrot::logic::descriptors::ChainDescriptorBuilder{}
-        .StartWith(is_terminal)
+        .Then(is_terminal)
         .Then(is_serial)
-        .End(is_terminal);
+        .Then(is_terminal)
+        .Build("linear_3_chain");
 ```
 
 Declare it in `descriptors_chain_descriptors.h` as
 `extern const ChainDescriptor linear_3_chain;`.
 
-### 6b. Note on DFS implementation
+### 6b. DFS implementation semantics
 
-`ChainDescriptorBuilder::End()` currently returns a descriptor that always
-returns `false`. The TODO comment in `ChainDescriptorBuilder.h` marks the DFS
-traversal work needed. Do not write tests that expect `true` results from
-`ChainDescriptorBuilder` until the traversal is implemented.
+`ChainDescriptorBuilder::Build()` returns a working DFS-based descriptor.
+
+- `Sequence` steps consume exactly one node.
+- A final `Sequence` step can complete on the current node (no required
+  neighbour traversal).
+- `WhileIsTrue` is one-or-more, not zero-or-more.
+- `WhileIsTrue` consumption tracking is per-step and per-path, so sibling
+  branches stay isolated through backtracking.
+- Missing anchor IDs are reported through node trace events and yield a failed
+  chain result.
+
+### 6c. Analysis trace integration model
+
+Descriptor analysis traces are standalone diagnostic artifacts in
+`DescriptorResult::m_trace`. They are not integrated with EventBus or any
+external event transport.
 
 ## 7. Step-by-step: adding a GraphDescriptor
 
@@ -358,26 +371,19 @@ Use `namespace descriptors = steamrot::logic::descriptors;` for brevity.
 
 The following are not yet implemented and represent planned work:
 
-1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO).
-   The builder captures the step list but the `End()` method always returns
-   `false`. A depth-first walk from the anchor node (via `SocketData::connected_to`),
-   matching each step predicate in order, needs to be implemented. Consider
-   handling cycles (`std::unordered_set<uint32_t>` visited set) and branching
-   (match any valid path).
-
-2. **ContextualNodeDescriptor modifiers** — common modifier factories
+1. **ContextualNodeDescriptor modifiers** — common modifier factories
    (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not yet declared
    in `descriptors_node_descriptors.h`. Add them as needed following section 5.
 
-3. **GraphDescriptor consumption in Logic** — `GrimoireMachinaActionLogic`
+2. **GraphDescriptor consumption in Logic** — `GrimoireMachinaActionLogic`
    (or a dedicated analysis step) should hold and evaluate `GraphDescriptor`
    instances to gate gameplay actions (e.g. "is the assembled machine valid?").
 
-4. **ScaffoldScenario expansion** — add new scenarios to `TestPartLibrary`
+3. **ScaffoldScenario expansion** — add new scenarios to `TestPartLibrary`
    (e.g. `StarTopology`, `LongLinearChain`) as chain/graph descriptors that
    need richer topologies are added.
 
-5. **EdgeDescriptor integration** — A future `EdgeDescriptor` type alias could
+4. **EdgeDescriptor integration** — A future `EdgeDescriptor` type alias could
    be added to express connection-type constraints (e.g. "connected via a
    fragment-joint edge only"). It would operate on `SocketData` or
    `SocketConnection` directly.
@@ -411,9 +417,8 @@ The following are not yet implemented and represent planned work:
   compile. Use `lift()` first if needed.
 - Node order in `ScaffoldScenarioExpectations` arrays is **fragments first,
   then joints** — mismatching the order silently flips expected values.
-- `ChainDescriptorBuilder::End()` always returns `false` until the DFS
-  traversal is implemented (see section 10). The TODO is in
-  `src/logic/descriptors/ChainDescriptorBuilder.h`.
+- `WhileIsTrue` is one-or-more semantics; an immediate first-node mismatch
+  fails that path.
 - There is no `build_part_graph` function. The `PartGraph` is `scaffold.parts`
   directly — no build step required.
 

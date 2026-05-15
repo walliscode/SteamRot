@@ -53,6 +53,13 @@ public:
   AnalysisTraceBuilder &EmptyPartGraph();
 
   /////////////////////////////////////////////////
+  /// @brief Append an EmptyChainSteps event.
+  ///
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &EmptyChainSteps();
+
+  /////////////////////////////////////////////////
   /// @brief Append a ScopeBegin event.
   ///
   /// @param name      Name of the descriptor scope.
@@ -88,7 +95,7 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(uint32_t part_id, std::string predicate_name,
-                                 uint32_t depth);
+                                 uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a NodeResult event.
@@ -126,7 +133,13 @@ public:
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &Backtracking(uint32_t from_id, uint32_t depth);
 
-  AnalysisTraceBuilder &ValidSubgraphIsolated();
+  /////////////////////////////////////////////////
+  /// @brief Append a ValidSubgraphIsolated event.
+  ///
+  /// @param depth Nesting depth of this event.
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &ValidSubgraphIsolated(uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Return a copy of the accumulated trace.

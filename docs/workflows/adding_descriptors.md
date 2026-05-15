@@ -274,6 +274,9 @@ Every descriptor evaluation populates an `AnalysisTrace` (a
 `std::vector<AnalysisEvent>`) in the result's `m_trace` field (inherited from
 `DescriptorResult`).
 
+Trace data is standalone descriptor analysis output. It is not routed through
+EventBus and does not require external event-system integration.
+
 ### Event kinds
 
 | `TraceEventKind`    | When emitted                 | Key fields                                               |
@@ -284,6 +287,9 @@ Every descriptor evaluation populates an `AnalysisTrace` (a
 | `Backtracking`      | DFS returns from a neighbour | `depth`, `from_id`                                       |
 | `ScopeBegin`        | Chain evaluation starts      | `depth=0`, `scope_name`, `scope_kind`, `anchor_id`       |
 | `ScopeEnd`          | Chain evaluation ends        | `depth=0`, `scope_name`, `scope_kind`, `result`          |
+| `ValidSubgraphIsolated` | A full chain match is isolated | `depth` |
+| `EmtpyPartGraph`    | Chain exits early on empty graph | `kind` |
+| `EmtpyChainSteps`   | Chain exits early with no configured steps | `kind` |
 
 The `depth` field lets any renderer reconstruct indentation without recursive
 data structures.
@@ -440,15 +446,14 @@ from an anchor node. Use `ChainDescriptorBuilder` from
 
 #### Builder API
 
-| Method             | Step kind     | Meaning                                                                         |
-| ------------------ | ------------- | ------------------------------------------------------------------------------- |
-| `.Then(nd)`        | `Sequence`    | Match exactly one node satisfying `nd`, then advance to the next step           |
-| `.WhileIsTrue(nd)` | `WhileIsTrue` | Match zero or more consecutive nodes satisfying `nd`, stop at the first failure |
-| `.Build(name)`     | —             | Returns `std::expected<ChainDescriptor, std::string>`                           |
+| Method             | Step kind     | Meaning                                                                                          |
+| ------------------ | ------------- | ------------------------------------------------------------------------------------------------ |
+| `.Then(nd)`        | `Sequence`    | Match exactly one node satisfying `nd`, then advance to the next step                            |
+| `.WhileIsTrue(nd)` | `WhileIsTrue` | Match **one or more** consecutive nodes satisfying `nd`; advance only after first non-match      |
+| `.Build(name)`     | —             | Returns a `ChainDescriptor`                                                                       |
 
-`Build()` returns an error string if called more than once on the same builder.
-Always pass a descriptive `name` — it appears in `ScopeBegin`/`ScopeEnd` trace
-events.
+`Build()` returns a ready-to-use descriptor. Always pass a descriptive `name` —
+it appears in `ScopeBegin`/`ScopeEnd` trace events.
 
 #### Declaration (`descriptors_chain_descriptors.h`)
 
@@ -462,34 +467,15 @@ extern const ChainDescriptor linear_3_chain;
 
 #### Definition (`descriptors_chain_descriptors.cpp`)
 
-Use an immediately-invoked lambda to unwrap the `std::expected` return from
-`Build()` safely at static-initialisation time:
+Build directly at static initialisation time:
 
 ```cpp
 /////////////////////////////////////////////////
-const ChainDescriptor linear_3_chain = [] {
-  auto result = ChainDescriptorBuilder{}
-      .Then(is_terminal)
-      .Then(is_serial)
-      .Then(is_terminal)
-      .Build("linear_3_chain");
-  // Build() only fails if the builder has already been consumed.
-  // An unconsumed fresh builder always succeeds.
-  return result.value();
-}();
-```
-
-For a local variable in a test or Logic function, `REQUIRE(result.has_value())`
-is idiomatic instead:
-
-```cpp
-auto build_result = ChainDescriptorBuilder{}
+const ChainDescriptor linear_3_chain = ChainDescriptorBuilder{}
     .Then(is_terminal)
     .Then(is_serial)
     .Then(is_terminal)
     .Build("linear_3_chain");
-REQUIRE(build_result.has_value());
-ChainDescriptor linear_3_chain = build_result.value();
 ```
 
 ---
@@ -658,7 +644,7 @@ Available builder methods:
 | -------------- | ---------------------------------------------------- | ---------- |
 | `LinearChain`  | fragment – joint – fragment (both sockets connected) | 3          |
 | `Ring`         | joint – joint – joint (ring of joints)               | 3          |
-| `IsolatedPair` | fragment – fragment (no connections)                 | 2          |
+| `IsolatedPair` | fragment – fragment (single connection between them) | 2          |
 | `SimpleBranch` | three fragments all connected to one joint           | 4          |
 
 ### Building a custom scaffold
@@ -717,7 +703,7 @@ fail — then add each piece of the implementation until all tests pass.
 
 A `ChainDescriptor` built with `ChainDescriptorBuilder` uses a depth-first
 search (DFS) from an anchor node. Each `Then(nd)` step must match exactly one
-node; `WhileIsTrue(nd)` matches zero or more consecutive nodes until `nd` first
+node; `WhileIsTrue(nd)` matches one or more consecutive nodes until `nd` first
 fails. The DFS records every evaluation as an `AnalysisTrace` in the result's
 `m_trace`. Use `AnalysisTraceBuilder` + `TraceEqualsMatcher` to assert the
 expected trace without hardcoding formatted strings.
@@ -798,14 +784,11 @@ definition:
 
 ```cpp
 /////////////////////////////////////////////////
-const ChainDescriptor linear_3_chain = [] {
-  auto result = ChainDescriptorBuilder{}
-      .Then(is_terminal)
-      .Then(is_serial)
-      .Then(is_terminal)
-      .Build("linear_3_chain");
-  return result.value();
-}();
+const ChainDescriptor linear_3_chain = ChainDescriptorBuilder{}
+    .Then(is_terminal)
+    .Then(is_serial)
+    .Then(is_terminal)
+    .Build("linear_3_chain");
 ```
 
 Build and run the boolean test — it should now **pass**.

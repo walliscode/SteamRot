@@ -35,11 +35,6 @@ struct DFSContext {
   std::vector<uint32_t> current_chain;
 
   /////////////////////////////////////////////////
-  /// @brief Whether at least one node has been consumed by a WhileIsTrue step.
-  /////////////////////////////////////////////////
-  bool at_least_one_while_loop_consumed{false};
-
-  /////////////////////////////////////////////////
   /// @brief Current nesting depth for trace event stamping.
   ///
   /// Starts at 1 (anchor node level). Incremented before recursing into a
@@ -71,7 +66,8 @@ struct DFSContext {
 void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
                         std::vector<ChainStep>::const_iterator steps_end,
                         DFSContext &context, uint32_t current_id,
-                        const PartGraph &parts, ChainDescriptorResult &result) {
+                        const PartGraph &parts, ChainDescriptorResult &result,
+                        bool while_step_consumed = false) {
 
   /////////////////////////////////////////////////
   /// CHECKING END CONDITIONS
@@ -116,35 +112,45 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
       return;
     }
     case ChainStepKind::WhileIsTrue: {
-      if (!context.at_least_one_while_loop_consumed) {
+      if (!while_step_consumed) {
         result.invalid_subgraphs.push_back(context.current_chain);
         return;
       }
-      // Reset the flag so that a subsequent WhileIsTrue step on this path
-      // independently requires at least one consumption of its own.
-      // Note: this flag is shared across all recursive calls for the current
-      // DFS path — paths explored after backtracking start with the flag
-      // already modified. A per-step design would be cleaner but requires
-      // more invasive changes.
-      context.at_least_one_while_loop_consumed = false;
       depth_first_search(std::next(steps_it), steps_end, context, current_id,
                          parts, result);
       return;
     }
     }
   }
-  if (steps_it->kind == ChainStepKind::WhileIsTrue) {
-    context.at_least_one_while_loop_consumed = true;
-  }
 
   // Mark current node as visited and record it on the candidate path.
   context.visited.insert(current_id);
   context.current_chain.push_back(current_id);
+  const auto cleanup_current_node = [&context, current_id]() {
+    context.current_chain.pop_back();
+    context.visited.erase(current_id);
+  };
+
+  // Sequence step can complete immediately on this node when it is the final
+  // required step, without requiring neighbour traversal.
+  if (steps_it->kind == ChainStepKind::Sequence &&
+      std::next(steps_it) == steps_end) {
+    result.valid_subgraphs.push_back(context.current_chain);
+
+    AnalysisEvent valid_event{};
+    valid_event.kind = TraceEventKind::ValidSubgraphIsolated;
+    valid_event.depth = context.depth;
+    context.trace.push_back(std::move(valid_event));
+
+    cleanup_current_node();
+    return;
+  }
 
   // Iterate connected neighbours.
   const auto part_it = parts.find(current_id);
   if (part_it == parts.end()) {
     result.invalid_subgraphs.push_back(context.current_chain);
+    cleanup_current_node();
     return;
   }
   const SocketMap &sockets = std::visit(
@@ -170,17 +176,20 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
 
     // Advance or stay on the current step, then recurse at increased depth.
     auto effective_steps_it = steps_it;
+    bool effective_while_step_consumed = while_step_consumed;
     switch (steps_it->kind) {
     case ChainStepKind::Sequence:
       effective_steps_it = std::next(steps_it);
+      effective_while_step_consumed = false;
       break;
     case ChainStepKind::WhileIsTrue:
+      effective_while_step_consumed = true;
       break;
     }
 
     ++context.depth;
     depth_first_search(effective_steps_it, steps_end, context, neighbour_id,
-                       parts, result);
+                       parts, result, effective_while_step_consumed);
     --context.depth;
 
     // Emit Backtracking at the parent depth after the recursive call returns.
@@ -192,8 +201,7 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   }
 
   // Unmark and remove from candidate path before backtracking.
-  context.current_chain.pop_back();
-  context.visited.erase(current_id);
+  cleanup_current_node();
 }
 } // namespace
 
@@ -221,6 +229,14 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         ChainDescriptorResult result{false};
         DFSContext context;
 
+        AnalysisEvent scope_begin{};
+        scope_begin.kind = TraceEventKind::ScopeBegin;
+        scope_begin.depth = 0;
+        scope_begin.scope_name = chain_name;
+        scope_begin.scope_kind = ScopeKind::Chain;
+        scope_begin.anchor_id = start_id;
+        context.trace.push_back(std::move(scope_begin));
+
         // Check for empty PartGraph
         if (parts.empty()) {
 
@@ -231,6 +247,15 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           AnalysisEvent empty_graph_event{};
           empty_graph_event.kind = TraceEventKind::EmtpyPartGraph;
           context.trace.push_back(std::move(empty_graph_event));
+
+          AnalysisEvent scope_end{};
+          scope_end.kind = TraceEventKind::ScopeEnd;
+          scope_end.depth = 0;
+          scope_end.scope_name = chain_name;
+          scope_end.scope_kind = ScopeKind::Chain;
+          scope_end.result = false;
+          context.trace.push_back(std::move(scope_end));
+
           result.m_trace = std::move(context.trace);
 
           // return early since there's no graph to traverse
@@ -249,19 +274,20 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           AnalysisEvent empty_steps_event{};
           empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
           context.trace.push_back(std::move(empty_steps_event));
+
+          AnalysisEvent scope_end{};
+          scope_end.kind = TraceEventKind::ScopeEnd;
+          scope_end.depth = 0;
+          scope_end.scope_name = chain_name;
+          scope_end.scope_kind = ScopeKind::Chain;
+          scope_end.result = false;
+          context.trace.push_back(std::move(scope_end));
+
           result.m_trace = std::move(context.trace);
 
           // return early since there's no steps to evaluate
           return result;
         }
-
-        AnalysisEvent scope_begin{};
-        scope_begin.kind = TraceEventKind::ScopeBegin;
-        scope_begin.depth = 0;
-        scope_begin.scope_name = chain_name;
-        scope_begin.scope_kind = ScopeKind::Chain;
-        scope_begin.anchor_id = start_id;
-        context.trace.push_back(std::move(scope_begin));
 
         depth_first_search(steps.cbegin(), steps.cend(), context, start_id,
                            parts, result);

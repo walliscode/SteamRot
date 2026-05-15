@@ -94,6 +94,27 @@ TEST_CASE("AnalysisTraceBuilder::Backtracking appends correct event",
   REQUIRE(ev.depth == 2u);
 }
 
+TEST_CASE("AnalysisTraceBuilder::EmptyChainSteps appends correct event",
+          "[unit][descriptors][builder][matcher]") {
+  tests::AnalysisTraceBuilder builder;
+  builder.EmptyChainSteps();
+
+  const AnalysisTrace trace = builder.Build();
+  REQUIRE(trace.size() == 1);
+  REQUIRE(trace[0].kind == TraceEventKind::EmtpyChainSteps);
+}
+
+TEST_CASE("AnalysisTraceBuilder::ValidSubgraphIsolated appends correct event",
+          "[unit][descriptors][builder][matcher]") {
+  tests::AnalysisTraceBuilder builder;
+  builder.ValidSubgraphIsolated(3u);
+
+  const AnalysisTrace trace = builder.Build();
+  REQUIRE(trace.size() == 1);
+  REQUIRE(trace[0].kind == TraceEventKind::ValidSubgraphIsolated);
+  REQUIRE(trace[0].depth == 3u);
+}
+
 TEST_CASE("AnalysisTraceBuilder::ScopeBegin appends correct event",
           "[unit][descriptors][builder][matcher]") {
   tests::AnalysisTraceBuilder builder;
