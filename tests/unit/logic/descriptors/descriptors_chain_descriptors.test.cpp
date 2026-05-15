@@ -66,4 +66,27 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
   }
+
+  SECTION("is_serial_chain fails with reason for incorrect anchor key") {
+    steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
+        steamrot::tests::ScaffoldScenario::IsolatedPair);
+    steamrot::PartGraph &parts = scaffold.parts;
+
+    constexpr uint32_t missing_anchor_id{9999};
+    ChainDescriptorResult result = is_serial_chain(parts, missing_anchor_id);
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, missing_anchor_id)
+            .NodeEval(missing_anchor_id, "is_serial", 1)
+            .NodeResult(missing_anchor_id, "is_serial", false,
+                        "incorrect key: part_id=9999", 1)
+            .ScopeEnd("is_serial_chain", ScopeKind::Chain, false)
+            .Build();
+
+    REQUIRE_FALSE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
 }

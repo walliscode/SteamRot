@@ -151,9 +151,14 @@ void depth_first_search(std::vector<ChainStep>::const_iterator steps_it,
   context.current_chain.push_back(current_id);
 
   // Iterate connected neighbours.
+  const auto part_it = parts.find(current_id);
+  if (part_it == parts.end()) {
+    result.invalid_subgraphs.push_back(context.current_chain);
+    return;
+  }
   const SocketMap &sockets = std::visit(
       [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-      parts.at(current_id));
+      part_it->second);
 
   for (const auto &[socket_id, socket] : sockets) {
     if (!socket.connected_to.has_value())

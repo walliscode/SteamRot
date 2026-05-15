@@ -105,8 +105,10 @@ GraphDescriptor          class; GraphDescriptorResult(const PartGraph&)
   modifier.
 - Combinators (`and_`, `or_`, `not_`) are generic templates. Both arguments must
   be the **same descriptor level** — mixing levels is a compile error.
-- Predicates access the part variant via `parts.at(id)` and read
-  `connection_count` from the base `PartInstance` via `std::visit`.
+- Predicates should look up nodes with `parts.find(id)` first; if the key is
+  missing, return `NodeDescriptorResult{false, "incorrect key: part_id=..."}`.
+- After a successful lookup, read `connection_count` from the base
+  `PartInstance` via `std::visit`.
 
 ---
 
@@ -217,9 +219,12 @@ name from the parameter. Each lambda's `NodeDescriptorResult` carries a
 const NodeDescriptor my_descriptor{
     "my_descriptor",
     [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+  const auto part_it = parts.find(id);
+  if (part_it == parts.end())
+    return NodeDescriptorResult{false, "incorrect key: part_id=" + std::to_string(id)};
   const size_t count = std::visit(
       [](const auto &inst) -> size_t { return inst.connection_count; },
-      parts.at(id));
+      part_it->second);
   const bool ok = /* your condition */;
   return NodeDescriptorResult{ok, ok ? "passes because ..." : "fails because ..."};
 }};
@@ -233,9 +238,13 @@ NodeDescriptor my_factory(size_t n) {
   return NodeDescriptor{
       "my_factory(" + std::to_string(n) + ")",
       [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const auto part_it = parts.find(id);
+        if (part_it == parts.end())
+          return NodeDescriptorResult{
+              false, "incorrect key: part_id=" + std::to_string(id)};
         const size_t count = std::visit(
             [](const auto &inst) -> size_t { return inst.connection_count; },
-            parts.at(id));
+            part_it->second);
         return NodeDescriptorResult{count == n,
             "connection_count=" + std::to_string(count) +
             ", expected==" + std::to_string(n)};
@@ -353,9 +362,13 @@ NodeDescriptor has_exactly_n_edges(size_t n) {
   return NodeDescriptor{
       "has_exactly_n_edges(" + std::to_string(n) + ")",
       [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const auto part_it = parts.find(id);
+        if (part_it == parts.end())
+          return NodeDescriptorResult{
+              false, "incorrect key: part_id=" + std::to_string(id)};
         const size_t count = std::visit(
             [](const auto &inst) -> size_t { return inst.connection_count; },
-            parts.at(id));
+            part_it->second);
         return NodeDescriptorResult{
             count == n,
             "connection_count=" + std::to_string(count) +
@@ -398,9 +411,13 @@ Walk the part's sockets; for each connected socket follow
 ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
   return [nd = std::move(nd)](const PartGraph &parts,
                                uint32_t id) -> NodeDescriptorResult {
+    const auto part_it = parts.find(id);
+    if (part_it == parts.end())
+      return NodeDescriptorResult{
+          false, "incorrect key: part_id=" + std::to_string(id)};
     const auto &sockets = std::visit(
         [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-        parts.at(id));
+        part_it->second);
     for (const auto &[socket_id, socket_data] : sockets) {
       if (!socket_data.connected_to.has_value())
         continue;

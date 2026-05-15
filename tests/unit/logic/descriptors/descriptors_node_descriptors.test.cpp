@@ -107,6 +107,29 @@ TEST_CASE("is_fragment and is_joint correctly identify node types",
   }
 }
 
+TEST_CASE("NodeDescriptor fails with reason for incorrect key",
+          "[unit][analysis][grimoire_machina]") {
+  constexpr uint32_t missing_part_id{9999};
+  const steamrot::PartGraph empty_parts{};
+
+  const descriptors::NodeDescriptorResult result =
+      descriptors::is_fragment(empty_parts, missing_part_id);
+
+  REQUIRE_FALSE(result);
+  REQUIRE(result.m_reason == "incorrect key: part_id=9999");
+
+  AnalysisTrace expected_trace =
+      steamrot::tests::AnalysisTraceBuilder{}
+          .NodeEval(missing_part_id, "is_fragment")
+          .NodeResult(missing_part_id, "is_fragment", false,
+                      "incorrect key: part_id=9999")
+          .Build();
+
+  REQUIRE_THAT(result.m_trace,
+               steamrot::tests::EqualsTrace(expected_trace,
+                                            descriptors::TerminalDescriptorFormatter{}));
+}
+
 TEST_CASE("predicate combinators compose correctly",
           "[unit][analysis][grimoire_machina]") {
   steamrot::tests::TestPartLibrary lib =
