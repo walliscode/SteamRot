@@ -50,6 +50,7 @@ ChainDescriptorResult run_dfs(uint32_t start_id, std::vector<ChainStep> steps,
   depth_first_search(start, context, parts, result);
   if (!result.valid_subgraphs.empty())
     result.m_result = true;
+  result.m_trace = std::move(context.trace);
   return result;
 }
 
