@@ -165,7 +165,7 @@ AnalysisTrace AnalysisTraceBuilder::Build() const { return m_trace; }
 uint32_t AnalysisTraceBuilder::ResolveAlias(const std::string &alias) const {
   if (!m_alias_to_id)
     throw std::runtime_error(
-        "AnalysisTraceBuilder alias map is not bound. Call BindAliases(...) "
+        "AnalysisTraceBuilder alias map is not bound. Call BindAliases() "
         "before using named event helpers.");
   auto it = m_alias_to_id->find(alias);
   if (it == m_alias_to_id->end())

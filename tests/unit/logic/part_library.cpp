@@ -318,7 +318,7 @@ ScaffoldResult PartLibraryBuilder::BuildScaffoldWithIds(
 
   auto register_alias = [&result](const std::string &alias, uint32_t id) {
     if (alias.empty())
-      FAIL("Part alias cannot be empty");
+      FAIL("Part alias cannot be empty in scaffold build");
     if (result.alias_to_id.contains(alias))
       FAIL("Duplicate part alias '" << alias << "'");
     result.alias_to_id.emplace(alias, id);
