@@ -11,6 +11,9 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "depth_first_search.h"
+#include "AnalysisTraceBuilder.h"
+#include "TerminalDescriptorFormatter.h"
+#include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include "part_library.h"
 #include <algorithm>
@@ -213,6 +216,27 @@ TEST_CASE(
     for (const auto &sg : result.valid_subgraphs) {
       REQUIRE(sg == std::vector<uint32_t>{2});
     }
+
+    const AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(2, "is_serial", 1)
+            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
+                        1)
+            .MovingToNeighbour(2, 0, 0, 1)
+            .NodeEval(0, "is_serial", 2)
+            .NodeResult(0, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .Backtracking(0, 1)
+            .MovingToNeighbour(2, 1, 1, 1)
+            .NodeEval(1, "is_serial", 2)
+            .NodeResult(1, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .Backtracking(1, 1)
+            .Build();
+
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
   }
 
   SECTION(
@@ -235,6 +259,33 @@ TEST_CASE(
     REQUIRE(
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
                   std::vector<uint32_t>{2, 1}) != result.valid_subgraphs.end());
+
+    const AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(2, "is_serial", 1)
+            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
+                        1)
+            .MovingToNeighbour(2, 0, 0, 1)
+            .NodeEval(0, "is_serial", 2)
+            .NodeResult(0, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .NodeEval(0, "is_terminal", 2)
+            .NodeResult(0, "is_terminal", true,
+                        "connection_count=1, expected==1", 2)
+            .Backtracking(0, 1)
+            .MovingToNeighbour(2, 1, 1, 1)
+            .NodeEval(1, "is_serial", 2)
+            .NodeResult(1, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .NodeEval(1, "is_terminal", 2)
+            .NodeResult(1, "is_terminal", true,
+                        "connection_count=1, expected==1", 2)
+            .Backtracking(1, 1)
+            .Build();
+
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
   }
 }
 
@@ -269,10 +320,37 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
     REQUIRE(!result.valid_subgraphs.empty());
     const bool found =
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 3}) != result.valid_subgraphs.end();
+                  std::vector<uint32_t>{2, 3, 1}) != result.valid_subgraphs.end();
 
-    CAPTURE(result.m_trace);
+    const AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(2, "is_serial", 1)
+            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
+                        1)
+            .MovingToNeighbour(2, 0, 0, 1)
+            .NodeEval(0, "is_serial", 2)
+            .NodeResult(0, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .Backtracking(0, 1)
+            .MovingToNeighbour(2, 3, 1, 1)
+            .NodeEval(3, "is_serial", 2)
+            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
+                        2)
+            .MovingToNeighbour(3, 1, 1, 2)
+            .NodeEval(1, "is_serial", 3)
+            .NodeResult(1, "is_serial", false,
+                        "connection_count=1, expected==2", 3)
+            .NodeEval(1, "is_terminal", 3)
+            .NodeResult(1, "is_terminal", true,
+                        "connection_count=1, expected==1", 3)
+            .Backtracking(1, 2)
+            .Backtracking(3, 1)
+            .Build();
+
     REQUIRE(found);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
   }
 
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
@@ -283,6 +361,32 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
                 parts);
 
     REQUIRE(result.valid_subgraphs.empty());
+
+    const AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(2, "is_serial", 1)
+            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
+                        1)
+            .MovingToNeighbour(2, 0, 0, 1)
+            .NodeEval(0, "is_serial", 2)
+            .NodeResult(0, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .Backtracking(0, 1)
+            .MovingToNeighbour(2, 3, 1, 1)
+            .NodeEval(3, "is_serial", 2)
+            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
+                        2)
+            .MovingToNeighbour(3, 1, 1, 2)
+            .NodeEval(1, "is_serial", 3)
+            .NodeResult(1, "is_serial", false,
+                        "connection_count=1, expected==2", 3)
+            .Backtracking(1, 2)
+            .Backtracking(3, 1)
+            .Build();
+
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
   }
 }
 
