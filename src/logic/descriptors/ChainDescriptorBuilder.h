@@ -11,51 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "depth_first_search.h"
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
 #include <vector>
 
 namespace steamrot::logic::descriptors {
-
-/////////////////////////////////////////////////
-/// @enum ChainStepKind
-/// @brief Identifies the flow-control behaviour of a single ChainStep.
-///
-/// Add new enumerators here to introduce additional flow-control strategies.
-/// traversal.
-/////////////////////////////////////////////////
-enum class ChainStepKind {
-  /////////////////////////////////////////////////
-  /// Consume exactly one node that satisfies the predicate.
-  /////////////////////////////////////////////////
-  Sequence,
-
-  /////////////////////////////////////////////////
-  /// Consume zero or more consecutive nodes that satisfy the predicate,
-  /// then pass the first non-matching node to the next step.
-  /// Used by @c WhileIsTrue().
-  /////////////////////////////////////////////////
-  WhileIsTrue,
-};
-
-/////////////////////////////////////////////////
-/// @struct ChainStep
-/// @brief One step in the ordered walk pattern built by ChainDescriptorBuilder.
-///
-/// Pairs a node predicate with the flow-control strategy that governs how many
-/// graph nodes it consumes during a DFS walk.
-/////////////////////////////////////////////////
-struct ChainStep {
-  /////////////////////////////////////////////////
-  /// @brief Predicate evaluated against each candidate node.
-  /////////////////////////////////////////////////
-  NodeDescriptor predicate;
-
-  /////////////////////////////////////////////////
-  /// @brief Flow-control behaviour for this step.
-  /////////////////////////////////////////////////
-  ChainStepKind kind{ChainStepKind::Sequence};
-};
 
 /////////////////////////////////////////////////
 /// @class ChainDescriptorBuilder
@@ -66,7 +27,7 @@ class ChainDescriptorBuilder {
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Ordered steps from StartWith() through End().
+  /// @brief Ordered steps from builder
   /////////////////////////////////////////////////
   std::vector<ChainStep> m_steps{};
 
