@@ -69,6 +69,33 @@ sf::VertexArray MakeBlueOriginTriangle() {
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
+ConnectionEndpointSpec FragmentSocket(size_t fragment_index, uint32_t socket_id) {
+  return ConnectionEndpointSpec{
+      .part_kind = PartSlotKind::Fragment,
+      .part_index = fragment_index,
+      .socket_id = socket_id,
+  };
+}
+
+/////////////////////////////////////////////////
+ConnectionEndpointSpec JointSocket(size_t joint_index, uint32_t socket_id) {
+  return ConnectionEndpointSpec{
+      .part_kind = PartSlotKind::Joint,
+      .part_index = joint_index,
+      .socket_id = socket_id,
+  };
+}
+
+/////////////////////////////////////////////////
+EndpointConnectionSpec Connect(ConnectionEndpointSpec endpoint_a,
+                               ConnectionEndpointSpec endpoint_b) {
+  return EndpointConnectionSpec{
+      .endpoint_a = endpoint_a,
+      .endpoint_b = endpoint_b,
+  };
+}
+
+/////////////////////////////////////////////////
 TestPartLibrary TestPartLibrary::Create() {
   TestPartLibrary lib;
 
@@ -170,9 +197,13 @@ TestPartLibrary TestPartLibrary::Create() {
     // fragment_two_sockets part_ids: [0]=frag0, [1]=frag1, [2]=joint0
     // frag0.socket[1] ↔ joint0.socket[0], joint0.socket[1] ↔ frag1.socket[0]
     {
-      ScaffoldResult result = builder.MakeConnectedScaffold(
+      ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
           {"fragment_two_sockets", "fragment_two_sockets"},
-          {"joint_two_sockets"}, {{0, 1, 2, 0}, {2, 1, 1, 0}});
+          {"joint_two_sockets"},
+          {
+              Connect(FragmentSocket(0, 1), JointSocket(0, 0)),
+              Connect(JointSocket(0, 1), FragmentSocket(1, 0)),
+          });
       lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain,
                                      std::move(result.scaffold));
     }
@@ -183,9 +214,14 @@ TestPartLibrary TestPartLibrary::Create() {
     // joint1.socket[1] ↔ joint2.socket[0]
     // joint2.socket[1] ↔ joint0.socket[1]
     {
-      ScaffoldResult result = builder.MakeConnectedScaffold(
-          {}, {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
-          {{0, 0, 1, 0}, {1, 1, 2, 0}, {2, 1, 0, 1}});
+      ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
+          {},
+          {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
+          {
+              Connect(JointSocket(0, 0), JointSocket(1, 0)),
+              Connect(JointSocket(1, 1), JointSocket(2, 0)),
+              Connect(JointSocket(2, 1), JointSocket(0, 1)),
+          });
       lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring,
                                      std::move(result.scaffold));
     }
@@ -194,8 +230,12 @@ TestPartLibrary TestPartLibrary::Create() {
     // part_ids: [0]=frag0, [1]=frag1
     // frag0.socket[0] ↔ frag1.socket[0]
     {
-      ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_one_socket", "fragment_one_socket"}, {}, {{0, 0, 1, 0}});
+      ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
+          {"fragment_one_socket", "fragment_one_socket"},
+          {},
+          {
+              Connect(FragmentSocket(0, 0), FragmentSocket(1, 0)),
+          });
       lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair,
                                      std::move(result.scaffold));
     }
@@ -208,9 +248,14 @@ TestPartLibrary TestPartLibrary::Create() {
     //           frag2.socket[0] ↔ joint0.socket[2]
     //
     {
-      ScaffoldResult result = builder.MakeConnectedScaffold(
+      ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
           {"fragment_one_socket", "fragment_one_socket", "fragment_one_socket"},
-          {"joint_three_sockets"}, {{0, 0, 3, 0}, {1, 0, 3, 1}, {2, 0, 3, 2}});
+          {"joint_three_sockets"},
+          {
+              Connect(FragmentSocket(0, 0), JointSocket(0, 0)),
+              Connect(FragmentSocket(1, 0), JointSocket(0, 1)),
+              Connect(FragmentSocket(2, 0), JointSocket(0, 2)),
+          });
       lib.scaffold_scenarios.emplace(ScaffoldScenario::SimpleBranch,
                                      std::move(result.scaffold));
     }
@@ -347,6 +392,44 @@ ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
 }
 
 /////////////////////////////////////////////////
+ScaffoldResult PartLibraryBuilder::MakeConnectedScaffoldWithEndpoints(
+    const std::vector<std::string> &fragment_names,
+    const std::vector<std::string> &joint_names,
+    const std::vector<EndpointConnectionSpec> &connections) {
+  std::vector<ConnectionSpec> translated_connections;
+  translated_connections.reserve(connections.size());
+
+  auto to_insertion_order_index =
+      [&fragment_names, &joint_names](const ConnectionEndpointSpec &endpoint)
+      -> size_t {
+    if (endpoint.part_kind == PartSlotKind::Fragment) {
+      if (endpoint.part_index >= fragment_names.size())
+        FAIL("Fragment endpoint index (" << endpoint.part_index
+                                         << ") out of range (size="
+                                         << fragment_names.size() << ")");
+      return endpoint.part_index;
+    }
+
+    if (endpoint.part_index >= joint_names.size())
+      FAIL("Joint endpoint index (" << endpoint.part_index
+                                    << ") out of range (size="
+                                    << joint_names.size() << ")");
+    return fragment_names.size() + endpoint.part_index;
+  };
+
+  for (const auto &connection : connections) {
+    translated_connections.push_back(ConnectionSpec{
+        .part_index_a = to_insertion_order_index(connection.endpoint_a),
+        .socket_id_a = connection.endpoint_a.socket_id,
+        .part_index_b = to_insertion_order_index(connection.endpoint_b),
+        .socket_id_b = connection.endpoint_b.socket_id,
+    });
+  }
+
+  return MakeConnectedScaffold(fragment_names, joint_names, translated_connections);
+}
+
+/////////////////////////////////////////////////
 const MachinaFormScaffold &
 PartLibraryBuilder::GetScenarioForAnalysis(ScaffoldScenario scenario) const {
   auto it = m_library.scaffold_scenarios.find(scenario);
@@ -464,6 +547,66 @@ TEST_CASE("PartLibraryBuilder resets IDs between scaffold and graph builds",
     REQUIRE(graph_b.contains(0));
     REQUIRE(graph_a.contains(1));
     REQUIRE(graph_b.contains(1));
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_CASE("PartLibraryBuilder endpoint helpers improve custom scaffold wiring",
+          "[unit][part_library]") {
+  TestPartLibrary lib = TestPartLibrary::Create();
+  PartLibraryBuilder builder{lib};
+
+  SECTION("MakeConnectedScaffoldWithEndpoints maps fragment and joint indices") {
+    ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
+        {"fragment_two_sockets", "fragment_two_sockets"},
+        {"joint_two_sockets"},
+        {
+            Connect(FragmentSocket(0, 1), JointSocket(0, 0)),
+            Connect(JointSocket(0, 1), FragmentSocket(1, 0)),
+        });
+
+    REQUIRE(result.part_ids.size() == 3u);
+    REQUIRE(result.part_ids[0] == 0u);
+    REQUIRE(result.part_ids[1] == 1u);
+    REQUIRE(result.part_ids[2] == 2u);
+
+    auto check_endpoint = [&result](uint32_t part_id, uint32_t socket_id,
+                                    uint32_t peer_part_id,
+                                    uint32_t peer_socket_id) {
+      std::visit(
+          [socket_id, peer_part_id, peer_socket_id](const auto &instance) {
+            REQUIRE(instance.sockets.count(socket_id) == 1u);
+            const SocketData &socket = instance.sockets.at(socket_id);
+            REQUIRE(socket.state == SocketState::Connected);
+            REQUIRE(socket.connected_to.has_value());
+            CHECK(socket.connected_to->peer_part_id == peer_part_id);
+            CHECK(socket.connected_to->peer_socket_id == peer_socket_id);
+          },
+          result.scaffold.parts.at(part_id));
+    };
+
+    check_endpoint(0, 1, 2, 0);
+    check_endpoint(2, 0, 0, 1);
+    check_endpoint(2, 1, 1, 0);
+    check_endpoint(1, 0, 2, 1);
+  }
+
+  SECTION("MakeConnectedScaffoldWithEndpoints fails for bad fragment indices") {
+    REQUIRE_THROWS(builder.MakeConnectedScaffoldWithEndpoints(
+        {"fragment_one_socket"},
+        {"joint_one_socket"},
+        {
+            Connect(FragmentSocket(1, 0), JointSocket(0, 0)),
+        }));
+  }
+
+  SECTION("MakeConnectedScaffoldWithEndpoints fails for bad joint indices") {
+    REQUIRE_THROWS(builder.MakeConnectedScaffoldWithEndpoints(
+        {"fragment_one_socket"},
+        {"joint_one_socket"},
+        {
+            Connect(FragmentSocket(0, 0), JointSocket(1, 0)),
+        }));
   }
 }
 

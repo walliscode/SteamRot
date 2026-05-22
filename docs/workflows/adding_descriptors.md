@@ -664,21 +664,28 @@ Available builder methods:
 ### Building a custom scaffold
 
 Use `PartLibraryBuilder` for topologies not covered by the standard scenarios.
-The `ConnectionSpec` fields are
-`{part_index_a, socket_id_a, part_index_b, socket_id_b}` (fragments are inserted
-before joints in the resulting `part_ids` vector):
+For readability, prefer endpoint helpers (`FragmentSocket`, `JointSocket`,
+`Connect`) with `MakeConnectedScaffoldWithEndpoints`:
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
 
 steamrot::tests::PartLibraryBuilder builder{lib};
 // fragment[0].socket[0] → joint[0].socket[0]
-steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-    {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
+steamrot::tests::ScaffoldResult result =
+    builder.MakeConnectedScaffoldWithEndpoints(
+        {"fragment_two_sockets"},
+        {"joint_two_sockets"},
+        {steamrot::tests::Connect(steamrot::tests::FragmentSocket(0, 0),
+                                  steamrot::tests::JointSocket(0, 0))});
 
 // Pass scaffold.parts (the PartGraph) to descriptors:
 REQUIRE(descriptors::my_descriptor(result.scaffold.parts, result.part_ids[0]));
 ```
+
+If needed, the index-based `MakeConnectedScaffold` API remains available and
+accepts `ConnectionSpec{part_index_a, socket_id_a, part_index_b, socket_id_b}`
+where fragments are inserted before joints.
 
 ### Testing ContextualNodeDescriptors and ChainDescriptors
 

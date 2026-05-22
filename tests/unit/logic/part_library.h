@@ -196,6 +196,87 @@ struct ConnectionSpec {
   uint32_t socket_id_b{0};
 };
 
+///////////////////////////////////////////////////
+/// @enum PartSlotKind
+/// @brief Selects whether an endpoint refers to fragment or joint insertion
+///        order.
+/////////////////////////////////////////////////
+enum class PartSlotKind {
+  Fragment,
+  Joint
+};
+
+///////////////////////////////////////////////////
+/// @struct ConnectionEndpointSpec
+/// @brief Describes one connection endpoint using fragment/joint-local indices.
+///
+/// This avoids manual conversion to combined insertion-order indices when
+/// building custom scaffolds:
+/// @code
+/// ConnectionEndpointSpec ep{PartSlotKind::Fragment, 0, 1};
+/// @endcode
+/////////////////////////////////////////////////
+struct ConnectionEndpointSpec {
+  /////////////////////////////////////////////////
+  /// @brief Whether @c part_index refers to fragment or joint order.
+  /////////////////////////////////////////////////
+  PartSlotKind part_kind{PartSlotKind::Fragment};
+
+  /////////////////////////////////////////////////
+  /// @brief 0-based index within fragment or joint list (based on part_kind).
+  /////////////////////////////////////////////////
+  size_t part_index{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Stable socket ID on that part.
+  /////////////////////////////////////////////////
+  uint32_t socket_id{0};
+};
+
+///////////////////////////////////////////////////
+/// @struct EndpointConnectionSpec
+/// @brief Connection between two explicit endpoints.
+/////////////////////////////////////////////////
+struct EndpointConnectionSpec {
+  /////////////////////////////////////////////////
+  /// @brief First endpoint.
+  /////////////////////////////////////////////////
+  ConnectionEndpointSpec endpoint_a{};
+
+  /////////////////////////////////////////////////
+  /// @brief Second endpoint.
+  /////////////////////////////////////////////////
+  ConnectionEndpointSpec endpoint_b{};
+};
+
+///////////////////////////////////////////////////
+/// @brief Create a fragment endpoint specification.
+///
+/// @param fragment_index 0-based index in fragment_names argument order.
+/// @param socket_id Stable socket ID on that fragment.
+/// @return Fragment endpoint spec.
+/////////////////////////////////////////////////
+ConnectionEndpointSpec FragmentSocket(size_t fragment_index, uint32_t socket_id);
+
+///////////////////////////////////////////////////
+/// @brief Create a joint endpoint specification.
+///
+/// @param joint_index 0-based index in joint_names argument order.
+/// @param socket_id Stable socket ID on that joint.
+/// @return Joint endpoint spec.
+/////////////////////////////////////////////////
+ConnectionEndpointSpec JointSocket(size_t joint_index, uint32_t socket_id);
+
+///////////////////////////////////////////////////
+/// @brief Create an endpoint-to-endpoint connection spec.
+///
+/// @param endpoint_a First endpoint.
+/// @param endpoint_b Second endpoint.
+/// @return Endpoint connection specification.
+/////////////////////////////////////////////////
+EndpointConnectionSpec Connect(ConnectionEndpointSpec endpoint_a,
+                               ConnectionEndpointSpec endpoint_b);
+
 /////////////////////////////////////////////////
 /// @struct ScaffoldResult
 /// @brief Bundles a MachinaFormScaffold with the insertion-order ID list.
@@ -317,12 +398,12 @@ void CheckNodeDescriptorForAllScenarios(
 /// PartGraph parts = builder.MakePartGraph({"fragment_no_socket"},
 ///                                     {"joint_one_socket"});
 ///
-/// // Build a scaffold with connections (no ID hunting, no socket patching)
-/// ScaffoldResult result = builder.MakeConnectedScaffold(
+/// // Build a scaffold with connections (fragment/joint indices stay separate)
+/// ScaffoldResult result = builder.MakeConnectedScaffoldWithEndpoints(
 ///     {"fragment_two_sockets", "fragment_two_sockets"},
 ///     {"joint_two_sockets"},
-///     {{0, 1, 2, 0},   // fragment[0].socket[1] -> joint[0].socket[0]
-///      {2, 1, 1, 0}}); // joint[0].socket[1]    -> fragment[1].socket[0]
+///     {Connect(FragmentSocket(0, 1), JointSocket(0, 0)),
+///      Connect(JointSocket(0, 1), FragmentSocket(1, 0))});
 ///
 /// // Or use a pre-built scenario
 /// const MachinaFormScaffold& chain =
@@ -461,6 +542,25 @@ public:
   MakeConnectedScaffold(const std::vector<std::string> &fragment_names,
                         const std::vector<std::string> &joint_names,
                         const std::vector<ConnectionSpec> &connections);
+
+  /////////////////////////////////////////////////
+  /// @brief Build a connected scaffold using explicit fragment/joint endpoints.
+  ///
+  /// This method accepts endpoint specs built with FragmentSocket(),
+  /// JointSocket(), and Connect(), then internally translates them to
+  /// insertion-order ConnectionSpec values. It improves readability for custom
+  /// topologies because fragment and joint indices are kept separate.
+  ///
+  /// @param fragment_names Names of Fragments to include, in order.
+  /// @param joint_names    Names of Joints to include, in order.
+  /// @param connections    Endpoint-based connections to wire.
+  /// @return ScaffoldResult containing the wired scaffold and insertion-order
+  ///         part IDs.
+  /////////////////////////////////////////////////
+  ScaffoldResult MakeConnectedScaffoldWithEndpoints(
+      const std::vector<std::string> &fragment_names,
+      const std::vector<std::string> &joint_names,
+      const std::vector<EndpointConnectionSpec> &connections);
 
   /////////////////////////////////////////////////
   /// @brief Return a const reference to a pre-wired MachinaFormScaffold
