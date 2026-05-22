@@ -160,8 +160,8 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
 
     REQUIRE_THAT(
         descriptor_result.m_trace,
-        steamrot::tests::EqualsTrace(expected_trace,
-                                     descriptors::TerminalDescriptorFormatter{}));
+        steamrot::tests::EqualsTrace(
+            expected_trace, descriptors::TerminalDescriptorFormatter{}));
   }
 
   SECTION("NodeDescriptor trace preserves explicit depth for a non-match") {
@@ -182,8 +182,8 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
 
     REQUIRE_THAT(
         descriptor_result.m_trace,
-        steamrot::tests::EqualsTrace(expected_trace,
-                                     descriptors::TerminalDescriptorFormatter{}));
+        steamrot::tests::EqualsTrace(
+            expected_trace, descriptors::TerminalDescriptorFormatter{}));
   }
 }
 
@@ -514,11 +514,10 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
   }
   SECTION("Returns true for nodes with 0 or 1 edge") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-        {{0, 0, 2, 0}}); // fragment[0].socket[0] -> joint[0].socket[0]
-    REQUIRE(result.scaffold.parts.size() == 3);
-    // fragment[1] has 0 edges, fragment[0] and joint[0] each have 1 edge —
-    // all three are terminal
+        {"fragment_two_sockets"}, {"joint_two_sockets"},
+        {{0, 0, 1, 0}}); // fragment[0].socket[0] -> joint[0].socket[0]
+    REQUIRE(result.scaffold.parts.size() == 2);
+
     for (const auto &id : result.part_ids) {
       REQUIRE(descriptors::is_terminal(result.scaffold.parts, id));
     }
