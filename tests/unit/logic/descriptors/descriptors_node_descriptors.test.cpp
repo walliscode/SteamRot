@@ -132,6 +132,61 @@ TEST_CASE("NodeDescriptor fails with reason for incorrect key",
                    expected_trace, descriptors::TerminalDescriptorFormatter{}));
 }
 
+TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
+          "[unit][analysis][grimoire_machina]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder builder{lib};
+
+  steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
+      {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
+      {{0, 0, 2, 0}, {1, 0, 2, 1}});
+  REQUIRE(result.scaffold.parts.size() == 3);
+
+  SECTION("is_serial trace includes predicate reason for a matching node") {
+    const uint32_t matching_id = result.part_ids[2];
+    const descriptors::NodeDescriptorResult descriptor_result =
+        descriptors::is_serial(result.scaffold.parts, matching_id);
+
+    REQUIRE(descriptor_result);
+    REQUIRE(descriptor_result.m_reason == "connection_count=2, expected==2");
+
+    steamrot::logic::descriptors::AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(matching_id, "is_serial", 0)
+            .NodeResult(matching_id, "is_serial", true,
+                        "connection_count=2, expected==2", 0)
+            .Build();
+
+    REQUIRE_THAT(
+        descriptor_result.m_trace,
+        steamrot::tests::EqualsTrace(expected_trace,
+                                     descriptors::TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("NodeDescriptor trace preserves explicit depth for a non-match") {
+    const uint32_t non_matching_id = result.part_ids[0];
+    const uint32_t depth = 3;
+    const descriptors::NodeDescriptorResult descriptor_result =
+        descriptors::is_serial(result.scaffold.parts, non_matching_id, depth);
+
+    REQUIRE_FALSE(descriptor_result);
+    REQUIRE(descriptor_result.m_reason == "connection_count=1, expected==2");
+
+    steamrot::logic::descriptors::AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{}
+            .NodeEval(non_matching_id, "is_serial", depth)
+            .NodeResult(non_matching_id, "is_serial", false,
+                        "connection_count=1, expected==2", depth)
+            .Build();
+
+    REQUIRE_THAT(
+        descriptor_result.m_trace,
+        steamrot::tests::EqualsTrace(expected_trace,
+                                     descriptors::TerminalDescriptorFormatter{}));
+  }
+}
+
 TEST_CASE("predicate combinators compose correctly",
           "[unit][analysis][grimoire_machina]") {
   steamrot::tests::TestPartLibrary lib =
