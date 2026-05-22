@@ -17,39 +17,33 @@ Transition resolve_transition(const ChainStep &step,
                               const bool predicate_result,
                               StepProgress progress) {
   switch (step.kind) {
-  case ChainStepKind::Sequence: {
 
+  /////////////////////////////////////////////////
+  /// Sequence: consume exactly one matching node and advance to the next step.
+  /////////////////////////////////////////////////
+  case ChainStepKind::Sequence: {
     return predicate_result
                ? Transition{TransitionKind::ConsumeNodeAndAdvanceStep}
                : Transition{TransitionKind::Reject};
-    ;
   }
-  case ChainStepKind::WhileIsTrue: {
 
-    if (predicate_result) {
-      // increate count of how many nodes have satisfied the predicate for this
-      // step
-      progress.match_count++;
-      // consume the node and stay on the current step
-      return Transition{TransitionKind::ConsumeNodeAndHoldStep};
-    }
-    // if the predicate fails, we only advance if we've satisfied the predicate
-    // at least once, otherwise this chain is invalid and we reject
-    return progress.match_count >= 1
-               ? Transition{TransitionKind::HoldNodeAndAdvanceStep}
-               : Transition{TransitionKind::Reject};
-  }
+  /////////////////////////////////////////////////
+  /// WhileIsTrue / WhileIsTrueForN: consume every consecutive matching node,
+  /// then hand the first non-matching node to the next step.
+  ///
+  /// Both kinds share the same logic; the only difference is the minimum
+  /// number of nodes required before the step is considered satisfied.
+  /// WhileIsTrue uses the default min_repetitions of 1.
+  /////////////////////////////////////////////////
+  case ChainStepKind::WhileIsTrue:
   case ChainStepKind::WhileIsTrueForN: {
     if (predicate_result) {
-      // increate count of how many nodes have satisfied the predicate for this
-      // step
+      // Increment the count and carry it forward in the returned transition so
+      // the cursor's progress is updated for the next recursive layer.
       progress.match_count++;
-      // consume the node and stay on the current step
-      return Transition{TransitionKind::ConsumeNodeAndHoldStep};
+      return Transition{TransitionKind::ConsumeNodeAndHoldStep, progress};
     }
-    // if the predicate fails, we only advance if we've satisfied the predicate
-    // at least min_repetitions times, otherwise this chain is invalid and we
-    // reject
+    // Predicate failed: advance only if the minimum count has been reached.
     return progress.match_count >= step.min_repetitions
                ? Transition{TransitionKind::HoldNodeAndAdvanceStep}
                : Transition{TransitionKind::Reject};
@@ -61,11 +55,11 @@ Transition resolve_transition(const ChainStep &step,
 void depth_first_search(Cursor cursor, DFSContext &context,
                         const PartGraph &parts, ChainDescriptorResult &result) {
 
-  // set some local variables for readability
-  const auto &current_id = cursor.current_id;
-  const auto &current_node = parts.find(current_id);
+  /////////////////////////////////////////////////
+  /// SECTION: Validate that the current node exists in the graph
+  /////////////////////////////////////////////////
+  const auto current_node = parts.find(cursor.current_id);
   if (current_node == parts.end()) {
-    // if the current node doesn't exist in the graph, this is an invalid chain
     result.invalid_subgraphs.push_back(context.current_chain);
     AnalysisEvent invalid_event{};
     invalid_event.kind = TraceEventKind::InvalidSubgraphIsolated;
@@ -73,105 +67,116 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     context.trace.push_back(std::move(invalid_event));
     return;
   }
-  // All steps satisfied
+
+  /////////////////////////////////////////////////
+  /// SECTION: Check if all steps have been satisfied (base case)
+  ///
+  /// This fires when HoldNodeAndAdvanceStep re-enters with steps_end already
+  /// set — the current node is not evaluated or consumed, only the chain
+  /// accumulated so far is recorded as valid.
+  /////////////////////////////////////////////////
   if (cursor.steps_it == context.steps_end) {
-
-    // we've created a valid subgraph! record it in the result
     result.valid_subgraphs.push_back(context.current_chain);
-
-    // emit ValidSubgraphIsolated event
-    AnalysisEvent valid_event{};
-    valid_event.kind = TraceEventKind::ValidSubgraphIsolated;
-    valid_event.depth = cursor.depth;
-    context.trace.push_back(std::move(valid_event));
-
     return;
   }
 
-  // if the node has already been visited we have a cycle
-  // current behaviour is to return, however we may want cycles in the future
+  /////////////////////////////////////////////////
+  /// SECTION: Cycle guard — skip nodes already on the current path
+  /////////////////////////////////////////////////
   if (context.visited.count(cursor.current_id))
     return;
 
-  // Evaluate the current node against the current step's predicate
+  /////////////////////////////////////////////////
+  /// SECTION: Evaluate the current node against the current step's predicate
+  /////////////////////////////////////////////////
   const ChainStep &current_step = *cursor.steps_it;
   const NodeDescriptor &current_predicate = current_step.predicate;
-  auto predicate_result = current_predicate(parts, cursor.current_id);
+  auto predicate_result =
+      current_predicate(parts, cursor.current_id, cursor.depth);
   Merge(context.trace, std::move(predicate_result.m_trace));
 
-  // Ask what should be done with the result
   Transition transition = resolve_transition(
       current_step, static_cast<bool>(predicate_result), cursor.progress);
 
-  // handle non consuming outcomes
+  /////////////////////////////////////////////////
+  /// SECTION: Act on the transition
+  /////////////////////////////////////////////////
   switch (transition.kind) {
 
-    // simplest case, this route no longer works
   case TransitionKind::Reject: {
-    // we've found a invalid chain, record the failture and emit trace
+    // Record the rejected path and return; the NodeResult trace event already
+    // explains why the predicate failed.
     result.invalid_subgraphs.push_back(context.current_chain);
-    AnalysisEvent invalid_event{};
-    invalid_event.kind = TraceEventKind::InvalidSubgraphIsolated;
-    invalid_event.depth = cursor.depth;
-
     return;
   }
-    // used for when we are ending a while loop and want to reevalute the same
-    // node with the next step
+
   case TransitionKind::HoldNodeAndAdvanceStep: {
-    // create a new Cursor object as a copy of the current one
+    // The node did not match the current step but the step is satisfied (e.g.
+    // end of a WhileIsTrue run). Re-evaluate the same node against the next
+    // step without consuming it onto the path.
     Cursor next_cursor = cursor;
-    // advance variables
     next_cursor.steps_it = std::next(next_cursor.steps_it);
-    next_cursor.progress = transition.progress;
-    // perform dfs with the new cursor
+    next_cursor.progress = {};
     depth_first_search(next_cursor, context, parts, result);
+    return;
   }
 
   case TransitionKind::ConsumeNodeAndHoldStep: {
-    // mark the current node as visited and add it to the current chain
+    // Node matched the current repeating step; consume it and keep the same
+    // step active for the next neighbour. Propagate the updated match count so
+    // subsequent layers know how many nodes have been consumed so far.
     context.visited.insert(cursor.current_id);
     context.current_chain.push_back(cursor.current_id);
+    cursor.progress = transition.progress;
+    break;
   }
 
   case TransitionKind::ConsumeNodeAndAdvanceStep: {
-    // // mark the current node as visited and add it to the current chain
-    // context.visited.insert(cursor.current_id);
-    // context.current_chain.push_back(cursor.current_id);
-    // // create a new Cursor object as a copy of the current one
-    // Cursor next_cursor = cursor;
-    // // advance variables
-    // next_cursor.steps_it = std::next(next_cursor.steps_it);
-    // next_cursor.progress = transition.progress;
-    // // perform dfs with the new cursor
-    // depth_first_search(next_cursor, context, parts, result);
+    // Node matched a Sequence step; consume it and advance to the next step.
+    context.visited.insert(cursor.current_id);
+    context.current_chain.push_back(cursor.current_id);
+    cursor.steps_it = std::next(cursor.steps_it);
+    cursor.progress = {};
+    break;
   }
   }
 
-  // now we move onto the next nodes in the graph, anything that has a held node
+  /////////////////////////////////////////////////
+  /// SECTION: Record valid subgraph if all steps are now satisfied
+  ///
+  /// This fires when ConsumeNodeAndAdvanceStep consumed the last Sequence step,
+  /// advancing steps_it to steps_end. The subgraph is recorded immediately and
+  /// we backtrack without iterating neighbours, since there is no remaining
+  /// step to match against them.
+  /////////////////////////////////////////////////
+  if (cursor.steps_it == context.steps_end) {
+    result.valid_subgraphs.push_back(context.current_chain);
+    context.visited.erase(cursor.current_id);
+    context.current_chain.pop_back();
+    return;
+  }
 
-  // use std::visit so we guarantee that the sockets is type safe
+  /////////////////////////////////////////////////
+  /// SECTION: Traverse neighbours
+  ///
+  /// cursor.steps_it and cursor.progress have been updated by the switch above
+  /// and are forwarded to each child cursor so every neighbour continues from
+  /// the correct step.
+  /////////////////////////////////////////////////
   const SocketMap &sockets = std::visit(
       [](const auto &instance) -> const SocketMap & {
         return instance.sockets;
       },
       current_node->second);
 
-  // cycle through the neighbours of the current node
   for (const auto &[socket_id, socket_data] : sockets) {
-
-    // if this socket isn't connected to anything, skip it
     if (!socket_data.connected_to)
       continue;
 
-    // get the neighbour id from the socket connection
     const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
     if (context.visited.count(neighbour_id))
-      // potentially add some kind of event here in the future to indicate that
-      // we're skipping a visited node
       continue;
 
-    // emit a moving to neighbour event
     AnalysisEvent move_event{};
     move_event.kind = TraceEventKind::MovingToNeighbour;
     move_event.depth = cursor.depth;
@@ -180,18 +185,14 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     move_event.socket_id = socket_id;
     context.trace.push_back(std::move(move_event));
 
-    // set up a new cursor for the recursive call
     Cursor child{};
     child.current_id = neighbour_id;
     child.steps_it = cursor.steps_it;
     child.progress = cursor.progress;
     child.depth = cursor.depth + 1;
 
-    // call dfs recursively with the new cursor
     depth_first_search(child, context, parts, result);
 
-    // if we are here then we have backtracked from the neighbour, emit a
-    // backtracking event
     AnalysisEvent backtrack_event{};
     backtrack_event.kind = TraceEventKind::Backtracking;
     backtrack_event.depth = cursor.depth;
@@ -200,12 +201,10 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     context.trace.push_back(std::move(backtrack_event));
   }
 
-  // we've now visited all the neighbours of the current node, we need to unmark
-  // it as we return
+  /////////////////////////////////////////////////
+  /// SECTION: Backtrack — unmark the current node before returning
+  /////////////////////////////////////////////////
   context.visited.erase(cursor.current_id);
   context.current_chain.pop_back();
-
-  // not strictly necessary, but to indiciate that we are unwinding
-  return;
 }
 } // namespace steamrot::logic::descriptors

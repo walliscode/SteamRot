@@ -27,6 +27,7 @@ collision_grimoire_machina.test.cpp
 descriptors/descriptors_node_descriptors.test.cpp
 descriptors/descriptors_chain_descriptors.test.cpp
 descriptors/ChainDescriptorBuilder.test.cpp
+descriptors/depth_first_search.test.cpp
 )
 
 target_include_directories(test_logic

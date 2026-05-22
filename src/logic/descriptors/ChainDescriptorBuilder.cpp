@@ -36,7 +36,7 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
       [steps = std::move(steps), chain_name = std::move(name)](
           const PartGraph &parts, uint32_t start_id) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
-        DFSContext context;
+        DFSContext context{steps};
 
         // Check for empty PartGraph
         if (parts.empty()) {
@@ -80,8 +80,11 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         scope_begin.anchor_id = start_id;
         context.trace.push_back(std::move(scope_begin));
 
-        depth_first_search(steps.cbegin(), steps.cend(), context, start_id,
-                           parts, result);
+        Cursor start_cursor{};
+        start_cursor.current_id = start_id;
+        start_cursor.steps_it = context.steps.cbegin();
+        start_cursor.depth = 1;
+        depth_first_search(start_cursor, context, parts, result);
 
         if (!result.valid_subgraphs.empty()) {
           result.m_result = true;
