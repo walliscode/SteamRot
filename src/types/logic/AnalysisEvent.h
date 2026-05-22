@@ -42,7 +42,8 @@ enum class TraceEventKind {
   Backtracking,
   ScopeBegin,
   ScopeEnd,
-  ValidSubgraphIsolated
+  ValidSubgraphIsolated,
+  InvalidSubgraphIsolated,
 };
 
 /////////////////////////////////////////////////

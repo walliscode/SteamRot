@@ -86,6 +86,9 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   case TraceEventKind::ValidSubgraphIsolated: {
     return indent + "[PASS]  valid subgraph is isolated";
   }
+  case TraceEventKind::InvalidSubgraphIsolated: {
+    return indent + "[FAIL]  invalid subgraph is isolated";
+  }
   }
 
   return indent + "[?]";

@@ -88,7 +88,7 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(uint32_t part_id, std::string predicate_name,
-                                 uint32_t depth);
+                                 uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a NodeResult event.

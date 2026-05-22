@@ -91,32 +91,39 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{} // begin chain at node 2
             .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0, 2)
-            // evaluate node 2 against is_serial
+            // node 2 (joint with 2 connections) satisfies is_serial
             .NodeEval(2, "is_serial", 1)
-            // this should pass since node 2 has 2 connections
             .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
                         1)
-            // move to first node connected to node 2, which should be node 0
+            // socket[0] of joint leads to frag0 (id=0)
             .MovingToNeighbour(2, 0, 0, 1)
-            // evaluate node 0 against is_serial
+            // frag0 has 1 connection, so is_serial fails
             .NodeEval(0, "is_serial", 2)
-            // this should fail since node 0 has only 1 connection
             .NodeResult(0, "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            // as this is a WhileIsTrue step, so as long as one node in the
-            // chain was correct, it moves to the next step and evaluates the
-            // same node
+            // WhileIsTrue consumed at least one node, so re-evaluate frag0
+            // against the next step (is_terminal) without consuming it first
             .NodeEval(0, "is_terminal", 2)
             .NodeResult(0, "is_terminal", true,
-                        "connection_count=1, expected==1", 1)
+                        "connection_count=1, expected==1", 2)
+            .Backtracking(0, 1)
+            // socket[1] of joint leads to frag1 (id=1)
+            .MovingToNeighbour(2, 1, 1, 1)
+            // frag1 also has 1 connection, same pattern as frag0
+            .NodeEval(1, "is_serial", 2)
+            .NodeResult(1, "is_serial", false,
+                        "connection_count=1, expected==2", 2)
+            .NodeEval(1, "is_terminal", 2)
+            .NodeResult(1, "is_terminal", true,
+                        "connection_count=1, expected==1", 2)
+            .Backtracking(1, 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, true, 0)
             .Build();
 
     // assert result and trace
-
+    REQUIRE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
-    REQUIRE(result);
   }
 }
