@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AnalysisEvent.h"
+#include "part_library.h"
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -45,6 +46,18 @@ namespace steamrot::tests {
 /////////////////////////////////////////////////
 class AnalysisTraceBuilder {
 public:
+  /////////////////////////////////////////////////
+  /// @brief Bind this builder to a scaffold alias map.
+  ///
+  /// Named event helpers will resolve aliases to stable part IDs using
+  /// @p scaffold_result.alias_to_id.
+  ///
+  /// @param scaffold_result Scaffold result carrying alias/id maps.
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &
+  BindAliases(const steamrot::tests::ScaffoldResult &scaffold_result);
+
   /////////////////////////////////////////////////
   /// @brief Append an EmptyPartGraph event.
   ///
@@ -91,6 +104,13 @@ public:
                                  uint32_t depth = 0);
 
   /////////////////////////////////////////////////
+  /// @brief Append a NodeEval event using a named part alias.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &NodeEvalNamed(std::string alias,
+                                      std::string predicate_name,
+                                      uint32_t depth = 0);
+
+  /////////////////////////////////////////////////
   /// @brief Append a NodeResult event.
   ///
   /// @param part_id        Stable part ID of the node evaluated.
@@ -103,6 +123,14 @@ public:
   AnalysisTraceBuilder &NodeResult(uint32_t part_id, std::string predicate_name,
                                    bool result, std::string reason = {},
                                    uint32_t depth = 0);
+
+  /////////////////////////////////////////////////
+  /// @brief Append a NodeResult event using a named part alias.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &NodeResultNamed(std::string alias,
+                                        std::string predicate_name, bool result,
+                                        std::string reason = {},
+                                        uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a MovingToNeighbour event.
@@ -118,6 +146,14 @@ public:
                                           uint32_t socket_id, uint32_t depth);
 
   /////////////////////////////////////////////////
+  /// @brief Append a MovingToNeighbour event using named part aliases.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &MovingToNeighbourNamed(std::string from_alias,
+                                               std::string to_alias,
+                                               uint32_t socket_id,
+                                               uint32_t depth);
+
+  /////////////////////////////////////////////////
   /// @brief Append a Backtracking event.
   ///
   /// @param from_id Part ID of the node being backtracked from.
@@ -125,6 +161,20 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &Backtracking(uint32_t from_id, uint32_t depth);
+
+  /////////////////////////////////////////////////
+  /// @brief Append a Backtracking event using a named part alias.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &BacktrackingNamed(std::string from_alias,
+                                          uint32_t depth);
+
+  /////////////////////////////////////////////////
+  /// @brief Append a ScopeBegin event with an optional named anchor alias.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &
+  ScopeBeginNamed(std::string name, steamrot::logic::descriptors::ScopeKind kind,
+                  uint32_t depth = 0,
+                  std::optional<std::string> anchor_alias = std::nullopt);
 
   AnalysisTraceBuilder &ValidSubgraphIsolated();
 
@@ -137,7 +187,10 @@ public:
   steamrot::logic::descriptors::AnalysisTrace Build() const;
 
 private:
+  uint32_t ResolveAlias(const std::string &alias) const;
+
   steamrot::logic::descriptors::AnalysisTrace m_trace{};
+  const std::map<std::string, uint32_t> *m_alias_to_id{nullptr};
 };
 
 } // namespace steamrot::tests

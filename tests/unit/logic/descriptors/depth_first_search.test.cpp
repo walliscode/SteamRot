@@ -201,8 +201,9 @@ TEST_CASE(
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
   const steamrot::tests::ScaffoldResult sr = builder.MakeConnectedScaffold(
-      {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-      {{0, 1, 2, 0}, {2, 1, 1, 0}});
+      {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+      {{"joint0", "joint_two_sockets"}},
+      {{"frag0", 1, "joint0", 0}, {"joint0", 1, "frag1", 0}});
   const steamrot::PartGraph &parts = sr.scaffold.parts;
 
   SECTION("WhileIsTrue(is_serial) only: joint0 recorded as valid via "
@@ -211,28 +212,30 @@ TEST_CASE(
     // fail is_serial; since match_count=1 >= 1 they trigger
     // HoldNodeAndAdvanceStep which re-enters with steps_end → records {joint0}.
     const ChainDescriptorResult result =
-        run_dfs(2, {make_step(is_serial, ChainStepKind::WhileIsTrue)}, parts);
+        run_dfs(sr.alias_to_id.at("joint0"),
+                {make_step(is_serial, ChainStepKind::WhileIsTrue)}, parts);
 
     REQUIRE(!result.valid_subgraphs.empty());
     for (const auto &sg : result.valid_subgraphs) {
-      REQUIRE(sg == std::vector<uint32_t>{2});
+      REQUIRE(sg == std::vector<uint32_t>{sr.alias_to_id.at("joint0")});
     }
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+            .BindAliases(sr)
+            .NodeEvalNamed("joint0", "is_serial", 1)
+            .NodeResultNamed("joint0", "is_serial", true,
+                            "connection_count=2, expected==2", 1)
+            .MovingToNeighbourNamed("joint0", "frag0", 0, 1)
+            .NodeEvalNamed("frag0", "is_serial", 2)
+            .NodeResultNamed("frag0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 1, 1, 1)
-            .NodeEval(1, "is_serial", 2)
-            .NodeResult(1, "is_serial", false,
+            .BacktrackingNamed("frag0", 1)
+            .MovingToNeighbourNamed("joint0", "frag1", 1, 1)
+            .NodeEvalNamed("frag1", "is_serial", 2)
+            .NodeResultNamed("frag1", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(1, 1)
+            .BacktrackingNamed("frag1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -247,7 +250,7 @@ TEST_CASE(
     // is_serial failing at the terminal correctly resolves to
     // HoldNodeAndAdvanceStep (match_count=1 >= 1) rather than Reject.
     const ChainDescriptorResult result =
-        run_dfs(2,
+        run_dfs(sr.alias_to_id.at("joint0"),
                 {make_step(is_serial, ChainStepKind::WhileIsTrue),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
@@ -256,32 +259,37 @@ TEST_CASE(
     REQUIRE(result.valid_subgraphs.size() == 2);
     REQUIRE(
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 0}) != result.valid_subgraphs.end());
+                  std::vector<uint32_t>{sr.alias_to_id.at("joint0"),
+                                        sr.alias_to_id.at("frag0")}) !=
+        result.valid_subgraphs.end());
     REQUIRE(
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 1}) != result.valid_subgraphs.end());
+                  std::vector<uint32_t>{sr.alias_to_id.at("joint0"),
+                                        sr.alias_to_id.at("frag1")}) !=
+        result.valid_subgraphs.end());
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+            .BindAliases(sr)
+            .NodeEvalNamed("joint0", "is_serial", 1)
+            .NodeResultNamed("joint0", "is_serial", true,
+                            "connection_count=2, expected==2", 1)
+            .MovingToNeighbourNamed("joint0", "frag0", 0, 1)
+            .NodeEvalNamed("frag0", "is_serial", 2)
+            .NodeResultNamed("frag0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .NodeEval(0, "is_terminal", 2)
-            .NodeResult(0, "is_terminal", true,
+            .NodeEvalNamed("frag0", "is_terminal", 2)
+            .NodeResultNamed("frag0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 1, 1, 1)
-            .NodeEval(1, "is_serial", 2)
-            .NodeResult(1, "is_serial", false,
+            .BacktrackingNamed("frag0", 1)
+            .MovingToNeighbourNamed("joint0", "frag1", 1, 1)
+            .NodeEvalNamed("frag1", "is_serial", 2)
+            .NodeResultNamed("frag1", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .NodeEval(1, "is_terminal", 2)
-            .NodeResult(1, "is_terminal", true,
+            .NodeEvalNamed("frag1", "is_terminal", 2)
+            .NodeResultNamed("frag1", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(1, 1)
+            .BacktrackingNamed("frag1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -305,15 +313,17 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
   const steamrot::tests::ScaffoldResult sr = builder.MakeConnectedScaffold(
-      {"fragment_one_socket", "fragment_one_socket"},
-      {"joint_two_sockets", "joint_two_sockets"},
-      {{0, 0, 2, 0}, {2, 1, 3, 0}, {3, 1, 1, 0}});
+      {{"frag0", "fragment_one_socket"}, {"frag1", "fragment_one_socket"}},
+      {{"joint0", "joint_two_sockets"}, {"joint1", "joint_two_sockets"}},
+      {{"frag0", 0, "joint0", 0},
+       {"joint0", 1, "joint1", 0},
+       {"joint1", 1, "frag1", 0}});
   const steamrot::PartGraph &parts = sr.scaffold.parts;
   // IDs: frag0=0, frag1=1, joint0=2, joint1=3
 
   SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
     const ChainDescriptorResult result =
-        run_dfs(2,
+        run_dfs(sr.alias_to_id.at("joint0"),
                 {make_step(is_serial, ChainStepKind::WhileIsTrueForN, 2),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
@@ -321,31 +331,35 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
     REQUIRE(!result.valid_subgraphs.empty());
     const bool found =
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 3, 1}) != result.valid_subgraphs.end();
+                  std::vector<uint32_t>{sr.alias_to_id.at("joint0"),
+                                        sr.alias_to_id.at("joint1"),
+                                        sr.alias_to_id.at("frag1")}) !=
+        result.valid_subgraphs.end();
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+            .BindAliases(sr)
+            .NodeEvalNamed("joint0", "is_serial", 1)
+            .NodeResultNamed("joint0", "is_serial", true,
+                            "connection_count=2, expected==2", 1)
+            .MovingToNeighbourNamed("joint0", "frag0", 0, 1)
+            .NodeEvalNamed("frag0", "is_serial", 2)
+            .NodeResultNamed("frag0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 3, 1, 1)
-            .NodeEval(3, "is_serial", 2)
-            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
-                        2)
-            .MovingToNeighbour(3, 1, 1, 2)
-            .NodeEval(1, "is_serial", 3)
-            .NodeResult(1, "is_serial", false,
+            .BacktrackingNamed("frag0", 1)
+            .MovingToNeighbourNamed("joint0", "joint1", 1, 1)
+            .NodeEvalNamed("joint1", "is_serial", 2)
+            .NodeResultNamed("joint1", "is_serial", true,
+                            "connection_count=2, expected==2", 2)
+            .MovingToNeighbourNamed("joint1", "frag1", 1, 2)
+            .NodeEvalNamed("frag1", "is_serial", 3)
+            .NodeResultNamed("frag1", "is_serial", false,
                         "connection_count=1, expected==2", 3)
-            .NodeEval(1, "is_terminal", 3)
-            .NodeResult(1, "is_terminal", true,
+            .NodeEvalNamed("frag1", "is_terminal", 3)
+            .NodeResultNamed("frag1", "is_terminal", true,
                         "connection_count=1, expected==1", 3)
-            .Backtracking(1, 2)
-            .Backtracking(3, 1)
+            .BacktrackingNamed("frag1", 2)
+            .BacktrackingNamed("joint1", 1)
             .Build();
 
     REQUIRE(found);
@@ -356,7 +370,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
 
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
     const ChainDescriptorResult result =
-        run_dfs(2,
+        run_dfs(sr.alias_to_id.at("joint0"),
                 {make_step(is_serial, ChainStepKind::WhileIsTrueForN, 3),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
@@ -365,24 +379,25 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+            .BindAliases(sr)
+            .NodeEvalNamed("joint0", "is_serial", 1)
+            .NodeResultNamed("joint0", "is_serial", true,
+                            "connection_count=2, expected==2", 1)
+            .MovingToNeighbourNamed("joint0", "frag0", 0, 1)
+            .NodeEvalNamed("frag0", "is_serial", 2)
+            .NodeResultNamed("frag0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 3, 1, 1)
-            .NodeEval(3, "is_serial", 2)
-            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
-                        2)
-            .MovingToNeighbour(3, 1, 1, 2)
-            .NodeEval(1, "is_serial", 3)
-            .NodeResult(1, "is_serial", false,
+            .BacktrackingNamed("frag0", 1)
+            .MovingToNeighbourNamed("joint0", "joint1", 1, 1)
+            .NodeEvalNamed("joint1", "is_serial", 2)
+            .NodeResultNamed("joint1", "is_serial", true,
+                            "connection_count=2, expected==2", 2)
+            .MovingToNeighbourNamed("joint1", "frag1", 1, 2)
+            .NodeEvalNamed("frag1", "is_serial", 3)
+            .NodeResultNamed("frag1", "is_serial", false,
                         "connection_count=1, expected==2", 3)
-            .Backtracking(1, 2)
-            .Backtracking(3, 1)
+            .BacktrackingNamed("frag1", 2)
+            .BacktrackingNamed("joint1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,

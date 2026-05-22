@@ -9,6 +9,7 @@
 #include "AnalysisTraceBuilder.h"
 #include "TraceEqualsMatcher.h"
 #include "TerminalDescriptorFormatter.h"
+#include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 
@@ -165,6 +166,50 @@ TEST_CASE("AnalysisTraceBuilder::Build returns a copy",
 
   REQUIRE(first.size() == 1);
   REQUIRE(second.size() == 2);
+}
+
+TEST_CASE("AnalysisTraceBuilder named APIs resolve aliases to numeric IDs",
+          "[unit][descriptors][builder][matcher]") {
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder scaffold_builder{lib};
+  const steamrot::tests::ScaffoldResult sr = scaffold_builder.MakeConnectedScaffold(
+      {{"frag0", "fragment_one_socket"}}, {{"joint0", "joint_one_socket"}},
+      {{"frag0", 0, "joint0", 0}});
+
+  tests::AnalysisTraceBuilder builder;
+  builder.BindAliases(sr)
+      .ScopeBeginNamed("chain", ScopeKind::Chain, 0u, std::string{"joint0"})
+      .NodeEvalNamed("frag0", "is_fragment", 1u)
+      .MovingToNeighbourNamed("frag0", "joint0", 0u, 1u)
+      .BacktrackingNamed("joint0", 1u)
+      .ScopeEnd("chain", ScopeKind::Chain, true, 0u);
+
+  const AnalysisTrace trace = builder.Build();
+  REQUIRE(trace.size() == 5);
+  REQUIRE(trace[0].anchor_id.has_value());
+  REQUIRE(*trace[0].anchor_id == sr.alias_to_id.at("joint0"));
+  REQUIRE(trace[1].part_id == sr.alias_to_id.at("frag0"));
+  REQUIRE(trace[2].from_id == sr.alias_to_id.at("frag0"));
+  REQUIRE(trace[2].to_id == sr.alias_to_id.at("joint0"));
+  REQUIRE(trace[3].from_id == sr.alias_to_id.at("joint0"));
+}
+
+TEST_CASE("AnalysisTraceBuilder named APIs throw on unresolved aliases",
+          "[unit][descriptors][builder][matcher]") {
+  tests::AnalysisTraceBuilder builder;
+  REQUIRE_THROWS(builder.NodeEvalNamed("missing", "is_fragment"));
+
+  steamrot::tests::TestPartLibrary lib =
+      steamrot::tests::TestPartLibrary::Create();
+  steamrot::tests::PartLibraryBuilder scaffold_builder{lib};
+  const steamrot::tests::ScaffoldResult sr =
+      scaffold_builder.MakeConnectedScaffold(
+          {{"frag0", "fragment_one_socket"}}, {}, {});
+
+  tests::AnalysisTraceBuilder bound_builder;
+  bound_builder.BindAliases(sr);
+  REQUIRE_THROWS(bound_builder.NodeEvalNamed("missing", "is_fragment"));
 }
 
 // ─── TraceEqualsMatcher ──────────────────────────────────────────────────────

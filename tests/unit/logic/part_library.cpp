@@ -64,6 +64,22 @@ sf::VertexArray MakeBlueOriginTriangle() {
   return va;
 }
 
+///////////////////////////////////////////////
+/// @brief Build named part declarations from plain catalog names.
+///////////////////////////////////////////////
+std::vector<steamrot::tests::NamedPartSpec>
+MakeNamedSpecs(const std::vector<std::string> &part_names,
+               const std::string &alias_prefix) {
+  std::vector<steamrot::tests::NamedPartSpec> specs;
+  specs.reserve(part_names.size());
+  for (size_t i = 0; i < part_names.size(); ++i) {
+    specs.push_back(
+        steamrot::tests::NamedPartSpec{alias_prefix + std::to_string(i),
+                                       part_names[i]});
+  }
+  return specs;
+}
+
 } // namespace
 
 namespace steamrot::tests {
@@ -171,8 +187,9 @@ TestPartLibrary TestPartLibrary::Create() {
     // frag0.socket[1] ↔ joint0.socket[0], joint0.socket[1] ↔ frag1.socket[0]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_two_sockets", "fragment_two_sockets"},
-          {"joint_two_sockets"}, {{0, 1, 2, 0}, {2, 1, 1, 0}});
+          {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+          {{"joint0", "joint_two_sockets"}},
+          {{"frag0", 1, "joint0", 0}, {"joint0", 1, "frag1", 0}});
       lib.scaffold_scenarios.emplace(ScaffoldScenario::LinearChain,
                                      std::move(result.scaffold));
     }
@@ -184,8 +201,13 @@ TestPartLibrary TestPartLibrary::Create() {
     // joint2.socket[1] ↔ joint0.socket[1]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {}, {"joint_two_sockets", "joint_two_sockets", "joint_two_sockets"},
-          {{0, 0, 1, 0}, {1, 1, 2, 0}, {2, 1, 0, 1}});
+          {},
+          {{"joint0", "joint_two_sockets"},
+           {"joint1", "joint_two_sockets"},
+           {"joint2", "joint_two_sockets"}},
+          {{"joint0", 0, "joint1", 0},
+           {"joint1", 1, "joint2", 0},
+           {"joint2", 1, "joint0", 1}});
       lib.scaffold_scenarios.emplace(ScaffoldScenario::Ring,
                                      std::move(result.scaffold));
     }
@@ -195,7 +217,8 @@ TestPartLibrary TestPartLibrary::Create() {
     // frag0.socket[0] ↔ frag1.socket[0]
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_one_socket", "fragment_one_socket"}, {}, {{0, 0, 1, 0}});
+          {{"frag0", "fragment_one_socket"}, {"frag1", "fragment_one_socket"}},
+          {}, {{"frag0", 0, "frag1", 0}});
       lib.scaffold_scenarios.emplace(ScaffoldScenario::IsolatedPair,
                                      std::move(result.scaffold));
     }
@@ -209,8 +232,13 @@ TestPartLibrary TestPartLibrary::Create() {
     //
     {
       ScaffoldResult result = builder.MakeConnectedScaffold(
-          {"fragment_one_socket", "fragment_one_socket", "fragment_one_socket"},
-          {"joint_three_sockets"}, {{0, 0, 3, 0}, {1, 0, 3, 1}, {2, 0, 3, 2}});
+          {{"frag0", "fragment_one_socket"},
+           {"frag1", "fragment_one_socket"},
+           {"frag2", "fragment_one_socket"}},
+          {{"joint0", "joint_three_sockets"}},
+          {{"frag0", 0, "joint0", 0},
+           {"frag1", 0, "joint0", 1},
+           {"frag2", 0, "joint0", 2}});
       lib.scaffold_scenarios.emplace(ScaffoldScenario::SimpleBranch,
                                      std::move(result.scaffold));
     }
@@ -273,26 +301,41 @@ PartLibraryBuilder::MakePartGraph(const std::vector<std::string> &fragment_names
 MachinaFormScaffold PartLibraryBuilder::MakeScaffoldWithParts(
     const std::vector<std::string> &fragment_names,
     const std::vector<std::string> &joint_names) {
-  return BuildScaffoldWithIds(fragment_names, joint_names).scaffold;
+  return BuildScaffoldWithIds(MakeNamedSpecs(fragment_names, "fragment_"),
+                              MakeNamedSpecs(joint_names, "joint_"))
+      .scaffold;
 }
 
 /////////////////////////////////////////////////
 ScaffoldResult PartLibraryBuilder::BuildScaffoldWithIds(
-    const std::vector<std::string> &fragment_names,
-    const std::vector<std::string> &joint_names) {
+    const std::vector<NamedPartSpec> &fragment_specs,
+    const std::vector<NamedPartSpec> &joint_specs) {
   m_next_id = 0;
   ScaffoldResult result;
-  result.part_ids.reserve(fragment_names.size() + joint_names.size());
+  const size_t part_count = fragment_specs.size() + joint_specs.size();
+  result.part_ids.reserve(part_count);
+  result.ordered_aliases.reserve(part_count);
 
-  for (const auto &name : fragment_names) {
-    FragmentInstance instance = MakeFragmentInstance(name);
-    result.part_ids.push_back(instance.id);
+  auto register_alias = [&result](const std::string &alias, uint32_t id) {
+    if (alias.empty())
+      FAIL("Part alias cannot be empty");
+    if (result.alias_to_id.contains(alias))
+      FAIL("Duplicate part alias '" << alias << "'");
+    result.alias_to_id.emplace(alias, id);
+    result.id_to_alias.emplace(id, alias);
+    result.ordered_aliases.push_back(alias);
+    result.part_ids.push_back(id);
+  };
+
+  for (const auto &spec : fragment_specs) {
+    FragmentInstance instance = MakeFragmentInstance(spec.part_name);
+    register_alias(spec.alias, instance.id);
     result.scaffold.parts.emplace(instance.id, std::move(instance));
   }
 
-  for (const auto &name : joint_names) {
-    JointInstance instance = MakeJointInstance(name);
-    result.part_ids.push_back(instance.id);
+  for (const auto &spec : joint_specs) {
+    JointInstance instance = MakeJointInstance(spec.part_name);
+    register_alias(spec.alias, instance.id);
     result.scaffold.parts.emplace(instance.id, std::move(instance));
   }
 
@@ -302,23 +345,27 @@ ScaffoldResult PartLibraryBuilder::BuildScaffoldWithIds(
 
 /////////////////////////////////////////////////
 ScaffoldResult PartLibraryBuilder::MakeConnectedScaffold(
-    const std::vector<std::string> &fragment_names,
-    const std::vector<std::string> &joint_names,
+    const std::vector<NamedPartSpec> &fragment_specs,
+    const std::vector<NamedPartSpec> &joint_specs,
     const std::vector<ConnectionSpec> &connections) {
-  ScaffoldResult result = BuildScaffoldWithIds(fragment_names, joint_names);
+  ScaffoldResult result = BuildScaffoldWithIds(fragment_specs, joint_specs);
 
   for (const auto &spec : connections) {
-    if (spec.part_index_a >= result.part_ids.size())
-      FAIL("ConnectionSpec.part_index_a ("
-           << spec.part_index_a
-           << ") out of range (size=" << result.part_ids.size() << ")");
-    if (spec.part_index_b >= result.part_ids.size())
-      FAIL("ConnectionSpec.part_index_b ("
-           << spec.part_index_b
-           << ") out of range (size=" << result.part_ids.size() << ")");
+    if (spec.from_alias.empty() || spec.to_alias.empty())
+      FAIL("ConnectionSpec alias fields cannot be empty");
+    if (spec.from_alias == spec.to_alias)
+      FAIL("ConnectionSpec self-connection is not allowed for alias '"
+           << spec.from_alias << "'");
 
-    const uint32_t id_a = result.part_ids[spec.part_index_a];
-    const uint32_t id_b = result.part_ids[spec.part_index_b];
+    auto alias_to_id = [&result](const std::string &alias) -> uint32_t {
+      auto it = result.alias_to_id.find(alias);
+      if (it == result.alias_to_id.end())
+        FAIL("ConnectionSpec alias '" << alias << "' not found in scaffold");
+      return it->second;
+    };
+
+    const uint32_t id_a = alias_to_id(spec.from_alias);
+    const uint32_t id_b = alias_to_id(spec.to_alias);
 
     auto set_connected = [&result](uint32_t part_id, uint32_t socket_id,
                                    uint32_t peer_part_id,
@@ -444,12 +491,14 @@ TEST_CASE("PartLibraryBuilder resets IDs between scaffold and graph builds",
 
   SECTION("MakeConnectedScaffold starts IDs at zero for each call") {
     ScaffoldResult result_a = builder.MakeConnectedScaffold(
-        {"fragment_one_socket"}, {"joint_one_socket"}, {{0, 0, 1, 0}});
+        {{"frag0", "fragment_one_socket"}}, {{"joint0", "joint_one_socket"}},
+        {{"frag0", 0, "joint0", 0}});
     ScaffoldResult result_b = builder.MakeConnectedScaffold(
-        {"fragment_one_socket"}, {"joint_one_socket"}, {{0, 0, 1, 0}});
+        {{"frag0", "fragment_one_socket"}}, {{"joint0", "joint_one_socket"}},
+        {{"frag0", 0, "joint0", 0}});
 
-    REQUIRE(result_a.part_ids[0] == 0u);
-    REQUIRE(result_b.part_ids[0] == 0u);
+    REQUIRE(result_a.alias_to_id.at("frag0") == 0u);
+    REQUIRE(result_b.alias_to_id.at("frag0") == 0u);
     REQUIRE(result_a.scaffold.next_id == 2u);
     REQUIRE(result_b.scaffold.next_id == 2u);
   }
@@ -464,6 +513,47 @@ TEST_CASE("PartLibraryBuilder resets IDs between scaffold and graph builds",
     REQUIRE(graph_b.contains(0));
     REQUIRE(graph_a.contains(1));
     REQUIRE(graph_b.contains(1));
+  }
+}
+
+///////////////////////////////////////////////
+TEST_CASE("PartLibraryBuilder validates alias-based scaffold specs",
+          "[unit][part_library]") {
+  TestPartLibrary lib = TestPartLibrary::Create();
+  PartLibraryBuilder builder{lib};
+
+  SECTION("Build output exposes alias mappings") {
+    const ScaffoldResult result = builder.MakeConnectedScaffold(
+        {{"frag0", "fragment_one_socket"}, {"frag1", "fragment_one_socket"}},
+        {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}, {"joint0", 1, "frag1", 0}});
+
+    REQUIRE(result.ordered_aliases ==
+            std::vector<std::string>{"frag0", "frag1", "joint0"});
+    REQUIRE(result.alias_to_id.at("frag0") == 0u);
+    REQUIRE(result.alias_to_id.at("frag1") == 1u);
+    REQUIRE(result.alias_to_id.at("joint0") == 2u);
+    REQUIRE(result.id_to_alias.at(0u) == "frag0");
+    REQUIRE(result.id_to_alias.at(1u) == "frag1");
+    REQUIRE(result.id_to_alias.at(2u) == "joint0");
+  }
+
+  SECTION("Duplicate aliases fail fast") {
+    REQUIRE_THROWS(builder.MakeConnectedScaffold(
+        {{"dup", "fragment_one_socket"}, {"dup", "fragment_one_socket"}},
+        {{"joint0", "joint_one_socket"}}, {}));
+  }
+
+  SECTION("Unknown aliases in connections fail fast") {
+    REQUIRE_THROWS(builder.MakeConnectedScaffold(
+        {{"frag0", "fragment_one_socket"}}, {{"joint0", "joint_one_socket"}},
+        {{"frag0", 0, "missing", 0}}));
+  }
+
+  SECTION("Self-connections fail fast") {
+    REQUIRE_THROWS(builder.MakeConnectedScaffold(
+        {{"frag0", "fragment_two_sockets"}}, {},
+        {{"frag0", 0, "frag0", 1}}));
   }
 }
 

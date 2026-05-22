@@ -53,7 +53,8 @@ TEST_CASE("connection_count is maintained after connecting parts",
 
   // fragment[0].socket[0] -> joint[0].socket[0]
   steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-      {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
+      {{"frag0", "fragment_two_sockets"}}, {{"joint0", "joint_two_sockets"}},
+      {{"frag0", 0, "joint0", 0}});
 
   REQUIRE(result.scaffold.parts.size() == 2);
   // Both endpoints gain connection_count == 1 from the single connection.
@@ -139,12 +140,13 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
   steamrot::tests::PartLibraryBuilder builder{lib};
 
   steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-      {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-      {{0, 0, 2, 0}, {1, 0, 2, 1}});
+      {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+      {{"joint0", "joint_two_sockets"}},
+      {{"frag0", 0, "joint0", 0}, {"frag1", 0, "joint0", 1}});
   REQUIRE(result.scaffold.parts.size() == 3);
 
   SECTION("is_serial trace includes predicate reason for a matching node") {
-    const uint32_t matching_id = result.part_ids[2];
+    const uint32_t matching_id = result.alias_to_id.at("joint0");
     const descriptors::NodeDescriptorResult descriptor_result =
         descriptors::is_serial(result.scaffold.parts, matching_id);
 
@@ -153,9 +155,10 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
 
     steamrot::logic::descriptors::AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(matching_id, "is_serial", 0)
-            .NodeResult(matching_id, "is_serial", true,
-                        "connection_count=2, expected==2", 0)
+            .BindAliases(result)
+            .NodeEvalNamed("joint0", "is_serial", 0)
+            .NodeResultNamed("joint0", "is_serial", true,
+                             "connection_count=2, expected==2", 0)
             .Build();
 
     REQUIRE_THAT(
@@ -165,7 +168,7 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
   }
 
   SECTION("NodeDescriptor trace preserves explicit depth for a non-match") {
-    const uint32_t non_matching_id = result.part_ids[0];
+    const uint32_t non_matching_id = result.alias_to_id.at("frag0");
     const uint32_t depth = 3;
     const descriptors::NodeDescriptorResult descriptor_result =
         descriptors::is_serial(result.scaffold.parts, non_matching_id, depth);
@@ -175,9 +178,10 @@ TEST_CASE("NodeDescriptor emits focused trace details for is_serial",
 
     steamrot::logic::descriptors::AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(non_matching_id, "is_serial", depth)
-            .NodeResult(non_matching_id, "is_serial", false,
-                        "connection_count=1, expected==2", depth)
+            .BindAliases(result)
+            .NodeEvalNamed("frag0", "is_serial", depth)
+            .NodeResultNamed("frag0", "is_serial", false,
+                             "connection_count=1, expected==2", depth)
             .Build();
 
     REQUIRE_THAT(
@@ -270,7 +274,8 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Nodes with 1 edge") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
+        {{"frag0", "fragment_two_sockets"}}, {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}});
     REQUIRE(result.scaffold.parts.size() == 2);
     // The fragment and the joint each have 1 edge.
     for (const auto &id : result.part_ids) {
@@ -282,9 +287,10 @@ TEST_CASE("has_exactly_n_edges tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Nodes with 2 edges") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-        {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[0].socket[0]
-         {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
+        {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+        {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}, // fragment[0].socket[0] -> joint[0].socket[0]
+         {"frag1", 0, "joint0", 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // fragment[0] and fragment[1] have 1 edge each; joint[0] has 2 edges.
     REQUIRE_FALSE(has_0(result.scaffold.parts, result.part_ids[0]));
@@ -372,7 +378,8 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
 
   SECTION("Nodes with 1 edge") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
+        {{"frag0", "fragment_two_sockets"}}, {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}});
     REQUIRE(result.scaffold.parts.size() == 2);
     // Both parts have 1 edge: satisfy min_0 and min_1, but not min_2.
     for (const auto &id : result.part_ids) {
@@ -384,9 +391,10 @@ TEST_CASE("has_minimum_n_connected_sockets tests",
 
   SECTION("Nodes with 2 edges") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-        {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[0].socket[0]
-         {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
+        {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+        {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}, // fragment[0].socket[0] -> joint[0].socket[0]
+         {"frag1", 0, "joint0", 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // fragment[0] and fragment[1] each have 1 edge; joint[0] has 2 edges.
     REQUIRE(min_0(result.scaffold.parts, result.part_ids[0]));
@@ -434,11 +442,13 @@ TEST_CASE("has_maximum_n_connected_sockets tests",
   // combos of connections
   steamrot::tests::ScaffoldResult scaffold_result =
       builder.MakeConnectedScaffold(
-          {"fragment_two_sockets", "fragment_two_sockets"},
-          {"joint_two_sockets", "joint_two_sockets", "joint_one_socket"},
-          {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[2].socket[0]
-           {0, 1, 3, 0},   // fragment[0].socket[1] -> joint[3].socket[0]
-           {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[2].socket[1]
+          {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+          {{"joint0", "joint_two_sockets"},
+           {"joint1", "joint_two_sockets"},
+           {"joint2", "joint_one_socket"}},
+          {{"frag0", 0, "joint0", 0}, // fragment[0].socket[0] -> joint[2].socket[0]
+           {"frag0", 1, "joint1", 0}, // fragment[0].socket[1] -> joint[3].socket[0]
+           {"frag1", 0, "joint0", 1}}); // fragment[1].socket[0] -> joint[2].socket[1]
 
   // act & assert
   const std::vector<uint32_t> &part_ids = scaffold_result.part_ids;
@@ -505,17 +515,18 @@ TEST_CASE("is_terminal tests", "[unit][analysis][grimoire_machina]") {
 
   SECTION("Returns false for nodes with 2 or more edges") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-        {{0, 0, 2, 0},   // fragment[0].socket[0] -> joint[0].socket[0]
-         {1, 0, 2, 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
+        {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+        {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}, // fragment[0].socket[0] -> joint[0].socket[0]
+         {"frag1", 0, "joint0", 1}}); // fragment[1].socket[0] -> joint[0].socket[1]
     REQUIRE(result.scaffold.parts.size() == 3);
     // joint[0] has 2 edges, so it should not be terminal
     REQUIRE(not_terminal(result.scaffold.parts, result.part_ids[2]));
   }
   SECTION("Returns true for nodes with 0 or 1 edge") {
     steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-        {"fragment_two_sockets"}, {"joint_two_sockets"},
-        {{0, 0, 1, 0}}); // fragment[0].socket[0] -> joint[0].socket[0]
+        {{"frag0", "fragment_two_sockets"}}, {{"joint0", "joint_two_sockets"}},
+        {{"frag0", 0, "joint0", 0}}); // fragment[0].socket[0] -> joint[0].socket[0]
     REQUIRE(result.scaffold.parts.size() == 2);
 
     for (const auto &id : result.part_ids) {
@@ -542,8 +553,8 @@ TEST_CASE(
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
   steamrot::tests::ScaffoldResult result =
-      builder.MakeConnectedScaffold({"fragment_one_socket"}, {}, {});
-  const uint32_t frag_id = result.part_ids[0];
+      builder.MakeConnectedScaffold({{"frag0", "fragment_one_socket"}}, {}, {});
+  const uint32_t frag_id = result.alias_to_id.at("frag0");
 
   // Act: run the descriptor and capture the trace.
   const descriptors::NodeDescriptorResult nd_result =
@@ -556,8 +567,10 @@ TEST_CASE(
   // AnalysisTraceBuilder, ensuring the formatter round-trips correctly.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder.NodeEval(frag_id, "is_fragment", 0)
-      .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
+  trace_builder.BindAliases(result)
+      .NodeEvalNamed("frag0", "is_fragment", 0)
+      .NodeResultNamed("frag0", "is_fragment", true,
+                       "node holds FragmentInstance");
 
   REQUIRE_THAT(nd_result.m_trace,
                steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
@@ -571,8 +584,8 @@ TEST_CASE(
       steamrot::tests::TestPartLibrary::Create();
   steamrot::tests::PartLibraryBuilder builder{lib};
   steamrot::tests::ScaffoldResult result =
-      builder.MakeConnectedScaffold({}, {"joint_one_socket"}, {});
-  const uint32_t joint_id = result.part_ids[0];
+      builder.MakeConnectedScaffold({}, {{"joint0", "joint_one_socket"}}, {});
+  const uint32_t joint_id = result.alias_to_id.at("joint0");
 
   // Act: run the descriptor on a joint node — expected to return false.
   const descriptors::NodeDescriptorResult nd_result =
@@ -584,8 +597,9 @@ TEST_CASE(
   // Assert: trace matches expected.
   descriptors::TerminalDescriptorFormatter fmt;
   steamrot::tests::AnalysisTraceBuilder trace_builder;
-  trace_builder.NodeEval(joint_id, "is_fragment", 0)
-      .NodeResult(joint_id, "is_fragment", false, "node holds JointInstance");
+  trace_builder.BindAliases(result)
+      .NodeEvalNamed("joint0", "is_fragment", 0)
+      .NodeResultNamed("joint0", "is_fragment", false, "node holds JointInstance");
 
   REQUIRE_THAT(nd_result.m_trace,
                steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));

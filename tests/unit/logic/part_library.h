@@ -9,12 +9,11 @@
 /// exposes a scaffold_scenarios map (keyed by ScaffoldScenario) of pre-wired
 /// MachinaFormScaffold topologies for use in NodeDescriptor tests.
 ///
-/// ConnectionSpec describes one connection between two parts using
-/// insertion-order indices (fragments first, then joints) so callers never
-/// need to map-walk for stable IDs.
+/// ConnectionSpec describes one connection between two named part aliases,
+/// allowing tests to stay readable while IDs remain deterministic.
 ///
-/// ScaffoldResult bundles a MachinaFormScaffold with the insertion-order ID
-/// list, making it easy to wire additional connections programmatically.
+/// ScaffoldResult bundles a MachinaFormScaffold with alias↔ID mappings and
+/// insertion-order lists for robust test lookups.
 ///
 /// ScaffoldScenarioExpectations holds one std::array<bool, N> per
 /// ScaffoldScenario (N equals the node count for that scenario) so callers can
@@ -159,26 +158,37 @@ struct TestPartLibrary {
 };
 
 /////////////////////////////////////////////////
-/// @struct ConnectionSpec
-/// @brief Describes a single connection between two socket endpoints using
-///        insertion-order part indices.
+/// @struct NamedPartSpec
+/// @brief Declares one scaffold instance using an explicit alias and a library
+///        part name.
 ///
-/// Part indices are 0-based positions in the combined insertion order used
-/// by PartLibraryBuilder: fragments first (in argument order), then joints
-/// (in argument order). Using indices instead of raw IDs keeps test specs
-/// resilient to the builder's internal ID counter value.
+/// @c alias identifies this concrete instance within a scaffold build and must
+/// be unique across both fragment and joint declarations for that build.
 ///
-/// Example — connect fragment[0].socket[1] to joint[0].socket[0]
-/// (assuming two fragments before the joint):
-/// @code
-/// ConnectionSpec spec{0, 1, 2, 0};
-/// @endcode
+/// @c part_name must match an entry in TestPartLibrary::fragments or
+/// TestPartLibrary::joints depending on which declaration list it appears in.
 /////////////////////////////////////////////////
+struct NamedPartSpec {
+  /////////////////////////////////////////////////
+  /// @brief Unique instance alias used by connections and trace builders.
+  /////////////////////////////////////////////////
+  std::string alias{};
+
+  /////////////////////////////////////////////////
+  /// @brief Source part name in the test library catalog.
+  /////////////////////////////////////////////////
+  std::string part_name{};
+};
+
+///////////////////////////////////////////////
+/// @struct ConnectionSpec
+/// @brief Describes a single connection between two named part aliases.
+///////////////////////////////////////////////
 struct ConnectionSpec {
   /////////////////////////////////////////////////
-  /// @brief Insertion-order index of the first part.
+  /// @brief Alias of the first endpoint part.
   /////////////////////////////////////////////////
-  size_t part_index_a{0};
+  std::string from_alias{};
 
   /////////////////////////////////////////////////
   /// @brief Stable socket ID on the first part's sockets map.
@@ -186,9 +196,9 @@ struct ConnectionSpec {
   uint32_t socket_id_a{0};
 
   /////////////////////////////////////////////////
-  /// @brief Insertion-order index of the second part.
+  /// @brief Alias of the second endpoint part.
   /////////////////////////////////////////////////
-  size_t part_index_b{0};
+  std::string to_alias{};
 
   /////////////////////////////////////////////////
   /// @brief Stable socket ID on the second part's sockets map.
@@ -198,11 +208,7 @@ struct ConnectionSpec {
 
 /////////////////////////////////////////////////
 /// @struct ScaffoldResult
-/// @brief Bundles a MachinaFormScaffold with the insertion-order ID list.
-///
-/// @c part_ids holds the stable IDs assigned to each part in the order they
-/// were inserted (fragments first, then joints). Use it to wire additional
-/// Connections beyond what PartLibraryBuilder::MakeConnectedScaffold provides.
+/// @brief Bundles a MachinaFormScaffold with alias/ID mapping artifacts.
 ///
 /// All raw pointers in @c scaffold point into the TestPartLibrary used to
 /// build it. The library must outlive the ScaffoldResult.
@@ -215,8 +221,25 @@ struct ScaffoldResult {
 
   /////////////////////////////////////////////////
   /// @brief Stable part IDs in insertion order (fragments first, then joints).
+  ///
+  /// Maintained for compatibility with legacy tests.
   /////////////////////////////////////////////////
   std::vector<uint32_t> part_ids;
+
+  /////////////////////////////////////////////////
+  /// @brief Part aliases in insertion order (fragments first, then joints).
+  /////////////////////////////////////////////////
+  std::vector<std::string> ordered_aliases;
+
+  /////////////////////////////////////////////////
+  /// @brief Map from instance alias to stable part ID.
+  /////////////////////////////////////////////////
+  std::map<std::string, uint32_t> alias_to_id;
+
+  /////////////////////////////////////////////////
+  /// @brief Reverse map from stable part ID to instance alias.
+  /////////////////////////////////////////////////
+  std::map<uint32_t, std::string> id_to_alias;
 };
 
 /////////////////////////////////////////////////
@@ -319,10 +342,9 @@ void CheckNodeDescriptorForAllScenarios(
 ///
 /// // Build a scaffold with connections (no ID hunting, no socket patching)
 /// ScaffoldResult result = builder.MakeConnectedScaffold(
-///     {"fragment_two_sockets", "fragment_two_sockets"},
-///     {"joint_two_sockets"},
-///     {{0, 1, 2, 0},   // fragment[0].socket[1] -> joint[0].socket[0]
-///      {2, 1, 1, 0}}); // joint[0].socket[1]    -> fragment[1].socket[0]
+///     {{"frag0", "fragment_two_sockets"}, {"frag1", "fragment_two_sockets"}},
+///     {{"joint0", "joint_two_sockets"}},
+///     {{"frag0", 1, "joint0", 0}, {"joint0", 1, "frag1", 0}});
 ///
 /// // Or use a pre-built scenario
 /// const MachinaFormScaffold& chain =
@@ -348,13 +370,13 @@ private:
   /// Shared implementation used by MakeScaffoldWithParts and
   /// MakeConnectedScaffold.
   ///
-  /// @param fragment_names Names of Fragments to include, in order.
-  /// @param joint_names    Names of Joints to include, in order.
+  /// @param fragment_specs Named Fragment instance declarations.
+  /// @param joint_specs    Named Joint instance declarations.
   /// @return ScaffoldResult with no connections and IDs in insertion order.
   /////////////////////////////////////////////////
   ScaffoldResult
-  BuildScaffoldWithIds(const std::vector<std::string> &fragment_names,
-                       const std::vector<std::string> &joint_names);
+  BuildScaffoldWithIds(const std::vector<NamedPartSpec> &fragment_specs,
+                       const std::vector<NamedPartSpec> &joint_specs);
 
 public:
   /////////////////////////////////////////////////
@@ -436,30 +458,29 @@ public:
   /////////////////////////////////////////////////
   /// @brief Build a MachinaFormScaffold with instances and connections wired.
   ///
-  /// Fragment instances are added first (in order), then Joint instances —
-  /// assigning part indices 0, 1, … in that combined order. Each
-  /// ConnectionSpec references parts by their insertion-order index, so no
-  /// map-walking or ID hunting is needed in tests.
+  /// Fragment instances are added first (in order), then Joint instances.
+  /// Each instance is declared with an explicit alias, and each ConnectionSpec
+  /// resolves endpoint aliases through the build's alias-to-ID map.
   ///
   /// For every connection in @p connections the method:
   ///   - Sets @c SocketData::connected_to on both endpoint sockets
   ///     (reciprocally) and marks them as @c SocketState::Connected.
   ///
-  /// Fails the test (via FAIL) if any part index or socket index in a
-  /// ConnectionSpec is out of range.
+  /// Fails the test (via FAIL) if aliases are duplicate/unknown, if a
+  /// self-connection is requested, or if any socket ID is invalid.
   ///
   /// All raw pointers in the result point into the library's storage — the
   /// library must outlive the returned ScaffoldResult.
   ///
-  /// @param fragment_names Names of Fragments to include, in order.
-  /// @param joint_names    Names of Joints to include, in order.
-  /// @param connections    Connections to wire, expressed as index-based specs.
+  /// @param fragment_specs Fragment instance declarations with aliases.
+  /// @param joint_specs    Joint instance declarations with aliases.
+  /// @param connections    Connections to wire, expressed as alias-based specs.
   /// @return ScaffoldResult containing the wired scaffold and insertion-order
-  ///         part IDs.
+  ///         alias/ID mappings.
   /////////////////////////////////////////////////
   ScaffoldResult
-  MakeConnectedScaffold(const std::vector<std::string> &fragment_names,
-                        const std::vector<std::string> &joint_names,
+  MakeConnectedScaffold(const std::vector<NamedPartSpec> &fragment_specs,
+                        const std::vector<NamedPartSpec> &joint_specs,
                         const std::vector<ConnectionSpec> &connections);
 
   /////////////////////////////////////////////////
