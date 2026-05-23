@@ -56,13 +56,11 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
                                                 const std::string id) {
-
-  // create a new FragmentInstance and add it to the part graph with the next
-  // available ID
+  // create a new FragmentInstance, assign its stable ID, then insert
+  const uint32_t instance_id = m_package.next_id++;
   FragmentInstance instance = MakeFragmentInstance(name);
-  const uint32_t instance_id = m_package.next_id;
-  m_package.part_graph.emplace(instance_id, instance);
-  m_package.next_id++;
+  instance.id = instance_id;
+  m_package.part_graph.emplace(instance_id, std::move(instance));
 
   // map the user-friendly string ID to the stable uint32_t ID in the part graph
   m_package.id_to_part_graph_id.emplace(id, instance_id);
@@ -73,44 +71,62 @@ PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::AddJoint(const JointNames name,
                                              const std::string id) {
-  // create a new JointInstance and add it to the part graph with the next
-  // available ID
+  // create a new JointInstance, assign its stable ID, then insert
+  const uint32_t instance_id = m_package.next_id++;
   JointInstance instance = MakeJointInstance(name);
-  const uint32_t instance_id = m_package.next_id;
-  m_package.part_graph.emplace(instance_id, instance);
-  m_package.next_id++;
+  instance.id = instance_id;
+  m_package.part_graph.emplace(instance_id, std::move(instance));
 
   // map the user-friendly string ID to the stable uint32_t ID in the part graph
   m_package.id_to_part_graph_id.emplace(id, instance_id);
   return *this;
 }
+
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
                                             const uint32_t from_socket_id,
                                             const std::string &to_id,
                                             const uint32_t to_socket_id) {
-  // look up the stable uint32_t IDs for the from and to parts using the string
-  // IDs provided by the user
-  // if either ID is not found, throw an exception
+  // look up stable part IDs; fail immediately if either alias is unknown
   const auto from_it = m_package.id_to_part_graph_id.find(from_id);
-  if (from_it == m_package.id_to_part_graph_id.end()) {
-    FAIL("from_id '" << from_id << "' not found in id_to_part_graph_id");
-  }
+  if (from_it == m_package.id_to_part_graph_id.end())
+    FAIL("Connect: from_id '" << from_id << "' not found");
+
   const auto to_it = m_package.id_to_part_graph_id.find(to_id);
-  if (to_it == m_package.id_to_part_graph_id.end()) {
-    FAIL("to_id '" << to_id << "' not found in id_to_part_graph_id");
-  }
+  if (to_it == m_package.id_to_part_graph_id.end())
+    FAIL("Connect: to_id '" << to_id << "' not found");
+
   const uint32_t from_part_id = from_it->second;
   const uint32_t to_part_id = to_it->second;
 
-  // use the create connection function that already exists in the logic code to
-  // create the connection between the two parts
-  auto result = steamrot::logic::action::grimoire_machina::create_connection(
-      std::get<FragmentInstance>(m_package.part_graph.at(from_part_id)),
-      from_socket_id,
-      std::get<JointInstance>(m_package.part_graph.at(to_part_id)),
-      to_socket_id);
-  // return *this to allow chaining of Connect calls
+  auto &from_variant = m_package.part_graph.at(from_part_id);
+  auto &to_variant = m_package.part_graph.at(to_part_id);
+
+  const bool from_is_fragment =
+      std::holds_alternative<FragmentInstance>(from_variant);
+  const bool to_is_fragment =
+      std::holds_alternative<FragmentInstance>(to_variant);
+
+  // only Fragment↔Joint connections are allowed — reject same-type pairs
+  if (from_is_fragment == to_is_fragment)
+    FAIL("Connect: only Fragment\xE2\x86\x94Joint connections are allowed ("
+         << from_id << " and " << to_id << " are the same type)");
+
+  // delegate to create_connection (always takes fragment first, then joint)
+  std::expected<std::monostate, std::string> result;
+  if (from_is_fragment) {
+    result = steamrot::logic::action::grimoire_machina::create_connection(
+        std::get<FragmentInstance>(from_variant), from_socket_id,
+        std::get<JointInstance>(to_variant), to_socket_id);
+  } else {
+    result = steamrot::logic::action::grimoire_machina::create_connection(
+        std::get<FragmentInstance>(to_variant), to_socket_id,
+        std::get<JointInstance>(from_variant), from_socket_id);
+  }
+
+  if (!result.has_value())
+    FAIL("Connect: " << result.error());
+
   return *this;
 }
 /////////////////////////////////////////////////

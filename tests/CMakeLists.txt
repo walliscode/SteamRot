@@ -11,6 +11,9 @@ add_subdirectory(matchers)
 add_subdirectory(harness)
 add_subdirectory(reporters)
 
+# Part graph builder and part catalog helpers
+add_subdirectory(part_graphs)
+
 # all tests run through the harness (test_data.json)
 add_subdirectory(simulation_tests)
 
