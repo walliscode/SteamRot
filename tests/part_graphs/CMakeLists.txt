@@ -17,6 +17,7 @@ target_link_libraries(part_graphs
 
 add_executable(test_part_graphs
   PartGraphBuilder.test.cpp
+  part_graph_library.test.cpp
 )
 
 target_link_libraries(test_part_graphs
