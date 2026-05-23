@@ -10,6 +10,7 @@
 #include "action_grimoire_machina.h"
 #include "catch2/catch_test_macros.hpp"
 #include "part_library.h"
+#include <expected>
 
 namespace steamrot::tests {
 /////////////////////////////////////////////////
@@ -125,7 +126,7 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
   }
 
   if (!result.has_value())
-    FAIL("Connect: " << result.error());
+    FAIL(result.error());
 
   return *this;
 }

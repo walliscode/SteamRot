@@ -63,7 +63,7 @@ target_include_directories(logic
 )
 
 target_link_libraries(logic
-  PRIVATE
+  PUBLIC
   entity
   types
   magic_enum

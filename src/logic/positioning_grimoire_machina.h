@@ -45,7 +45,7 @@ void initialize_joint_socket_positions(JointInstance &instance);
 /// written into this vector.
 /////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
-    const SocketConfig &config, sf::Vector2f &origin,
+    const SocketConfig &config, const sf::Vector2f &origin,
     std::vector<sf::Vector2f> &local_positions);
 
 /////////////////////////////////////////////////

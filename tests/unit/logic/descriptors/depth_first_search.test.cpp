@@ -15,7 +15,6 @@
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
-#include "part_library.h"
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
@@ -321,7 +320,8 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
     REQUIRE(!result.valid_subgraphs.empty());
     const bool found =
         std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 3, 1}) != result.valid_subgraphs.end();
+                  std::vector<uint32_t>{2, 3, 1}) !=
+        result.valid_subgraphs.end();
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{}

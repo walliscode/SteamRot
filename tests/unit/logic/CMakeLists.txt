@@ -44,6 +44,7 @@ target_link_libraries(test_logic
   matchers
   context_test_helpers
   harness
+  part_graphs
 
 
 )

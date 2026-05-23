@@ -1,5 +1,6 @@
 add_library(part_graphs
   PartGraphBuilder.cpp
+  part_graph_library.cpp
 )
 
 target_include_directories(part_graphs
