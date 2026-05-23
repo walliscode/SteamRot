@@ -221,7 +221,7 @@ struct JointInstance : public PartInstance {
   /// @param joint_ptr         Pointer to the Joint definition. May be nullptr.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
-  JointInstance(Joint *joint_ptr,
+  JointInstance(const Joint *joint_ptr,
                 sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, joint{joint_ptr} {
     if (!joint_ptr)
@@ -233,7 +233,7 @@ struct JointInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Pointer to the Joint definition being referenced.
   /////////////////////////////////////////////////
-  Joint *joint{nullptr};
+  const Joint *joint{nullptr};
 };
 
 /////////////////////////////////////////////////
@@ -258,7 +258,7 @@ struct FragmentInstance : public PartInstance {
   /// nullptr.
   /// @param initial_transform Transform placing this instance in world space.
   /////////////////////////////////////////////////
-  FragmentInstance(Fragment *fragment_ptr,
+  FragmentInstance(const Fragment *fragment_ptr,
                    sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, fragment{fragment_ptr} {
     if (fragment_ptr) {
@@ -270,7 +270,7 @@ struct FragmentInstance : public PartInstance {
   /////////////////////////////////////////////////
   /// @brief Pointer to the Fragment definition being referenced.
   /////////////////////////////////////////////////
-  Fragment *fragment{nullptr};
+  const Fragment *fragment{nullptr};
 };
 
 /// using helpers ///

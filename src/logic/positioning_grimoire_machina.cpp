@@ -19,8 +19,8 @@ void initialize_joint_socket_positions(JointInstance &instance) {
     return;
 
   std::vector<sf::Vector2f> positions;
-  compute_socket_local_positions_even_spread(
-      instance.joint->socket_config, instance.joint->origin, positions);
+  compute_socket_local_positions_even_spread(instance.joint->socket_config,
+                                             instance.joint->origin, positions);
 
   for (auto &[socket_id, socket] : instance.sockets) {
     socket.local_position = positions[socket_id];
@@ -29,7 +29,7 @@ void initialize_joint_socket_positions(JointInstance &instance) {
 
 /////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
-    const SocketConfig &config, sf::Vector2f &origin,
+    const SocketConfig &config, const sf::Vector2f &origin,
     std::vector<sf::Vector2f> &local_positions) {
 
   // if no sockets, return early (also avoids divide by zero in later

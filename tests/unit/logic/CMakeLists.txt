@@ -8,7 +8,6 @@ positioning_camera.test.cpp
 render_ui.test.cpp
 logic_render_test_helpers.cpp
 grimoire_machina_test_helpers.cpp
-part_library.cpp
 state_ui.test.cpp
 TestLogic.cpp
 action_grimoire_machina.test.cpp
@@ -45,6 +44,7 @@ target_link_libraries(test_logic
   matchers
   context_test_helpers
   harness
+  part_graphs
 
 
 )
