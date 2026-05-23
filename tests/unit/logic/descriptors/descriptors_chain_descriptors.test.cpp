@@ -13,7 +13,7 @@
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
-#include "part_library.h"
+
 #include <catch2/catch_test_macros.hpp>
 
 namespace {
