@@ -131,6 +131,47 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
   return *this;
 }
 /////////////////////////////////////////////////
+PartGraphBuilder &
+PartGraphBuilder::ConnectUnchecked(const std::string &from_id,
+                                   const uint32_t from_socket_id,
+                                   const std::string &to_id,
+                                   const uint32_t to_socket_id) {
+  const auto from_it = m_package.id_to_part_graph_id.find(from_id);
+  if (from_it == m_package.id_to_part_graph_id.end())
+    FAIL("ConnectUnchecked: from_id '" << from_id << "' not found");
+
+  const auto to_it = m_package.id_to_part_graph_id.find(to_id);
+  if (to_it == m_package.id_to_part_graph_id.end())
+    FAIL("ConnectUnchecked: to_id '" << to_id << "' not found");
+
+  const uint32_t from_part_id = from_it->second;
+  const uint32_t to_part_id = to_it->second;
+
+  // directly wire both socket endpoints without type-checking
+  auto set_connected = [this](uint32_t part_id, uint32_t socket_id,
+                               uint32_t peer_part_id,
+                               uint32_t peer_socket_id) {
+    std::visit(
+        [part_id, socket_id, peer_part_id,
+         peer_socket_id](auto &instance) {
+          if (!instance.sockets.count(socket_id))
+            FAIL("ConnectUnchecked: socket_id ("
+                 << socket_id << ") not found for part " << part_id);
+          instance.sockets.at(socket_id).state = SocketState::Connected;
+          instance.sockets.at(socket_id).connected_to =
+              SocketConnection{peer_part_id, peer_socket_id};
+          ++instance.connection_count;
+        },
+        m_package.part_graph.at(part_id));
+  };
+
+  set_connected(from_part_id, from_socket_id, to_part_id, to_socket_id);
+  set_connected(to_part_id, to_socket_id, from_part_id, from_socket_id);
+
+  return *this;
+}
+
+/////////////////////////////////////////////////
 PartGraphPackage PartGraphBuilder::Build() {
   // create copy of the package to return, then reset the builder's internal
   // state for potential reuse

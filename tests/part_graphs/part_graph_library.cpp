@@ -41,4 +41,14 @@ const PartGraphPackage linear_chain_5 =
         .Connect("j1", 1, "f2", 0)
         .Build();
 
+/////////////////////////////////////////////////
+const PartGraphPackage ring = PartGraphBuilder()
+                                  .AddJoint(JointNames::TwoSockets, "j0")
+                                  .AddJoint(JointNames::TwoSockets, "j1")
+                                  .AddJoint(JointNames::TwoSockets, "j2")
+                                  .ConnectUnchecked("j0", 0, "j1", 0)
+                                  .ConnectUnchecked("j1", 1, "j2", 0)
+                                  .ConnectUnchecked("j2", 1, "j0", 1)
+                                  .Build();
+
 } // namespace steamrot::tests

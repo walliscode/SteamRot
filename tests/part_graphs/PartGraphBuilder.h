@@ -84,6 +84,23 @@ public:
                             const uint32_t from_socket_id,
                             const std::string &to_id,
                             const uint32_t to_socket_id);
+
+  /////////////////////////////////////////////////
+  /// @brief Connects two parts without enforcing the Fragment↔Joint type
+  ///        restriction. Use for test topologies that deliberately wire
+  ///        same-type pairs (e.g. joint↔joint ring cycles or
+  ///        fragment↔fragment isolated pairs).
+  ///
+  /// @param from_id      User-friendly alias of the first part.
+  /// @param from_socket_id Socket ID on the first part.
+  /// @param to_id        User-friendly alias of the second part.
+  /// @param to_socket_id Socket ID on the second part.
+  /////////////////////////////////////////////////
+  PartGraphBuilder &ConnectUnchecked(const std::string &from_id,
+                                     const uint32_t from_socket_id,
+                                     const std::string &to_id,
+                                     const uint32_t to_socket_id);
+
   PartGraphPackage Build();
 };
 

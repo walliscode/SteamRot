@@ -10,9 +10,11 @@
 #include "AnalysisEvent.h"
 #include "AnalysisTraceBuilder.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraphBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
+#include "part_graph_library.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -23,11 +25,6 @@ constexpr uint32_t kMissingPartId{9999};
 TEST_CASE("ChainDescriptor is_serial_chain") {
 
   using namespace steamrot::logic::descriptors;
-
-  // arrange test library
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-  steamrot::tests::PartLibraryBuilder builder{lib};
 
   // some general assertions about the descriptor instance
   REQUIRE(is_serial_chain.GetName() == "is_serial_chain");
@@ -50,10 +47,8 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
   }
 
   SECTION("is_serial_chain evaluates IsolatedPair") {
-    // test predicate
-    steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
-        steamrot::tests::ScaffoldScenario::IsolatedPair);
-    steamrot::PartGraph &parts = scaffold.parts;
+    // test predicate: node 0 (fragment, connection_count=1) fails is_serial
+    const steamrot::PartGraph &parts = steamrot::tests::pair.part_graph;
 
     ChainDescriptorResult result = is_serial_chain(parts, 0);
 
@@ -75,17 +70,23 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
   }
 
   SECTION("is_serial_chain evaluates LinearChain") {
-    // test predicate
-    steamrot::MachinaFormScaffold scaffold = builder.GetScenarioForAnalysis(
-        steamrot::tests::ScaffoldScenario::LinearChain);
-    steamrot::PartGraph &parts = scaffold.parts;
+    // test predicate: f0(id=0, terminal) ─ j0(id=2, serial) ─ f1(id=1, terminal)
+    //   f0.socket[1] ↔ j0.socket[0]
+    //   j0.socket[1]  ↔ f1.socket[0]
+    const steamrot::PartGraph parts =
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
+                         "f0") // id=0
+            .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
+                         "f1")                                          // id=1
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")   // id=2
+            .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
+            .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
+            .Build()
+            .part_graph;
 
     // feed the middle joint node of the LinearChain to prevent it failing
-    // straight away on the first node due to the scenarios are made, the middle
-    // joint node has id 2, but to be safe we can check if it exists first
-    auto it = parts.find(2);
-    REQUIRE(it != parts.end());
-
+    // straight away on the first node; the joint has id=2
     ChainDescriptorResult result = is_serial_chain(parts, 2);
 
     // build expected trace
@@ -130,17 +131,24 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
   }
 
   SECTION("is_serial_chain evalutes serial chain that is 5 parts long") {
-    // test predicate
-    const steamrot::tests::ScaffoldResult scaffold_result =
-        builder.MakeConnectedScaffold(
-            {"fragment_two_sockets", "fragment_two_sockets",
-             "fragment_two_sockets"},
-            {"joint_two_sockets", "joint_two_sockets"},
-            {{0, 0, 3, 0},   // fragment[0].socket[1] -> joint[0].socket[0]
-             {3, 1, 1, 0},   // joint[0].socket[1]    -> fragment[1].socket[0]
-             {1, 1, 4, 0},   // fragment[1].socket[1] -> joint[1].socket[0]
-             {4, 1, 2, 0}}); // joint[1].socket[1]    -> fragment[2].socket[0]
-    const steamrot::PartGraph &parts = scaffold_result.scaffold.parts;
+    // f0(id=0, terminal) ─ j0(id=3, serial) ─ f1(id=1, serial) ─ j1(id=4, serial) ─ f2(id=2, terminal)
+    //   f0.socket[0] ↔ j0.socket[0]
+    //   j0.socket[1] ↔ f1.socket[0]
+    //   f1.socket[1] ↔ j1.socket[0]
+    //   j1.socket[1] ↔ f2.socket[0]
+    const steamrot::PartGraphPackage pkg =
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")  // id=0
+            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f2")  // id=2
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")       // id=3
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")       // id=4
+            .Connect("f0", 0, "j0", 0) // f0.socket[0] ↔ j0.socket[0]
+            .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
+            .Connect("f1", 1, "j1", 0) // f1.socket[1] ↔ j1.socket[0]
+            .Connect("j1", 1, "f2", 0) // j1.socket[1] ↔ f2.socket[0]
+            .Build();
+    const steamrot::PartGraph &parts = pkg.part_graph;
 
     SECTION("is_serial_chain evaluates from the start of the chain") {
       // build expected trace

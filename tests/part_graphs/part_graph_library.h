@@ -31,4 +31,12 @@ extern const PartGraphPackage linear_chain_3;
 /// ── fragment
 /////////////////////////////////////////////////
 extern const PartGraphPackage linear_chain_5;
+
+/////////////////////////////////////////////////
+/// @brief Three joints wired in a cycle:
+///        joint0.socket[0] ↔ joint1.socket[0]
+///        joint1.socket[1] ↔ joint2.socket[0]
+///        joint2.socket[1] ↔ joint0.socket[1]
+/////////////////////////////////////////////////
+extern const PartGraphPackage ring;
 } // namespace steamrot::tests

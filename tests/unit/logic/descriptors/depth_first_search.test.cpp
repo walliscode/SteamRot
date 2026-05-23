@@ -12,9 +12,11 @@
 /////////////////////////////////////////////////
 #include "depth_first_search.h"
 #include "AnalysisTraceBuilder.h"
+#include "PartGraphBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
+#include "part_graph_library.h"
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
@@ -146,15 +148,14 @@ TEST_CASE("resolve_transition: WhileIsTrueForN steps",
 TEST_CASE("depth_first_search: single-node scenarios",
           "[unit][logic][descriptors][dfs]") {
 
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-  steamrot::tests::PartLibraryBuilder builder{lib};
-
   SECTION("isolated node matching a Sequence step → one valid subgraph") {
     // fragment_no_socket has no sockets so there are no neighbours to visit;
     // the valid subgraph must be recorded when the Sequence step is consumed.
     const steamrot::PartGraph parts =
-        builder.MakePartGraph({"fragment_no_socket"}, {});
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .Build()
+            .part_graph;
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
 
@@ -165,7 +166,10 @@ TEST_CASE("depth_first_search: single-node scenarios",
 
   SECTION("isolated node not matching a Sequence step → one invalid subgraph") {
     const steamrot::PartGraph parts =
-        builder.MakePartGraph({"fragment_no_socket"}, {});
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .Build()
+            .part_graph;
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_joint, ChainStepKind::Sequence)}, parts);
 
@@ -176,7 +180,10 @@ TEST_CASE("depth_first_search: single-node scenarios",
   SECTION(
       "start node missing from graph → invalid subgraph recorded, no crash") {
     const steamrot::PartGraph parts =
-        builder.MakePartGraph({"fragment_no_socket"}, {});
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .Build()
+            .part_graph;
     const ChainDescriptorResult result =
         run_dfs(9999, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
 
@@ -196,13 +203,15 @@ TEST_CASE(
   //   frag0(id=0, terminal) ─ joint0(id=2, serial) ─ frag1(id=1, terminal)
   //   frag0.socket[1] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ frag1.socket[0]
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-  steamrot::tests::PartLibraryBuilder builder{lib};
-  const steamrot::tests::ScaffoldResult sr = builder.MakeConnectedScaffold(
-      {"fragment_two_sockets", "fragment_two_sockets"}, {"joint_two_sockets"},
-      {{0, 1, 2, 0}, {2, 1, 1, 0}});
-  const steamrot::PartGraph &parts = sr.scaffold.parts;
+  const steamrot::PartGraph parts =
+      steamrot::tests::PartGraphBuilder{}
+          .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0") // id=0
+          .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")       // id=2
+          .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
+          .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
+          .Build()
+          .part_graph;
 
   SECTION("WhileIsTrue(is_serial) only: joint0 recorded as valid via "
           "HoldNodeAndAdvanceStep path") {
@@ -300,14 +309,17 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
   //   frag0.socket[0] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ joint1.socket[0]
   //   joint1.socket[1] ↔ frag1.socket[0]
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-  steamrot::tests::PartLibraryBuilder builder{lib};
-  const steamrot::tests::ScaffoldResult sr = builder.MakeConnectedScaffold(
-      {"fragment_one_socket", "fragment_one_socket"},
-      {"joint_two_sockets", "joint_two_sockets"},
-      {{0, 0, 2, 0}, {2, 1, 3, 0}, {3, 1, 1, 0}});
-  const steamrot::PartGraph &parts = sr.scaffold.parts;
+  const steamrot::PartGraph parts =
+      steamrot::tests::PartGraphBuilder{}
+          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0") // id=0
+          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1") // id=1
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")      // id=2
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")      // id=3
+          .Connect("f0", 0, "j0", 0)       // f0.socket[0] ↔ j0.socket[0]
+          .ConnectUnchecked("j0", 1, "j1", 0) // j0.socket[1] ↔ j1.socket[0]
+          .Connect("j1", 1, "f1", 0)       // j1.socket[1] ↔ f1.socket[0]
+          .Build()
+          .part_graph;
   // IDs: frag0=0, frag1=1, joint0=2, joint1=3
 
   SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
@@ -397,16 +409,12 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
 TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
           "[unit][logic][descriptors][dfs]") {
 
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-  const steamrot::MachinaFormScaffold &scaffold =
-      lib.scaffold_scenarios.at(steamrot::tests::ScaffoldScenario::Ring);
-
   SECTION("single WhileIsTrue step terminates on Ring, no valid subgraphs") {
     // All joints in the Ring are serial so HoldNodeAndAdvanceStep never fires
     // (no failing node exists). The cycle guard ensures the DFS terminates.
-    const ChainDescriptorResult result = run_dfs(
-        0, {make_step(is_serial, ChainStepKind::WhileIsTrue)}, scaffold.parts);
+    const ChainDescriptorResult result =
+        run_dfs(0, {make_step(is_serial, ChainStepKind::WhileIsTrue)},
+                steamrot::tests::ring.part_graph);
     REQUIRE(result.valid_subgraphs.empty());
   }
 
@@ -418,7 +426,7 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
         run_dfs(0,
                 {make_step(is_serial, ChainStepKind::WhileIsTrue),
                  make_step(is_terminal, ChainStepKind::Sequence)},
-                scaffold.parts);
+                steamrot::tests::ring.part_graph);
     REQUIRE(result.valid_subgraphs.empty());
   }
 }
