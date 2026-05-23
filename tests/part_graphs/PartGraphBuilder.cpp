@@ -31,7 +31,9 @@ PartGraphBuilder::MakeFragmentInstance(const FragmentNames name) {
     f = &fragment_three_sockets;
     break;
   }
-  return FragmentInstance{f};
+  FragmentInstance instance{f};
+  instance.id = m_package.next_id++;
+  return instance;
 }
 
 /////////////////////////////////////////////////
@@ -51,16 +53,17 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
     j = &joint_three_sockets;
     break;
   }
-  return JointInstance{j};
+  JointInstance instance{j};
+  instance.id = m_package.next_id++;
+  return instance;
 }
 
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
                                                 const std::string id) {
-  // create a new FragmentInstance, assign its stable ID, then insert
-  const uint32_t instance_id = m_package.next_id++;
+  // create a new FragmentInstance (assigns stable ID), then insert
   FragmentInstance instance = MakeFragmentInstance(name);
-  instance.id = instance_id;
+  const uint32_t instance_id = instance.id;
   m_package.part_graph.emplace(instance_id, std::move(instance));
 
   // map the user-friendly string ID to the stable uint32_t ID in the part graph
@@ -72,10 +75,9 @@ PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::AddJoint(const JointNames name,
                                              const std::string id) {
-  // create a new JointInstance, assign its stable ID, then insert
-  const uint32_t instance_id = m_package.next_id++;
+  // create a new JointInstance (assigns stable ID), then insert
   JointInstance instance = MakeJointInstance(name);
-  instance.id = instance_id;
+  const uint32_t instance_id = instance.id;
   m_package.part_graph.emplace(instance_id, std::move(instance));
 
   // map the user-friendly string ID to the stable uint32_t ID in the part graph
