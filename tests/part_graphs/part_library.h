@@ -1,41 +1,15 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the TestPartLibrary struct and PartLibraryBuilder
-///        class for test infrastructure.
+/// @brief Header-only catalog of pre-defined Fragment and Joint definitions
+///        for test infrastructure.
 ///
-/// TestPartLibrary is a value-type struct that holds a small, fixed set of
-/// pre-defined Fragment and Joint objects keyed by name. Instantiate it via
-/// TestPartLibrary::Create() to get the standard catalog. The catalog also
-/// exposes a scaffold_scenarios map (keyed by ScaffoldScenario) of pre-wired
-/// MachinaFormScaffold topologies for use in NodeDescriptor tests.
+/// Each part is exposed as an @c inline @c const variable in the
+/// @c steamrot::tests namespace. They can be referenced directly in test
+/// builders and assertions without any factory call.
 ///
-/// ConnectionSpec describes one connection between two parts using
-/// insertion-order indices (fragments first, then joints) so callers never
-/// need to map-walk for stable IDs.
-///
-/// ScaffoldResult bundles a MachinaFormScaffold with the insertion-order ID
-/// list, making it easy to wire additional connections programmatically.
-///
-/// ScaffoldScenarioExpectations holds one std::array<bool, N> per
-/// ScaffoldScenario (N equals the node count for that scenario) so callers can
-/// express exact per-node expected results in a compact, type-safe way.
-/// Node order within each array matches insertion order (fragments first, then
-/// joints) as documented on each field.
-///
-/// CheckNodeDescriptorForAllScenarios runs a NodeDescriptor against every
-/// ScaffoldScenario in the library and CHECKs each node's result against the
-/// corresponding entry in a ScaffoldScenarioExpectations value.
-///
-/// PartLibraryBuilder wraps a TestPartLibrary reference and provides
-/// convenience methods to create FragmentInstances, JointInstances, PartGraphs,
-/// and fully-connected scaffolds backed by the library's storage.
-///
-/// ⚠ Instances produced by PartLibraryBuilder hold raw pointers into the
-/// TestPartLibrary they were built from. The library must outlive any
-/// instances, PartGraphs, or ScaffoldResults it produces. This applies to the
-/// pre-built scaffold_scenarios as well — do not extract a scenario from the
-/// library and use it after the library is destroyed, as scenarios hold raw
-/// pointers into the library's part storage.
+/// Fragments and Joints are read-only definitions; all mutable state lives in
+/// FragmentInstance and JointInstance wrappers. The @c const pointers stored
+/// on those instance types enforce this contract at compile time.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -48,33 +22,18 @@
 /////////////////////////////////////////////////
 #include "Fragment.h"
 #include "Joint.h"
-#include <map>
+#include "ViewDirection.h"
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 
 namespace steamrot::tests {
 
-enum class FragmentInstanceNames {
-  FragmentNoSocket,
-  FragmentOneSocket,
-  FragmentTwoSockets,
-  FragmentThreeSockets
-};
-
-enum class JointInstanceNames {
-  JointNoSocket,
-  JointOneSocket,
-  JointTwoSockets,
-  JointThreeSockets
-};
 /////////////////////////////////////////////////
 /// @enum ScaffoldScenario
-/// @brief Identifies a pre-wired MachinaFormScaffold topology stored in
-///        TestPartLibrary::scaffold_scenarios.
+/// @brief Identifies a pre-wired MachinaFormScaffold topology.
 ///
-/// Use as the key to TestPartLibrary::scaffold_scenarios:
-/// @code
-/// const MachinaFormScaffold& chain =
-///     lib.scaffold_scenarios.at(ScaffoldScenario::LinearChain);
-/// @endcode
+/// Used as a key in PartLibraryBuilder to request a specific pre-built
+/// scaffold topology.
 /////////////////////////////////////////////////
 enum class ScaffoldScenario {
   /////////////////////////////////////////////////
@@ -95,35 +54,169 @@ enum class ScaffoldScenario {
 
   /////////////////////////////////////////////////
   /// One Joint connected to one socket each of three fragments, creating a
-  /// branching point
+  /// branching point.
   /////////////////////////////////////////////////
   SimpleBranch
-
 };
 
-/////////////////////////////////////////////////
-/// @struct TestPartLibrary
-/// @brief Fixed catalog of named Fragment and Joint test definitions
-/////////////////////////////////////////////////
-struct TestPartLibrary {
-  /////////////////////////////////////////////////
-  /// @brief Named Fragment definitions.
-  /////////////////////////////////////////////////
-  std::map<FragmentInstanceNames, Fragment> fragments;
+} // namespace steamrot::tests
 
-  /////////////////////////////////////////////////
-  /// @brief Named Joint definitions.
-  /////////////////////////////////////////////////
-  std::map<JointInstanceNames, Joint> joints;
+/////////////////////////////////////////////////
+/// Internal helpers — not part of the public API
+/////////////////////////////////////////////////
+namespace steamrot::tests::detail {
 
-  /////////////////////////////////////////////////
-  /// @brief Create a TestPartLibrary pre-populated with the standard catalog
-  ///        and scaffold scenarios.
-  ///
-  /// @return TestPartLibrary containing the predefined Fragments, Joints,
-  ///         and pre-wired scaffold scenarios.
-  /////////////////////////////////////////////////
-  static TestPartLibrary Create();
-};
+/////////////////////////////////////////////////
+/// @brief Build a filled 20×20 square VertexArray (Triangles primitive).
+///
+/// @param x     Left edge x-coordinate.
+/// @param y     Top edge y-coordinate.
+/// @param color Fill color.
+/// @return VertexArray with 6 vertices forming two triangles.
+/////////////////////////////////////////////////
+inline sf::VertexArray MakeFilledSquare(float x, float y, sf::Color color) {
+  sf::VertexArray va(sf::PrimitiveType::Triangles, 6);
+  va[0] = sf::Vertex{{x, y}, color};
+  va[1] = sf::Vertex{{x + 20.f, y}, color};
+  va[2] = sf::Vertex{{x + 20.f, y + 20.f}, color};
+  va[3] = sf::Vertex{{x, y}, color};
+  va[4] = sf::Vertex{{x + 20.f, y + 20.f}, color};
+  va[5] = sf::Vertex{{x, y + 20.f}, color};
+  return va;
+}
+
+/////////////////////////////////////////////////
+/// @brief Build a green origin-aligned triangle VertexArray.
+///
+/// Vertices at (0, 0), (20, 0), (10, 20).
+/////////////////////////////////////////////////
+inline sf::VertexArray MakeGreenOriginTriangle() {
+  sf::VertexArray va(sf::PrimitiveType::Triangles);
+  va.append(sf::Vertex{sf::Vector2f{0.f, 0.f}, sf::Color::Green});
+  va.append(sf::Vertex{sf::Vector2f{20.f, 0.f}, sf::Color::Green});
+  va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, sf::Color::Green});
+  return va;
+}
+
+/////////////////////////////////////////////////
+/// @brief Build a blue origin-aligned triangle VertexArray.
+///
+/// Vertices at (0, 0), (20, 0), (10, 20).
+/////////////////////////////////////////////////
+inline sf::VertexArray MakeBlueOriginTriangle() {
+  sf::VertexArray va(sf::PrimitiveType::Triangles);
+  va.append(sf::Vertex{sf::Vector2f{0.f, 0.f}, sf::Color::Blue});
+  va.append(sf::Vertex{sf::Vector2f{20.f, 0.f}, sf::Color::Blue});
+  va.append(sf::Vertex{sf::Vector2f{10.f, 20.f}, sf::Color::Blue});
+  return va;
+}
+
+} // namespace steamrot::tests::detail
+
+/////////////////////////////////////////////////
+/// Part catalog
+/////////////////////////////////////////////////
+namespace steamrot::tests {
+
+/////////////////////////////////////////////////
+/// @brief fragment_no_socket: green origin triangle, no sockets.
+/////////////////////////////////////////////////
+inline const Fragment fragment_no_socket = []() {
+  Fragment f;
+  f.name = "fragment_no_socket";
+  f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                       detail::MakeGreenOriginTriangle());
+  return f;
+}();
+
+/////////////////////////////////////////////////
+/// @brief fragment_one_socket: green origin triangle + one socket at (5, 5).
+/////////////////////////////////////////////////
+inline const Fragment fragment_one_socket = []() {
+  Fragment f;
+  f.name = "fragment_one_socket";
+  f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                       detail::MakeGreenOriginTriangle());
+  f.sockets = {{5.f, 5.f}};
+  return f;
+}();
+
+/////////////////////////////////////////////////
+/// @brief fragment_two_sockets: white 20×20 square + sockets at (0, 10) and
+///        (20, 10).
+/////////////////////////////////////////////////
+inline const Fragment fragment_two_sockets = []() {
+  Fragment f;
+  f.name = "fragment_two_sockets";
+  f.positioning_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      detail::MakeFilledSquare(0.f, 0.f, sf::Color::White));
+  f.sockets = {{0.f, 10.f}, {20.f, 10.f}};
+  return f;
+}();
+
+/////////////////////////////////////////////////
+/// @brief fragment_three_sockets: white 20×20 square + sockets at (0, 10),
+///        (10, 10) and (20, 10).
+/////////////////////////////////////////////////
+inline const Fragment fragment_three_sockets = []() {
+  Fragment f;
+  f.name = "fragment_three_sockets";
+  f.positioning_views.insert_or_assign(
+      steamrot::ViewDirection::Front,
+      detail::MakeFilledSquare(0.f, 0.f, sf::Color::White));
+  f.sockets = {{0.f, 10.f}, {10.f, 10.f}, {20.f, 10.f}};
+  return f;
+}();
+
+/////////////////////////////////////////////////
+/// @brief joint_no_socket: blue origin triangle, no sockets.
+/////////////////////////////////////////////////
+inline const Joint joint_no_socket = []() {
+  Joint j;
+  j.name = "joint_no_socket";
+  j.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
+                                       detail::MakeBlueOriginTriangle());
+  return j;
+}();
+
+/////////////////////////////////////////////////
+/// @brief joint_one_socket: 1 socket at radius 10, full rotation arc.
+/////////////////////////////////////////////////
+inline const Joint joint_one_socket = []() {
+  Joint j;
+  j.name = "joint_one_socket";
+  j.socket_config.socket_count = 1;
+  j.socket_config.radius = 10.f;
+  j.socket_config.rotation_arc_min = 0.f;
+  j.socket_config.rotation_arc_max = 360.f;
+  return j;
+}();
+
+/////////////////////////////////////////////////
+/// @brief joint_two_sockets: 2 sockets at radius 15, full rotation arc.
+/////////////////////////////////////////////////
+inline const Joint joint_two_sockets = []() {
+  Joint j;
+  j.name = "joint_two_sockets";
+  j.socket_config.socket_count = 2;
+  j.socket_config.radius = 15.f;
+  j.socket_config.rotation_arc_min = 0.f;
+  j.socket_config.rotation_arc_max = 360.f;
+  return j;
+}();
+
+/////////////////////////////////////////////////
+/// @brief joint_three_sockets: 3 sockets at radius 15, full rotation arc.
+/////////////////////////////////////////////////
+inline const Joint joint_three_sockets = []() {
+  Joint j;
+  j.name = "joint_three_sockets";
+  j.socket_config.socket_count = 3;
+  j.socket_config.radius = 15.f;
+  j.socket_config.rotation_arc_min = 0.f;
+  j.socket_config.rotation_arc_max = 360.f;
+  return j;
+}();
 
 } // namespace steamrot::tests
