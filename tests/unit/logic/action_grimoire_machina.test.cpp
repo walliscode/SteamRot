@@ -10,6 +10,7 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraphBuilder.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
 #include "part_library.h"
@@ -1213,17 +1214,15 @@ TEST_CASE(
 TEST_CASE("create_connection tests",
           "[unit][actions][grimoire_machina][create_connection]") {
 
-  steamrot::tests::TestPartLibrary library{
-      steamrot::tests::TestPartLibrary::Create()};
-  steamrot::tests::PartLibraryBuilder builder(library);
+  steamrot::tests::PartGraphBuilder builder;
 
   SECTION("create_connection returns error when both parts have no "
           "sockets") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_no_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::NoSocket);
 
     steamrot::JointInstance joint_instance =
-        builder.MakeJointInstance("joint_no_socket");
+        builder.MakeJointInstance(steamrot::tests::JointNames::NoSocket);
 
     auto connection_result =
         steamrot::logic::action::grimoire_machina::create_connection(
@@ -1237,9 +1236,9 @@ TEST_CASE("create_connection tests",
   SECTION("create_connection returns error when socket indices are out of "
           "range") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     steamrot::JointInstance joint_instance =
-        builder.MakeJointInstance("joint_one_socket");
+        builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
     auto connection_result =
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 5, joint_instance, 5);
@@ -1252,9 +1251,9 @@ TEST_CASE("create_connection tests",
   SECTION("create_connection returns a valid result when given valid "
           "inputs") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     steamrot::JointInstance joint_instance =
-        builder.MakeJointInstance("joint_two_sockets");
+        builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
     auto connection_result =
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 0, joint_instance, 1);
@@ -1274,9 +1273,9 @@ TEST_CASE("create_connection tests",
   SECTION("create_connection changes SocketState on connected sockets to "
           "SocketStatae::Connected") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     steamrot::JointInstance joint_instance =
-        builder.MakeJointInstance("joint_two_sockets");
+        builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
     REQUIRE(frag_instance.sockets.at(0).state ==
             steamrot::SocketState::Available);
     REQUIRE(joint_instance.sockets.at(1).state ==
@@ -1295,14 +1294,13 @@ TEST_CASE("create_connection tests",
 TEST_CASE("check_socket_for_connection_readiness tests",
           "[unit][actions][grimoire_machina][check_socket_for_connection_"
           "readiness]") {
-  steamrot::tests::TestPartLibrary library{
-      steamrot::tests::TestPartLibrary::Create()};
-  steamrot::tests::PartLibraryBuilder builder(library);
+
+  steamrot::tests::PartGraphBuilder builder;
 
   SECTION("check_socket_for_connection_readiness returns false for state != "
           "Available and is_ready_to_connect is false") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // manually set the only socket to occupied
     frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
     frag_instance.sockets.at(0).is_ready_to_connect = false;
@@ -1315,7 +1313,7 @@ TEST_CASE("check_socket_for_connection_readiness tests",
   SECTION("check_socket_for_connection_readiness returns false for state != "
           "Available but is_ready_to_connect is true") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // manually set the only socket to occupied but ready
     frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
     frag_instance.sockets.at(0).is_ready_to_connect = true;
@@ -1327,7 +1325,7 @@ TEST_CASE("check_socket_for_connection_readiness tests",
   SECTION("check_socket_for_connection_readiness returns false for state == "
           "Available but is_ready_to_connect is false") {
     steamrot::FragmentInstance frag_instance =
-        builder.MakeFragmentInstance("fragment_one_socket");
+        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // ensure the only socket is available but not ready
     frag_instance.sockets.at(0).state = steamrot::SocketState::Available;
     frag_instance.sockets.at(0).is_ready_to_connect = false;
