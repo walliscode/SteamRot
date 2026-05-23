@@ -12,6 +12,7 @@
 #include "MachinaFormScaffold.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
+#include "descriptors_node_descriptors.h"
 #include "part_library.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -122,8 +123,92 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
 
     // assert result and trace
     REQUIRE(result);
+    REQUIRE(result.valid_subgraphs.size() == 2);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("is_serial_chain evalutes serial chain that is 5 parts long") {
+    // test predicate
+    const steamrot::tests::ScaffoldResult scaffold_result =
+        builder.MakeConnectedScaffold(
+            {"fragment_two_sockets", "fragment_two_sockets",
+             "fragment_two_sockets"},
+            {"joint_two_sockets", "joint_two_sockets"},
+            {{0, 0, 3, 0},   // fragment[0].socket[1] -> joint[0].socket[0]
+             {3, 1, 1, 0},   // joint[0].socket[1]    -> fragment[1].socket[0]
+             {1, 1, 4, 0},   // fragment[1].socket[1] -> joint[1].socket[0]
+             {4, 1, 2, 0}}); // joint[1].socket[1]    -> fragment[2].socket[0]
+    const steamrot::PartGraph &parts = scaffold_result.scaffold.parts;
+
+    SECTION("is_serial_chain evaluates from the start of the chain") {
+      // build expected trace
+      AnalysisTrace expected_trace =
+          steamrot::tests::AnalysisTraceBuilder{}
+              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, 0)
+              .NodeEval(0, is_serial.GetName(), 1)
+              .NodeResult(0, is_serial.GetName(), false,
+                          "connection_count=1, expected==2", 1)
+              .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, false, 0)
+              .Build();
+      ChainDescriptorResult result = is_serial_chain(parts, 0);
+      // assert result
+      REQUIRE_FALSE(result);
+      REQUIRE(result.valid_subgraphs.size() == 0);
+      REQUIRE_THAT(result.m_trace,
+                   steamrot::tests::EqualsTrace(expected_trace,
+                                                TerminalDescriptorFormatter{}));
+    }
+
+    SECTION("is_serial_chain evalutes from the second node") {
+      // build expected trace
+      AnalysisTrace expected_trace =
+          steamrot::tests::AnalysisTraceBuilder{}
+              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, 3)
+              .NodeEval(3, is_serial.GetName(), 1)
+              .NodeResult(3, is_serial.GetName(), true,
+                          "connection_count=2, expected==2", 1)
+              .MovingToNeighbour(3, 0, 0, 1)
+              .NodeEval(0, is_serial.GetName(), 2)
+              .NodeResult(0, is_serial.GetName(), false,
+                          "connection_count=1, expected==2", 2)
+              .NodeEval(0, is_terminal.GetName(), 2)
+              .NodeResult(0, is_terminal.GetName(), true,
+                          "connection_count=1, expected==1", 2)
+              .Backtracking(0, 1)
+              .MovingToNeighbour(3, 1, 1, 1)
+              .NodeEval(1, is_serial.GetName(), 2)
+              .NodeResult(1, is_serial.GetName(), true,
+                          "connection_count=2, expected==2", 2)
+              .MovingToNeighbour(1, 4, 1, 2)
+              .NodeEval(0, "is_terminal", 3)
+              .NodeResult(0, "is_terminal", true,
+                          "connection_count=1, expected==1", 3)
+              .Backtracking(0, 1)
+              .MovingToNeighbour(3, 1, 4, 0)
+              .NodeEval(4, is_serial.GetName(), 3)
+              .NodeResult(4, is_serial.GetName(), true,
+                          "connection_count=2, expected==2", 3)
+              .MovingToNeighbour(4, 0, 2, 0)
+              .NodeEval(2, is_serial.GetName(), 4)
+              .NodeResult(2, is_serial.GetName(), false,
+                          "connection_count=1, expected==2", 4)
+              .NodeEval(2, "is_terminal", 4)
+              .NodeResult(2, "is_terminal", true,
+                          "connection_count=1, expected==1", 4)
+              .Backtracking(2, 1)
+              .Backtracking(4, 1)
+              .Backtracking(3, 1)
+              .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
+              .Build();
+      ChainDescriptorResult result = is_serial_chain(parts, 3);
+      // assert result/
+      REQUIRE_THAT(result.m_trace,
+                   steamrot::tests::EqualsTrace(expected_trace,
+                                                TerminalDescriptorFormatter{}));
+      REQUIRE(result);
+      REQUIRE(result.valid_subgraphs.size() == 1);
+    }
   }
 }
