@@ -28,8 +28,10 @@ namespace steamrot::logic::descriptors {
 ///   [EVAL]  node#<id>  predicate=<name>
 ///   [PASS]  node#<id>  <name>  "<reason>"
 ///   [FAIL]  node#<id>  <name>  "<reason>"
-///   [MOVE]  node#<from> -> node#<to>  socket=<id>
-///   [BACK]  <- node#<from>
+///   [MOVE]  node#<from>.socket#<from_socket> ->
+///           node#<to>.socket#<to_socket>
+///   [BACK]  node#<from>.socket#<from_socket> ->
+///           node#<to>.socket#<to_socket>
 /// [PASS] chain_name
 /// [FAIL] chain_name
 /// @endcode

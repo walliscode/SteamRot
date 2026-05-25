@@ -104,7 +104,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeResult("j0", "is_serial", true,
                         "connection_count=2, expected==2", 1)
             // socket[0] of joint leads to frag0 (id=0)
-            .MovingToNeighbour("j0", "f0", 0, 1)
+            .MovingToNeighbour("j0", 0, "f0", 0, 1)
             // frag0 has 1 connection, so is_serial fails
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -114,9 +114,9 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeEval("f0", "is_terminal", 2)
             .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking("f0", 1)
+            .Backtracking("f0", 0, "j0", 0, 1)
             // socket[1] of joint leads to frag1 (id=1)
-            .MovingToNeighbour("j0", "f1", 1, 1)
+            .MovingToNeighbour("j0", 1, "f1", 0, 1)
             // frag1 also has 1 connection, same pattern as frag0
             .NodeEval("f1", "is_serial", 2)
             .NodeResult("f1", "is_serial", false,
@@ -124,7 +124,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeEval("f1", "is_terminal", 2)
             .NodeResult("f1", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking("f1", 1)
+            .Backtracking("f1", 0, "j0", 1, 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, true, 0)
             .Build();
 
@@ -186,7 +186,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeResult("j0", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 1)
               // this is going to try socket[0] first
-              .MovingToNeighbour("j0", "f0", 0, 1)
+              .MovingToNeighbour("j0", 0, "f0", 0, 1)
               .NodeEval("f0", is_serial.GetName(), 2)
               .NodeResult("f0", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 2)
@@ -194,16 +194,16 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeResult("f0", is_terminal.GetName(), true,
                           "connection_count=1, expected==1", 2)
               // this should store a valid subgraph here
-              .Backtracking("f0", 1)
-              .MovingToNeighbour("j0", "f1", 1, 1)
+              .Backtracking("f0", 0, "j0", 0, 1)
+              .MovingToNeighbour("j0", 1, "f1", 0, 1)
               .NodeEval("f1", is_serial.GetName(), 2)
               .NodeResult("f1", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 2)
-              .MovingToNeighbour("f1", "j1", 1, 2)
+              .MovingToNeighbour("f1", 1, "j1", 0, 2)
               .NodeEval("j1", "is_serial", 3)
               .NodeResult("j1", "is_serial", true,
                           "connection_count=2, expected==2", 3)
-              .MovingToNeighbour("j1", "f2", 1, 3)
+              .MovingToNeighbour("j1", 1, "f2", 0, 3)
               .NodeEval("f2", is_serial.GetName(), 4)
               .NodeResult("f2", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 4)
@@ -211,9 +211,9 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeResult("f2", is_terminal.GetName(), true,
                           "connection_count=1, expected==1", 4)
               // this should store a valid subgraph here
-              .Backtracking("f2", 3)
-              .Backtracking("j1", 2)
-              .Backtracking("f1", 1)
+              .Backtracking("f2", 0, "j1", 1, 3)
+              .Backtracking("j1", 0, "f1", 1, 2)
+              .Backtracking("f1", 0, "j0", 1, 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
               .Build();
       ChainDescriptorResult result =

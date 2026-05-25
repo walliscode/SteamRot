@@ -122,13 +122,15 @@ AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::MovingToNeighbourById(
-    uint32_t from_id, uint32_t to_id, uint32_t socket_id, uint32_t depth) {
+    uint32_t from_id, uint32_t from_socket_id, uint32_t to_id,
+    uint32_t to_socket_id, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
   ev.from_id = from_id;
+  ev.from_socket_id = from_socket_id;
   ev.to_id = to_id;
-  ev.socket_id = socket_id;
+  ev.to_socket_id = to_socket_id;
   m_trace.push_back(std::move(ev));
   return *this;
 }
@@ -136,39 +138,53 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::MovingToNeighbourById(
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
+                                        uint32_t from_socket_id,
                                         const std::string &to_id_alias,
-                                        uint32_t socket_id, uint32_t depth) {
+                                        uint32_t to_socket_id,
+                                        uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
   ev.from_id = ResolvePartId(from_id_alias);
   ev.from_id_alias = from_id_alias;
+  ev.from_socket_id = from_socket_id;
   ev.to_id = ResolvePartId(to_id_alias);
   ev.to_id_alias = to_id_alias;
-  ev.socket_id = socket_id;
+  ev.to_socket_id = to_socket_id;
   m_trace.push_back(std::move(ev));
   return *this;
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(uint32_t from_id,
-                                                             uint32_t depth) {
+AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(
+    uint32_t from_id, uint32_t from_socket_id, uint32_t to_id,
+    uint32_t to_socket_id, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
   ev.from_id = from_id;
+  ev.from_socket_id = from_socket_id;
+  ev.to_id = to_id;
+  ev.to_socket_id = to_socket_id;
   m_trace.push_back(std::move(ev));
   return *this;
 }
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::Backtracking(const std::string &from_id_alias,
+                                   uint32_t from_socket_id,
+                                   const std::string &to_id_alias,
+                                   uint32_t to_socket_id,
                                    uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
   ev.from_id = ResolvePartId(from_id_alias);
   ev.from_id_alias = from_id_alias;
+  ev.from_socket_id = from_socket_id;
+  ev.to_id = ResolvePartId(to_id_alias);
+  ev.to_id_alias = to_id_alias;
+  ev.to_socket_id = to_socket_id;
   m_trace.push_back(std::move(ev));
   return *this;
 }
