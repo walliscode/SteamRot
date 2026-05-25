@@ -118,10 +118,20 @@ struct AnalysisEvent {
   uint32_t from_id{0};
 
   /////////////////////////////////////////////////
+  /// @brief Human readable alias for the source part ID, if available.
+  /////////////////////////////////////////////////
+  std::string from_id_alias{};
+
+  /////////////////////////////////////////////////
   /// @brief Part ID of the destination node for a traversal.
   /// Populated for MovingToNeighbour.
   /////////////////////////////////////////////////
   uint32_t to_id{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Human readable alias for the destination part ID, if available.
+  /////////////////////////////////////////////////
+  std::string to_id_alias{};
 
   /////////////////////////////////////////////////
   /// @brief Socket ID on the source part through which the edge is traversed.

@@ -89,27 +89,20 @@ AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResultById(uint32_t part_id,
-                                     std::string predicate_name, bool result,
-                                     std::string reason, uint32_t depth) {
+AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
+                                 std::string predicate_name, bool result,
+                                 std::string reason, uint32_t depth) {
+
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeResult;
   ev.depth = depth;
-  ev.part_id = part_id;
+  ev.part_id = ResolvePartId(part_id_alias);
+  ev.part_id_alias = part_id_alias;
   ev.predicate_name = std::move(predicate_name);
   ev.result = result;
   ev.reason = std::move(reason);
   m_trace.push_back(std::move(ev));
   return *this;
-}
-
-/////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
-                                 std::string predicate_name, bool result,
-                                 std::string reason, uint32_t depth) {
-  return NodeResultById(ResolvePartId(part_id_alias), std::move(predicate_name),
-                        result, std::move(reason), depth);
 }
 
 /////////////////////////////////////////////////
@@ -130,8 +123,16 @@ AnalysisTraceBuilder &
 AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
                                         const std::string &to_id_alias,
                                         uint32_t socket_id, uint32_t depth) {
-  return MovingToNeighbourById(ResolvePartId(from_id_alias),
-                               ResolvePartId(to_id_alias), socket_id, depth);
+  AnalysisEvent ev{};
+  ev.kind = TraceEventKind::MovingToNeighbour;
+  ev.depth = depth;
+  ev.from_id = ResolvePartId(from_id_alias);
+  ev.part_id_alias = from_id_alias;
+  ev.to_id = ResolvePartId(to_id_alias);
+  ev.to_id_alias = to_id_alias;
+  ev.socket_id = socket_id;
+  m_trace.push_back(std::move(ev));
+  return *this;
 }
 
 /////////////////////////////////////////////////
