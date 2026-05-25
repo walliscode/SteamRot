@@ -6,12 +6,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "AnalysisTraceBuilder.h"
 #include "TraceEqualsMatcher.h"
+#include "AnalysisTraceBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
-#include <stdexcept>
 #include <unordered_map>
 
 using namespace steamrot::logic::descriptors;
@@ -19,8 +18,8 @@ namespace tests = steamrot::tests;
 
 namespace {
 const std::unordered_map<std::string, uint32_t> kPartIds{
-    {"f0", 0u}, {"j0", 1u}, {"f1", 2u}, {"j1", 3u}, {"f2", 4u}, {"p7", 7u},
-    {"p3", 3u}, {"p5", 5u}, {"missing", 99u}};
+    {"f0", 0u}, {"j0", 1u}, {"f1", 2u}, {"j1", 3u},      {"f2", 4u},
+    {"p7", 7u}, {"p3", 3u}, {"p5", 5u}, {"missing", 99u}};
 }
 
 // ─── AnalysisTraceBuilder ────────────────────────────────────────────────────
@@ -146,20 +145,20 @@ TEST_CASE("AnalysisTraceBuilder::ScopeEnd appends correct event",
   REQUIRE(ev.depth == 0u);
 }
 
-TEST_CASE("AnalysisTraceBuilder supports method chaining across all event types",
-          "[unit][descriptors][builder][matcher]") {
+TEST_CASE(
+    "AnalysisTraceBuilder supports method chaining across all event types",
+    "[unit][descriptors][builder][matcher]") {
   tests::AnalysisTraceBuilder builder{kPartIds};
-  builder
-    .ScopeBegin("chain", ScopeKind::Chain, 0u, "j0")
-    .NodeEval("j0", "is_terminal", 1u)
-    .NodeResult("j0", "is_terminal", true, "connection_count=1, expected<=1",
-                1u)
-    .MovingToNeighbour("j0", "f1", 0u, 1u)
-    .NodeEval("f1", "is_terminal", 2u)
-    .NodeResult("f1", "is_terminal", false, "connection_count=2, expected<=1",
-                2u)
-    .Backtracking("f1", 1u)
-    .ScopeEnd("chain", ScopeKind::Chain, false, 0u);
+  builder.ScopeBegin("chain", ScopeKind::Chain, 0u, "j0")
+      .NodeEval("j0", "is_terminal", 1u)
+      .NodeResult("j0", "is_terminal", true, "connection_count=1, expected<=1",
+                  1u)
+      .MovingToNeighbour("j0", "f1", 0u, 1u)
+      .NodeEval("f1", "is_terminal", 2u)
+      .NodeResult("f1", "is_terminal", false, "connection_count=2, expected<=1",
+                  2u)
+      .Backtracking("f1", 1u)
+      .ScopeEnd("chain", ScopeKind::Chain, false, 0u);
 
   REQUIRE(builder.Build().size() == 8);
 }
@@ -183,8 +182,7 @@ TEST_CASE("AnalysisTraceBuilder resolves string IDs via id_to_part_graph_id",
       {"f0", 0u}, {"j0", 1u}};
 
   tests::AnalysisTraceBuilder builder{id_to_part_graph_id};
-  builder
-      .ScopeBegin("chain", ScopeKind::Chain, 0u, "f0")
+  builder.ScopeBegin("chain", ScopeKind::Chain, 0u, "f0")
       .NodeEval("f0", "is_fragment", 1u)
       .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance", 1u)
       .MovingToNeighbour("f0", "j0", 0u, 1u)
@@ -204,7 +202,10 @@ TEST_CASE("AnalysisTraceBuilder resolves string IDs via id_to_part_graph_id",
 TEST_CASE("AnalysisTraceBuilder string-ID overloads validate alias map",
           "[unit][descriptors][builder][matcher]") {
   SECTION("throws when alias is missing from alias map") {
-    tests::AnalysisTraceBuilder builder{{{"f0", 0u}}};
+    // construct map as we are passing a reference so it needs to outlive the
+    // builder
+    std::unordered_map<std::string, uint32_t> id_to_part_graph_id{{"f0", 0u}};
+    tests::AnalysisTraceBuilder builder{id_to_part_graph_id};
     REQUIRE_THROWS_AS(builder.NodeEval("missing", "is_fragment"),
                       std::out_of_range);
   }
@@ -217,9 +218,8 @@ TEST_CASE("TraceEqualsMatcher matches identical traces",
   TerminalDescriptorFormatter fmt;
 
   tests::AnalysisTraceBuilder builder{kPartIds};
-  builder
-    .NodeEval("f0", "is_fragment")
-    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
+  builder.NodeEval("f0", "is_fragment")
+      .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 
   const AnalysisTrace trace = builder.Build();
 
@@ -231,14 +231,12 @@ TEST_CASE("TraceEqualsMatcher rejects traces that differ",
   TerminalDescriptorFormatter fmt;
 
   tests::AnalysisTraceBuilder expected_builder{kPartIds};
-  expected_builder
-    .NodeEval("f0", "is_fragment")
-    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
+  expected_builder.NodeEval("f0", "is_fragment")
+      .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 
   tests::AnalysisTraceBuilder actual_builder{kPartIds};
-  actual_builder
-    .NodeEval("f0", "is_joint")
-    .NodeResult("f0", "is_joint", false, "node holds FragmentInstance");
+  actual_builder.NodeEval("f0", "is_joint")
+      .NodeResult("f0", "is_joint", false, "node holds FragmentInstance");
 
   REQUIRE_THAT(actual_builder.Build(),
                !tests::EqualsTrace(expected_builder.Build(), fmt));
@@ -249,9 +247,8 @@ TEST_CASE("TraceEqualsMatcher rejects traces with different lengths",
   TerminalDescriptorFormatter fmt;
 
   tests::AnalysisTraceBuilder expected_builder{kPartIds};
-  expected_builder
-    .NodeEval("f0", "is_fragment")
-    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
+  expected_builder.NodeEval("f0", "is_fragment")
+      .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 
   tests::AnalysisTraceBuilder actual_builder{kPartIds};
   actual_builder.NodeEval("f0", "is_fragment");
@@ -273,20 +270,17 @@ TEST_CASE("TraceEqualsMatcher::describe returns 'equals trace' when matched",
   REQUIRE(matcher.describe() == "equals trace");
 }
 
-TEST_CASE(
-    "TraceEqualsMatcher::describe reports mismatch details on failure",
-    "[unit][descriptors][builder][matcher]") {
+TEST_CASE("TraceEqualsMatcher::describe reports mismatch details on failure",
+          "[unit][descriptors][builder][matcher]") {
   TerminalDescriptorFormatter fmt;
 
   tests::AnalysisTraceBuilder expected_builder{kPartIds};
-  expected_builder
-    .NodeEval("f0", "is_fragment")
-    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
+  expected_builder.NodeEval("f0", "is_fragment")
+      .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 
   tests::AnalysisTraceBuilder actual_builder{kPartIds};
-  actual_builder
-    .NodeEval("f0", "is_joint")
-    .NodeResult("f0", "is_joint", false, "node holds FragmentInstance");
+  actual_builder.NodeEval("f0", "is_joint")
+      .NodeResult("f0", "is_joint", false, "node holds FragmentInstance");
 
   const AnalysisTrace expected_trace = expected_builder.Build();
   const AnalysisTrace actual_trace = actual_builder.Build();

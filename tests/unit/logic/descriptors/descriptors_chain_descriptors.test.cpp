@@ -200,24 +200,20 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeResult("f1", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 2)
               .MovingToNeighbour("f1", "j1", 1, 2)
-              .NodeEval("f0", "is_terminal", 3)
-              .NodeResult("f0", "is_terminal", true,
-                          "connection_count=1, expected==1", 3)
-              .Backtracking("f0", 1)
-              .MovingToNeighbour("j0", "f1", 4, 0)
-              .NodeEval("j1", is_serial.GetName(), 3)
-              .NodeResult("j1", is_serial.GetName(), true,
+              .NodeEval("j1", "is_serial", 3)
+              .NodeResult("j1", "is_serial", true,
                           "connection_count=2, expected==2", 3)
-              .MovingToNeighbour("j1", "f2", 2, 0)
+              .MovingToNeighbour("j1", "f2", 1, 3)
               .NodeEval("f2", is_serial.GetName(), 4)
               .NodeResult("f2", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 4)
-              .NodeEval("f2", "is_terminal", 4)
-              .NodeResult("f2", "is_terminal", true,
+              .NodeEval("f2", is_terminal.GetName(), 4)
+              .NodeResult("f2", is_terminal.GetName(), true,
                           "connection_count=1, expected==1", 4)
-              .Backtracking("f2", 1)
-              .Backtracking("j1", 1)
-              .Backtracking("j0", 1)
+              // this should store a valid subgraph here
+              .Backtracking("f2", 3)
+              .Backtracking("j1", 2)
+              .Backtracking("f1", 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
               .Build();
       ChainDescriptorResult result =
@@ -227,7 +223,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                    steamrot::tests::EqualsTrace(expected_trace,
                                                 TerminalDescriptorFormatter{}));
       REQUIRE(result);
-      REQUIRE(result.valid_subgraphs.size() == 1);
+      REQUIRE(result.valid_subgraphs.size() == 2);
     }
   }
 }
