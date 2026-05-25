@@ -25,6 +25,7 @@ collision_grimoire_machina.test.cpp
 # descriptors tests
 descriptors/descriptors_node_descriptors.test.cpp
 descriptors/descriptors_chain_descriptors.test.cpp
+descriptors/AnchorBranchWorkflow.test.cpp
 descriptors/ChainDescriptorBuilder.test.cpp
 descriptors/depth_first_search.test.cpp
 )
@@ -50,4 +51,3 @@ target_link_libraries(test_logic
 )
 
 catch_discover_tests(test_logic)
-

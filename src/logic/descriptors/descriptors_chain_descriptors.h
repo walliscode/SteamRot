@@ -14,6 +14,7 @@
 #include "DescriptorResult.h"
 #include "MachinaFormScaffold.h"
 #include "descriptors_node_descriptors.h"
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -115,5 +116,14 @@ inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
 /// finally a terminal node
 /////////////////////////////////////////////////
 extern const ChainDescriptor is_serial_chain;
+
+/////////////////////////////////////////////////
+/// @brief Returns a ChainDescriptor that matches a serial chain containing at
+/// least @p min_length serial nodes followed by one terminal node.
+///
+/// @param min_length Minimum number of consecutive serial nodes required.
+/// @return ChainDescriptor with a stable name including @p min_length.
+/////////////////////////////////////////////////
+ChainDescriptor is_serial_chain_of_min_length(size_t min_length);
 
 } // namespace steamrot::logic::descriptors

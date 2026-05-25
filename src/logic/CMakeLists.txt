@@ -48,6 +48,7 @@ add_library(logic
   collision_grimoire_machina.cpp
 
   # descriptors
+  descriptors/AnchorBranchWorkflow.cpp
   descriptors/ChainDescriptorBuilder.cpp
   descriptors/descriptors_general.cpp
   descriptors/descriptors_node_descriptors.cpp

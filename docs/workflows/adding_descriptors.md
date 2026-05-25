@@ -16,6 +16,7 @@ analysis system: `NodeDescriptor` and `ChainDescriptor`.
 - [Composing Descriptors](#composing-descriptors)
 - [Testing Descriptors](#testing-descriptors)
 - [Analysis Trace System](#analysis-trace-system)
+- [Workflow Example: Anchor + Branch + Cardinality + Assignment](#workflow-example-anchor--branch--cardinality--assignment)
 - [Future Implementation Notes](#future-implementation-notes)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
@@ -78,6 +79,7 @@ Prefer the narrowest descriptor level that answers the question.
 | `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp` | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates |
 | `src/logic/descriptors/descriptors_general.h` | `and_`, `or_`, `not_` combinators |
 | `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp` | `ChainDescriptorBuilder` |
+| `src/logic/descriptors/AnchorBranchWorkflow.h/.cpp` | Anchor + branch + cardinality orchestration and assignment |
 | `src/logic/descriptors/DescriptorFormatter.h` | Base trace formatter |
 | `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp` | Plain-text trace rendering |
 | `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests |
@@ -151,6 +153,15 @@ const ChainDescriptor my_chain = ChainDescriptorBuilder{}
     .value();
 ```
 
+For minimum-length repeating segments, use `WhileIsTrueForN()`:
+
+```cpp
+const ChainDescriptor min_serial_3 = ChainDescriptorBuilder{}
+    .WhileIsTrueForN(is_serial, 3)
+    .Then(is_terminal)
+    .Build("is_serial_chain(min_length=3)");
+```
+
 If you only need to reuse node logic at the anchor node, convert it with
 `lift_to_chain()`:
 
@@ -215,6 +226,38 @@ Every descriptor evaluation populates an `AnalysisTrace` in the result's
 
 Use `TerminalDescriptorFormatter` to render a readable trace string.
 
+## Workflow Example: Anchor + Branch + Cardinality + Assignment
+
+`AnchorBranchWorkflow` supports a common orchestration flow:
+
+1. Validate an anchor node (`NodeDescriptor`)
+2. Evaluate each outgoing branch from that anchor (`ChainDescriptor`)
+3. Apply cardinality (`minimum_valid_branches`)
+4. Assign the first N passing branches (`assignment_count`)
+
+Example definition:
+
+```cpp
+const AnchorBranchWorkflow workflow{
+    {.m_anchor_rule = is_joint,
+     .m_branch_rule = is_serial_chain_of_min_length(3),
+     .m_minimum_valid_branches = 2,
+     .m_assignment_count = 2}};
+```
+
+Execution:
+
+```cpp
+const AnchorBranchWorkflowResult result =
+    workflow.Execute(scaffold.parts, anchor_id);
+```
+
+Result fields:
+
+- `m_overall_pass` — final pass/fail after cardinality
+- `m_assigned_branches` — first N passing branch paths
+- `m_branch_evaluations` — per-neighbour branch outcomes and diagnostics
+
 ## Future Implementation Notes
 
 1. **ChainDescriptorBuilder traversal polish** — continue improving cycle
@@ -253,4 +296,5 @@ Use `TerminalDescriptorFormatter` to render a readable trace string.
 - [ ] Defined the descriptor in the matching source file
 - [ ] Added or updated descriptor tests
 - [ ] Verified all call sites pass `scaffold.parts`
+- [ ] Used `AnchorBranchWorkflow` when the feature needs anchor + branch + cardinality assignment
 - [ ] Updated this document if the descriptor API changed

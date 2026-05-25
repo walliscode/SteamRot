@@ -14,6 +14,7 @@
 #include "depth_first_search.h"
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
+#include <cstddef>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -68,6 +69,22 @@ public:
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
   ChainDescriptorBuilder &WhileIsTrue(NodeDescriptor nd);
+
+  /////////////////////////////////////////////////
+  /// @brief Append a repeating predicate that matches at least
+  ///        @p min_repetitions consecutive nodes while @p nd holds.
+  ///
+  /// Adds a @c ChainStepKind::WhileIsTrueForN step. The DFS walk consumes nodes
+  /// satisfying @p nd until the first node that does not satisfy it, then
+  /// passes that node to the subsequent step. The step is rejected unless at
+  /// least @p min_repetitions nodes were consumed.
+  ///
+  /// @param nd NodeDescriptor evaluated repeatedly during the walk.
+  /// @param min_repetitions Minimum number of matches required before advancing.
+  /// @return *this for method chaining.
+  /////////////////////////////////////////////////
+  ChainDescriptorBuilder &WhileIsTrueForN(NodeDescriptor nd,
+                                          size_t min_repetitions);
 
   /////////////////////////////////////////////////
   /// @brief Returns a ChainDescriptor containing the steps added to this

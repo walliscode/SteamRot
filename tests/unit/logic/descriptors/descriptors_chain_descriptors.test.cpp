@@ -227,3 +227,43 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     }
   }
 }
+
+TEST_CASE("ChainDescriptor is_serial_chain_of_min_length",
+          "[unit][logic][descriptors]") {
+
+  using namespace steamrot::logic::descriptors;
+
+  // topology: frag0(terminal) ─ joint0(serial) ─ joint1(serial) ─
+  // frag1(terminal)
+  const steamrot::tests::PartGraphPackage pkg =
+      steamrot::tests::PartGraphBuilder{}
+          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1")
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")
+          .Connect("f0", 0, "j0", 0)
+          .ConnectUnchecked("j0", 1, "j1", 0)
+          .Connect("j1", 1, "f1", 0)
+          .Build();
+  const steamrot::PartGraph &parts = pkg.part_graph;
+
+  SECTION("min_length=2 passes for two serial nodes followed by terminal") {
+    const ChainDescriptor descriptor = is_serial_chain_of_min_length(2);
+    const ChainDescriptorResult result =
+        descriptor(parts, pkg.id_to_part_graph_id.at("j0"));
+
+    REQUIRE(descriptor.GetName() == "is_serial_chain(min_length=2)");
+    REQUIRE(result);
+    REQUIRE_FALSE(result.valid_subgraphs.empty());
+  }
+
+  SECTION("min_length=3 fails when only two serial nodes are available") {
+    const ChainDescriptor descriptor = is_serial_chain_of_min_length(3);
+    const ChainDescriptorResult result =
+        descriptor(parts, pkg.id_to_part_graph_id.at("j0"));
+
+    REQUIRE(descriptor.GetName() == "is_serial_chain(min_length=3)");
+    REQUIRE_FALSE(result);
+    REQUIRE(result.valid_subgraphs.empty());
+  }
+}

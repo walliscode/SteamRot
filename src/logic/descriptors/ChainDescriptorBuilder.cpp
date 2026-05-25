@@ -9,6 +9,7 @@
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -23,6 +24,17 @@ ChainDescriptorBuilder &ChainDescriptorBuilder::Then(NodeDescriptor nd) {
 /////////////////////////////////////////////////
 ChainDescriptorBuilder &ChainDescriptorBuilder::WhileIsTrue(NodeDescriptor nd) {
   m_steps.push_back({std::move(nd), ChainStepKind::WhileIsTrue});
+  return *this;
+}
+
+/////////////////////////////////////////////////
+ChainDescriptorBuilder &
+ChainDescriptorBuilder::WhileIsTrueForN(NodeDescriptor nd,
+                                        size_t min_repetitions) {
+  if (min_repetitions == 0)
+    min_repetitions = 1;
+  m_steps.push_back(
+      {std::move(nd), ChainStepKind::WhileIsTrueForN, min_repetitions});
   return *this;
 }
 
