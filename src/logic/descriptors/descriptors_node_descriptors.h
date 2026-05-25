@@ -113,30 +113,6 @@ private:
 };
 
 /////////////////////////////////////////////////
-/// @brief Predicate for a single node with full access to the PartGraph.
-///
-/// Semantically distinct from @c NodeDescriptor: use
-/// @c ContextualNodeDescriptor when the predicate examines neighbouring
-/// nodes via socket traversal, and @c NodeDescriptor when it examines only
-/// the named node's own data.
-///
-/// Both types share the same underlying class; the distinction is enforced
-/// by naming convention and the @c lift() conversion function.
-/////////////////////////////////////////////////
-using ContextualNodeDescriptor = NodeDescriptor;
-
-/////////////////////////////////////////////////
-/// @brief Lift a NodeDescriptor to a ContextualNodeDescriptor.
-///
-/// Both types share the same class; this is an identity conversion used to
-/// make the semantic promotion explicit at call sites.
-///
-/// @param nd NodeDescriptor to lift.
-/// @return ContextualNodeDescriptor wrapping @p nd.
-/////////////////////////////////////////////////
-inline ContextualNodeDescriptor lift(NodeDescriptor nd) { return nd; }
-
-/////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
 /// FragmentInstance.
 /////////////////////////////////////////////////

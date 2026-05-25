@@ -27,10 +27,9 @@ namespace steamrot::logic::descriptors {
 /////////////////////////////////////////////////
 /// Generic combinators
 ///
-/// Work uniformly with NodeDescriptor, ContextualNodeDescriptor,
-/// ChainDescriptor, and GraphDescriptor. Template deduction ensures that
-/// both arguments must be the same descriptor level; mixing levels is a
-/// compile error.
+/// Work uniformly with NodeDescriptor and ChainDescriptor. Template
+/// deduction ensures that both arguments must be the same descriptor level;
+/// mixing levels is a compile error.
 ///
 /// Each combinator:
 ///  - Composes a synthesised name from the inputs (e.g. "(a AND b)").

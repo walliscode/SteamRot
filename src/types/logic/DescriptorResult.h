@@ -61,8 +61,7 @@ struct DescriptorResult {
 
 /////////////////////////////////////////////////
 /// @struct NodeDescriptorResult
-/// @brief Result type for NodeDescriptor and ContextualNodeDescriptor
-///        evaluations.
+/// @brief Result type for NodeDescriptor evaluations.
 ///
 /// @c m_reason carries a human-readable explanation of the predicate
 /// outcome (e.g. "connection_count=2, expected<=1").
@@ -103,17 +102,6 @@ struct ChainDescriptorResult : DescriptorResult {
 
   ChainDescriptorResult() = default;
   explicit ChainDescriptorResult(bool result) : DescriptorResult(result) {}
-};
-
-/////////////////////////////////////////////////
-/// @struct GraphDescriptorResult
-/// @brief Result type for GraphDescriptor evaluations.
-///
-/// Inherits DescriptorResult's bool conversion and equality operators.
-/////////////////////////////////////////////////
-struct GraphDescriptorResult : DescriptorResult {
-  GraphDescriptorResult() = default;
-  explicit GraphDescriptorResult(bool result) : DescriptorResult(result) {}
 };
 
 } // namespace steamrot::logic::descriptors
