@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
-#include <unordered_map>
 #include <vector>
 
 using namespace steamrot::logic::descriptors;
@@ -204,7 +203,7 @@ TEST_CASE(
   //   frag0(id=0, terminal) ─ joint0(id=2, serial) ─ frag1(id=1, terminal)
   //   frag0.socket[1] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ frag1.socket[0]
-  const steamrot::PartGraphPackage pkg =
+  const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
           .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0") // id=0
           .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
@@ -231,8 +230,7 @@ TEST_CASE(
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        1)
+                        "connection_count=2, expected==2", 1)
             .MovingToNeighbour("j0", "f0", 0, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -275,8 +273,7 @@ TEST_CASE(
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        1)
+                        "connection_count=2, expected==2", 1)
             .MovingToNeighbour("j0", "f0", 0, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -312,15 +309,15 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
   //   frag0.socket[0] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ joint1.socket[0]
   //   joint1.socket[1] ↔ frag1.socket[0]
-  const steamrot::PartGraphPackage pkg =
+  const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
           .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0") // id=0
           .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1") // id=1
           .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")      // id=2
           .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")      // id=3
-          .Connect("f0", 0, "j0", 0)       // f0.socket[0] ↔ j0.socket[0]
+          .Connect("f0", 0, "j0", 0)          // f0.socket[0] ↔ j0.socket[0]
           .ConnectUnchecked("j0", 1, "j1", 0) // j0.socket[1] ↔ j1.socket[0]
-          .Connect("j1", 1, "f1", 0)       // j1.socket[1] ↔ f1.socket[0]
+          .Connect("j1", 1, "f1", 0)          // j1.socket[1] ↔ f1.socket[0]
           .Build();
   const steamrot::PartGraph &parts = pkg.part_graph;
   // IDs: frag0=0, frag1=1, joint0=2, joint1=3
@@ -342,8 +339,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        1)
+                        "connection_count=2, expected==2", 1)
             .MovingToNeighbour("j0", "f0", 0, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -352,8 +348,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
             .MovingToNeighbour("j0", "j1", 1, 1)
             .NodeEval("j1", "is_serial", 2)
             .NodeResult("j1", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        2)
+                        "connection_count=2, expected==2", 2)
             .MovingToNeighbour("j1", "f1", 1, 2)
             .NodeEval("f1", "is_serial", 3)
             .NodeResult("f1", "is_serial", false,
@@ -384,8 +379,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        1)
+                        "connection_count=2, expected==2", 1)
             .MovingToNeighbour("j0", "f0", 0, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -394,8 +388,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
             .MovingToNeighbour("j0", "j1", 1, 1)
             .NodeEval("j1", "is_serial", 2)
             .NodeResult("j1", "is_serial", true,
-                        "connection_count=2, expected==2",
-                        2)
+                        "connection_count=2, expected==2", 2)
             .MovingToNeighbour("j1", "f1", 1, 2)
             .NodeEval("f1", "is_serial", 3)
             .NodeResult("f1", "is_serial", false,
