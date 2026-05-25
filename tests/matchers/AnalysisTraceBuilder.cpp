@@ -29,23 +29,16 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
                                  uint32_t depth,
-                                 std::optional<uint32_t> anchor_id) {
+                                 std::optional<std::string> anchor_id_alias) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::ScopeBegin;
   ev.depth = depth;
   ev.scope_name = std::move(name);
   ev.scope_kind = kind;
-  ev.anchor_id = anchor_id;
+  if (anchor_id_alias.has_value())
+    ev.anchor_id = ResolvePartId(anchor_id_alias.value());
   m_trace.push_back(std::move(ev));
   return *this;
-}
-
-/////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
-                                 uint32_t depth,
-                                 const std::string &anchor_id_alias) {
-  return ScopeBegin(std::move(name), kind, depth, ResolvePartId(anchor_id_alias));
 }
 
 /////////////////////////////////////////////////
@@ -64,9 +57,9 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
-                                                     std::string predicate_name,
-                                                     uint32_t depth) {
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::NodeEvalById(uint32_t part_id, std::string predicate_name,
+                                   uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
   ev.depth = depth;
@@ -80,14 +73,15 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
                                std::string predicate_name, uint32_t depth) {
-  return NodeEval(ResolvePartId(part_id_alias), std::move(predicate_name), depth);
+  return NodeEvalById(ResolvePartId(part_id_alias), std::move(predicate_name),
+                      depth);
 }
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResult(uint32_t part_id, std::string predicate_name,
-                                 bool result, std::string reason,
-                                 uint32_t depth) {
+AnalysisTraceBuilder::NodeResultById(uint32_t part_id,
+                                    std::string predicate_name, bool result,
+                                    std::string reason, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeResult;
   ev.depth = depth;
@@ -104,14 +98,15 @@ AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
                                  std::string predicate_name, bool result,
                                  std::string reason, uint32_t depth) {
-  return NodeResult(ResolvePartId(part_id_alias), std::move(predicate_name),
-                    result, std::move(reason), depth);
+  return NodeResultById(ResolvePartId(part_id_alias), std::move(predicate_name),
+                        result, std::move(reason), depth);
 }
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
-AnalysisTraceBuilder::MovingToNeighbour(uint32_t from_id, uint32_t to_id,
-                                        uint32_t socket_id, uint32_t depth) {
+AnalysisTraceBuilder::MovingToNeighbourById(uint32_t from_id, uint32_t to_id,
+                                            uint32_t socket_id,
+                                            uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
@@ -127,13 +122,13 @@ AnalysisTraceBuilder &
 AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
                                         const std::string &to_id_alias,
                                         uint32_t socket_id, uint32_t depth) {
-  return MovingToNeighbour(ResolvePartId(from_id_alias), ResolvePartId(to_id_alias),
-                           socket_id, depth);
+  return MovingToNeighbourById(ResolvePartId(from_id_alias),
+                               ResolvePartId(to_id_alias), socket_id, depth);
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
-                                                         uint32_t depth) {
+AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(uint32_t from_id,
+                                                             uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -145,7 +140,7 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::Backtracking(const std::string &from_id_alias,
                                    uint32_t depth) {
-  return Backtracking(ResolvePartId(from_id_alias), depth);
+  return BacktrackingById(ResolvePartId(from_id_alias), depth);
 }
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {

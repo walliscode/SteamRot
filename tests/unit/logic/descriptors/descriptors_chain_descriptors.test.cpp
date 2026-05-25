@@ -17,6 +17,7 @@
 #include "part_graph_library.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_map>
 
 namespace {
 constexpr uint32_t kMissingPartId{9999};
@@ -37,7 +38,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
 
     // build expected trace
     AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}.EmptyPartGraph().Build();
+        steamrot::tests::AnalysisTraceBuilder{{}}.EmptyPartGraph().Build();
 
     // assert result and trace
     REQUIRE_FALSE(result);
@@ -50,14 +51,16 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     // test predicate: node 0 (fragment, connection_count=1) fails is_serial
     const steamrot::PartGraph &parts = steamrot::tests::pair.part_graph;
 
-    ChainDescriptorResult result = is_serial_chain(parts, 0);
+    ChainDescriptorResult result = is_serial_chain(
+        parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"));
 
     // build expected trace
     AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0, 0)
-            .NodeEval(0, "is_serial", 1)
-            .NodeResult(0, "is_serial", false,
+        steamrot::tests::AnalysisTraceBuilder{
+            steamrot::tests::pair.id_to_part_graph_id}
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0, "f0")
+            .NodeEval("f0", "is_serial", 1)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, false, 0)
             .Build();
@@ -73,7 +76,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     // test predicate: f0(id=0, terminal) ─ j0(id=2, serial) ─ f1(id=1, terminal)
     //   f0.socket[1] ↔ j0.socket[0]
     //   j0.socket[1]  ↔ f1.socket[0]
-    const steamrot::PartGraph parts =
+    const steamrot::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
             .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
                          "f0") // id=0
@@ -82,43 +85,45 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")   // id=2
             .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
-            .Build()
-            .part_graph;
+            .Build();
+    const steamrot::PartGraph &parts = pkg.part_graph;
 
     // feed the middle joint node of the LinearChain to prevent it failing
     // straight away on the first node; the joint has id=2
-    ChainDescriptorResult result = is_serial_chain(parts, 2);
+    ChainDescriptorResult result =
+        is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"));
 
     // build expected trace
     AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{} // begin chain at node 2
-            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0, 2)
+        steamrot::tests::AnalysisTraceBuilder{
+            pkg.id_to_part_graph_id} // begin chain at node 2
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 0, "j0")
             // node 2 (joint with 2 connections) satisfies is_serial
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
+            .NodeEval("j0", "is_serial", 1)
+            .NodeResult("j0", "is_serial", true, "connection_count=2, expected==2",
                         1)
             // socket[0] of joint leads to frag0 (id=0)
-            .MovingToNeighbour(2, 0, 0, 1)
+            .MovingToNeighbour("j0", "f0", 0, 1)
             // frag0 has 1 connection, so is_serial fails
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+            .NodeEval("f0", "is_serial", 2)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
             // WhileIsTrue consumed at least one node, so re-evaluate frag0
             // against the next step (is_terminal) without consuming it first
-            .NodeEval(0, "is_terminal", 2)
-            .NodeResult(0, "is_terminal", true,
+            .NodeEval("f0", "is_terminal", 2)
+            .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(0, 1)
+            .Backtracking("f0", 1)
             // socket[1] of joint leads to frag1 (id=1)
-            .MovingToNeighbour(2, 1, 1, 1)
+            .MovingToNeighbour("j0", "f1", 1, 1)
             // frag1 also has 1 connection, same pattern as frag0
-            .NodeEval(1, "is_serial", 2)
-            .NodeResult(1, "is_serial", false,
+            .NodeEval("f1", "is_serial", 2)
+            .NodeResult("f1", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .NodeEval(1, "is_terminal", 2)
-            .NodeResult(1, "is_terminal", true,
+            .NodeEval("f1", "is_terminal", 2)
+            .NodeResult("f1", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(1, 1)
+            .Backtracking("f1", 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, true, 0)
             .Build();
 
@@ -153,14 +158,15 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     SECTION("is_serial_chain evaluates from the start of the chain") {
       // build expected trace
       AnalysisTrace expected_trace =
-          steamrot::tests::AnalysisTraceBuilder{}
-              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, 0)
-              .NodeEval(0, is_serial.GetName(), 1)
-              .NodeResult(0, is_serial.GetName(), false,
+          steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, "f0")
+              .NodeEval("f0", is_serial.GetName(), 1)
+              .NodeResult("f0", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, false, 0)
               .Build();
-      ChainDescriptorResult result = is_serial_chain(parts, 0);
+      ChainDescriptorResult result =
+          is_serial_chain(parts, pkg.id_to_part_graph_id.at("f0"));
       // assert result
       REQUIRE_FALSE(result);
       REQUIRE(result.valid_subgraphs.size() == 0);
@@ -172,45 +178,46 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     SECTION("is_serial_chain evalutes from the second node") {
       // build expected trace
       AnalysisTrace expected_trace =
-          steamrot::tests::AnalysisTraceBuilder{}
-              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, 3)
-              .NodeEval(3, is_serial.GetName(), 1)
-              .NodeResult(3, is_serial.GetName(), true,
+          steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+              .ScopeBegin(is_serial_chain.GetName(), ScopeKind::Chain, 0, "j0")
+              .NodeEval("j0", is_serial.GetName(), 1)
+              .NodeResult("j0", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 1)
-              .MovingToNeighbour(3, 0, 0, 1)
-              .NodeEval(0, is_serial.GetName(), 2)
-              .NodeResult(0, is_serial.GetName(), false,
+              .MovingToNeighbour("j0", "f0", 0, 1)
+              .NodeEval("f0", is_serial.GetName(), 2)
+              .NodeResult("f0", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 2)
-              .NodeEval(0, is_terminal.GetName(), 2)
-              .NodeResult(0, is_terminal.GetName(), true,
+              .NodeEval("f0", is_terminal.GetName(), 2)
+              .NodeResult("f0", is_terminal.GetName(), true,
                           "connection_count=1, expected==1", 2)
-              .Backtracking(0, 1)
-              .MovingToNeighbour(3, 1, 1, 1)
-              .NodeEval(1, is_serial.GetName(), 2)
-              .NodeResult(1, is_serial.GetName(), true,
+              .Backtracking("f0", 1)
+              .MovingToNeighbour("j0", "f1", 1, 1)
+              .NodeEval("f1", is_serial.GetName(), 2)
+              .NodeResult("f1", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 2)
-              .MovingToNeighbour(1, 4, 1, 2)
-              .NodeEval(0, "is_terminal", 3)
-              .NodeResult(0, "is_terminal", true,
+              .MovingToNeighbour("f1", "j1", 1, 2)
+              .NodeEval("f0", "is_terminal", 3)
+              .NodeResult("f0", "is_terminal", true,
                           "connection_count=1, expected==1", 3)
-              .Backtracking(0, 1)
-              .MovingToNeighbour(3, 1, 4, 0)
-              .NodeEval(4, is_serial.GetName(), 3)
-              .NodeResult(4, is_serial.GetName(), true,
+              .Backtracking("f0", 1)
+              .MovingToNeighbour("j0", "f1", 4, 0)
+              .NodeEval("j1", is_serial.GetName(), 3)
+              .NodeResult("j1", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 3)
-              .MovingToNeighbour(4, 0, 2, 0)
-              .NodeEval(2, is_serial.GetName(), 4)
-              .NodeResult(2, is_serial.GetName(), false,
+              .MovingToNeighbour("j1", "f2", 2, 0)
+              .NodeEval("f2", is_serial.GetName(), 4)
+              .NodeResult("f2", is_serial.GetName(), false,
                           "connection_count=1, expected==2", 4)
-              .NodeEval(2, "is_terminal", 4)
-              .NodeResult(2, "is_terminal", true,
+              .NodeEval("f2", "is_terminal", 4)
+              .NodeResult("f2", "is_terminal", true,
                           "connection_count=1, expected==1", 4)
-              .Backtracking(2, 1)
-              .Backtracking(4, 1)
-              .Backtracking(3, 1)
+              .Backtracking("f2", 1)
+              .Backtracking("j1", 1)
+              .Backtracking("j0", 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
               .Build();
-      ChainDescriptorResult result = is_serial_chain(parts, 3);
+      ChainDescriptorResult result =
+          is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"));
       // assert result/
       REQUIRE_THAT(result.m_trace,
                    steamrot::tests::EqualsTrace(expected_trace,
