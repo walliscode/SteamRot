@@ -207,9 +207,9 @@ REQUIRE(result.m_result == true);
 Every descriptor evaluation populates an `AnalysisTrace` in the result's
 `m_trace` field.
 
-`ChainDescriptorResult` also records only single paths:
+`ChainDescriptorResult` also records path outputs:
 - `valid_subgraph` stores the first valid path, if one is found.
-- `invalid_subgraph` stores the first rejected path, if one is encountered.
+- `invalid_subgraphs` stores rejected paths encountered during traversal.
 
 | `TraceEventKind` | When emitted | Key fields |
 | --- | --- | --- |

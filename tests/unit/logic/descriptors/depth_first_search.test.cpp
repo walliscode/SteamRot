@@ -160,7 +160,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
 
     REQUIRE(result.valid_subgraph.has_value());
     REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{0});
-    REQUIRE_FALSE(result.invalid_subgraph.has_value());
+    REQUIRE(result.invalid_subgraphs.empty());
   }
 
   SECTION("isolated node not matching a Sequence step → one invalid subgraph") {
@@ -173,7 +173,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
         run_dfs(0, {make_step(is_joint, ChainStepKind::Sequence)}, parts);
 
     REQUIRE_FALSE(result.valid_subgraph.has_value());
-    REQUIRE(result.invalid_subgraph.has_value());
+    REQUIRE(result.invalid_subgraphs.size() == 1);
   }
 
   SECTION(
@@ -187,7 +187,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
         run_dfs(9999, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
 
     REQUIRE_FALSE(result.valid_subgraph.has_value());
-    REQUIRE(result.invalid_subgraph.has_value());
+    REQUIRE(result.invalid_subgraphs.size() == 1);
   }
 }
 

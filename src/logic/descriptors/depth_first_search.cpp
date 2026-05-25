@@ -62,8 +62,7 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /////////////////////////////////////////////////
   const auto current_node = parts.find(cursor.current_id);
   if (current_node == parts.end()) {
-    if (!result.invalid_subgraph.has_value())
-      result.invalid_subgraph = context.current_chain;
+    result.invalid_subgraphs.push_back(context.current_chain);
     AnalysisEvent invalid_event{};
     invalid_event.kind = TraceEventKind::InvalidSubgraphIsolated;
     invalid_event.depth = cursor.depth;
@@ -110,8 +109,7 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   case TransitionKind::Reject: {
     // Record the rejected path and return; the NodeResult trace event already
     // explains why the predicate failed.
-    if (!result.invalid_subgraph.has_value())
-      result.invalid_subgraph = context.current_chain;
+    result.invalid_subgraphs.push_back(context.current_chain);
     return;
   }
 

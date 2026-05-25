@@ -82,10 +82,10 @@ struct NodeDescriptorResult : DescriptorResult {
 /// @struct ChainDescriptorResult
 /// @brief Result type for ChainDescriptor evaluations.
 ///
-/// @c valid_subgraph and @c invalid_subgraph record the first matching and
-/// first rejected part-ID path explored by the DFS. The @c m_trace (inherited
-/// from DescriptorResult) contains the full structured event sequence and is
-/// the primary source for analysis output.
+/// @c valid_subgraph records the first matching part-ID path and
+/// @c invalid_subgraphs records rejected part-ID paths explored by the DFS.
+/// The @c m_trace (inherited from DescriptorResult) contains the full
+/// structured event sequence and is the primary source for analysis output.
 /////////////////////////////////////////////////
 struct ChainDescriptorResult : DescriptorResult {
 
@@ -96,10 +96,10 @@ struct ChainDescriptorResult : DescriptorResult {
   std::optional<std::vector<uint32_t>> valid_subgraph{};
 
   /////////////////////////////////////////////////
-  /// @brief First part-ID path that partially satisfies the chain pattern but
-  /// fails at some step.
+  /// @brief Ordered sets of part IDs that partially satisfy the chain pattern
+  /// but fail at some step.
   /////////////////////////////////////////////////
-  std::optional<std::vector<uint32_t>> invalid_subgraph{};
+  std::vector<std::vector<uint32_t>> invalid_subgraphs{};
 
   ChainDescriptorResult() = default;
   explicit ChainDescriptorResult(bool result) : DescriptorResult(result) {}
