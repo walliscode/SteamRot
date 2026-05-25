@@ -54,6 +54,8 @@ Transition resolve_transition(const ChainStep &step,
 /////////////////////////////////////////////////
 void depth_first_search(Cursor cursor, DFSContext &context,
                         const PartGraph &parts, ChainDescriptorResult &result) {
+  if (result.valid_subgraph.has_value())
+    return;
 
   /////////////////////////////////////////////////
   /// SECTION: Validate that the current node exists in the graph
@@ -76,7 +78,8 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /// accumulated so far is recorded as valid.
   /////////////////////////////////////////////////
   if (cursor.steps_it == context.steps_end) {
-    result.valid_subgraphs.push_back(context.current_chain);
+    if (!result.valid_subgraph.has_value())
+      result.valid_subgraph = context.current_chain;
     return;
   }
 
@@ -150,7 +153,8 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /// step to match against them.
   /////////////////////////////////////////////////
   if (cursor.steps_it == context.steps_end) {
-    result.valid_subgraphs.push_back(context.current_chain);
+    if (!result.valid_subgraph.has_value())
+      result.valid_subgraph = context.current_chain;
     context.visited.erase(cursor.current_id);
     context.current_chain.pop_back();
     return;
@@ -218,6 +222,9 @@ void depth_first_search(Cursor cursor, DFSContext &context,
         current_node->second);
     backtrack_event.to_socket_id = socket_id;
     context.trace.push_back(std::move(backtrack_event));
+
+    if (result.valid_subgraph.has_value())
+      break;
   }
 
   /////////////////////////////////////////////////

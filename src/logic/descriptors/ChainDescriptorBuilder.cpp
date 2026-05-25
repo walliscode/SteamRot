@@ -94,7 +94,7 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         start_cursor.depth = 1;
         depth_first_search(start_cursor, context, parts, result);
 
-        if (!result.valid_subgraphs.empty()) {
+        if (result.valid_subgraph.has_value()) {
           result.m_result = true;
         }
 

@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "AnalysisEvent.h"
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -81,24 +82,24 @@ struct NodeDescriptorResult : DescriptorResult {
 /// @struct ChainDescriptorResult
 /// @brief Result type for ChainDescriptor evaluations.
 ///
-/// @c valid_subgraphs and @c invalid_subgraphs record the part-ID paths
-/// explored by the DFS. The @c m_trace (inherited from DescriptorResult)
-/// contains the full structured event sequence and is the primary source
-/// for analysis output.
+/// @c valid_subgraph records the first matching part-ID path and
+/// @c invalid_subgraphs records rejected part-ID paths explored by the DFS.
+/// The @c m_trace (inherited from DescriptorResult) contains the full
+/// structured event sequence and is the primary source for analysis output.
 /////////////////////////////////////////////////
 struct ChainDescriptorResult : DescriptorResult {
 
   /////////////////////////////////////////////////
-  /// @brief Ordered sets of part IDs (one per match) that satisfy the chain
-  /// pattern from the anchor node.
+  /// @brief First part-ID path that satisfies the chain pattern from the
+  /// anchor node.
   /////////////////////////////////////////////////
-  std::vector<std::vector<uint32_t>> valid_subgraphs;
+  std::optional<std::vector<uint32_t>> valid_subgraph{};
 
   /////////////////////////////////////////////////
   /// @brief Ordered sets of part IDs that partially satisfy the chain pattern
   /// but fail at some step.
   /////////////////////////////////////////////////
-  std::vector<std::vector<uint32_t>> invalid_subgraphs;
+  std::vector<std::vector<uint32_t>> invalid_subgraphs{};
 
   ChainDescriptorResult() = default;
   explicit ChainDescriptorResult(bool result) : DescriptorResult(result) {}
