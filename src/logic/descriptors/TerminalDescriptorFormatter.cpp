@@ -19,6 +19,13 @@ namespace {
 std::string Indent(uint32_t depth) { return std::string(depth * 2u, ' '); }
 
 /////////////////////////////////////////////////
+/// @brief Format a node/socket endpoint label.
+/////////////////////////////////////////////////
+std::string FormatEndpoint(const std::string &node_label, uint32_t socket_id) {
+  return node_label + ".socket#" + std::to_string(socket_id);
+}
+
+/////////////////////////////////////////////////
 /// @brief Format a single AnalysisEvent as a terminal line.
 /////////////////////////////////////////////////
 std::string FormatEvent(const AnalysisEvent &ev) {
@@ -89,15 +96,21 @@ std::string FormatEvent(const AnalysisEvent &ev) {
     const std::string to_label = ev.to_id_alias.empty()
                                      ? "node#" + std::to_string(ev.to_id)
                                      : ev.to_id_alias;
-    return indent + "[MOVE]  " + from_label + " -> " + to_label +
-           "  socket=" + std::to_string(ev.socket_id);
+    return indent + "[MOVE]  " +
+           FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
+           FormatEndpoint(to_label, ev.to_socket_id);
   }
 
   case TraceEventKind::Backtracking: {
     const std::string from_label = ev.from_id_alias.empty()
-                                       ? "node#" + std::to_string(ev.from_id)
-                                       : ev.from_id_alias;
-    return indent + "[BACK]  <- " + from_label;
+                                      ? "node#" + std::to_string(ev.from_id)
+                                      : ev.from_id_alias;
+    const std::string to_label = ev.to_id_alias.empty()
+                                     ? "node#" + std::to_string(ev.to_id)
+                                     : ev.to_id_alias;
+    return indent + "[BACK]  " +
+           FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
+           FormatEndpoint(to_label, ev.to_socket_id);
   }
 
   case TraceEventKind::ValidSubgraphIsolated: {
