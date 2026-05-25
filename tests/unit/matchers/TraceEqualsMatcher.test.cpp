@@ -11,6 +11,8 @@
 #include "TerminalDescriptorFormatter.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
+#include <stdexcept>
+#include <unordered_map>
 
 using namespace steamrot::logic::descriptors;
 namespace tests = steamrot::tests;
@@ -165,6 +167,46 @@ TEST_CASE("AnalysisTraceBuilder::Build returns a copy",
 
   REQUIRE(first.size() == 1);
   REQUIRE(second.size() == 2);
+}
+
+TEST_CASE("AnalysisTraceBuilder resolves string IDs via id_to_part_graph_id",
+          "[unit][descriptors][builder][matcher]") {
+  const std::unordered_map<std::string, uint32_t> id_to_part_graph_id{
+      {"f0", 0u}, {"j0", 2u}};
+
+  tests::AnalysisTraceBuilder builder{id_to_part_graph_id};
+  builder
+      .ScopeBegin("chain", ScopeKind::Chain, 0u, "f0")
+      .NodeEval("f0", "is_fragment", 1u)
+      .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance", 1u)
+      .MovingToNeighbour("f0", "j0", 0u, 1u)
+      .Backtracking("j0", 1u);
+
+  const AnalysisTrace trace = builder.Build();
+  REQUIRE(trace.size() == 5);
+  REQUIRE(trace[0].anchor_id.has_value());
+  REQUIRE(trace[0].anchor_id.value() == 0u);
+  REQUIRE(trace[1].part_id == 0u);
+  REQUIRE(trace[2].part_id == 0u);
+  REQUIRE(trace[3].from_id == 0u);
+  REQUIRE(trace[3].to_id == 2u);
+  REQUIRE(trace[4].from_id == 2u);
+}
+
+TEST_CASE("AnalysisTraceBuilder string-ID overloads validate alias map",
+          "[unit][descriptors][builder][matcher]") {
+  SECTION("throws when string overload is used without alias map") {
+    tests::AnalysisTraceBuilder builder;
+    REQUIRE_THROWS_AS(builder.NodeEval("f0", "is_fragment"), std::logic_error);
+  }
+
+  SECTION("throws when alias is missing from alias map") {
+    const std::unordered_map<std::string, uint32_t> id_to_part_graph_id{
+        {"f0", 0u}};
+    tests::AnalysisTraceBuilder builder{id_to_part_graph_id};
+    REQUIRE_THROWS_AS(builder.NodeEval("missing", "is_fragment"),
+                      std::out_of_range);
+  }
 }
 
 // ─── TraceEqualsMatcher ──────────────────────────────────────────────────────

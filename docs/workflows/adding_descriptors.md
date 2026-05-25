@@ -640,15 +640,33 @@ REQUIRE_THAT(nd_result.m_trace,
              steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
 ```
 
+If your test scaffold uses string aliases (for example from
+`PartGraphPackage::id_to_part_graph_id`), construct the builder with that map
+and use string-ID overloads:
+
+```cpp
+steamrot::tests::AnalysisTraceBuilder trace_builder{
+    package.id_to_part_graph_id};
+
+trace_builder
+    .NodeEval("f0", "is_fragment")
+    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
+```
+
 Available builder methods:
 
 | Method                                                             | Event emitted                                     |
 | ------------------------------------------------------------------ | ------------------------------------------------- |
 | `.NodeEval(part_id, predicate_name, depth=0)`                      | `TraceEventKind::NodeEval`                        |
+| `.NodeEval(part_id_alias, predicate_name, depth=0)`                | `TraceEventKind::NodeEval`                        |
 | `.NodeResult(part_id, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult`                      |
+| `.NodeResult(part_id_alias, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult`                |
 | `.MovingToNeighbour(from_id, to_id, socket_id, depth=0)`           | `TraceEventKind::MovingToNeighbour`               |
+| `.MovingToNeighbour(from_id_alias, to_id_alias, socket_id, depth=0)` | `TraceEventKind::MovingToNeighbour`            |
 | `.Backtracking(from_id, depth=0)`                                  | `TraceEventKind::Backtracking`                    |
+| `.Backtracking(from_id_alias, depth=0)`                            | `TraceEventKind::Backtracking`                    |
 | `.ScopeBegin(name, kind, depth=0, anchor_id=nullopt)`              | `TraceEventKind::ScopeBegin`                      |
+| `.ScopeBegin(name, kind, depth, anchor_id_alias)`                  | `TraceEventKind::ScopeBegin`                      |
 | `.ScopeEnd(name, kind, result, depth=0)`                           | `TraceEventKind::ScopeEnd`                        |
 | `.Build()`                                                         | Returns a copy of the accumulated `AnalysisTrace` |
 
