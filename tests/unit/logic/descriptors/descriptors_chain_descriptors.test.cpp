@@ -70,7 +70,8 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
   }
 
   SECTION("is_serial_chain evaluates LinearChain") {
-    // test predicate: f0(id=0, terminal) ─ j0(id=2, serial) ─ f1(id=1, terminal)
+    // test predicate: f0(id=0, terminal) ─ j0(id=2, serial) ─ f1(id=1,
+    // terminal)
     //   f0.socket[1] ↔ j0.socket[0]
     //   j0.socket[1]  ↔ f1.socket[0]
     const steamrot::PartGraph parts =
@@ -78,8 +79,8 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
                          "f0") // id=0
             .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
-                         "f1")                                          // id=1
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")   // id=2
+                         "f1")                                       // id=1
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0") // id=2
             .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
             .Build()
@@ -131,18 +132,22 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
   }
 
   SECTION("is_serial_chain evalutes serial chain that is 5 parts long") {
-    // f0(id=0, terminal) ─ j0(id=3, serial) ─ f1(id=1, serial) ─ j1(id=4, serial) ─ f2(id=2, terminal)
+    // f0(id=0, terminal) ─ j0(id=3, serial) ─ f1(id=1, serial) ─ j1(id=4,
+    // serial) ─ f2(id=2, terminal)
     //   f0.socket[0] ↔ j0.socket[0]
     //   j0.socket[1] ↔ f1.socket[0]
     //   f1.socket[1] ↔ j1.socket[0]
     //   j1.socket[1] ↔ f2.socket[0]
-    const steamrot::PartGraphPackage pkg =
+    const steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")  // id=0
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f2")  // id=2
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")       // id=3
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")       // id=4
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket,
+                         "f0") // id=0
+            .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
+                         "f1") // id=1
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket,
+                         "f2")                                       // id=2
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0") // id=3
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1") // id=4
             .Connect("f0", 0, "j0", 0) // f0.socket[0] ↔ j0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
             .Connect("f1", 1, "j1", 0) // f1.socket[1] ↔ j1.socket[0]
