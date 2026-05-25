@@ -624,6 +624,8 @@ namespace descriptors = steamrot::logic::descriptors;
 steamrot::tests::PartLibraryBuilder builder{lib};
 auto result = builder.MakeConnectedScaffold({"fragment_one_socket"}, {}, {});
 const uint32_t frag_id = result.part_ids[0];
+const std::unordered_map<std::string, uint32_t> id_to_part_graph_id{
+    {"f0", frag_id}};
 
 // Run the descriptor
 auto nd_result = descriptors::is_fragment(result.scaffold.parts, frag_id);
@@ -631,24 +633,36 @@ REQUIRE(nd_result.m_result == true);
 
 // Build expected trace
 descriptors::TerminalDescriptorFormatter fmt;
-steamrot::tests::AnalysisTraceBuilder trace_builder;
+steamrot::tests::AnalysisTraceBuilder trace_builder{id_to_part_graph_id};
 trace_builder
-    .NodeEval(frag_id, "is_fragment")
-    .NodeResult(frag_id, "is_fragment", true, "node holds FragmentInstance");
+    .NodeEval("f0", "is_fragment")
+    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 
 REQUIRE_THAT(nd_result.m_trace,
              steamrot::tests::EqualsTrace(trace_builder.Build(), fmt));
+```
+
+Construct the builder with an alias map (for example from
+`PartGraphPackage::id_to_part_graph_id`) and use string part IDs:
+
+```cpp
+steamrot::tests::AnalysisTraceBuilder trace_builder{
+    package.id_to_part_graph_id};
+
+trace_builder
+    .NodeEval("f0", "is_fragment")
+    .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance");
 ```
 
 Available builder methods:
 
 | Method                                                             | Event emitted                                     |
 | ------------------------------------------------------------------ | ------------------------------------------------- |
-| `.NodeEval(part_id, predicate_name, depth=0)`                      | `TraceEventKind::NodeEval`                        |
-| `.NodeResult(part_id, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult`                      |
-| `.MovingToNeighbour(from_id, to_id, socket_id, depth=0)`           | `TraceEventKind::MovingToNeighbour`               |
-| `.Backtracking(from_id, depth=0)`                                  | `TraceEventKind::Backtracking`                    |
-| `.ScopeBegin(name, kind, depth=0, anchor_id=nullopt)`              | `TraceEventKind::ScopeBegin`                      |
+| `.NodeEval(part_id_alias, predicate_name, depth=0)`                | `TraceEventKind::NodeEval`                        |
+| `.NodeResult(part_id_alias, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult`                |
+| `.MovingToNeighbour(from_id_alias, to_id_alias, socket_id, depth=0)` | `TraceEventKind::MovingToNeighbour`            |
+| `.Backtracking(from_id_alias, depth=0)`                            | `TraceEventKind::Backtracking`                    |
+| `.ScopeBegin(name, kind, depth=0, anchor_id_alias=nullopt)`        | `TraceEventKind::ScopeBegin`                      |
 | `.ScopeEnd(name, kind, result, depth=0)`                           | `TraceEventKind::ScopeEnd`                        |
 | `.Build()`                                                         | Returns a copy of the accumulated `AnalysisTrace` |
 
@@ -841,55 +855,38 @@ SECTION("Trace matches expected DFS events from a terminal-fragment anchor") {
   namespace descriptors = steamrot::logic::descriptors;
   descriptors::TerminalDescriptorFormatter fmt;
 
-  // anchor_id = first fragment in the LinearChain scenario
-  // The LinearChain scenario inserts: frag0, frag1, joint0.
-  // Insertion-order IDs come from part_ids; for the pre-built scenario
-  // the IDs are stable across test runs.
-  const steamrot::MachinaFormScaffold &scaffold =
-      lib.scaffold_scenarios.at(steamrot::tests::ScaffoldScenario::LinearChain);
-
-  // Identify the fragment IDs and joint ID from the map
-  std::vector<uint32_t> frag_ids, joint_ids;
-  for (const auto &[id, v] : scaffold.parts) {
-    if (std::holds_alternative<steamrot::FragmentInstance>(v))
-      frag_ids.push_back(id);
-    else
-      joint_ids.push_back(id);
-  }
-  REQUIRE(frag_ids.size() == 2);
-  REQUIRE(joint_ids.size() == 1);
-
-  const uint32_t anchor = frag_ids[0];
-  const uint32_t serial = joint_ids[0];
-  const uint32_t far_end = frag_ids[1];
+  const steamrot::tests::PartGraphPackage &package = steamrot::tests::linear_chain_3;
+  const steamrot::PartGraph &parts = package.part_graph;
 
   ChainDescriptorResult result =
-      descriptors::linear_3_chain(scaffold.parts, anchor);
+      descriptors::linear_3_chain(
+          parts, package.id_to_part_graph_id.at("f0"));
   REQUIRE(result.m_result == true);
 
   // Build expected trace. Depths: ScopeBegin=0, anchor=1, serial=2, far_end=3.
-  steamrot::tests::AnalysisTraceBuilder builder;
+  steamrot::tests::AnalysisTraceBuilder builder{package.id_to_part_graph_id};
   builder
-    .ScopeBegin("linear_3_chain", descriptors::ScopeKind::Chain, 0u, anchor)
+    .ScopeBegin("linear_3_chain", descriptors::ScopeKind::Chain, 0u,
+                "f0")
     // Step 1: anchor satisfies is_terminal
-    .NodeEval(anchor, "has_maximum_n_edges(1)", 1u)
-    .NodeResult(anchor, "has_maximum_n_edges(1)", true,
+    .NodeEval("f0", "has_maximum_n_edges(1)", 1u)
+    .NodeResult("f0", "has_maximum_n_edges(1)", true,
                 "connection_count=1, expected<=1", 1u)
     // DFS moves to the serial joint; socket_id depends on SocketMap insertion order
-    .MovingToNeighbour(anchor, serial, 0u, 1u)  // socket_id may need adjustment based on SocketMap order
+    .MovingToNeighbour("f0", "j0", 0u, 1u)  // socket_id may need adjustment based on SocketMap order
     // Step 2: serial joint satisfies is_serial
-    .NodeEval(serial, "has_exactly_n_edges(2)", 2u)
-    .NodeResult(serial, "has_exactly_n_edges(2)", true,
+    .NodeEval("j0", "has_exactly_n_edges(2)", 2u)
+    .NodeResult("j0", "has_exactly_n_edges(2)", true,
                 "connection_count=2, expected==2", 2u)
     // DFS moves to far-end fragment
-    .MovingToNeighbour(serial, far_end, /*socket_id*/1u, 2u)
+    .MovingToNeighbour("j0", "f1", /*socket_id*/1u, 2u)
     // Step 3: far-end fragment satisfies is_terminal
-    .NodeEval(far_end, "has_maximum_n_edges(1)", 3u)
-    .NodeResult(far_end, "has_maximum_n_edges(1)", true,
+    .NodeEval("f1", "has_maximum_n_edges(1)", 3u)
+    .NodeResult("f1", "has_maximum_n_edges(1)", true,
                 "connection_count=1, expected<=1", 3u)
     // All steps matched — no more steps to consume, DFS returns
-    .Backtracking(far_end, 2u)
-    .Backtracking(serial, 1u)
+    .Backtracking("f1", 2u)
+    .Backtracking("j0", 1u)
     .ScopeEnd("linear_3_chain", descriptors::ScopeKind::Chain, true, 0u);
 
   REQUIRE_THAT(result.m_trace, steamrot::tests::EqualsTrace(builder.Build(), fmt));
