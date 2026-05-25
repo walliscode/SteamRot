@@ -74,7 +74,7 @@ TEST_CASE("AnalysisTraceBuilder::NodeResult reason defaults to empty",
 TEST_CASE("AnalysisTraceBuilder::MovingToNeighbour appends correct event",
           "[unit][descriptors][builder][matcher]") {
   tests::AnalysisTraceBuilder builder{kPartIds};
-  builder.MovingToNeighbour("j0", "f1", 0u, 3u);
+  builder.MovingToNeighbour("j0", 4u, "f1", 9u, 3u);
 
   const AnalysisTrace trace = builder.Build();
   REQUIRE(trace.size() == 1);
@@ -82,15 +82,16 @@ TEST_CASE("AnalysisTraceBuilder::MovingToNeighbour appends correct event",
   const AnalysisEvent &ev = trace[0];
   REQUIRE(ev.kind == TraceEventKind::MovingToNeighbour);
   REQUIRE(ev.from_id == 1u);
+  REQUIRE(ev.from_socket_id == 4u);
   REQUIRE(ev.to_id == 2u);
-  REQUIRE(ev.socket_id == 0u);
+  REQUIRE(ev.to_socket_id == 9u);
   REQUIRE(ev.depth == 3u);
 }
 
 TEST_CASE("AnalysisTraceBuilder::Backtracking appends correct event",
           "[unit][descriptors][builder][matcher]") {
   tests::AnalysisTraceBuilder builder{kPartIds};
-  builder.Backtracking("p5", 2u);
+  builder.Backtracking("p5", 6u, "p3", 2u, 2u);
 
   const AnalysisTrace trace = builder.Build();
   REQUIRE(trace.size() == 1);
@@ -98,6 +99,9 @@ TEST_CASE("AnalysisTraceBuilder::Backtracking appends correct event",
   const AnalysisEvent &ev = trace[0];
   REQUIRE(ev.kind == TraceEventKind::Backtracking);
   REQUIRE(ev.from_id == 5u);
+  REQUIRE(ev.from_socket_id == 6u);
+  REQUIRE(ev.to_id == 3u);
+  REQUIRE(ev.to_socket_id == 2u);
   REQUIRE(ev.depth == 2u);
 }
 
@@ -153,11 +157,11 @@ TEST_CASE(
       .NodeEval("j0", "is_terminal", 1u)
       .NodeResult("j0", "is_terminal", true, "connection_count=1, expected<=1",
                   1u)
-      .MovingToNeighbour("j0", "f1", 0u, 1u)
+      .MovingToNeighbour("j0", 0u, "f1", 1u, 1u)
       .NodeEval("f1", "is_terminal", 2u)
       .NodeResult("f1", "is_terminal", false, "connection_count=2, expected<=1",
                   2u)
-      .Backtracking("f1", 1u)
+      .Backtracking("f1", 1u, "j0", 0u, 1u)
       .ScopeEnd("chain", ScopeKind::Chain, false, 0u);
 
   REQUIRE(builder.Build().size() == 8);
@@ -185,8 +189,8 @@ TEST_CASE("AnalysisTraceBuilder resolves string IDs via id_to_part_graph_id",
   builder.ScopeBegin("chain", ScopeKind::Chain, 0u, "f0")
       .NodeEval("f0", "is_fragment", 1u)
       .NodeResult("f0", "is_fragment", true, "node holds FragmentInstance", 1u)
-      .MovingToNeighbour("f0", "j0", 0u, 1u)
-      .Backtracking("j0", 1u);
+      .MovingToNeighbour("f0", 0u, "j0", 1u, 1u)
+      .Backtracking("j0", 1u, "f0", 0u, 1u);
 
   const AnalysisTrace trace = builder.Build();
   REQUIRE(trace.size() == 5);

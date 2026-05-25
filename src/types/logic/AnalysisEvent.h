@@ -55,12 +55,12 @@ enum class TraceEventKind {
 ///
 /// | kind               | fields used |
 /// |--------------------|------------------------------------------------------|
-/// | NodeEval           | depth, part_id, predicate_name | | NodeResult |
-/// depth, part_id, predicate_name, result, reason        | | MovingToNeighbour
-/// | depth, from_id, to_id, socket_id                     | | Backtracking |
-/// depth, from_id                                       | | ScopeBegin | depth,
-/// scope_name, scope_kind, anchor_id (optional)  | | ScopeEnd           |
-/// depth, scope_name, scope_kind, result                 |
+/// | NodeEval           | depth, part_id, predicate_name |
+/// | NodeResult         | depth, part_id, predicate_name, result, reason |
+/// | MovingToNeighbour  | depth, from_id, to_id, from_socket_id, to_socket_id |
+/// | Backtracking       | depth, from_id, to_id, from_socket_id, to_socket_id |
+/// | ScopeBegin         | depth, scope_name, scope_kind, anchor_id (optional) |
+/// | ScopeEnd           | depth, scope_name, scope_kind, result |
 /////////////////////////////////////////////////
 struct AnalysisEvent {
   /////////////////////////////////////////////////
@@ -123,8 +123,8 @@ struct AnalysisEvent {
   std::string from_id_alias{};
 
   /////////////////////////////////////////////////
-  /// @brief Part ID of the destination node for a traversal.
-  /// Populated for MovingToNeighbour.
+  /// @brief Part ID of the destination node for a traversal or backtrack.
+  /// Populated for MovingToNeighbour and Backtracking.
   /////////////////////////////////////////////////
   uint32_t to_id{0};
 
@@ -134,10 +134,16 @@ struct AnalysisEvent {
   std::string to_id_alias{};
 
   /////////////////////////////////////////////////
-  /// @brief Socket ID on the source part through which the edge is traversed.
-  /// Populated for MovingToNeighbour.
+  /// @brief Socket ID on the source node through which the edge is traversed.
+  /// Populated for MovingToNeighbour and Backtracking.
   /////////////////////////////////////////////////
-  uint32_t socket_id{0};
+  uint32_t from_socket_id{0};
+
+  /////////////////////////////////////////////////
+  /// @brief Socket ID on the destination node reached by the traversal.
+  /// Populated for MovingToNeighbour and Backtracking.
+  /////////////////////////////////////////////////
+  uint32_t to_socket_id{0};
 
   // ── ScopeBegin / ScopeEnd ─────────────────────────────────────────────────
 

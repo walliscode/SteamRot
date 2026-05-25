@@ -118,25 +118,34 @@ public:
   /////////////////////////////////////////////////
   /// @brief Append a MovingToNeighbour event using string part aliases.
   ///
-  /// @param from_id_alias Source part alias.
-  /// @param to_id_alias   Destination part alias.
-  /// @param socket_id     Socket ID on the source part through which the edge
-  ///                      is traversed.
-  /// @param depth         Nesting depth of this event.
+  /// @param from_id_alias   Source part alias.
+  /// @param from_socket_id  Source socket ID through which the edge is
+  ///                        traversed.
+  /// @param to_id_alias     Destination part alias.
+  /// @param to_socket_id    Destination socket ID reached by the traversal.
+  /// @param depth           Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &MovingToNeighbour(const std::string &from_id_alias,
+                                          uint32_t from_socket_id,
                                           const std::string &to_id_alias,
-                                          uint32_t socket_id, uint32_t depth);
+                                          uint32_t to_socket_id,
+                                          uint32_t depth);
 
   /////////////////////////////////////////////////
   /// @brief Append a Backtracking event using a string part alias.
   ///
-  /// @param from_id_alias Part alias of the node being backtracked from.
-  /// @param depth         Nesting depth of this event.
+  /// @param from_id_alias   Part alias of the node being backtracked from.
+  /// @param from_socket_id  Socket ID on the source node.
+  /// @param to_id_alias     Part alias of the destination node.
+  /// @param to_socket_id    Socket ID on the destination node.
+  /// @param depth           Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &Backtracking(const std::string &from_id_alias,
+                                     uint32_t from_socket_id,
+                                     const std::string &to_id_alias,
+                                     uint32_t to_socket_id,
                                      uint32_t depth);
 
   AnalysisTraceBuilder &ValidSubgraphIsolated();
@@ -183,10 +192,16 @@ public:
   steamrot::logic::descriptors::AnalysisTrace Build() const;
 
 private:
-  AnalysisTraceBuilder &MovingToNeighbourById(uint32_t from_id, uint32_t to_id,
-                                              uint32_t socket_id,
+  AnalysisTraceBuilder &MovingToNeighbourById(uint32_t from_id,
+                                              uint32_t from_socket_id,
+                                              uint32_t to_id,
+                                              uint32_t to_socket_id,
                                               uint32_t depth);
-  AnalysisTraceBuilder &BacktrackingById(uint32_t from_id, uint32_t depth);
+  AnalysisTraceBuilder &BacktrackingById(uint32_t from_id,
+                                         uint32_t from_socket_id,
+                                         uint32_t to_id,
+                                         uint32_t to_socket_id,
+                                         uint32_t depth);
   uint32_t ResolvePartId(const std::string &part_id_alias) const;
 
   const std::unordered_map<std::string, uint32_t> *m_id_to_part_graph_id{
