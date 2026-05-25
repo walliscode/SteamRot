@@ -157,8 +157,8 @@ Start: I need to query something about the assembled machine.
 
 | File                                                                 | Purpose                                                                                                                           |
 | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `src/types/entity/MachinaFormScaffold.h`                             | `PartGraph` type alias; `JointInstance`, `FragmentInstance`, `PartInstance`, `SocketMap`, `SocketData`, `SocketConnection`        |
-| `src/types/logic/AnalysisEvent.h`                                    | `TraceEventKind`, `ScopeKind`, `AnalysisEvent`, `AnalysisTrace`, `Merge()`                                                        |
+| `src/types/entity/MachinaFormScaffold.h`                             | `PartGraph` type alias; `JointInstance`, `FragmentInstance`, `PartInstance` (+ `alias` field), `SocketMap`, `SocketData`, `SocketConnection` |
+| `src/types/logic/AnalysisEvent.h`                                    | `TraceEventKind`, `ScopeKind`, `AnalysisEvent` (+ `part_id_alias`, `from_id_alias`, `to_id_alias` fields), `AnalysisTrace`, `Merge()` |
 | `src/types/logic/DescriptorResult.h`                                 | `NodeDescriptorResult` (+ `m_reason`), `ChainDescriptorResult`, `GraphDescriptorResult`, `DescriptorResult` (base with `m_trace`) |
 | `src/logic/descriptors/descriptors_node_descriptors.h/.cpp`          | `NodeDescriptor` class, `ContextualNodeDescriptor` alias, `lift`, concrete predicates                                             |
 | `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp`         | `ChainDescriptor` class, `lift_to_chain`, concrete chain predicates                                                               |
@@ -166,7 +166,7 @@ Start: I need to query something about the assembled machine.
 | `src/logic/descriptors/descriptors_general.h`                        | `and_`, `or_`, `not_` combinators                                                                                                 |
 | `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp`                | `ChainDescriptorBuilder` class (DFS with trace emission)                                                                          |
 | `src/logic/descriptors/DescriptorFormatter.h`                        | `DescriptorFormatter` abstract base                                                                                               |
-| `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp`           | Terminal plain-text trace renderer                                                                                                |
+| `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp`           | Terminal plain-text trace renderer (uses alias labels when set, `node#<id>` otherwise)                                            |
 | `tests/unit/logic/part_library.h/.cpp`                               | `TestPartLibrary`, `PartLibraryBuilder`, `CheckNodeDescriptorForAllScenarios`                                                     |
 | `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests                                                                                                             |
 
@@ -660,11 +660,22 @@ Available builder methods:
 | ------------------------------------------------------------------ | ------------------------------------------------- |
 | `.NodeEval(part_id_alias, predicate_name, depth=0)`                | `TraceEventKind::NodeEval`                        |
 | `.NodeResult(part_id_alias, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult`                |
+| `.NodeEvalById(part_id, predicate_name, depth=0)`                  | `TraceEventKind::NodeEval` (no alias — use for missing parts) |
+| `.NodeResultById(part_id, predicate_name, result, reason="", depth=0)` | `TraceEventKind::NodeResult` (no alias — use for missing parts) |
 | `.MovingToNeighbour(from_id_alias, to_id_alias, socket_id, depth=0)` | `TraceEventKind::MovingToNeighbour`            |
 | `.Backtracking(from_id_alias, depth=0)`                            | `TraceEventKind::Backtracking`                    |
 | `.ScopeBegin(name, kind, depth=0, anchor_id_alias=nullopt)`        | `TraceEventKind::ScopeBegin`                      |
 | `.ScopeEnd(name, kind, result, depth=0)`                           | `TraceEventKind::ScopeEnd`                        |
 | `.Build()`                                                         | Returns a copy of the accumulated `AnalysisTrace` |
+
+> **Alias display**: When a `PartGraphBuilder` part alias is set, the
+> `TerminalDescriptorFormatter` displays the alias (e.g. `f0`) instead of the
+> numeric ID (e.g. `node#0`). The string-alias builder methods
+> (`.NodeEval`, `.NodeResult`, `.MovingToNeighbour`, `.Backtracking`) populate
+> the alias in the expected event so the formatter produces the same output as
+> the actual trace. For parts that do not exist in the graph (missing-key tests),
+> use the `*ById` overloads, which leave the alias empty and the formatter falls
+> back to `node#<id>`.
 
 ### Pre-built scaffold scenarios
 

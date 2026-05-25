@@ -25,8 +25,15 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
   eval_event.part_id = id;
   eval_event.predicate_name = m_name;
 
+  const auto part_it = parts.find(id);
+  if (part_it != parts.end()) {
+    eval_event.part_id_alias = std::visit(
+        [](const auto &inst) -> const std::string & { return inst.alias; },
+        part_it->second);
+  }
+
   NodeDescriptorResult result{};
-  if (parts.find(id) == parts.end()) {
+  if (part_it == parts.end()) {
     result = NodeDescriptorResult{false, "incorrect key: part_id=" +
                                              std::to_string(id)};
   } else {
@@ -37,6 +44,7 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
   result_event.kind = TraceEventKind::NodeResult;
   result_event.depth = depth;
   result_event.part_id = id;
+  result_event.part_id_alias = eval_event.part_id_alias;
   result_event.predicate_name = m_name;
   result_event.result = static_cast<bool>(result);
   result_event.reason = result.m_reason;

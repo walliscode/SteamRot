@@ -78,6 +78,14 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         scope_begin.scope_name = chain_name;
         scope_begin.scope_kind = ScopeKind::Chain;
         scope_begin.anchor_id = start_id;
+        if (const auto anchor_it = parts.find(start_id);
+            anchor_it != parts.end()) {
+          scope_begin.part_id_alias = std::visit(
+              [](const auto &inst) -> const std::string & {
+                return inst.alias;
+              },
+              anchor_it->second);
+        }
         context.trace.push_back(std::move(scope_begin));
 
         Cursor start_cursor{};

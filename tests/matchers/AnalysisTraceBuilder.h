@@ -142,6 +142,39 @@ public:
   AnalysisTraceBuilder &ValidSubgraphIsolated();
 
   /////////////////////////////////////////////////
+  /// @brief Append a NodeEval event using a raw numeric part ID (no alias).
+  ///
+  /// Use this overload when the part does not exist in the PartGraph (e.g.
+  /// for missing-key error tests), so there is no alias to resolve.
+  ///
+  /// @param part_id        Raw numeric part ID.
+  /// @param predicate_name Name of the predicate applied to the node.
+  /// @param depth          Nesting depth of this event.
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &NodeEvalById(uint32_t part_id,
+                                     std::string predicate_name,
+                                     uint32_t depth = 0);
+
+  /////////////////////////////////////////////////
+  /// @brief Append a NodeResult event using a raw numeric part ID (no alias).
+  ///
+  /// Use this overload when the part does not exist in the PartGraph (e.g.
+  /// for missing-key error tests), so there is no alias to resolve.
+  ///
+  /// @param part_id        Raw numeric part ID.
+  /// @param predicate_name Name of the predicate.
+  /// @param result         Outcome of the predicate evaluation.
+  /// @param reason         Human-readable explanation of the outcome.
+  /// @param depth          Nesting depth of this event.
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &NodeResultById(uint32_t part_id,
+                                       std::string predicate_name, bool result,
+                                       std::string reason = {},
+                                       uint32_t depth = 0);
+
+  /////////////////////////////////////////////////
   /// @brief Return a copy of the accumulated trace.
   ///
   /// The builder remains usable after this call; further events may be
@@ -150,13 +183,6 @@ public:
   steamrot::logic::descriptors::AnalysisTrace Build() const;
 
 private:
-  // AnalysisTraceBuilder &NodeEvalById(uint32_t part_id, std::string
-  // predicate_name,
-  //                                    uint32_t depth);
-  // AnalysisTraceBuilder &NodeResultById(uint32_t part_id,
-  //                                      std::string predicate_name, bool
-  //                                      result, std::string reason, uint32_t
-  //                                      depth);
   AnalysisTraceBuilder &MovingToNeighbourById(uint32_t from_id, uint32_t to_id,
                                               uint32_t socket_id,
                                               uint32_t depth);
