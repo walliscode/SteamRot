@@ -46,7 +46,10 @@ std::string FormatEvent(const AnalysisEvent &ev) {
     }
     line += "] " + ev.scope_name;
     if (ev.anchor_id.has_value()) {
-      line += "  anchor=node#" + std::to_string(*ev.anchor_id);
+      const std::string anchor_label = ev.part_id_alias.empty()
+                                           ? "node#" + std::to_string(*ev.anchor_id)
+                                           : ev.part_id_alias;
+      line += "  anchor=" + anchor_label;
     }
     return line;
   }
@@ -59,14 +62,20 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   }
 
   case TraceEventKind::NodeEval: {
-    return indent + "[EVAL]  node#" + std::to_string(ev.part_id) +
+    const std::string node_label = ev.part_id_alias.empty()
+                                       ? "node#" + std::to_string(ev.part_id)
+                                       : ev.part_id_alias;
+    return indent + "[EVAL]  " + node_label +
            "  predicate=" + ev.predicate_name;
   }
 
   case TraceEventKind::NodeResult: {
+    const std::string node_label = ev.part_id_alias.empty()
+                                       ? "node#" + std::to_string(ev.part_id)
+                                       : ev.part_id_alias;
     std::string line = indent;
     line += ev.result ? "[PASS]" : "[FAIL]";
-    line += "  node#" + std::to_string(ev.part_id) + "  " + ev.predicate_name;
+    line += "  " + node_label + "  " + ev.predicate_name;
     if (!ev.reason.empty()) {
       line += "  \"" + ev.reason + "\"";
     }
@@ -74,13 +83,21 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   }
 
   case TraceEventKind::MovingToNeighbour: {
-    return indent + "[MOVE]  node#" + std::to_string(ev.from_id) + " -> node#" +
-           std::to_string(ev.to_id) +
+    const std::string from_label = ev.from_id_alias.empty()
+                                       ? "node#" + std::to_string(ev.from_id)
+                                       : ev.from_id_alias;
+    const std::string to_label = ev.to_id_alias.empty()
+                                     ? "node#" + std::to_string(ev.to_id)
+                                     : ev.to_id_alias;
+    return indent + "[MOVE]  " + from_label + " -> " + to_label +
            "  socket=" + std::to_string(ev.socket_id);
   }
 
   case TraceEventKind::Backtracking: {
-    return indent + "[BACK]  <- node#" + std::to_string(ev.from_id);
+    const std::string from_label = ev.from_id_alias.empty()
+                                       ? "node#" + std::to_string(ev.from_id)
+                                       : ev.from_id_alias;
+    return indent + "[BACK]  <- " + from_label;
   }
 
   case TraceEventKind::ValidSubgraphIsolated: {

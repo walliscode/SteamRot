@@ -181,7 +181,15 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     move_event.kind = TraceEventKind::MovingToNeighbour;
     move_event.depth = cursor.depth;
     move_event.from_id = cursor.current_id;
+    move_event.from_id_alias = std::visit(
+        [](const auto &inst) -> const std::string & { return inst.alias; },
+        current_node->second);
     move_event.to_id = neighbour_id;
+    if (const auto to_it = parts.find(neighbour_id); to_it != parts.end()) {
+      move_event.to_id_alias = std::visit(
+          [](const auto &inst) -> const std::string & { return inst.alias; },
+          to_it->second);
+    }
     move_event.socket_id = socket_id;
     context.trace.push_back(std::move(move_event));
 
@@ -197,6 +205,11 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     backtrack_event.kind = TraceEventKind::Backtracking;
     backtrack_event.depth = cursor.depth;
     backtrack_event.from_id = neighbour_id;
+    if (const auto from_it = parts.find(neighbour_id); from_it != parts.end()) {
+      backtrack_event.from_id_alias = std::visit(
+          [](const auto &inst) -> const std::string & { return inst.alias; },
+          from_it->second);
+    }
     backtrack_event.to_id = cursor.current_id;
     context.trace.push_back(std::move(backtrack_event));
   }

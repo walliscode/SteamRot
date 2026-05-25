@@ -173,6 +173,16 @@ struct PartInstance {
   uint32_t id{0};
 
   /////////////////////////////////////////////////
+  /// @brief Human-readable alias for this instance (e.g. "f0", "j1").
+  ///
+  /// Optional. When populated, the analysis trace formatter will display this
+  /// label instead of the raw numeric @c id. In production this is left empty;
+  /// the test infrastructure (@c PartGraphBuilder) sets it to the user-friendly
+  /// string alias passed to @c AddFragment / @c AddJoint.
+  /////////////////////////////////////////////////
+  std::string alias{};
+
+  /////////////////////////////////////////////////
   /// @brief Single transform that positions this instance on the canvas.
   /////////////////////////////////////////////////
   sf::Transform transform{sf::Transform::Identity};

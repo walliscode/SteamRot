@@ -70,15 +70,15 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
     constexpr uint32_t kMissingId{99};
     const descriptors::NodeDescriptorResult result =
         descriptors::is_fragment(tests::pair.part_graph, kMissingId);
-    std::unordered_map<std::string, uint32_t> id_to_part_graph_id{
-        tests::pair.id_to_part_graph_id};
-    id_to_part_graph_id["missing"] = kMissingId;
 
+    // The missing part has no alias in the graph, so the expected trace uses
+    // the numeric-ID overloads to match the actual trace formatting.
+    tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
     const descriptors::AnalysisTrace expected =
-        tests::AnalysisTraceBuilder{id_to_part_graph_id}
-            .NodeEval("missing", descriptors::is_fragment.GetName())
-            .NodeResult("missing", descriptors::is_fragment.GetName(), false,
-                        "incorrect key: part_id=99")
+        builder
+            .NodeEvalById(kMissingId, descriptors::is_fragment.GetName())
+            .NodeResultById(kMissingId, descriptors::is_fragment.GetName(),
+                            false, "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -128,15 +128,15 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
     constexpr uint32_t kMissingId{99};
     const descriptors::NodeDescriptorResult result =
         descriptors::is_joint(tests::pair.part_graph, kMissingId);
-    std::unordered_map<std::string, uint32_t> id_to_part_graph_id{
-        tests::pair.id_to_part_graph_id};
-    id_to_part_graph_id["missing"] = kMissingId;
 
+    // The missing part has no alias in the graph, so the expected trace uses
+    // the numeric-ID overloads to match the actual trace formatting.
+    tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
     const descriptors::AnalysisTrace expected =
-        tests::AnalysisTraceBuilder{id_to_part_graph_id}
-            .NodeEval("missing", descriptors::is_joint.GetName())
-            .NodeResult("missing", descriptors::is_joint.GetName(), false,
-                        "incorrect key: part_id=99")
+        builder
+            .NodeEvalById(kMissingId, descriptors::is_joint.GetName())
+            .NodeResultById(kMissingId, descriptors::is_joint.GetName(), false,
+                            "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);

@@ -63,6 +63,7 @@ PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
                                                 const std::string id) {
   // create a new FragmentInstance (assigns stable ID), then insert
   FragmentInstance instance = MakeFragmentInstance(name);
+  instance.alias = id;
   const uint32_t instance_id = instance.id;
   m_package.part_graph.emplace(instance_id, std::move(instance));
 
@@ -77,6 +78,7 @@ PartGraphBuilder &PartGraphBuilder::AddJoint(const JointNames name,
                                              const std::string id) {
   // create a new JointInstance (assigns stable ID), then insert
   JointInstance instance = MakeJointInstance(name);
+  instance.alias = id;
   const uint32_t instance_id = instance.id;
   m_package.part_graph.emplace(instance_id, std::move(instance));
 
