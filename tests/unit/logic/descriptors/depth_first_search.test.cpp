@@ -203,15 +203,15 @@ TEST_CASE(
   //   frag0(id=0, terminal) ─ joint0(id=2, serial) ─ frag1(id=1, terminal)
   //   frag0.socket[1] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ frag1.socket[0]
-  const steamrot::PartGraph parts =
+  const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
           .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0") // id=0
           .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
           .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")       // id=2
           .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
           .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
-          .Build()
-          .part_graph;
+          .Build();
+  const steamrot::PartGraph &parts = pkg.part_graph;
 
   SECTION("WhileIsTrue(is_serial) only: joint0 recorded as valid via "
           "HoldNodeAndAdvanceStep path") {
@@ -227,20 +227,20 @@ TEST_CASE(
     }
 
     const AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .NodeEval("j0", "is_serial", 1)
+            .NodeResult("j0", "is_serial", true,
+                        "connection_count=2, expected==2", 1)
+            .MovingToNeighbour("j0", "f0", 0, 1)
+            .NodeEval("f0", "is_serial", 2)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 1, 1, 1)
-            .NodeEval(1, "is_serial", 2)
-            .NodeResult(1, "is_serial", false,
+            .Backtracking("f0", 1)
+            .MovingToNeighbour("j0", "f1", 1, 1)
+            .NodeEval("f1", "is_serial", 2)
+            .NodeResult("f1", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(1, 1)
+            .Backtracking("f1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -270,26 +270,26 @@ TEST_CASE(
                   std::vector<uint32_t>{2, 1}) != result.valid_subgraphs.end());
 
     const AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .NodeEval("j0", "is_serial", 1)
+            .NodeResult("j0", "is_serial", true,
+                        "connection_count=2, expected==2", 1)
+            .MovingToNeighbour("j0", "f0", 0, 1)
+            .NodeEval("f0", "is_serial", 2)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .NodeEval(0, "is_terminal", 2)
-            .NodeResult(0, "is_terminal", true,
+            .NodeEval("f0", "is_terminal", 2)
+            .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 1, 1, 1)
-            .NodeEval(1, "is_serial", 2)
-            .NodeResult(1, "is_serial", false,
+            .Backtracking("f0", 1)
+            .MovingToNeighbour("j0", "f1", 1, 1)
+            .NodeEval("f1", "is_serial", 2)
+            .NodeResult("f1", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .NodeEval(1, "is_terminal", 2)
-            .NodeResult(1, "is_terminal", true,
+            .NodeEval("f1", "is_terminal", 2)
+            .NodeResult("f1", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking(1, 1)
+            .Backtracking("f1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -309,17 +309,17 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
   //   frag0.socket[0] ↔ joint0.socket[0]
   //   joint0.socket[1] ↔ joint1.socket[0]
   //   joint1.socket[1] ↔ frag1.socket[0]
-  const steamrot::PartGraph parts =
+  const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
           .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0") // id=0
           .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1") // id=1
           .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")      // id=2
           .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")      // id=3
-          .Connect("f0", 0, "j0", 0)       // f0.socket[0] ↔ j0.socket[0]
+          .Connect("f0", 0, "j0", 0)          // f0.socket[0] ↔ j0.socket[0]
           .ConnectUnchecked("j0", 1, "j1", 0) // j0.socket[1] ↔ j1.socket[0]
-          .Connect("j1", 1, "f1", 0)       // j1.socket[1] ↔ f1.socket[0]
-          .Build()
-          .part_graph;
+          .Connect("j1", 1, "f1", 0)          // j1.socket[1] ↔ f1.socket[0]
+          .Build();
+  const steamrot::PartGraph &parts = pkg.part_graph;
   // IDs: frag0=0, frag1=1, joint0=2, joint1=3
 
   SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
@@ -336,28 +336,28 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
         result.valid_subgraphs.end();
 
     const AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .NodeEval("j0", "is_serial", 1)
+            .NodeResult("j0", "is_serial", true,
+                        "connection_count=2, expected==2", 1)
+            .MovingToNeighbour("j0", "f0", 0, 1)
+            .NodeEval("f0", "is_serial", 2)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 3, 1, 1)
-            .NodeEval(3, "is_serial", 2)
-            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
-                        2)
-            .MovingToNeighbour(3, 1, 1, 2)
-            .NodeEval(1, "is_serial", 3)
-            .NodeResult(1, "is_serial", false,
+            .Backtracking("f0", 1)
+            .MovingToNeighbour("j0", "j1", 1, 1)
+            .NodeEval("j1", "is_serial", 2)
+            .NodeResult("j1", "is_serial", true,
+                        "connection_count=2, expected==2", 2)
+            .MovingToNeighbour("j1", "f1", 1, 2)
+            .NodeEval("f1", "is_serial", 3)
+            .NodeResult("f1", "is_serial", false,
                         "connection_count=1, expected==2", 3)
-            .NodeEval(1, "is_terminal", 3)
-            .NodeResult(1, "is_terminal", true,
+            .NodeEval("f1", "is_terminal", 3)
+            .NodeResult("f1", "is_terminal", true,
                         "connection_count=1, expected==1", 3)
-            .Backtracking(1, 2)
-            .Backtracking(3, 1)
+            .Backtracking("f1", 2)
+            .Backtracking("j1", 1)
             .Build();
 
     REQUIRE(found);
@@ -376,25 +376,25 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
     REQUIRE(result.valid_subgraphs.empty());
 
     const AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{}
-            .NodeEval(2, "is_serial", 1)
-            .NodeResult(2, "is_serial", true, "connection_count=2, expected==2",
-                        1)
-            .MovingToNeighbour(2, 0, 0, 1)
-            .NodeEval(0, "is_serial", 2)
-            .NodeResult(0, "is_serial", false,
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .NodeEval("j0", "is_serial", 1)
+            .NodeResult("j0", "is_serial", true,
+                        "connection_count=2, expected==2", 1)
+            .MovingToNeighbour("j0", "f0", 0, 1)
+            .NodeEval("f0", "is_serial", 2)
+            .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking(0, 1)
-            .MovingToNeighbour(2, 3, 1, 1)
-            .NodeEval(3, "is_serial", 2)
-            .NodeResult(3, "is_serial", true, "connection_count=2, expected==2",
-                        2)
-            .MovingToNeighbour(3, 1, 1, 2)
-            .NodeEval(1, "is_serial", 3)
-            .NodeResult(1, "is_serial", false,
+            .Backtracking("f0", 1)
+            .MovingToNeighbour("j0", "j1", 1, 1)
+            .NodeEval("j1", "is_serial", 2)
+            .NodeResult("j1", "is_serial", true,
+                        "connection_count=2, expected==2", 2)
+            .MovingToNeighbour("j1", "f1", 1, 2)
+            .NodeEval("f1", "is_serial", 3)
+            .NodeResult("f1", "is_serial", false,
                         "connection_count=1, expected==2", 3)
-            .Backtracking(1, 2)
-            .Backtracking(3, 1)
+            .Backtracking("f1", 2)
+            .Backtracking("j1", 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,

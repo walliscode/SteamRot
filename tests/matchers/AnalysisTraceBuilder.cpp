@@ -7,10 +7,16 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AnalysisTraceBuilder.h"
+#include <stdexcept>
 
 namespace steamrot::tests {
 
 using namespace steamrot::logic::descriptors;
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder::AnalysisTraceBuilder(
+    const std::unordered_map<std::string, uint32_t> &id_to_part_graph_id)
+    : m_id_to_part_graph_id{&id_to_part_graph_id} {}
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
@@ -23,13 +29,14 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::EmptyPartGraph() {
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::ScopeBegin(std::string name, ScopeKind kind,
                                  uint32_t depth,
-                                 std::optional<uint32_t> anchor_id) {
+                                 std::optional<std::string> anchor_id_alias) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::ScopeBegin;
   ev.depth = depth;
   ev.scope_name = std::move(name);
   ev.scope_kind = kind;
-  ev.anchor_id = anchor_id;
+  if (anchor_id_alias.has_value())
+    ev.anchor_id = ResolvePartId(anchor_id_alias.value());
   m_trace.push_back(std::move(ev));
   return *this;
 }
@@ -50,9 +57,9 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
-                                                     std::string predicate_name,
-                                                     uint32_t depth) {
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::NodeEvalById(uint32_t part_id, std::string predicate_name,
+                                   uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
   ev.depth = depth;
@@ -64,9 +71,17 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::NodeEval(uint32_t part_id,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResult(uint32_t part_id, std::string predicate_name,
-                                 bool result, std::string reason,
-                                 uint32_t depth) {
+AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
+                               std::string predicate_name, uint32_t depth) {
+  return NodeEvalById(ResolvePartId(part_id_alias), std::move(predicate_name),
+                      depth);
+}
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::NodeResultById(uint32_t part_id,
+                                    std::string predicate_name, bool result,
+                                    std::string reason, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeResult;
   ev.depth = depth;
@@ -80,8 +95,18 @@ AnalysisTraceBuilder::NodeResult(uint32_t part_id, std::string predicate_name,
 
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
-AnalysisTraceBuilder::MovingToNeighbour(uint32_t from_id, uint32_t to_id,
-                                        uint32_t socket_id, uint32_t depth) {
+AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
+                                 std::string predicate_name, bool result,
+                                 std::string reason, uint32_t depth) {
+  return NodeResultById(ResolvePartId(part_id_alias), std::move(predicate_name),
+                        result, std::move(reason), depth);
+}
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::MovingToNeighbourById(uint32_t from_id, uint32_t to_id,
+                                            uint32_t socket_id,
+                                            uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
@@ -93,8 +118,17 @@ AnalysisTraceBuilder::MovingToNeighbour(uint32_t from_id, uint32_t to_id,
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
-                                                         uint32_t depth) {
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
+                                        const std::string &to_id_alias,
+                                        uint32_t socket_id, uint32_t depth) {
+  return MovingToNeighbourById(ResolvePartId(from_id_alias),
+                               ResolvePartId(to_id_alias), socket_id, depth);
+}
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(uint32_t from_id,
+                                                             uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -103,11 +137,32 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(uint32_t from_id,
   return *this;
 }
 /////////////////////////////////////////////////
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::Backtracking(const std::string &from_id_alias,
+                                   uint32_t depth) {
+  return BacktrackingById(ResolvePartId(from_id_alias), depth);
+}
+/////////////////////////////////////////////////
 AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {
 
   return *this;
 }
 /////////////////////////////////////////////////
 AnalysisTrace AnalysisTraceBuilder::Build() const { return m_trace; }
+
+/////////////////////////////////////////////////
+uint32_t
+AnalysisTraceBuilder::ResolvePartId(const std::string &part_id_alias) const {
+  if (!m_id_to_part_graph_id) {
+    throw std::logic_error(
+        "AnalysisTraceBuilder requires id_to_part_graph_id for string IDs");
+  }
+
+  const auto it = m_id_to_part_graph_id->find(part_id_alias);
+  if (it == m_id_to_part_graph_id->end())
+    throw std::out_of_range("Unknown part ID alias: " + part_id_alias);
+
+  return it->second;
+}
 
 } // namespace steamrot::tests
