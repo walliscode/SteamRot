@@ -104,7 +104,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeResult("j0", "is_serial", true,
                         "connection_count=2, expected==2", 1)
             // socket[0] of joint leads to frag0 (id=0)
-            .MovingToNeighbour("j0", 0, "f0", 0, 1)
+            .MovingToNeighbour("j0", 0, "f0", 1, 1)
             // frag0 has 1 connection, so is_serial fails
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
@@ -114,7 +114,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeEval("f0", "is_terminal", 2)
             .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking("f0", 0, "j0", 0, 1)
+            .Backtracking("f0", 1, "j0", 0, 1)
             // socket[1] of joint leads to frag1 (id=1)
             .MovingToNeighbour("j0", 1, "f1", 0, 1)
             // frag1 also has 1 connection, same pattern as frag0

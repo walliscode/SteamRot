@@ -231,11 +231,11 @@ TEST_CASE(
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
                         "connection_count=2, expected==2", 1)
-            .MovingToNeighbour("j0", 0, "f0", 0, 1)
+            .MovingToNeighbour("j0", 0, "f0", 1, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
-            .Backtracking("f0", 0, "j0", 0, 1)
+            .Backtracking("f0", 1, "j0", 0, 1)
             .MovingToNeighbour("j0", 1, "f1", 0, 1)
             .NodeEval("f1", "is_serial", 2)
             .NodeResult("f1", "is_serial", false,
@@ -274,14 +274,14 @@ TEST_CASE(
             .NodeEval("j0", "is_serial", 1)
             .NodeResult("j0", "is_serial", true,
                         "connection_count=2, expected==2", 1)
-            .MovingToNeighbour("j0", 0, "f0", 0, 1)
+            .MovingToNeighbour("j0", 0, "f0", 1, 1)
             .NodeEval("f0", "is_serial", 2)
             .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
             .NodeEval("f0", "is_terminal", 2)
             .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
-            .Backtracking("f0", 0, "j0", 0, 1)
+            .Backtracking("f0", 1, "j0", 0, 1)
             .MovingToNeighbour("j0", 1, "f1", 0, 1)
             .NodeEval("f1", "is_serial", 2)
             .NodeResult("f1", "is_serial", false,
