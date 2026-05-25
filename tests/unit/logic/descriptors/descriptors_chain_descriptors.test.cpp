@@ -145,14 +145,11 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
     //   j1.socket[1] ↔ f2.socket[0]
     const steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket,
-                         "f0") // id=0
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets,
-                         "f1") // id=1
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket,
-                         "f2")                                       // id=2
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0") // id=3
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1") // id=4
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1")
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f2")
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")
             .Connect("f0", 0, "j0", 0) // f0.socket[0] ↔ j0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
             .Connect("f1", 1, "j1", 0) // f1.socket[1] ↔ j1.socket[0]
@@ -180,7 +177,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                                                 TerminalDescriptorFormatter{}));
     }
 
-    SECTION("is_serial_chain evalutes from the second node") {
+    SECTION("is_serial_chain evalutes from node j0") {
       // build expected trace
       AnalysisTrace expected_trace =
           steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -188,6 +185,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeEval("j0", is_serial.GetName(), 1)
               .NodeResult("j0", is_serial.GetName(), true,
                           "connection_count=2, expected==2", 1)
+              // this is going to try socket[0] first
               .MovingToNeighbour("j0", "f0", 0, 1)
               .NodeEval("f0", is_serial.GetName(), 2)
               .NodeResult("f0", is_serial.GetName(), false,
@@ -195,6 +193,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
               .NodeEval("f0", is_terminal.GetName(), 2)
               .NodeResult("f0", is_terminal.GetName(), true,
                           "connection_count=1, expected==1", 2)
+              // this should store a valid subgraph here
               .Backtracking("f0", 1)
               .MovingToNeighbour("j0", "f1", 1, 1)
               .NodeEval("f1", is_serial.GetName(), 2)

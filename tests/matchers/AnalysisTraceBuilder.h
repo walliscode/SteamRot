@@ -113,8 +113,7 @@ public:
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeResult(const std::string &part_id_alias,
                                    std::string predicate_name, bool result,
-                                   std::string reason = {},
-                                   uint32_t depth = 0);
+                                   std::string reason = {}, uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a MovingToNeighbour event using string part aliases.
@@ -151,11 +150,13 @@ public:
   steamrot::logic::descriptors::AnalysisTrace Build() const;
 
 private:
-  AnalysisTraceBuilder &NodeEvalById(uint32_t part_id, std::string predicate_name,
-                                     uint32_t depth);
-  AnalysisTraceBuilder &
-  NodeResultById(uint32_t part_id, std::string predicate_name, bool result,
-                 std::string reason, uint32_t depth);
+  // AnalysisTraceBuilder &NodeEvalById(uint32_t part_id, std::string
+  // predicate_name,
+  //                                    uint32_t depth);
+  // AnalysisTraceBuilder &NodeResultById(uint32_t part_id,
+  //                                      std::string predicate_name, bool
+  //                                      result, std::string reason, uint32_t
+  //                                      depth);
   AnalysisTraceBuilder &MovingToNeighbourById(uint32_t from_id, uint32_t to_id,
                                               uint32_t socket_id,
                                               uint32_t depth);
