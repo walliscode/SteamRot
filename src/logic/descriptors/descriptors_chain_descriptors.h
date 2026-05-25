@@ -26,8 +26,7 @@ namespace steamrot::logic::descriptors {
 ///
 /// Wraps a @c std::function with the signature
 /// @c ChainDescriptorResult(const PartGraph&, uint32_t part_id).
-/// The distinction from @c ContextualNodeDescriptor is semantic:
-/// a @c ChainDescriptor answers a structural question about a subgraph
+/// A @c ChainDescriptor answers a structural question about a subgraph
 /// reachable from the start node (e.g. "does a 3-node linear chain begin
 /// here?") rather than a question about the start node alone.
 ///

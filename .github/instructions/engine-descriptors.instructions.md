@@ -1,9 +1,9 @@
-# Engine Descriptors: Adding and Testing Graph Descriptors
+# Engine Descriptors: Adding and Testing Descriptors
 
-**What this covers:** The four-level descriptor hierarchy used to query a
-`PartGraph`, the rules for choosing the right level, how to implement and
-register new descriptors, how to write tests against `TestPartLibrary`
-scenarios, and notes on planned future work.
+**What this covers:** The remaining descriptor hierarchy used to query a
+`PartGraph`, how to choose between node and chain descriptors, how to implement
+and register them, and how to keep the human-facing workflow documentation in
+sync.
 
 ---
 
@@ -21,60 +21,41 @@ using PartGraph = std::map<uint32_t, std::variant<JointInstance, FragmentInstanc
 It is exposed as `MachinaFormScaffold::parts`. All descriptors receive
 `const PartGraph&` directly. Call sites always pass `scaffold.parts`.
 
-There are four levels, ordered from narrowest to broadest scope:
+There are two descriptor levels:
 
 | Type | Signature | Scope |
 |---|---|---|
 | `NodeDescriptor` | `NodeDescriptorResult(const PartGraph&, uint32_t)` | One node's own data |
-| `ContextualNodeDescriptor` | `NodeDescriptorResult(const PartGraph&, uint32_t)` | One node + its direct neighbours |
 | `ChainDescriptor` | `ChainDescriptorResult(const PartGraph&, uint32_t)` | Multi-hop walk from one anchor |
-| `GraphDescriptor` | `GraphDescriptorResult(const PartGraph&)` | Whole graph, no anchor |
 
-All four type aliases live in their respective files in `src/logic/descriptors/`
-in the `steamrot::logic::descriptors` namespace:
-- `NodeDescriptor`, `ContextualNodeDescriptor`, `lift` → `descriptors_node_descriptors.h`
+The descriptor headers live in `src/logic/descriptors/` in the
+`steamrot::logic::descriptors` namespace:
+- `NodeDescriptor` → `descriptors_node_descriptors.h`
 - `ChainDescriptor`, `lift_to_chain` → `descriptors_chain_descriptors.h`
-- `GraphDescriptor`, `any_node_satisfies`, `all_nodes_satisfy` → `descriptors_graph_descriptors.h`
-
-The generic combinators (`and_`, `or_`, `not_`) live in
-`src/logic/descriptors/descriptors_general.h` under the same namespace.
-`ChainDescriptorBuilder` lives in `src/logic/descriptors/ChainDescriptorBuilder.h`
-under the `steamrot::logic::descriptors` namespace.
+- `and_`, `or_`, `not_` → `descriptors_general.h`
+- `ChainDescriptorBuilder` → `ChainDescriptorBuilder.h`
 
 ---
 
 ## 2. Decision flowchart — which level to use
 
 ```
-Does your predicate need MORE than one node?
+Does your predicate only inspect one node's own data?
 │
-├── No  ──────────────────────────────────►  NodeDescriptor
-│                                            NodeDescriptorResult(const PartGraph&, uint32_t)
-└── Yes
+├── Yes ───────────────────────────────────────► NodeDescriptor
+│                                                NodeDescriptorResult(const PartGraph&, uint32_t)
+└── No
      │
-     ├── Only the immediate neighbours
-     │   (depth 1, via SocketData::connected_to)?
-     │    └──────────────────────────────►  ContextualNodeDescriptor
-     │                                      NodeDescriptorResult(const PartGraph&, uint32_t)
-     │
-     ├── A walk or path through multiple
-     │   hops (DFS traversal needed)?
-     │    └──────────────────────────────►  ChainDescriptor
-     │                                      (build with ChainDescriptorBuilder)
-     │
-     └── No anchor at all — a question
-         about the whole assembled machine?
-          └─────────────────────────────►  GraphDescriptor
-                                           (derive via any_node_satisfies /
-                                            all_nodes_satisfy)
+     └── Does it need a multi-hop walk from one anchor node?
+          └────────────────────────────────────► ChainDescriptor
+                                                   ChainDescriptorResult(const PartGraph&, uint32_t)
+                                                   Build with ChainDescriptorBuilder
 ```
 
 Key rules:
-- `GraphDescriptor` is **terminal** — never feed it back into a modifier.
-- Never flow information **downward**: `ChainDescriptor` must not consume a
-  `GraphDescriptor`.
-- Use `lift()` to promote a narrower descriptor to a wider one without
-  duplicating logic.
+- Prefer `NodeDescriptor` whenever the answer depends only on the anchor node.
+- Use `ChainDescriptor` for traversal-based questions.
+- Use `lift_to_chain()` to reuse node logic inside a chain descriptor.
 
 ---
 
@@ -83,23 +64,19 @@ Key rules:
 | Descriptor level | Header file | Source file |
 |---|---|---|
 | `NodeDescriptor` constants/factories | `src/logic/descriptors/descriptors_node_descriptors.h` | `descriptors_node_descriptors.cpp` |
-| `ContextualNodeDescriptor` modifiers | `src/logic/descriptors/descriptors_node_descriptors.h` | `descriptors_node_descriptors.cpp` |
 | `ChainDescriptor` (via builder) | `src/logic/descriptors/descriptors_chain_descriptors.h` | `descriptors_chain_descriptors.cpp` |
-| `GraphDescriptor` | `src/logic/descriptors/descriptors_graph_descriptors.h` | `descriptors_graph_descriptors.cpp` |
-| Combinators (`and_`, `or_`, `not_`) | `src/logic/descriptors/descriptors_general.h` — `steamrot::logic::descriptors` namespace | (header-only templates) |
-| `ChainDescriptorBuilder` | `src/logic/descriptors/ChainDescriptorBuilder.h` — `steamrot::logic::descriptors` namespace | `ChainDescriptorBuilder.cpp` |
+| Combinators (`and_`, `or_`, `not_`) | `src/logic/descriptors/descriptors_general.h` | header-only |
+| `ChainDescriptorBuilder` | `src/logic/descriptors/ChainDescriptorBuilder.h` | `ChainDescriptorBuilder.cpp` |
 
-All files live in `src/logic/descriptors/`. All declarations and definitions use
-the `steamrot::logic::descriptors` namespace. Follow the
-`extern const NodeDescriptor name;` pattern for named predicates and the
-`Type factory_name(args)` pattern for parameterised factories.
+Follow the `extern const NodeDescriptor name;` pattern for named predicates and
+the `Type factory_name(args)` pattern for parameterised factories.
 
 ---
 
 ## 4. Step-by-step: adding a NodeDescriptor
 
-Predicates access the part variant via `parts.at(id)` and read `connection_count`
-from `PartInstance` using `std::visit`.
+Predicates access the part variant via `parts.find(id)` and read
+`connection_count` from `PartInstance` using `std::visit`.
 
 ### 4a. Declare in the header
 
@@ -131,304 +108,140 @@ In `src/logic/descriptors/descriptors_node_descriptors.cpp`:
 
 ```cpp
 /////////////////////////////////////////////////
-const NodeDescriptor my_new_descriptor =
+const NodeDescriptor my_new_descriptor{
+    "my_new_descriptor",
     [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-  const size_t count = std::visit(
-      [](const auto &inst) -> size_t { return inst.connection_count; },
-      parts.at(id));
-  return NodeDescriptorResult{/* your condition */};
-};
-
-/////////////////////////////////////////////////
-NodeDescriptor my_factory(size_t n) {
-  return [n](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-    const size_t count = std::visit(
-        [](const auto &inst) -> size_t { return inst.connection_count; },
-        parts.at(id));
-    return NodeDescriptorResult{count == n};
-  };
-}
-```
-
-### 4c. No CMake changes needed
-
-Both files are already compiled into the `logic` target. No edits to
-`CMakeLists.txt` are required.
-
----
-
-## 5. Step-by-step: adding a ContextualNodeDescriptor
-
-A contextual descriptor answers "is this node X, given its neighbours?"
-Neighbours are reached by iterating the part's `SocketMap` and following
-`SocketData::connected_to`.
-
-### 5a. Declare a modifier function in the header
-
-```cpp
-/////////////////////////////////////////////////
-/// @brief Returns a ContextualNodeDescriptor that returns true when the
-///        node is connected to at least one node satisfying @p nd.
-///
-/// @param nd NodeDescriptor to test against each neighbour.
-/// @return ContextualNodeDescriptor.
-/////////////////////////////////////////////////
-ContextualNodeDescriptor is_connected_to(NodeDescriptor nd);
-```
-
-### 5b. Implement in the source
-
-```cpp
-ContextualNodeDescriptor is_connected_to(NodeDescriptor nd) {
-  return [nd = std::move(nd)](const PartGraph &parts,
-                               uint32_t id) -> NodeDescriptorResult {
-    const auto &sockets = std::visit(
-        [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-        parts.at(id));
-    for (const auto &[socket_id, socket_data] : sockets) {
-      if (!socket_data.connected_to.has_value())
-        continue;
-      const uint32_t peer_id = socket_data.connected_to->peer_part_id;
-      if (parts.count(peer_id) && nd(parts, peer_id))
-        return NodeDescriptorResult{true};
-    }
-    return NodeDescriptorResult{false};
-  };
-}
+      const auto part_it = parts.find(id);
+      if (part_it == parts.end())
+        return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                               std::to_string(id)};
+      const size_t count = std::visit(
+          [](const auto &inst) -> size_t { return inst.connection_count; },
+          part_it->second);
+      const bool ok = /* your condition */;
+      return NodeDescriptorResult{ok};
+    }};
 ```
 
 ---
 
-## 6. Step-by-step: adding a ChainDescriptor
+## 5. Step-by-step: adding a ChainDescriptor
 
 A chain descriptor answers a structural question about a walk from one node.
 
-### 6a. Use ChainDescriptorBuilder
+### 5a. Use ChainDescriptorBuilder
 
 `ChainDescriptorBuilder` lives in `src/logic/descriptors/ChainDescriptorBuilder.h`
 in the `steamrot::logic::descriptors` namespace.
 
 ```cpp
-// In descriptors_chain_descriptors.cpp
-const ChainDescriptor linear_3_chain =
-    steamrot::logic::descriptors::ChainDescriptorBuilder{}
-        .StartWith(is_terminal)
-        .Then(is_serial)
-        .End(is_terminal);
+const ChainDescriptor linear_3_chain = ChainDescriptorBuilder{}
+    .WhileIsTrue(is_serial)
+    .Then(is_terminal)
+    .Build("linear_3_chain")
+    .value();
 ```
 
 Declare it in `descriptors_chain_descriptors.h` as
 `extern const ChainDescriptor linear_3_chain;`.
 
-### 6b. Note on DFS implementation
+### 5b. Reuse node logic when helpful
 
-`ChainDescriptorBuilder::End()` currently returns a descriptor that always
-returns `false`. The TODO comment in `ChainDescriptorBuilder.h` marks the DFS
-traversal work needed. Do not write tests that expect `true` results from
-`ChainDescriptorBuilder` until the traversal is implemented.
-
-## 7. Step-by-step: adding a GraphDescriptor
-
-`GraphDescriptor` is always derived, never written from scratch. Use
-`any_node_satisfies` or `all_nodes_satisfy` from
-`src/logic/descriptors/descriptors_graph_descriptors.h`:
+Use `lift_to_chain()` when you need a chain descriptor that simply evaluates the
+anchor node with existing node-level logic:
 
 ```cpp
-namespace descriptors = steamrot::logic::descriptors;
-
-// "Does the graph contain at least one terminal fragment?"
-descriptors::GraphDescriptor has_terminal_fragment =
-    descriptors::any_node_satisfies(
-        descriptors::lift(descriptors::and_(
-            descriptors::is_terminal, descriptors::is_fragment)));
-
-// "Are all nodes either fragments or joints?" (always true by construction)
-descriptors::GraphDescriptor all_known_types =
-    descriptors::all_nodes_satisfy(
-        descriptors::lift(descriptors::or_(
-            descriptors::is_fragment, descriptors::is_joint)));
-
-// Evaluate — pass scaffold.parts, never the whole scaffold
-if (has_terminal_fragment(scaffold.parts)) { ... }
+ChainDescriptor terminal_node_only = lift_to_chain(is_terminal);
 ```
-
-Declare `GraphDescriptor` instances in
-`src/logic/descriptors/descriptors_graph_descriptors.h` and define them in
-`descriptors_graph_descriptors.cpp`. They are never passed back into
-`any_node_satisfies` or combinators.
 
 ---
 
-## 8. Writing tests
+## 6. Writing tests
 
 All descriptor tests live in
 `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` and use
-`TestPartLibrary` and `CheckNodeDescriptorForAllScenarios`.
+`TestPartLibrary` plus `CheckNodeDescriptorForAllScenarios` for node-level
+predicates.
 
-### 8a. Use CheckNodeDescriptorForAllScenarios for named predicates
+### 6a. Use CheckNodeDescriptorForAllScenarios for named node predicates
 
 This helper runs your descriptor against every pre-built scaffold scenario and
 CHECKs per-node results against a `ScaffoldScenarioExpectations` struct.
-Node order within each array is **fragments first, then joints**, matching the
-insertion order documented in `part_library.h`.
+
+### 6b. Test chain descriptors with parts + anchor id
+
+Pass `result.scaffold.parts` and the chosen part ID:
 
 ```cpp
 namespace descriptors = steamrot::logic::descriptors;
 
-TEST_CASE("my_new_descriptor tests", "[unit][analysis][grimoire_machina]") {
-  steamrot::tests::TestPartLibrary lib =
-      steamrot::tests::TestPartLibrary::Create();
-
-  SECTION("Analyses all ScaffoldScenarios correctly for my_new_descriptor") {
-    steamrot::tests::CheckNodeDescriptorForAllScenarios(
-        descriptors::my_new_descriptor,
-        {.linear_chain   = {/* expected per node */},
-         .ring            = {/* expected per node */},
-         .isolated_pair   = {/* expected per node */},
-         .simple_branch   = {/* expected per node */}},
-        lib);
-  }
-}
+auto result = descriptors::is_serial_chain(scaffold.parts, anchor_id);
+REQUIRE(result.m_result == true);
 ```
-
-### 8b. Build custom scaffolds for edge cases
-
-Use `PartLibraryBuilder` to construct scaffolds that the standard scenarios do
-not cover. Pass `result.scaffold.parts` (the `PartGraph`) to descriptors:
-
-```cpp
-namespace descriptors = steamrot::logic::descriptors;
-
-steamrot::tests::PartLibraryBuilder builder{lib};
-steamrot::tests::ScaffoldResult result = builder.MakeConnectedScaffold(
-    {"fragment_two_sockets"}, {"joint_two_sockets"}, {{0, 0, 1, 0}});
-REQUIRE(descriptors::my_new_descriptor(result.scaffold.parts, result.part_ids[0]));
-```
-
-### 8c. Test ContextualNodeDescriptors and ChainDescriptors with parts + id
-
-Pass `parts` and the part ID:
-
-```cpp
-namespace descriptors = steamrot::logic::descriptors;
-
-descriptors::ContextualNodeDescriptor cnd =
-    descriptors::is_connected_to(descriptors::is_fragment);
-REQUIRE(cnd(result.scaffold.parts, result.part_ids[0]));
-```
-
-### 8d. Test GraphDescriptors against a whole PartGraph
-
-```cpp
-namespace descriptors = steamrot::logic::descriptors;
-
-descriptors::GraphDescriptor gd =
-    descriptors::any_node_satisfies(
-        descriptors::lift(descriptors::is_terminal));
-REQUIRE(gd(result.scaffold.parts));
-```
-
-### 8e. No new CMake edits needed for tests
-
-`descriptors/descriptors_node_descriptors.test.cpp` is already listed in
-`tests/unit/logic/CMakeLists.txt`.
 
 ---
 
-## 9. Lifting and composing descriptors
+## 7. Lifting and composing descriptors
 
 | Operation | Signature | Purpose |
 |---|---|---|
-| `steamrot::logic::descriptors::lift(nd)` | `NodeDescriptor → ContextualNodeDescriptor` | Ignore the graph, apply nd to the node |
-| `steamrot::logic::descriptors::lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Same as lift but typed as ChainDescriptor |
-| `steamrot::logic::descriptors::any_node_satisfies(cd)` | `ChainDescriptor → GraphDescriptor` | True if any part in PartGraph satisfies cd |
-| `steamrot::logic::descriptors::all_nodes_satisfy(cd)` | `ChainDescriptor → GraphDescriptor` | True if every part in PartGraph satisfies cd |
-| `steamrot::logic::descriptors::and_(a, b)` | `Desc × Desc → Desc` | Both must be true; works at any level |
-| `steamrot::logic::descriptors::or_(a, b)` | `Desc × Desc → Desc` | Either must be true; works at any level |
-| `steamrot::logic::descriptors::not_(a)` | `Desc → Desc` | Negate; works at any level |
+| `steamrot::logic::descriptors::lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Reuse node logic in a chain context |
+| `steamrot::logic::descriptors::and_(a, b)` | `Desc × Desc → Desc` | Both must be true; works within one descriptor level |
+| `steamrot::logic::descriptors::or_(a, b)` | `Desc × Desc → Desc` | Either must be true; works within one descriptor level |
+| `steamrot::logic::descriptors::not_(a)` | `Desc → Desc` | Negate; works within one descriptor level |
 
-`and_`, `or_`, `not_` are templated — both arguments must be the **same**
-descriptor level. Mixing levels is a compile error. All live in the
-`steamrot::logic::descriptors` namespace (`src/logic/descriptors/descriptors_general.h`).
-Use `namespace descriptors = steamrot::logic::descriptors;` for brevity.
+`and_`, `or_`, `not_` are templated — both arguments must be the same
+descriptor level. Mixing levels is a compile error.
 
 ---
 
-## 10. Future implementation notes
+## 8. Future implementation notes
 
 The following are not yet implemented and represent planned work:
 
-1. **ChainDescriptorBuilder DFS traversal** (`ChainDescriptorBuilder.h` TODO).
-   The builder captures the step list but the `End()` method always returns
-   `false`. A depth-first walk from the anchor node (via `SocketData::connected_to`),
-   matching each step predicate in order, needs to be implemented. Consider
-   handling cycles (`std::unordered_set<uint32_t>` visited set) and branching
-   (match any valid path).
-
-2. **ContextualNodeDescriptor modifiers** — common modifier factories
-   (`is_connected_to`, `exactly_n_of`, `at_least_n_of`) are not yet declared
-   in `descriptors_node_descriptors.h`. Add them as needed following section 5.
-
-3. **GraphDescriptor consumption in Logic** — `GrimoireMachinaActionLogic`
-   (or a dedicated analysis step) should hold and evaluate `GraphDescriptor`
-   instances to gate gameplay actions (e.g. "is the assembled machine valid?").
-
-4. **ScaffoldScenario expansion** — add new scenarios to `TestPartLibrary`
-   (e.g. `StarTopology`, `LongLinearChain`) as chain/graph descriptors that
-   need richer topologies are added.
-
-5. **EdgeDescriptor integration** — A future `EdgeDescriptor` type alias could
-   be added to express connection-type constraints (e.g. "connected via a
-   fragment-joint edge only"). It would operate on `SocketData` or
-   `SocketConnection` directly.
-
----
+1. **ChainDescriptorBuilder DFS traversal polish** — keep improving traversal
+   behaviour, cycle handling, and branching diagnostics as the chain vocabulary
+   grows.
+2. **ScaffoldScenario expansion** — add new scenarios to `TestPartLibrary`
+   (e.g. `StarTopology`, `LongLinearChain`) as chain descriptors need richer
+   topologies.
+3. **EdgeDescriptor integration** — a future `EdgeDescriptor` type alias could
+   express connection-type constraints directly on `SocketData` or
+   `SocketConnection`.
 
 ## Key rules
 
-- Never add `std::shared_ptr<Subscriber>` members to a Logic class to store
-  a descriptor. Descriptors are free-function values, not objects with
-  lifetime management.
-- Never pass a `GraphDescriptor` into `any_node_satisfies`, `all_nodes_satisfy`,
-  or any combinator — it is a terminal type.
-- Always guard FlatBuffers field accesses in any descriptor that reads
-  component data serialised via FlatBuffers.
+- Never add `std::shared_ptr<Subscriber>` members to a Logic class to store a
+  descriptor. Descriptors are free-function values, not objects with lifetime
+  management.
+- Always guard FlatBuffers field accesses in any descriptor that reads component
+  data serialised via FlatBuffers.
 - Keep `ProcessLogic()` as a clean list of named free-function calls; evaluate
   descriptors inside the free functions, not directly in `ProcessLogic`.
 - **Always pass `scaffold.parts`** (the `PartGraph`) to descriptor call sites,
   never the whole `MachinaFormScaffold`.
 - **Always update `docs/workflows/adding_descriptors.md`** when making any
-  change to descriptor type aliases, signatures, or patterns. This is the
-  primary human-facing documentation for the descriptor system.
+  change to descriptor type aliases, signatures, or patterns.
 
 ## Gotchas
 
-- `ContextualNodeDescriptor` and `ChainDescriptor` are the **same underlying
-  `std::function` type**. The type system cannot distinguish them; the
-  distinction is purely semantic and enforced by naming convention.
-- `and_/or_/not_` require both arguments to be the same type. Passing a
-  `NodeDescriptor` and a `ContextualNodeDescriptor` to `and_()` will not
-  compile. Use `lift()` first if needed.
+- `and_/or_/not_` require both arguments to be the same type.
 - Node order in `ScaffoldScenarioExpectations` arrays is **fragments first,
   then joints** — mismatching the order silently flips expected values.
-- `ChainDescriptorBuilder::End()` always returns `false` until the DFS
-  traversal is implemented (see section 10). The TODO is in
-  `src/logic/descriptors/ChainDescriptorBuilder.h`.
 - There is no `build_part_graph` function. The `PartGraph` is `scaffold.parts`
   directly — no build step required.
 
 ## Related files
 
 - `src/types/entity/MachinaFormScaffold.h` — `PartGraph` type alias; `PartInstance`, `JointInstance`, `FragmentInstance`, `SocketMap`, `SocketData`, `SocketConnection`
-- `src/types/logic/DescriptorResult.h` — `NodeDescriptorResult`, `ChainDescriptorResult`, `GraphDescriptorResult`
-- `src/logic/descriptors/descriptors_node_descriptors.h` / `.cpp` — `NodeDescriptor`, `ContextualNodeDescriptor`, `lift`, and concrete node-level predicates (`steamrot::logic::descriptors` namespace)
+- `src/types/logic/DescriptorResult.h` — `NodeDescriptorResult`, `ChainDescriptorResult`, `DescriptorResult`
+- `src/logic/descriptors/descriptors_node_descriptors.h` / `.cpp` — `NodeDescriptor` and concrete node-level predicates
 - `src/logic/descriptors/descriptors_chain_descriptors.h` / `.cpp` — `ChainDescriptor`, `lift_to_chain`, and concrete chain predicates
-- `src/logic/descriptors/descriptors_graph_descriptors.h` — `GraphDescriptor`, `any_node_satisfies`, `all_nodes_satisfy`
 - `src/logic/descriptors/descriptors_general.h` — combinators (`and_`, `or_`, `not_`)
 - `src/logic/descriptors/ChainDescriptorBuilder.h` / `.cpp` — `ChainDescriptorBuilder` class
 - `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` — descriptor unit tests
 - `tests/unit/logic/part_library.h` / `.cpp` — `TestPartLibrary`, `CheckNodeDescriptorForAllScenarios`, `ScaffoldScenario`
-- `docs/workflows/adding_descriptors.md` — **primary human-facing documentation; must be kept in sync**
+- `docs/workflows/adding_descriptors.md` — primary human-facing descriptor workflow
 
 ---
 
