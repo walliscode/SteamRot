@@ -17,7 +17,6 @@
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include "part_graph_library.h"
-#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 #include <vector>
@@ -49,7 +48,7 @@ ChainDescriptorResult run_dfs(uint32_t start_id, std::vector<ChainStep> steps,
   start.depth = 1;
   ChainDescriptorResult result{false};
   depth_first_search(start, context, parts, result);
-  if (!result.valid_subgraphs.empty())
+  if (result.valid_subgraph.has_value())
     result.m_result = true;
   result.m_trace = std::move(context.trace);
   return result;
@@ -159,9 +158,9 @@ TEST_CASE("depth_first_search: single-node scenarios",
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
 
-    REQUIRE(!result.valid_subgraphs.empty());
-    REQUIRE(result.valid_subgraphs.front() == std::vector<uint32_t>{0});
-    REQUIRE(result.invalid_subgraphs.empty());
+    REQUIRE(result.valid_subgraph.has_value());
+    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{0});
+    REQUIRE_FALSE(result.invalid_subgraph.has_value());
   }
 
   SECTION("isolated node not matching a Sequence step → one invalid subgraph") {
@@ -173,8 +172,8 @@ TEST_CASE("depth_first_search: single-node scenarios",
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_joint, ChainStepKind::Sequence)}, parts);
 
-    REQUIRE(result.valid_subgraphs.empty());
-    REQUIRE(!result.invalid_subgraphs.empty());
+    REQUIRE_FALSE(result.valid_subgraph.has_value());
+    REQUIRE(result.invalid_subgraph.has_value());
   }
 
   SECTION(
@@ -187,8 +186,8 @@ TEST_CASE("depth_first_search: single-node scenarios",
     const ChainDescriptorResult result =
         run_dfs(9999, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
 
-    REQUIRE(result.valid_subgraphs.empty());
-    REQUIRE(!result.invalid_subgraphs.empty());
+    REQUIRE_FALSE(result.valid_subgraph.has_value());
+    REQUIRE(result.invalid_subgraph.has_value());
   }
 }
 
@@ -221,10 +220,8 @@ TEST_CASE(
     const ChainDescriptorResult result =
         run_dfs(2, {make_step(is_serial, ChainStepKind::WhileIsTrue)}, parts);
 
-    REQUIRE(!result.valid_subgraphs.empty());
-    for (const auto &sg : result.valid_subgraphs) {
-      REQUIRE(sg == std::vector<uint32_t>{2});
-    }
+    REQUIRE(result.valid_subgraph.has_value());
+    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2});
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -236,11 +233,6 @@ TEST_CASE(
             .NodeResult("f0", "is_serial", false,
                         "connection_count=1, expected==2", 2)
             .Backtracking("f0", 1, "j0", 0, 1)
-            .MovingToNeighbour("j0", 1, "f1", 0, 1)
-            .NodeEval("f1", "is_serial", 2)
-            .NodeResult("f1", "is_serial", false,
-                        "connection_count=1, expected==2", 2)
-            .Backtracking("f1", 0, "j0", 1, 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -260,14 +252,8 @@ TEST_CASE(
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
 
-    // Both {joint0, frag0} and {joint0, frag1} must be recorded.
-    REQUIRE(result.valid_subgraphs.size() == 2);
-    REQUIRE(
-        std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 0}) != result.valid_subgraphs.end());
-    REQUIRE(
-        std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 1}) != result.valid_subgraphs.end());
+    REQUIRE(result.valid_subgraph.has_value());
+    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 0});
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -282,14 +268,6 @@ TEST_CASE(
             .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
             .Backtracking("f0", 1, "j0", 0, 1)
-            .MovingToNeighbour("j0", 1, "f1", 0, 1)
-            .NodeEval("f1", "is_serial", 2)
-            .NodeResult("f1", "is_serial", false,
-                        "connection_count=1, expected==2", 2)
-            .NodeEval("f1", "is_terminal", 2)
-            .NodeResult("f1", "is_terminal", true,
-                        "connection_count=1, expected==1", 2)
-            .Backtracking("f1", 0, "j0", 1, 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -329,11 +307,8 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
 
-    REQUIRE(!result.valid_subgraphs.empty());
-    const bool found =
-        std::find(result.valid_subgraphs.begin(), result.valid_subgraphs.end(),
-                  std::vector<uint32_t>{2, 3, 1}) !=
-        result.valid_subgraphs.end();
+    REQUIRE(result.valid_subgraph.has_value());
+    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 3, 1});
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -360,7 +335,6 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
             .Backtracking("j1", 0, "j0", 1, 1)
             .Build();
 
-    REQUIRE(found);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
@@ -373,7 +347,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
 
-    REQUIRE(result.valid_subgraphs.empty());
+    REQUIRE_FALSE(result.valid_subgraph.has_value());
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -415,7 +389,7 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_serial, ChainStepKind::WhileIsTrue)},
                 steamrot::tests::ring.part_graph);
-    REQUIRE(result.valid_subgraphs.empty());
+    REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 
   SECTION(
@@ -427,6 +401,6 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
                 {make_step(is_serial, ChainStepKind::WhileIsTrue),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 steamrot::tests::ring.part_graph);
-    REQUIRE(result.valid_subgraphs.empty());
+    REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 }

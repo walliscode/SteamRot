@@ -131,6 +131,9 @@ const NodeDescriptor my_descriptor{
 A `ChainDescriptor` answers a traversal-based question from one anchor node.
 Use `ChainDescriptorBuilder`.
 
+Chain evaluation is first-match only: traversal stops as soon as the first valid
+chain is found (based on DFS neighbour iteration order).
+
 ### Declaration
 
 Add the declaration in `src/logic/descriptors/descriptors_chain_descriptors.h`:
@@ -203,6 +206,10 @@ REQUIRE(result.m_result == true);
 
 Every descriptor evaluation populates an `AnalysisTrace` in the result's
 `m_trace` field.
+
+`ChainDescriptorResult` also records only single paths:
+- `valid_subgraph` stores the first valid path, if one is found.
+- `invalid_subgraph` stores the first rejected path, if one is encountered.
 
 | `TraceEventKind` | When emitted | Key fields |
 | --- | --- | --- |

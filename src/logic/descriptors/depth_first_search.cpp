@@ -54,13 +54,16 @@ Transition resolve_transition(const ChainStep &step,
 /////////////////////////////////////////////////
 void depth_first_search(Cursor cursor, DFSContext &context,
                         const PartGraph &parts, ChainDescriptorResult &result) {
+  if (result.valid_subgraph.has_value())
+    return;
 
   /////////////////////////////////////////////////
   /// SECTION: Validate that the current node exists in the graph
   /////////////////////////////////////////////////
   const auto current_node = parts.find(cursor.current_id);
   if (current_node == parts.end()) {
-    result.invalid_subgraphs.push_back(context.current_chain);
+    if (!result.invalid_subgraph.has_value())
+      result.invalid_subgraph = context.current_chain;
     AnalysisEvent invalid_event{};
     invalid_event.kind = TraceEventKind::InvalidSubgraphIsolated;
     invalid_event.depth = cursor.depth;
@@ -76,7 +79,8 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /// accumulated so far is recorded as valid.
   /////////////////////////////////////////////////
   if (cursor.steps_it == context.steps_end) {
-    result.valid_subgraphs.push_back(context.current_chain);
+    if (!result.valid_subgraph.has_value())
+      result.valid_subgraph = context.current_chain;
     return;
   }
 
@@ -106,7 +110,8 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   case TransitionKind::Reject: {
     // Record the rejected path and return; the NodeResult trace event already
     // explains why the predicate failed.
-    result.invalid_subgraphs.push_back(context.current_chain);
+    if (!result.invalid_subgraph.has_value())
+      result.invalid_subgraph = context.current_chain;
     return;
   }
 
@@ -150,7 +155,8 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /// step to match against them.
   /////////////////////////////////////////////////
   if (cursor.steps_it == context.steps_end) {
-    result.valid_subgraphs.push_back(context.current_chain);
+    if (!result.valid_subgraph.has_value())
+      result.valid_subgraph = context.current_chain;
     context.visited.erase(cursor.current_id);
     context.current_chain.pop_back();
     return;
@@ -218,6 +224,9 @@ void depth_first_search(Cursor cursor, DFSContext &context,
         current_node->second);
     backtrack_event.to_socket_id = socket_id;
     context.trace.push_back(std::move(backtrack_event));
+
+    if (result.valid_subgraph.has_value())
+      break;
   }
 
   /////////////////////////////////////////////////

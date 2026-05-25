@@ -17,7 +17,7 @@
 #include "part_graph_library.h"
 
 #include <catch2/catch_test_macros.hpp>
-#include <unordered_map>
+#include <vector>
 
 namespace {
 constexpr uint32_t kMissingPartId{9999};
@@ -115,22 +115,13 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
             .NodeResult("f0", "is_terminal", true,
                         "connection_count=1, expected==1", 2)
             .Backtracking("f0", 1, "j0", 0, 1)
-            // socket[1] of joint leads to frag1 (id=1)
-            .MovingToNeighbour("j0", 1, "f1", 0, 1)
-            // frag1 also has 1 connection, same pattern as frag0
-            .NodeEval("f1", "is_serial", 2)
-            .NodeResult("f1", "is_serial", false,
-                        "connection_count=1, expected==2", 2)
-            .NodeEval("f1", "is_terminal", 2)
-            .NodeResult("f1", "is_terminal", true,
-                        "connection_count=1, expected==1", 2)
-            .Backtracking("f1", 0, "j0", 1, 1)
             .ScopeEnd("is_serial_chain", ScopeKind::Chain, true, 0)
             .Build();
 
     // assert result and trace
     REQUIRE(result);
-    REQUIRE(result.valid_subgraphs.size() == 2);
+    REQUIRE(result.valid_subgraph.has_value());
+    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 0});
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
@@ -171,7 +162,7 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
           is_serial_chain(parts, pkg.id_to_part_graph_id.at("f0"));
       // assert result
       REQUIRE_FALSE(result);
-      REQUIRE(result.valid_subgraphs.size() == 0);
+      REQUIRE_FALSE(result.valid_subgraph.has_value());
       REQUIRE_THAT(result.m_trace,
                    steamrot::tests::EqualsTrace(expected_trace,
                                                 TerminalDescriptorFormatter{}));
@@ -195,25 +186,6 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                           "connection_count=1, expected==1", 2)
               // this should store a valid subgraph here
               .Backtracking("f0", 0, "j0", 0, 1)
-              .MovingToNeighbour("j0", 1, "f1", 0, 1)
-              .NodeEval("f1", is_serial.GetName(), 2)
-              .NodeResult("f1", is_serial.GetName(), true,
-                          "connection_count=2, expected==2", 2)
-              .MovingToNeighbour("f1", 1, "j1", 0, 2)
-              .NodeEval("j1", "is_serial", 3)
-              .NodeResult("j1", "is_serial", true,
-                          "connection_count=2, expected==2", 3)
-              .MovingToNeighbour("j1", 1, "f2", 0, 3)
-              .NodeEval("f2", is_serial.GetName(), 4)
-              .NodeResult("f2", is_serial.GetName(), false,
-                          "connection_count=1, expected==2", 4)
-              .NodeEval("f2", is_terminal.GetName(), 4)
-              .NodeResult("f2", is_terminal.GetName(), true,
-                          "connection_count=1, expected==1", 4)
-              // this should store a valid subgraph here
-              .Backtracking("f2", 0, "j1", 1, 3)
-              .Backtracking("j1", 0, "f1", 1, 2)
-              .Backtracking("f1", 0, "j0", 1, 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
               .Build();
       ChainDescriptorResult result =
@@ -223,7 +195,8 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                    steamrot::tests::EqualsTrace(expected_trace,
                                                 TerminalDescriptorFormatter{}));
       REQUIRE(result);
-      REQUIRE(result.valid_subgraphs.size() == 2);
+      REQUIRE(result.valid_subgraph.has_value());
+      REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{3, 0});
     }
   }
 }
