@@ -15,9 +15,18 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace steamrot::logic::descriptors {
+
+/////////////////////////////////////////////////
+/// @brief An ordered list of part IDs produced by a successful DFS walk.
+///
+/// Aliases @c std::vector<uint32_t> so that archetype result structs can use
+/// a named, self-documenting type for their fields.
+/////////////////////////////////////////////////
+using SubGraph = std::vector<uint32_t>;
 
 /////////////////////////////////////////////////
 /// @struct DescriptorResult
@@ -105,4 +114,52 @@ struct ChainDescriptorResult : DescriptorResult {
   explicit ChainDescriptorResult(bool result) : DescriptorResult(result) {}
 };
 
+struct TestArchetypeResult {
+  SubGraph chain1;
+  SubGraph chain2;
+  std::vector<SubGraph> chains;
+};
+/////////////////////////////////////////////////
+/// @class GrabResult
+/// @brief Store the anchor and arms of a successful Grab MachinaArchetype
+/////////////////////////////////////////////////
+struct GrabResult {
+  /////////////////////////////////////////////////
+  /// @brief Anchor node from which the arms extend
+  /////////////////////////////////////////////////
+  SubGraph anchor;
+
+  /////////////////////////////////////////////////
+  /// @brief Collection of grabbing arms
+  /////////////////////////////////////////////////
+  std::vector<SubGraph> arms;
+};
+
+using ArchetypeVariant = std::variant<TestArchetypeResult, GrabResult>;
+
+/////////////////////////////////////////////////
+/// @class MachinaArchetypeResult
+/// @brief Result type for MachinaArchetype evaluations.
+/////////////////////////////////////////////////
+struct MachinaArchetypeResult : DescriptorResult {
+
+  /////////////////////////////////////////////////
+  /// @brief default constructor for MachinaArchetypeResult.
+  /////////////////////////////////////////////////
+  MachinaArchetypeResult() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Construct a MachinaArchetypeResult with a boolean result.
+  ///
+  /// @param result
+  /////////////////////////////////////////////////
+  explicit MachinaArchetypeResult(bool result, ArchetypeVariant variant)
+      : DescriptorResult(result), result_sub_graphs(variant) {}
+
+  /////////////////////////////////////////////////
+  /// @brief Variant to store all possible subgraph results from
+  /// MachinaArchetype evaluation.
+  /////////////////////////////////////////////////
+  ArchetypeVariant result_sub_graphs;
+};
 } // namespace steamrot::logic::descriptors

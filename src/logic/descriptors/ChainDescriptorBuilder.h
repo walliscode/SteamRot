@@ -11,9 +11,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "ChainDescriptor.h"
 #include "depth_first_search.h"
-#include "descriptors_chain_descriptors.h"
-#include "descriptors_node_descriptors.h"
 #include <vector>
 
 namespace steamrot::logic::descriptors {
@@ -30,11 +29,6 @@ private:
   /// @brief Ordered steps from builder
   /////////////////////////////////////////////////
   std::vector<ChainStep> m_steps{};
-
-  /////////////////////////////////////////////////
-  /// @brief Flag to prevent modification of the builder after End() is called.
-  /////////////////////////////////////////////////
-  bool m_build_finalised{false};
 
 public:
   /////////////////////////////////////////////////

@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "descriptors_node_descriptors.h"
+#include "NodeDescriptor.h"
 #include <unordered_set>
 
 namespace steamrot::logic::descriptors {

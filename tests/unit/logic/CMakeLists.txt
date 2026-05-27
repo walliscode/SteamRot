@@ -27,6 +27,7 @@ descriptors/descriptors_node_descriptors.test.cpp
 descriptors/descriptors_chain_descriptors.test.cpp
 descriptors/ChainDescriptorBuilder.test.cpp
 descriptors/depth_first_search.test.cpp
+descriptors/MachinaArchetypeBuilder.test.cpp
 )
 
 target_include_directories(test_logic
