@@ -27,14 +27,6 @@
 namespace steamrot::logic::descriptors {
 
 /////////////////////////////////////////////////
-/// @brief An ordered list of part IDs produced by a successful DFS walk.
-///
-/// Aliases @c std::vector<uint32_t> so that archetype result structs can use
-/// a named, self-documenting type for their fields.
-/////////////////////////////////////////////////
-using SubGraph = std::vector<uint32_t>;
-
-/////////////////////////////////////////////////
 /// @enum ArchetypeStepKind
 /// @brief Classifies how a step in a @c MachinaArchetypeBuilder is matched.
 ///
@@ -153,6 +145,10 @@ public:
         std::move(name),
         [steps = std::move(steps)](const PartGraph &parts,
                                    uint32_t id) -> MachinaArchetypeResult {
+          // create variant to hold the result struct, default-constructed
+          std::variant<T> result_struct{};
+
+          // evaluate each step in order, passing the same (parts, id) to each
           bool all_passed = true;
           for (const auto &step : steps) {
             ChainDescriptorResult chain_result = step.descriptor(parts, id);
@@ -160,7 +156,7 @@ public:
               all_passed = false;
             }
           }
-          return MachinaArchetypeResult{all_passed};
+          return MachinaArchetypeResult{all_passed, result_struct};
         }};
   }
 };
