@@ -105,4 +105,22 @@ struct ChainDescriptorResult : DescriptorResult {
   explicit ChainDescriptorResult(bool result) : DescriptorResult(result) {}
 };
 
+/////////////////////////////////////////////////
+/// @class MachinaArchetypeResult
+/// @brief Result type for MachinaArchetype evaluations.
+/////////////////////////////////////////////////
+struct MachinaArchetypeResult : DescriptorResult {
+
+  /////////////////////////////////////////////////
+  /// @brief default constructor for MachinaArchetypeResult.
+  /////////////////////////////////////////////////
+  MachinaArchetypeResult() = default;
+
+  /////////////////////////////////////////////////
+  /// @brief Construct a MachinaArchetypeResult with a boolean result.
+  ///
+  /// @param result
+  /////////////////////////////////////////////////
+  explicit MachinaArchetypeResult(bool result) : DescriptorResult(result) {}
+};
 } // namespace steamrot::logic::descriptors

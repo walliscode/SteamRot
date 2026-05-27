@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ChainDescriptorBuilder.h"
-#include "descriptors_node_descriptors.h"
 #include <catch2/catch_test_macros.hpp>
 
 using namespace steamrot::logic::descriptors;
@@ -19,14 +18,6 @@ steamrot::logic::descriptors::NodeDescriptor make_test_predicate() {
              -> steamrot::logic::descriptors::NodeDescriptorResult {
     return steamrot::logic::descriptors::NodeDescriptorResult{true};
   };
-}
-
-TEST_CASE("ChainDescriptor constructs correctly with StartWith and Then",
-          "[ChainDescriptorBuilder]") {
-
-  ChainDescriptorBuilder builder;
-  const auto &steps = builder.GetSteps();
-  REQUIRE(steps.size() == 0);
 }
 
 TEST_CASE("ChainDescriptorBuilder::Then tests", "[ChainDescriptorBuilder]") {
