@@ -49,7 +49,8 @@ TEST_CASE("MachinaArchetype Grab tests") {
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 0, "j0")
             .NodeEval("j0", is_joint.GetName(), 1)
-            .NodeResult("j0", is_joint.GetName(), true, "connection_count=2", 1)
+            .NodeResult("j0", is_joint.GetName(), true,
+                        "node holds JointInstance", 1)
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, true, 0)
             .Build();
 
@@ -61,6 +62,31 @@ TEST_CASE("MachinaArchetype Grab tests") {
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
-    REQUIRE_FALSE(result);
+    REQUIRE(result);
+  }
+
+  SECTION("Grab offsets trace depth when requested") {
+
+    steamrot::tests::PartGraphPackage pkg =
+        steamrot::tests::PartGraphBuilder{}
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .Build();
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 2, "j0")
+            .NodeEval("j0", is_joint.GetName(), 3)
+            .NodeResult("j0", is_joint.GetName(), true,
+                        "node holds JointInstance", 3)
+            .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, true, 2)
+            .Build();
+
+    MachinaArchetypeResult result =
+        grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 2);
+
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+    REQUIRE(result);
   }
 }

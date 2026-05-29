@@ -189,7 +189,8 @@ public:
         archetype_name,
         [steps = std::move(steps), archetype_name = archetype_name](
             const PartGraph &parts,
-            uint32_t start_id) -> MachinaArchetypeResult {
+            uint32_t start_id,
+            uint32_t depth) -> MachinaArchetypeResult {
           // create MachinaArchetypeResult to accumulate the final result and
           // trace
           MachinaArchetypeResult result{false, T{}};
@@ -229,7 +230,7 @@ public:
           }
 
           add_scope_begin_event(context, archetype_name,
-                                ScopeKind::MachinaArchetype, parts, 0,
+                                ScopeKind::MachinaArchetype, parts, depth,
                                 start_id);
 
           // create cursor
@@ -245,7 +246,7 @@ public:
 
               // evalute the current node with the step's descriptor
               ChainDescriptorResult step_result =
-                  step.descriptor(parts, graph_cursor);
+                  step.descriptor(parts, graph_cursor, depth + 1);
 
               // for a simple sequence step, if the result is false then the
               // whole archetype fails and we can break early; if it's true then
@@ -266,6 +267,8 @@ public:
             if (!result.m_result)
               break;
           }
+          add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
+                              result.m_result, depth);
           // move trace and return result
           result.m_trace = std::move(context.trace);
           return result;

@@ -29,7 +29,8 @@ class MachinaArchetype {
   /// @brief Underlying callable type.
   /////////////////////////////////////////////////
   using FnType =
-      std::function<MachinaArchetypeResult(const PartGraph &, uint32_t)>;
+      std::function<MachinaArchetypeResult(const PartGraph &, uint32_t,
+                                           uint32_t)>;
 
 private:
   /////////////////////////////////////////////////
@@ -62,9 +63,11 @@ public:
   ///
   /// @param parts The PartGraph to query.
   /// @param id    Stable part ID of the anchor node.
+  /// @param depth Nesting depth used for archetype-scope trace events.
   /////////////////////////////////////////////////
-  MachinaArchetypeResult operator()(const PartGraph &parts, uint32_t id) const {
-    return m_fn(parts, id);
+  MachinaArchetypeResult operator()(const PartGraph &parts, uint32_t id,
+                                    uint32_t depth = 0) const {
+    return m_fn(parts, id, depth);
   }
 
   /////////////////////////////////////////////////
