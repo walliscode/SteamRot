@@ -269,7 +269,7 @@ public:
           }
           add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
                               result.m_result, depth);
-          // move trace and return result
+          // scope events complete; move trace and return result
           result.m_trace = std::move(context.trace);
           return result;
         }};
