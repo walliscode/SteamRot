@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
+#include "descriptors_analysis_event_helpers.h"
 #include <string>
 #include <vector>
 
@@ -45,9 +46,7 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           result.m_result = false;
 
           // set up EmtpyGraph event in the trace
-          AnalysisEvent empty_graph_event{};
-          empty_graph_event.kind = TraceEventKind::EmtpyPartGraph;
-          context.trace.push_back(std::move(empty_graph_event));
+          add_empty_part_graph_event(context);
           result.m_trace = std::move(context.trace);
 
           // return early since there's no graph to traverse
@@ -63,30 +62,15 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
 
           // set up EmptyChainSteps event in the trace to explain why the result
           // is false
-          AnalysisEvent empty_steps_event{};
-          empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
-          context.trace.push_back(std::move(empty_steps_event));
+          add_empty_chain_steps_event(context);
           result.m_trace = std::move(context.trace);
 
           // return early since there's no steps to evaluate
           return result;
         }
 
-        AnalysisEvent scope_begin{};
-        scope_begin.kind = TraceEventKind::ScopeBegin;
-        scope_begin.depth = 0;
-        scope_begin.scope_name = chain_name;
-        scope_begin.scope_kind = ScopeKind::Chain;
-        scope_begin.anchor_id = start_id;
-        if (const auto anchor_it = parts.find(start_id);
-            anchor_it != parts.end()) {
-          scope_begin.part_id_alias = std::visit(
-              [](const auto &inst) -> const std::string & {
-                return inst.alias;
-              },
-              anchor_it->second);
-        }
-        context.trace.push_back(std::move(scope_begin));
+        add_scope_begin_event(context, chain_name, ScopeKind::Chain, parts, 0,
+                              start_id);
 
         Cursor start_cursor{};
         start_cursor.current_id = start_id;
@@ -99,13 +83,8 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
         }
 
         // ScopeEnd
-        AnalysisEvent scope_end{};
-        scope_end.kind = TraceEventKind::ScopeEnd;
-        scope_end.depth = 0;
-        scope_end.scope_name = chain_name;
-        scope_end.scope_kind = ScopeKind::Chain;
-        scope_end.result = result.m_result;
-        context.trace.push_back(std::move(scope_end));
+        add_scope_end_event(context, chain_name, ScopeKind::Chain,
+                            result.m_result, 0);
 
         result.m_trace = std::move(context.trace);
         return result;
