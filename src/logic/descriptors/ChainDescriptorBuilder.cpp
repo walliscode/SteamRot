@@ -35,8 +35,12 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
   return ChainDescriptor{
       name,
       [steps = std::move(steps), chain_name = std::move(name)](
-          const PartGraph &parts, uint32_t start_id) -> ChainDescriptorResult {
+          const PartGraph &parts, uint32_t start_id,
+          uint32_t depth) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
+
+        // create DFSContext to hold the trace and any other state we want to
+        // pass
         DFSContext context{steps};
 
         // Check for empty PartGraph
@@ -69,13 +73,13 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
           return result;
         }
 
-        add_scope_begin_event(context, chain_name, ScopeKind::Chain, parts, 0,
-                              start_id);
+        add_scope_begin_event(context, chain_name, ScopeKind::Chain, parts,
+                              depth, start_id);
 
         Cursor start_cursor{};
         start_cursor.current_id = start_id;
         start_cursor.steps_it = context.steps.cbegin();
-        start_cursor.depth = 1;
+        start_cursor.depth = depth + 1;
         depth_first_search(start_cursor, context, parts, result);
 
         if (result.valid_subgraph.has_value()) {
@@ -84,7 +88,7 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
 
         // ScopeEnd
         add_scope_end_event(context, chain_name, ScopeKind::Chain,
-                            result.m_result, 0);
+                            result.m_result, depth);
 
         result.m_trace = std::move(context.trace);
         return result;

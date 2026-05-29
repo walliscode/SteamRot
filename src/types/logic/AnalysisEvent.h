@@ -26,7 +26,7 @@ namespace steamrot::logic::descriptors {
 enum class ScopeKind {
   Node,
   Chain,
-  Graph,
+  MachinaArchetype,
 };
 
 /////////////////////////////////////////////////

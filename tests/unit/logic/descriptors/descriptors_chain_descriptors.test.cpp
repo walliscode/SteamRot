@@ -72,6 +72,29 @@ TEST_CASE("ChainDescriptor is_serial_chain") {
                                               TerminalDescriptorFormatter{}));
   }
 
+  SECTION("is_serial_chain offsets trace depth when requested") {
+    const steamrot::PartGraph &parts = steamrot::tests::pair.part_graph;
+
+    ChainDescriptorResult result =
+        is_serial_chain(parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"),
+                        3);
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{
+            steamrot::tests::pair.id_to_part_graph_id}
+            .ScopeBegin("is_serial_chain", ScopeKind::Chain, 3, "f0")
+            .NodeEval("f0", "is_serial", 4)
+            .NodeResult("f0", "is_serial", false,
+                        "connection_count=1, expected==2", 4)
+            .ScopeEnd("is_serial_chain", ScopeKind::Chain, false, 3)
+            .Build();
+
+    REQUIRE_FALSE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
   SECTION("is_serial_chain evaluates LinearChain") {
     // test predicate: f0(id=0, terminal) ─ j0(id=2, serial) ─ f1(id=1,
     // terminal)

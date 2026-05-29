@@ -44,8 +44,8 @@ std::string FormatEvent(const AnalysisEvent &ev) {
     case ScopeKind::Chain:
       line += "CHAIN";
       break;
-    case ScopeKind::Graph:
-      line += "GRAPH";
+    case ScopeKind::MachinaArchetype:
+      line += "MACHINA_ARCHETYPE";
       break;
     case ScopeKind::Node:
       line += "SCOPE";
@@ -53,9 +53,9 @@ std::string FormatEvent(const AnalysisEvent &ev) {
     }
     line += "] " + ev.scope_name;
     if (ev.anchor_id.has_value()) {
-      const std::string anchor_label = ev.part_id_alias.empty()
-                                           ? "node#" + std::to_string(*ev.anchor_id)
-                                           : ev.part_id_alias;
+      const std::string anchor_label =
+          ev.part_id_alias.empty() ? "node#" + std::to_string(*ev.anchor_id)
+                                   : ev.part_id_alias;
       line += "  anchor=" + anchor_label;
     }
     return line;
@@ -96,21 +96,19 @@ std::string FormatEvent(const AnalysisEvent &ev) {
     const std::string to_label = ev.to_id_alias.empty()
                                      ? "node#" + std::to_string(ev.to_id)
                                      : ev.to_id_alias;
-    return indent + "[MOVE]  " +
-           FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
-           FormatEndpoint(to_label, ev.to_socket_id);
+    return indent + "[MOVE]  " + FormatEndpoint(from_label, ev.from_socket_id) +
+           " -> " + FormatEndpoint(to_label, ev.to_socket_id);
   }
 
   case TraceEventKind::Backtracking: {
     const std::string from_label = ev.from_id_alias.empty()
-                                      ? "node#" + std::to_string(ev.from_id)
-                                      : ev.from_id_alias;
+                                       ? "node#" + std::to_string(ev.from_id)
+                                       : ev.from_id_alias;
     const std::string to_label = ev.to_id_alias.empty()
                                      ? "node#" + std::to_string(ev.to_id)
                                      : ev.to_id_alias;
-    return indent + "[BACK]  " +
-           FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
-           FormatEndpoint(to_label, ev.to_socket_id);
+    return indent + "[BACK]  " + FormatEndpoint(from_label, ev.from_socket_id) +
+           " -> " + FormatEndpoint(to_label, ev.to_socket_id);
   }
 
   case TraceEventKind::ValidSubgraphIsolated: {

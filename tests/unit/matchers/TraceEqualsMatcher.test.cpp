@@ -124,11 +124,11 @@ TEST_CASE("AnalysisTraceBuilder::ScopeBegin appends correct event",
     REQUIRE(*ev.anchor_id == 4u);
   }
 
-  SECTION("Graph scope without anchor") {
-    builder.ScopeBegin("my_graph", ScopeKind::Graph, 0u);
+  SECTION("MachinaArchetype scope without anchor") {
+    builder.ScopeBegin("my_graph", ScopeKind::MachinaArchetype, 0u);
 
     const AnalysisTrace trace = builder.Build();
-    REQUIRE(trace[0].scope_kind == ScopeKind::Graph);
+    REQUIRE(trace[0].scope_kind == ScopeKind::MachinaArchetype);
     REQUIRE_FALSE(trace[0].anchor_id.has_value());
   }
 }

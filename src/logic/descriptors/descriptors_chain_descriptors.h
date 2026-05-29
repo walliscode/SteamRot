@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ChainDescriptor.h"
-#include "descriptors_node_descriptors.h"
+#include "NodeDescriptor.h"
 
 namespace steamrot::logic::descriptors {
 
@@ -31,8 +31,9 @@ inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
   return ChainDescriptor{
       nd.GetName(),
       [nd = std::move(nd)](const PartGraph &parts,
-                           uint32_t id) -> ChainDescriptorResult {
-        auto node_result = nd(parts, id);
+                           uint32_t id,
+                           uint32_t depth) -> ChainDescriptorResult {
+        auto node_result = nd(parts, id, depth);
         ChainDescriptorResult result{static_cast<bool>(node_result)};
         Merge(result.m_trace, std::move(node_result.m_trace));
         return result;

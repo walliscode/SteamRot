@@ -37,7 +37,8 @@ public:
   /// @brief Underlying callable type.
   /////////////////////////////////////////////////
   using FnType =
-      std::function<ChainDescriptorResult(const PartGraph &, uint32_t)>;
+      std::function<ChainDescriptorResult(const PartGraph &, uint32_t,
+                                          uint32_t)>;
 
   ChainDescriptor() = default;
 
@@ -58,9 +59,11 @@ public:
   ///
   /// @param parts The PartGraph to query.
   /// @param id    Stable part ID of the anchor node.
+  /// @param depth Nesting depth used for chain-scope trace events.
   /////////////////////////////////////////////////
-  ChainDescriptorResult operator()(const PartGraph &parts, uint32_t id) const {
-    return m_fn(parts, id);
+  ChainDescriptorResult operator()(const PartGraph &parts, uint32_t id,
+                                   uint32_t depth = 0) const {
+    return m_fn(parts, id, depth);
   }
 
   /////////////////////////////////////////////////
