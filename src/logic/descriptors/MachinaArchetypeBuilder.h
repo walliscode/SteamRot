@@ -16,9 +16,11 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "AnalysisEvent.h"
 #include "ChainDescriptor.h"
 #include "DescriptorResult.h"
 #include "MachinaArchetype.h"
+#include "descriptors_analysis_event_helpers.h"
 #include <cstdint>
 #include <string>
 #include <variant>
@@ -203,9 +205,7 @@ public:
             result.m_result = false;
 
             // set up EmtpyGraph event in the trace
-            AnalysisEvent empty_graph_event{};
-            empty_graph_event.kind = TraceEventKind::EmtpyPartGraph;
-            context.trace.push_back(std::move(empty_graph_event));
+            add_empty_part_graph_event(context);
             result.m_trace = std::move(context.trace);
 
             // return early since there's no graph to traverse
@@ -221,30 +221,16 @@ public:
 
             // set up EmptyChainSteps event in the trace to explain why the
             // result is false
-            AnalysisEvent empty_steps_event{};
-            empty_steps_event.kind = TraceEventKind::EmtpyChainSteps;
-            context.trace.push_back(std::move(empty_steps_event));
+            add_empty_chain_steps_event(context);
             result.m_trace = std::move(context.trace);
 
             // return early since there's no steps to evaluate
             return result;
           }
 
-          AnalysisEvent scope_begin{};
-          scope_begin.kind = TraceEventKind::ScopeBegin;
-          scope_begin.depth = 0;
-          scope_begin.scope_name = archetype_name;
-          scope_begin.scope_kind = ScopeKind::MachinaArchetype;
-          scope_begin.anchor_id = start_id;
-          if (const auto anchor_it = parts.find(start_id);
-              anchor_it != parts.end()) {
-            scope_begin.part_id_alias = std::visit(
-                [](const auto &inst) -> const std::string & {
-                  return inst.alias;
-                },
-                anchor_it->second);
-          }
-          context.trace.push_back(std::move(scope_begin));
+          add_scope_begin_event(context, archetype_name,
+                                ScopeKind::MachinaArchetype, parts, 0,
+                                start_id);
 
           // create cursor
           uint32_t graph_cursor = start_id;
@@ -267,6 +253,8 @@ public:
               if (!step_result)
                 result.m_result = false;
 
+              // append the step's trace to the overall trace
+              Merge(context.trace, std::move(step_result.m_trace));
               break;
             }
             case ArchetypeStepKind::AtLeastNOf: {
