@@ -36,6 +36,9 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
       [steps = std::move(steps), chain_name = std::move(name)](
           const PartGraph &parts, uint32_t start_id) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
+
+        // create DFSContext to hold the trace and any other state we want to
+        // pass
         DFSContext context{steps};
 
         // Check for empty PartGraph

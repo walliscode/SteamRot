@@ -77,3 +77,44 @@ TEST_CASE("MachinaArchetypeBuilder::Then tests", "[MachinaArchetypeBuilder]") {
     REQUIRE(steps[1].descriptor.GetName() == "cd2");
   }
 }
+TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
+          "[MachinaArchetypeBuilder]") {
+  // arrange
+  MachinaArchetypeBuilder<TestArchetypeResult> builder;
+  const auto &steps = builder.GetSteps();
+  REQUIRE(steps.size() == 0);
+
+  SECTION("AtLeastNOf adds a step with AtLeastNOf kind") {
+    // act
+    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains);
+    // assert
+    REQUIRE(steps.size() == 1);
+    REQUIRE(steps[0].kind == ArchetypeStepKind::AtLeastNOf);
+  }
+
+  SECTION("AtLeastNOf stores the correct descriptor name") {
+    // act
+    builder.AtLeastNOf(make_test_chain("my_chain"), 1,
+                       &TestArchetypeResult::chains);
+    // assert
+    REQUIRE(steps.size() == 1);
+    REQUIRE(steps[0].descriptor.GetName() == "my_chain");
+  }
+
+  SECTION("AtLeastNOf stores the correct member pointer") {
+    // act
+    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains);
+    // assert
+    REQUIRE(steps.size() == 1);
+    REQUIRE(std::get<std::vector<SubGraph> TestArchetypeResult::*>(
+                steps[0].result_storage) == &TestArchetypeResult::chains);
+  }
+
+  SECTION("AtLeastNOf adds min repetitions correctly") {
+    // act
+    builder.AtLeastNOf(make_test_chain("cd1"), 2, &TestArchetypeResult::chains);
+    // assert
+    REQUIRE(steps.size() == 1);
+    REQUIRE(steps[0].min_repetitions == 2);
+  }
+}

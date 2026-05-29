@@ -12,7 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "ChainDescriptor.h"
-#include "descriptors_node_descriptors.h"
+#include "NodeDescriptor.h"
 
 namespace steamrot::logic::descriptors {
 
