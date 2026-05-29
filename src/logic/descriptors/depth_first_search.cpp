@@ -9,6 +9,7 @@
 #include "depth_first_search.h"
 #include "AnalysisEvent.h"
 #include "MachinaFormScaffold.h"
+#include "descriptors_analysis_event_helpers.h"
 
 namespace steamrot::logic::descriptors {
 
@@ -63,10 +64,7 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   const auto current_node = parts.find(cursor.current_id);
   if (current_node == parts.end()) {
     result.invalid_subgraphs.push_back(context.current_chain);
-    AnalysisEvent invalid_event{};
-    invalid_event.kind = TraceEventKind::InvalidSubgraphIsolated;
-    invalid_event.depth = cursor.depth;
-    context.trace.push_back(std::move(invalid_event));
+    add_invalid_subgraph_isolated_event(context, cursor.depth);
     return;
   }
 
@@ -181,22 +179,10 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     if (context.visited.count(neighbour_id))
       continue;
 
-    AnalysisEvent move_event{};
-    move_event.kind = TraceEventKind::MovingToNeighbour;
-    move_event.depth = cursor.depth;
-    move_event.from_id = cursor.current_id;
-    move_event.from_id_alias = std::visit(
-        [](const auto &inst) -> const std::string & { return inst.alias; },
-        current_node->second);
-    move_event.from_socket_id = socket_id;
-    move_event.to_id = neighbour_id;
-    if (const auto to_it = parts.find(neighbour_id); to_it != parts.end()) {
-      move_event.to_id_alias = std::visit(
-          [](const auto &inst) -> const std::string & { return inst.alias; },
-          to_it->second);
-    }
-    move_event.to_socket_id = socket_data.connected_to->peer_socket_id;
-    context.trace.push_back(std::move(move_event));
+    append_event(context, make_moving_to_neighbour_event(
+                              cursor.depth, cursor.current_id, socket_id,
+                              neighbour_id,
+                              socket_data.connected_to->peer_socket_id, parts));
 
     Cursor child{};
     child.current_id = neighbour_id;
@@ -206,22 +192,10 @@ void depth_first_search(Cursor cursor, DFSContext &context,
 
     depth_first_search(child, context, parts, result);
 
-    AnalysisEvent backtrack_event{};
-    backtrack_event.kind = TraceEventKind::Backtracking;
-    backtrack_event.depth = cursor.depth;
-    backtrack_event.from_id = neighbour_id;
-    if (const auto from_it = parts.find(neighbour_id); from_it != parts.end()) {
-      backtrack_event.from_id_alias = std::visit(
-          [](const auto &inst) -> const std::string & { return inst.alias; },
-          from_it->second);
-    }
-    backtrack_event.from_socket_id = socket_data.connected_to->peer_socket_id;
-    backtrack_event.to_id = cursor.current_id;
-    backtrack_event.to_id_alias = std::visit(
-        [](const auto &inst) -> const std::string & { return inst.alias; },
-        current_node->second);
-    backtrack_event.to_socket_id = socket_id;
-    context.trace.push_back(std::move(backtrack_event));
+    append_event(context, make_backtracking_event(
+                              cursor.depth, neighbour_id,
+                              socket_data.connected_to->peer_socket_id,
+                              cursor.current_id, socket_id, parts));
 
     if (result.valid_subgraph.has_value())
       break;

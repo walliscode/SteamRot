@@ -7,6 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "descriptors_node_descriptors.h"
+#include "descriptors_analysis_event_helpers.h"
 #include <string>
 
 namespace steamrot::logic::descriptors {
@@ -19,18 +20,8 @@ NodeDescriptor::NodeDescriptor(std::string name, FnType fn)
 NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
                                                 uint32_t id,
                                                 uint32_t depth) const {
-  AnalysisEvent eval_event{};
-  eval_event.kind = TraceEventKind::NodeEval;
-  eval_event.depth = depth;
-  eval_event.part_id = id;
-  eval_event.predicate_name = m_name;
-
+  AnalysisEvent eval_event = make_node_eval_event(depth, id, m_name, parts);
   const auto part_it = parts.find(id);
-  if (part_it != parts.end()) {
-    eval_event.part_id_alias = std::visit(
-        [](const auto &inst) -> const std::string & { return inst.alias; },
-        part_it->second);
-  }
 
   NodeDescriptorResult result{};
   if (part_it == parts.end()) {
@@ -40,14 +31,9 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
     result = m_fn(parts, id);
   }
 
-  AnalysisEvent result_event{};
-  result_event.kind = TraceEventKind::NodeResult;
-  result_event.depth = depth;
-  result_event.part_id = id;
-  result_event.part_id_alias = eval_event.part_id_alias;
-  result_event.predicate_name = m_name;
-  result_event.result = static_cast<bool>(result);
-  result_event.reason = result.m_reason;
+  AnalysisEvent result_event = make_node_result_event(
+      depth, id, m_name, static_cast<bool>(result), result.m_reason,
+      eval_event.part_id_alias);
 
   result.m_trace.push_back(std::move(eval_event));
   result.m_trace.push_back(std::move(result_event));
