@@ -56,7 +56,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
 
     // test predicate
     MachinaArchetypeResult result =
-        grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"));
+        grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
 
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
@@ -78,6 +78,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .NodeEval("j0", is_joint.GetName(), 3)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 3)
+
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, true, 2)
             .Build();
 
