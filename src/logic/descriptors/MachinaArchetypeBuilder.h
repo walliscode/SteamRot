@@ -127,20 +127,11 @@ private:
   static bool EvaluateSequenceStep(const ArchetypeStep &step,
                                    const PartGraph &parts, uint32_t graph_cursor,
                                    uint32_t depth,
-                                   ArchetypeAnalysisContext &context,
-                                   T &typed_result) {
+                                   ArchetypeAnalysisContext &context) {
     ChainDescriptorResult step_result =
         step.descriptor(parts, graph_cursor, depth + 1);
-    const bool step_succeeded = static_cast<bool>(step_result);
-
-    if (step_succeeded && step_result.valid_subgraph.has_value() &&
-        std::holds_alternative<SubGraph T::*>(step.result_storage)) {
-      typed_result.*std::get<SubGraph T::*>(step.result_storage) =
-          *step_result.valid_subgraph;
-    }
-
     Merge(context.trace, std::move(step_result.m_trace));
-    return step_succeeded;
+    return static_cast<bool>(step_result);
   }
 
   static bool EvaluateAtLeastNOfStep(const ArchetypeStep &step,
@@ -148,13 +139,15 @@ private:
                                      const SocketMap &sockets, uint32_t depth,
                                      ArchetypeAnalysisContext &context,
                                      T &typed_result) {
+    // This should never happen because AtLeastNOf always stores a vector
+    // pointer; keep this defensive guard to fail safely if that invariant
+    // is ever broken.
     if (!std::holds_alternative<std::vector<SubGraph> T::*>(step.result_storage))
       return false;
 
     size_t matches_found = 0;
     std::vector<SubGraph> &result_vector =
         typed_result.*std::get<std::vector<SubGraph> T::*>(step.result_storage);
-    result_vector.clear();
 
     for (const auto &[socket_id, socket_data] : sockets) {
       (void)socket_id;
@@ -215,8 +208,7 @@ private:
       bool step_succeeded = false;
       switch (step.kind) {
       case ArchetypeStepKind::Sequence:
-        step_succeeded = EvaluateSequenceStep(step, parts, start_id, depth,
-                                              context, typed_result);
+        step_succeeded = EvaluateSequenceStep(step, parts, start_id, depth, context);
         break;
       case ArchetypeStepKind::AtLeastNOf:
         step_succeeded = EvaluateAtLeastNOfStep(step, parts, start_sockets,
@@ -225,8 +217,6 @@ private:
       }
 
       result.m_result = result.m_result && step_succeeded;
-      if (!result.m_result)
-        break;
     }
 
     add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
