@@ -55,6 +55,27 @@ TEST_CASE("ChainDescriptorBuilder::WhileIsTrue tests",
   }
 }
 
+TEST_CASE("ChainDescriptorBuilder::WhileIsTrueForMinimumN tests",
+          "[ChainDescriptorBuilder]") {
+  // arrange
+  ChainDescriptorBuilder builder;
+  const auto &steps = builder.GetSteps();
+  REQUIRE(steps.size() == 0);
+  NodeDescriptor test_predicate = make_test_predicate();
+  uint32_t min_repetitions = 3;
+  SECTION("WhileIsTrueForMinimumN adds a step with the correct "
+          "predicate, kind, and min_repetitions") {
+    // act
+    builder.WhileIsTrueForMinimumN(test_predicate, min_repetitions);
+    // assert
+    REQUIRE(steps.size() == 1);
+    const ChainStep &step = steps[0];
+    REQUIRE(step.kind == ChainStepKind::WhileIsTrueForMinimumN);
+    REQUIRE(step.predicate.target_type() == test_predicate.target_type());
+    REQUIRE(step.min_repetitions == min_repetitions);
+  }
+}
+
 TEST_CASE("ChainDescriptorBuilder supports multiple steps",
           "[ChainDescriptorBuilder]") {
   // arrange

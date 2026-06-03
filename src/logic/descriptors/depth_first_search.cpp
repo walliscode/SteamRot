@@ -29,15 +29,15 @@ Transition resolve_transition(const ChainStep &step,
   }
 
   /////////////////////////////////////////////////
-  /// WhileIsTrue / WhileIsTrueForN: consume every consecutive matching node,
-  /// then hand the first non-matching node to the next step.
+  /// WhileIsTrue / WhileIsTrueForMinimumN: consume every consecutive matching
+  /// node, then hand the first non-matching node to the next step.
   ///
   /// Both kinds share the same logic; the only difference is the minimum
   /// number of nodes required before the step is considered satisfied.
   /// WhileIsTrue uses the default min_repetitions of 1.
   /////////////////////////////////////////////////
   case ChainStepKind::WhileIsTrue:
-  case ChainStepKind::WhileIsTrueForN: {
+  case ChainStepKind::WhileIsTrueForMinimumN: {
     if (predicate_result) {
       // Increment the count and carry it forward in the returned transition so
       // the cursor's progress is updated for the next recursive layer.
@@ -49,6 +49,8 @@ Transition resolve_transition(const ChainStep &step,
                ? Transition{TransitionKind::HoldNodeAndAdvanceStep}
                : Transition{TransitionKind::Reject};
   }
+  default:
+    return Transition{TransitionKind::Reject};
   }
 }
 
@@ -179,10 +181,10 @@ void depth_first_search(Cursor cursor, DFSContext &context,
     if (context.visited.count(neighbour_id))
       continue;
 
-    append_event(context, make_moving_to_neighbour_event(
-                              cursor.depth, cursor.current_id, socket_id,
-                              neighbour_id,
-                              socket_data.connected_to->peer_socket_id, parts));
+    append_event(context,
+                 make_moving_to_neighbour_event(
+                     cursor.depth, cursor.current_id, socket_id, neighbour_id,
+                     socket_data.connected_to->peer_socket_id, parts));
 
     Cursor child{};
     child.current_id = neighbour_id;

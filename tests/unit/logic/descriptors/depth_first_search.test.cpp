@@ -109,33 +109,37 @@ TEST_CASE("resolve_transition: WhileIsTrue steps",
 }
 
 /////////////////////////////////////////////////
-/// resolve_transition — WhileIsTrueForN
+/// resolve_transition — WhileIsTrueForMinimumN
 /////////////////////////////////////////////////
-TEST_CASE("resolve_transition: WhileIsTrueForN steps",
+TEST_CASE("resolve_transition: WhileIsTrueForMinimumN steps",
           "[unit][logic][descriptors][dfs]") {
 
   SECTION("predicate passes → ConsumeNodeAndHoldStep, count incremented") {
-    ChainStep step = make_step(is_serial, ChainStepKind::WhileIsTrueForN, 2);
+    ChainStep step =
+        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, true, StepProgress{1});
     REQUIRE(t.kind == TransitionKind::ConsumeNodeAndHoldStep);
     REQUIRE(t.progress.match_count == 2);
   }
 
   SECTION("predicate fails, count below minimum → Reject") {
-    ChainStep step = make_step(is_serial, ChainStepKind::WhileIsTrueForN, 3);
+    ChainStep step =
+        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 3);
     const Transition t = resolve_transition(step, false, StepProgress{2});
     REQUIRE(t.kind == TransitionKind::Reject);
   }
 
   SECTION(
       "predicate fails, count exactly at minimum → HoldNodeAndAdvanceStep") {
-    ChainStep step = make_step(is_serial, ChainStepKind::WhileIsTrueForN, 2);
+    ChainStep step =
+        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, false, StepProgress{2});
     REQUIRE(t.kind == TransitionKind::HoldNodeAndAdvanceStep);
   }
 
   SECTION("predicate fails, count exceeds minimum → HoldNodeAndAdvanceStep") {
-    ChainStep step = make_step(is_serial, ChainStepKind::WhileIsTrueForN, 2);
+    ChainStep step =
+        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, false, StepProgress{5});
     REQUIRE(t.kind == TransitionKind::HoldNodeAndAdvanceStep);
   }
@@ -277,9 +281,9 @@ TEST_CASE(
 }
 
 /////////////////////////////////////////////////
-/// depth_first_search — WhileIsTrueForN minimum enforcement
+/// depth_first_search — WhileIsTrueForMinimumN minimum enforcement
 /////////////////////////////////////////////////
-TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
+TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
           "[unit][logic][descriptors][dfs]") {
 
   // topology: frag0(terminal) ─ joint0(serial) ─ joint1(serial) ─
@@ -303,7 +307,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
   SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
     const ChainDescriptorResult result =
         run_dfs(2,
-                {make_step(is_serial, ChainStepKind::WhileIsTrueForN, 2),
+                {make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
 
@@ -343,7 +347,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForN minimum enforcement",
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
     const ChainDescriptorResult result =
         run_dfs(2,
-                {make_step(is_serial, ChainStepKind::WhileIsTrueForN, 3),
+                {make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 3),
                  make_step(is_terminal, ChainStepKind::Sequence)},
                 parts);
 

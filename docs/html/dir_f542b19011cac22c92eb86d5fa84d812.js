@@ -7,6 +7,5 @@ var dir_f542b19011cac22c92eb86d5fa84d812 =
     [ "MachinaForm.h", "MachinaForm_8h.html", "MachinaForm_8h" ],
     [ "MachinaFormScaffold.h", "MachinaFormScaffold_8h.html", "MachinaFormScaffold_8h" ],
     [ "Part.h", "Part_8h.html", "Part_8h" ],
-    [ "PartGraph.h", "PartGraph_8h.html", "PartGraph_8h" ],
     [ "ViewDirection.h", "ViewDirection_8h.html", "ViewDirection_8h" ]
 ];

@@ -11,10 +11,10 @@ var namespacesteamrot_1_1logic_1_1positioning =
       [ "UpdatePosition", "namespacesteamrot_1_1logic_1_1positioning_1_1ghost.html#a39d9b2cbcc8cb4da2d31fecf0d04062e", null ]
     ] ],
     [ "grimoire_machina", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html", [
-      [ "compute_socket_local_positions_even_spread", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a89d803047dab52faba33f961c58902d1", null ],
+      [ "compute_socket_local_positions_even_spread", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#ab98a03429d89c4cfbff32a3cf78a780d", null ],
       [ "initialize_joint_socket_positions", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a445dd43b82a91cb930333938ec788083", null ],
-      [ "position_first_part_of_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#ac226c81d26533da2162bd3e88bf8bf7f", null ],
-      [ "position_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a5037acd78b5bc3215919831342543522", null ]
+      [ "position_first_part_of_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a388a350df91aaec50730048845a5712c", null ],
+      [ "position_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1positioning_1_1grimoire__machina.html#a82daa0245f91469b5ecd3584c466e169", null ]
     ] ],
     [ "ui", "namespacesteamrot_1_1logic_1_1positioning_1_1ui.html", [
       [ "ApplyMinMaxSizing", "namespacesteamrot_1_1logic_1_1positioning_1_1ui.html#a55319ffea4be8dc715faab58cb65a6f8", null ],

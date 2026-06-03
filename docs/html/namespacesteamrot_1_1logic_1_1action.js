@@ -14,11 +14,11 @@ var namespacesteamrot_1_1logic_1_1action =
       [ "SelectGhostItem", "namespacesteamrot_1_1logic_1_1action_1_1ghost.html#a5822cc57ac5658382ad1fb3d1f1142ab", null ]
     ] ],
     [ "grimoire_machina", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html", [
-      [ "check_MrGhost_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ac335f904174682cba04257f5d9143b4f", null ],
-      [ "check_PartMap_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a0b038b40b0b0e3f9f5f22da8fe1b80dc", null ],
+      [ "check_MrGhost_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#acc372b53be709f3c3d23f7f55a595999", null ],
+      [ "check_PartGraph_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a86fef2fe2433179b05934d6affac4e75", null ],
       [ "check_socket_for_connection_readiness", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#aa0c928e0020861fd6d00dfe07bd75cbf", null ],
       [ "clear_active_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a12caf908a9ff54937c82558ecaf9da67", null ],
-      [ "create_connection", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a015aaaac2c55039ed8eeae1b088d7089", null ],
+      [ "create_connection", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a267ea526cda19a6b3aad4bd7589a9daf", null ],
       [ "get_all_fragment_names", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a1493aed9574a4967f743f80fa9ec7124", null ],
       [ "get_all_joint_names", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a4ece06f0db252af0470fde7d2f439241", null ],
       [ "initialise_active_machina_form_scaffold", "namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#ae1724e3a02ee3f5b38999dc38a5c9294", null ],

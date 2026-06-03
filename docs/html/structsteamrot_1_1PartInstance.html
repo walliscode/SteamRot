@@ -131,12 +131,18 @@ Public Member Functions</h2></td></tr>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ac8eb9800ffa360090517b7b423f02d93" id="r_ac8eb9800ffa360090517b7b423f02d93"><td class="memItemLeft">uint32_t&#160;</td><td class="memItemRight"><a class="el" href="#ac8eb9800ffa360090517b7b423f02d93">id</a> {0}</td></tr>
 <tr class="memdesc:ac8eb9800ffa360090517b7b423f02d93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stable ID assigned by <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> when this instance is added. Unique across both joints and fragments.  <br /></td></tr>
+<tr class="memitem:acf1ea43eb103934f6095b590ef083538" id="r_acf1ea43eb103934f6095b590ef083538"><td class="memItemLeft">std::string&#160;</td><td class="memItemRight"><a class="el" href="#acf1ea43eb103934f6095b590ef083538">alias</a> {}</td></tr>
+<tr class="memdesc:acf1ea43eb103934f6095b590ef083538"><td class="mdescLeft">&#160;</td><td class="mdescRight">Human-readable alias for this instance (e.g. "f0", "j1").  <br /></td></tr>
 <tr class="memitem:ad7c0584a80d2532428fdbe21c107e1fc" id="r_ad7c0584a80d2532428fdbe21c107e1fc"><td class="memItemLeft">sf::Transform&#160;</td><td class="memItemRight"><a class="el" href="#ad7c0584a80d2532428fdbe21c107e1fc">transform</a> {sf::Transform::Identity}</td></tr>
 <tr class="memdesc:ad7c0584a80d2532428fdbe21c107e1fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Single transform that positions this instance on the canvas.  <br /></td></tr>
+<tr class="memitem:a552c33c22a58445c526aec26b3c48e19" id="r_a552c33c22a58445c526aec26b3c48e19"><td class="memItemLeft">size_t&#160;</td><td class="memItemRight"><a class="el" href="#a552c33c22a58445c526aec26b3c48e19">connection_count</a> {0}</td></tr>
+<tr class="memdesc:a552c33c22a58445c526aec26b3c48e19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of established connections on this instance.  <br /></td></tr>
+<tr class="memitem:a49cc48046cef1a6976b8ff18a6f443de" id="r_a49cc48046cef1a6976b8ff18a6f443de"><td class="memItemLeft"><a class="el" href="namespacesteamrot.html#acd66b10a4a29679c8986fa0560be0791">SocketMap</a>&#160;</td><td class="memItemRight"><a class="el" href="#a49cc48046cef1a6976b8ff18a6f443de">sockets</a></td></tr>
+<tr class="memdesc:a49cc48046cef1a6976b8ff18a6f443de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per-socket data (local position + mutable state), keyed by stable socket ID.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Common base for all placed instances on the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>. </p>
-<p>Holds the stable unique ID and the world-space transform shared by every placed part. Socket data (position + state) is held in the concrete subtype's <code>sockets</code> vector, which is fully initialised at construction. </p>
+<p>Holds the stable unique ID, world-space transform, socket map, and adjacency degree (connection_count) shared by every placed part. Socket data (position + state) is fully initialised at construction by the concrete subtype's constructor. </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a84ea0d934cd0ab1fee4bd78c03e08db2" name="a84ea0d934cd0ab1fee4bd78c03e08db2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a84ea0d934cd0ab1fee4bd78c03e08db2">&#9670;&#160;</a></span>PartInstance()</h2>
@@ -172,6 +178,40 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="acf1ea43eb103934f6095b590ef083538" name="acf1ea43eb103934f6095b590ef083538"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf1ea43eb103934f6095b590ef083538">&#9670;&#160;</a></span>alias</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string steamrot::PartInstance::alias {}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Human-readable alias for this instance (e.g. "f0", "j1"). </p>
+<p>Optional. When populated, the analysis trace formatter will display this label instead of the raw numeric <code>id</code>. In production this is left empty; the test infrastructure (<code>PartGraphBuilder</code>) sets it to the user-friendly string alias passed to <code>AddFragment</code> / <code>AddJoint</code>. </p>
+
+</div>
+</div>
+<a id="a552c33c22a58445c526aec26b3c48e19" name="a552c33c22a58445c526aec26b3c48e19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a552c33c22a58445c526aec26b3c48e19">&#9670;&#160;</a></span>connection_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t steamrot::PartInstance::connection_count {0}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Number of established connections on this instance. </p>
+<p>Incremented by <code>create_connection</code> for each new connection added. Decremented by any future disconnect action. Mirrors adjacency degree directly on the scaffold so graph queries can skip the build step. </p>
+
+</div>
+</div>
 <a id="ac8eb9800ffa360090517b7b423f02d93" name="ac8eb9800ffa360090517b7b423f02d93"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac8eb9800ffa360090517b7b423f02d93">&#9670;&#160;</a></span>id</h2>
 
@@ -185,6 +225,23 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Stable ID assigned by <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> when this instance is added. Unique across both joints and fragments. </p>
+
+</div>
+</div>
+<a id="a49cc48046cef1a6976b8ff18a6f443de" name="a49cc48046cef1a6976b8ff18a6f443de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49cc48046cef1a6976b8ff18a6f443de">&#9670;&#160;</a></span>sockets</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacesteamrot.html#acd66b10a4a29679c8986fa0560be0791">SocketMap</a> steamrot::PartInstance::sockets</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Per-socket data (local position + mutable state), keyed by stable socket ID. </p>
+<p>Populated at construction by the concrete subtype (<a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> or <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a>). Socket positions are zero-initialised for joints and copied from the <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> definition for fragments. </p>
 
 </div>
 </div>

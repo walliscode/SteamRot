@@ -18,4 +18,16 @@ const ChainDescriptor is_serial_chain = ChainDescriptorBuilder{}
                                             .WhileIsTrue(is_serial)
                                             .Then(is_terminal)
                                             .Build("is_serial_chain");
+
+/////////////////////////////////////////////////
+ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n) {
+  return ChainDescriptorBuilder{}
+      .WhileIsTrueForMinimumN(is_serial, n)
+      .Then(is_terminal)
+      .Build("is_serial_chain_with_minimum_length_" + std::to_string(n));
+}
+
+/////////////////////////////////////////////////
+const ChainDescriptor is_serial_chain_with_minimum_length_2 =
+    is_serial_chain_with_minimum_length_n(2);
 } // namespace steamrot::logic::descriptors

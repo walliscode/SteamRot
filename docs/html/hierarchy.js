@@ -1,6 +1,8 @@
 var hierarchy =
 [
     [ "steamrot::AccessibilityPreferencesFbsBuilder", "structsteamrot_1_1AccessibilityPreferencesFbsBuilder.html", null ],
+    [ "steamrot::logic::descriptors::AnalysisEvent", "structsteamrot_1_1logic_1_1descriptors_1_1AnalysisEvent.html", null ],
+    [ "steamrot::logic::descriptors::ArchetypeAnalysisContext", "structsteamrot_1_1logic_1_1descriptors_1_1ArchetypeAnalysisContext.html", null ],
     [ "steamrot::ArchetypeManager", "classsteamrot_1_1ArchetypeManager.html", null ],
     [ "steamrot::AssetConfig", "structsteamrot_1_1AssetConfig.html", null ],
     [ "steamrot::AssetConfigFbsBuilder", "structsteamrot_1_1AssetConfigFbsBuilder.html", null ],
@@ -14,6 +16,9 @@ var hierarchy =
     [ "steamrot::CameraPayload", "structsteamrot_1_1CameraPayload.html", null ],
     [ "steamrot::CameraPayloadFbsBuilder", "structsteamrot_1_1CameraPayloadFbsBuilder.html", null ],
     [ "steamrot::CameraState", "structsteamrot_1_1CameraState.html", null ],
+    [ "steamrot::logic::descriptors::ChainDescriptor", "classsteamrot_1_1logic_1_1descriptors_1_1ChainDescriptor.html", null ],
+    [ "steamrot::logic::descriptors::ChainDescriptorBuilder", "classsteamrot_1_1logic_1_1descriptors_1_1ChainDescriptorBuilder.html", null ],
+    [ "steamrot::logic::descriptors::ChainStep", "structsteamrot_1_1logic_1_1descriptors_1_1ChainStep.html", null ],
     [ "steamrot::ChildDataFbsBuilder", "structsteamrot_1_1ChildDataFbsBuilder.html", null ],
     [ "CMachinaForm", "classCMachinaForm.html", null ],
     [ "steamrot::ColorDataFbsBuilder", "structsteamrot_1_1ColorDataFbsBuilder.html", null ],
@@ -24,12 +29,21 @@ var hierarchy =
     ] ],
     [ "steamrot::ComponentContainer&lt; Components &gt;", "structsteamrot_1_1ComponentContainer.html", null ],
     [ "steamrot::ComponentContainer&lt; std::tuple&lt; Components... &gt; &gt;", "structsteamrot_1_1ComponentContainer_3_01std_1_1tuple_3_01Components_8_8_8_01_4_01_4.html", null ],
-    [ "steamrot::Connection", "structsteamrot_1_1Connection.html", null ],
+    [ "steamrot::logic::descriptors::Cursor", "structsteamrot_1_1logic_1_1descriptors_1_1Cursor.html", null ],
     [ "steamrot::DataAccessFactory", "classsteamrot_1_1DataAccessFactory.html", null ],
     [ "steamrot::DataLoader", "classsteamrot_1_1DataLoader.html", [
       [ "steamrot::FlatbuffersDataLoader", "classsteamrot_1_1FlatbuffersDataLoader.html", null ],
       [ "steamrot::FlatbuffersTestDataLoader", "classsteamrot_1_1FlatbuffersTestDataLoader.html", null ]
     ] ],
+    [ "steamrot::logic::descriptors::DescriptorFormatter", "classsteamrot_1_1logic_1_1descriptors_1_1DescriptorFormatter.html", [
+      [ "steamrot::logic::descriptors::TerminalDescriptorFormatter", "classsteamrot_1_1logic_1_1descriptors_1_1TerminalDescriptorFormatter.html", null ]
+    ] ],
+    [ "steamrot::logic::descriptors::DescriptorResult", "structsteamrot_1_1logic_1_1descriptors_1_1DescriptorResult.html", [
+      [ "steamrot::logic::descriptors::ChainDescriptorResult", "structsteamrot_1_1logic_1_1descriptors_1_1ChainDescriptorResult.html", null ],
+      [ "steamrot::logic::descriptors::MachinaArchetypeResult", "structsteamrot_1_1logic_1_1descriptors_1_1MachinaArchetypeResult.html", null ],
+      [ "steamrot::logic::descriptors::NodeDescriptorResult", "structsteamrot_1_1logic_1_1descriptors_1_1NodeDescriptorResult.html", null ]
+    ] ],
+    [ "steamrot::logic::descriptors::DFSContext", "structsteamrot_1_1logic_1_1descriptors_1_1DFSContext.html", null ],
     [ "steamrot::DisplayConfig", "structsteamrot_1_1DisplayConfig.html", null ],
     [ "steamrot::DisplayConfigFbsBuilder", "structsteamrot_1_1DisplayConfigFbsBuilder.html", null ],
     [ "steamrot::DisplayManager", "classsteamrot_1_1DisplayManager.html", null ],
@@ -43,7 +57,6 @@ var hierarchy =
     [ "steamrot::DropDownListDataFbsBuilder", "structsteamrot_1_1DropDownListDataFbsBuilder.html", null ],
     [ "steamrot::DropDownListStyleDataFbsBuilder", "structsteamrot_1_1DropDownListStyleDataFbsBuilder.html", null ],
     [ "steamrot::ElementCatalogEntry", "structsteamrot_1_1ElementCatalogEntry.html", null ],
-    [ "steamrot::Connection::Endpoint", "structsteamrot_1_1Connection_1_1Endpoint.html", null ],
     [ "steamrot::Engine", "classsteamrot_1_1Engine.html", [
       [ "steamrot::GameEngine", "classsteamrot_1_1GameEngine.html", [
         [ "steamrot::SandboxEngine", "classsteamrot_1_1SandboxEngine.html", null ]
@@ -85,6 +98,7 @@ var hierarchy =
     [ "steamrot::GameContext", "structsteamrot_1_1GameContext.html", null ],
     [ "steamrot::GhostPayload", "structsteamrot_1_1GhostPayload.html", null ],
     [ "steamrot::GhostPayloadFbsBuilder", "structsteamrot_1_1GhostPayloadFbsBuilder.html", null ],
+    [ "steamrot::logic::descriptors::GrabResult", "structsteamrot_1_1logic_1_1descriptors_1_1GrabResult.html", null ],
     [ "steamrot::GrimoireMachina", "structsteamrot_1_1GrimoireMachina.html", null ],
     [ "steamrot::GrimoireMachinaDataFbsBuilder", "structsteamrot_1_1GrimoireMachinaDataFbsBuilder.html", null ],
     [ "std::hash&lt; steamrot::UserInputBitset &gt;", "structstd_1_1hash_3_01steamrot_1_1UserInputBitset_01_4.html", null ],
@@ -168,24 +182,24 @@ var hierarchy =
     [ "steamrot::logic::LogicFactory", "classsteamrot_1_1logic_1_1LogicFactory.html", null ],
     [ "steamrot::LogicPayload", "structsteamrot_1_1LogicPayload.html", null ],
     [ "steamrot::LogicPayloadFbsBuilder", "structsteamrot_1_1LogicPayloadFbsBuilder.html", null ],
+    [ "steamrot::logic::descriptors::MachinaArchetype", "classsteamrot_1_1logic_1_1descriptors_1_1MachinaArchetype.html", null ],
+    [ "steamrot::logic::descriptors::MachinaArchetypeBuilder&lt; T &gt;", "classsteamrot_1_1logic_1_1descriptors_1_1MachinaArchetypeBuilder.html", null ],
     [ "steamrot::MachinaForm", "structsteamrot_1_1MachinaForm.html", null ],
     [ "steamrot::MachinaFormFbsBuilder", "structsteamrot_1_1MachinaFormFbsBuilder.html", null ],
     [ "steamrot::MachinaFormScaffold", "structsteamrot_1_1MachinaFormScaffold.html", null ],
     [ "steamrot::MouseInputDataFbsBuilder", "structsteamrot_1_1MouseInputDataFbsBuilder.html", null ],
     [ "steamrot::MrGhost", "structsteamrot_1_1MrGhost.html", null ],
+    [ "steamrot::logic::descriptors::NodeDescriptor", "classsteamrot_1_1logic_1_1descriptors_1_1NodeDescriptor.html", null ],
     [ "steamrot::PanelDataFbsBuilder", "structsteamrot_1_1PanelDataFbsBuilder.html", null ],
     [ "steamrot::PanelStyleDataFbsBuilder", "structsteamrot_1_1PanelStyleDataFbsBuilder.html", null ],
     [ "steamrot::Part", "structsteamrot_1_1Part.html", [
       [ "steamrot::Fragment", "structsteamrot_1_1Fragment.html", null ],
       [ "steamrot::Joint", "structsteamrot_1_1Joint.html", null ]
     ] ],
-    [ "steamrot::PartEdge", "structsteamrot_1_1PartEdge.html", null ],
-    [ "steamrot::PartGraph", "structsteamrot_1_1PartGraph.html", null ],
     [ "steamrot::PartInstance", "structsteamrot_1_1PartInstance.html", [
       [ "steamrot::FragmentInstance", "structsteamrot_1_1FragmentInstance.html", null ],
       [ "steamrot::JointInstance", "structsteamrot_1_1JointInstance.html", null ]
     ] ],
-    [ "steamrot::PartNode", "structsteamrot_1_1PartNode.html", null ],
     [ "steamrot::PerformanceMetrics", "structsteamrot_1_1PerformanceMetrics.html", null ],
     [ "steamrot::SaveData", "structsteamrot_1_1SaveData.html", null ],
     [ "steamrot::SaveDataFbsBuilder", "structsteamrot_1_1SaveDataFbsBuilder.html", null ],
@@ -228,8 +242,10 @@ var hierarchy =
     [ "steamrot::SimulationStepFbsBuilder", "structsteamrot_1_1SimulationStepFbsBuilder.html", null ],
     [ "steamrot::SocketConfig", "structsteamrot_1_1SocketConfig.html", null ],
     [ "steamrot::SocketConfigFbsBuilder", "structsteamrot_1_1SocketConfigFbsBuilder.html", null ],
+    [ "steamrot::SocketConnection", "structsteamrot_1_1SocketConnection.html", null ],
     [ "steamrot::SocketData", "structsteamrot_1_1SocketData.html", null ],
     [ "SocketState", "structSocketState.html", null ],
+    [ "steamrot::logic::descriptors::StepProgress", "structsteamrot_1_1logic_1_1descriptors_1_1StepProgress.html", null ],
     [ "Style", "structStyle.html", [
       [ "ButtonStyle", "structButtonStyle.html", null ],
       [ "DropDownButtonStyle", "structDropDownButtonStyle.html", null ],
@@ -326,6 +342,7 @@ var hierarchy =
       [ "steamrot::FLATBUFFERS_FINAL_CLASS", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html", null ],
       [ "steamrot::FLATBUFFERS_FINAL_CLASS", "structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html", null ]
     ] ],
+    [ "steamrot::logic::descriptors::TestArchetypeResult", "structsteamrot_1_1logic_1_1descriptors_1_1TestArchetypeResult.html", null ],
     [ "steamrot::TestData", "structsteamrot_1_1TestData.html", null ],
     [ "steamrot::TestDataFbsBuilder", "structsteamrot_1_1TestDataFbsBuilder.html", null ],
     [ "steamrot::TestMetaData", "structsteamrot_1_1TestMetaData.html", null ],
@@ -336,6 +353,7 @@ var hierarchy =
     [ "steamrot::TickSnapshotPairFbsBuilder", "structsteamrot_1_1TickSnapshotPairFbsBuilder.html", null ],
     [ "steamrot::Tile", "classsteamrot_1_1Tile.html", null ],
     [ "Tile", "classTile.html", null ],
+    [ "steamrot::logic::descriptors::Transition", "structsteamrot_1_1logic_1_1descriptors_1_1Transition.html", null ],
     [ "steamrot::TriangleFbsBuilder", "structsteamrot_1_1TriangleFbsBuilder.html", null ],
     [ "steamrot::UIDisabledState", "structsteamrot_1_1UIDisabledState.html", null ],
     [ "UIElement", null, [
