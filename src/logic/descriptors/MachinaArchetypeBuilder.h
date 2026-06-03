@@ -188,8 +188,7 @@ public:
     return MachinaArchetype{
         archetype_name,
         [steps = std::move(steps), archetype_name = archetype_name](
-            const PartGraph &parts,
-            uint32_t start_id,
+            const PartGraph &parts, uint32_t start_id,
             uint32_t depth) -> MachinaArchetypeResult {
           // create MachinaArchetypeResult to accumulate the final result and
           // trace
@@ -235,13 +234,33 @@ public:
 
           // create cursor
           uint32_t graph_cursor = start_id;
+
+          // get the current node
+          const auto current_node = parts.find(graph_cursor);
+          if (current_node == parts.end()) {
+            // this is automatically a failed result since the starting node
+            // doesn't exist in the graph
+            result.m_result = false;
+            result.m_trace = std::move(context.trace);
+            add_scope_end_event(context, archetype_name,
+                                ScopeKind::MachinaArchetype, result.m_result,
+                                depth);
+            return result;
+          }
           // set starting result to true
           result.m_result = true;
-
+          // pull out the connections of the current node
+          const SocketMap &sockets = std::visit(
+              [](const auto &instance) -> const SocketMap & {
+                return instance.sockets;
+              },
+              current_node->second);
           // cycle through the steps and evalute each one depending on its
           // kind
-          for (const auto &step : steps) {
+          for (const ArchetypeStep &step : steps) {
+
             switch (step.kind) {
+
             case ArchetypeStepKind::Sequence: {
 
               // evalute the current node with the step's descriptor
@@ -249,8 +268,8 @@ public:
                   step.descriptor(parts, graph_cursor, depth + 1);
 
               // for a simple sequence step, if the result is false then the
-              // whole archetype fails and we can break early; if it's true then
-              // we can continue to the next step
+              // whole archetype fails and we can break early; if it's true
+              // then we can continue to the next step
               if (!step_result)
                 result.m_result = false;
 
@@ -259,16 +278,64 @@ public:
               break;
             }
             case ArchetypeStepKind::AtLeastNOf: {
+
+              // start a counter for the number of matches found
+              size_t matches_found = 0;
+
+              // check result storage variant type; for AtLeastNOf this must be
+              // a vector of SubGraph
+              if (!std::holds_alternative<std::vector<SubGraph> T::*>(
+                      step.result_storage)) {
+                // this should never happen since the builder enforces the
+                // correct variant type for each step kind, but we can be
+                // defensive and return false if the variant is not as
+                // expected
+                result.m_result = false;
+                break;
+              }
+
+              // evalute every neighbour of the current node with the step's
+              // descriptor
+              for (const auto &[socket_id, socket_data] : sockets) {
+                if (!socket_data.connected_to)
+                  continue;
+                const uint32_t neighbour_id =
+                    socket_data.connected_to->peer_part_id;
+                // evalute the neighbour with the step's descriptor
+                ChainDescriptorResult step_result =
+                    step.descriptor(parts, neighbour_id, depth + 1);
+                // append the step's trace to the overall trace
+                Merge(context.trace, std::move(step_result.m_trace));
+
+                // add the valid subgraph to the result if the step is
+                // satisfied
+                if (step_result) {
+                  // add the valid subgraph to the vector in the result struct
+                  std::vector<SubGraph> &result_vector =
+                      result.*
+                      std::get<std::vector<SubGraph> T::*>(step.result_storage);
+                  result_vector.push_back(step_result.valid_subgraph.value());
+
+                  // increment the matches found counter
+                  matches_found++;
+                }
+              }
+              // once all neighbours have been evaluated, check if the number
+              // of matches is sufficient
+              if (matches_found >= step.min_repetitions)
+                result.m_result = true;
+
               break;
             }
+              // if result is false then break early without evaluating
+              // further steps
+              if (!result.m_result)
+                break;
             }
-            // if result is false then break early without evaluating further
-            // steps
-            if (!result.m_result)
-              break;
           }
-          add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
-                              result.m_result, depth);
+          add_scope_end_event(context, archetype_name,
+                              ScopeKind::MachinaArchetype, result.m_result,
+                              depth);
           // scope events complete; move trace and return result
           result.m_trace = std::move(context.trace);
           return result;
