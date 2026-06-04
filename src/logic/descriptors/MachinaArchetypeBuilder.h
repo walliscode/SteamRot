@@ -146,9 +146,9 @@ private:
     if (step_result && step_result.valid_subgraph.has_value())
       result_field = step_result.valid_subgraph.value();
 
-    // add event showing whether result assignment happenend
-    make_machina_part_result_event(step.descriptor.GetName(),
-                                   static_cast<bool>(step_result), depth);
+    // add event showing whether result assignment happened
+    add_machina_part_result_event(context, step.descriptor.GetName(),
+                                  static_cast<bool>(step_result), depth);
 
     // merge trace to parent context
     Merge(context.trace, std::move(step_result.m_trace));

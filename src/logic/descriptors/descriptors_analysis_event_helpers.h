@@ -244,4 +244,13 @@ inline void add_scope_end_event(Context &context, std::string scope_name,
                                              result, depth));
 }
 
+template <typename Context>
+inline void add_machina_part_result_event(Context &context,
+                                          const std::string predicate_name,
+                                          const bool result,
+                                          uint32_t depth = 0) {
+  append_event(context,
+               make_machina_part_result_event(predicate_name, result, depth));
+}
+
 } // namespace steamrot::logic::descriptors
