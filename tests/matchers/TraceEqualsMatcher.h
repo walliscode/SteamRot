@@ -139,9 +139,9 @@ template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
       return "AnalysisEvent{kind=ValidSubgraphIsolated}";
     case TraceEventKind::InvalidSubgraphIsolated:
       return "AnalysisEvent{kind=InvalidSubgraphIsolated}";
+    default:
+      return "AnalysisEvent{kind=<unknown>}";
     }
-
-    return "AnalysisEvent{kind=<unknown>}";
   }
 };
 
