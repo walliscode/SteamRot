@@ -95,3 +95,54 @@ inline TraceEqualsMatcher EqualsTrace(
 }
 
 } // namespace steamrot::tests
+
+namespace Catch {
+
+template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
+  static std::string
+  convert(const steamrot::logic::descriptors::AnalysisEvent &event) {
+    using steamrot::logic::descriptors::TraceEventKind;
+
+    switch (event.kind) {
+    case TraceEventKind::EmtpyPartGraph:
+      return "AnalysisEvent{kind=EmptyPartGraph}";
+    case TraceEventKind::EmtpyChainSteps:
+      return "AnalysisEvent{kind=EmptyChainSteps}";
+    case TraceEventKind::NodeEval:
+      return "AnalysisEvent{kind=NodeEval, part_id=" +
+             std::to_string(event.part_id) + ", predicate=\"" +
+             event.predicate_name + "\"}";
+    case TraceEventKind::NodeResult:
+      return "AnalysisEvent{kind=NodeResult, part_id=" +
+             std::to_string(event.part_id) + ", predicate=\"" +
+             event.predicate_name +
+             "\", result=" + (event.result ? "true" : "false") + "}";
+    case TraceEventKind::MovingToNeighbour:
+      return "AnalysisEvent{kind=MovingToNeighbour, from_id=" +
+             std::to_string(event.from_id) +
+             ", to_id=" + std::to_string(event.to_id) + "}";
+    case TraceEventKind::Backtracking:
+      return "AnalysisEvent{kind=Backtracking, from_id=" +
+             std::to_string(event.from_id) +
+             ", to_id=" + std::to_string(event.to_id) + "}";
+    case TraceEventKind::ScopeBegin:
+      return "AnalysisEvent{kind=ScopeBegin, scope=\"" + event.scope_name +
+             "\"}";
+    case TraceEventKind::ScopeEnd:
+      return "AnalysisEvent{kind=ScopeEnd, scope=\"" + event.scope_name +
+             "\", result=" + (event.result ? "true" : "false") + "}";
+    case TraceEventKind::MachinaPartResult:
+      return "AnalysisEvent{kind=MachinaPartResult, part=\"" +
+             event.predicate_name +
+             "\", result=" + (event.result ? "true" : "false") + "}";
+    case TraceEventKind::ValidSubgraphIsolated:
+      return "AnalysisEvent{kind=ValidSubgraphIsolated}";
+    case TraceEventKind::InvalidSubgraphIsolated:
+      return "AnalysisEvent{kind=InvalidSubgraphIsolated}";
+    }
+
+    return "AnalysisEvent{kind=<unknown>}";
+  }
+};
+
+} // namespace Catch
