@@ -143,15 +143,16 @@ private:
     ChainDescriptorResult step_result =
         step.descriptor(parts, graph_cursor, depth + 1);
 
+    // merge trace to parent context
+    Merge(context.trace, std::move(step_result.m_trace));
+
+    // assign valid subgraph to result field if it exists
     if (step_result && step_result.valid_subgraph.has_value())
       result_field = step_result.valid_subgraph.value();
 
     // add event showing whether result assignment happened
     add_machina_part_result_event(context, step.descriptor.GetName(),
                                   static_cast<bool>(step_result), depth);
-
-    // merge trace to parent context
-    Merge(context.trace, std::move(step_result.m_trace));
 
     return static_cast<bool>(step_result);
   }
@@ -229,6 +230,7 @@ private:
 
     result.m_result = true;
     T &typed_result = GetTypedResult(result);
+
     for (const ArchetypeStep &step : steps) {
       bool step_succeeded = false;
       switch (step.kind) {
@@ -322,7 +324,8 @@ public:
             const PartGraph &parts, uint32_t start_id,
             uint32_t depth) -> MachinaArchetypeResult {
           return Evaluate(steps, archetype_name, parts, start_id, depth);
-        }};
+        },
+        m_steps.size()};
   }
 };
 } // namespace steamrot::logic::descriptors

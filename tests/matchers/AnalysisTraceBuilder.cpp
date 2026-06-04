@@ -171,6 +171,7 @@ AnalysisTraceBuilder::BacktrackingById(uint32_t from_id,
 AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(
     const std::string &from_id_alias, uint32_t from_socket_id,
     const std::string &to_id_alias, uint32_t to_socket_id, uint32_t depth) {
+
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -199,6 +200,7 @@ AnalysisTraceBuilder::MachinaPartResult(const std::string predicate_name,
   ev.depth = depth;
   ev.predicate_name = std::move(predicate_name);
   ev.result = result;
+  m_trace.push_back(std::move(ev));
 
   return *this;
 }

@@ -21,6 +21,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
 
   // some general assertions about the descriptor instance
   REQUIRE(grab.GetName() == "Grab");
+  REQUIRE(grab.GetNumberOfSteps() == 2);
 
   SECTION("Grab returns false on empty graph") {
     // test predicate
@@ -86,6 +87,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .NodeEval("j0", is_joint.GetName(), 1)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 1)
+            .MachinaPartResult(is_joint.GetName(), true, 0)
             .ScopeBegin(is_serial_chain_with_minimum_length_2.GetName(),
                         ScopeKind::Chain, 1, "f0")
             .ScopeEnd(is_serial_chain_with_minimum_length_2.GetName(),
