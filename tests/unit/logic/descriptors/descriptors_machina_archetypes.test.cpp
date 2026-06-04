@@ -53,6 +53,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .NodeEval("j0", is_joint.GetName(), 1)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 1)
+            .MachinaPartResult(is_joint.GetName(), 1)
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
             .Build();
 

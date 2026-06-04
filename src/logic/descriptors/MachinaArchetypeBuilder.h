@@ -125,12 +125,34 @@ private:
   }
 
   static bool EvaluateSequenceStep(const ArchetypeStep &step,
-                                   const PartGraph &parts, uint32_t graph_cursor,
-                                   uint32_t depth,
-                                   ArchetypeAnalysisContext &context) {
+                                   const PartGraph &parts,
+                                   uint32_t graph_cursor, uint32_t depth,
+                                   ArchetypeAnalysisContext &context,
+                                   T &typed_result) {
+
+    // guard statement for invalid pointer type; should never happen because
+    // Then() only accepts SubGraph T::*, but added defensively to fail safely
+    // if that invariant is ever broken.
+    if (!std::holds_alternative<SubGraph T::*>(step.result_storage)) {
+      return false;
+    }
+    SubGraph &result_field =
+        typed_result.*std::get<SubGraph T::*>(step.result_storage);
+
+    // analyise node with descriptor
     ChainDescriptorResult step_result =
         step.descriptor(parts, graph_cursor, depth + 1);
+
+    if (step_result && step_result.valid_subgraph.has_value())
+      result_field = step_result.valid_subgraph.value();
+
+    // add event showing whether result assignment happenend
+    make_machina_part_result_event(step.descriptor.GetName(),
+                                   static_cast<bool>(step_result), depth);
+
+    // merge trace to parent context
     Merge(context.trace, std::move(step_result.m_trace));
+
     return static_cast<bool>(step_result);
   }
 
@@ -142,7 +164,8 @@ private:
     // This should never happen because AtLeastNOf always stores a vector
     // pointer; keep this defensive guard to fail safely if that invariant
     // is ever broken.
-    if (!std::holds_alternative<std::vector<SubGraph> T::*>(step.result_storage))
+    if (!std::holds_alternative<std::vector<SubGraph> T::*>(
+            step.result_storage))
       return false;
 
     size_t matches_found = 0;
@@ -199,7 +222,9 @@ private:
     }
 
     const SocketMap &start_sockets = std::visit(
-        [](const auto &instance) -> const SocketMap & { return instance.sockets; },
+        [](const auto &instance) -> const SocketMap & {
+          return instance.sockets;
+        },
         start_node_it->second);
 
     result.m_result = true;
@@ -208,7 +233,8 @@ private:
       bool step_succeeded = false;
       switch (step.kind) {
       case ArchetypeStepKind::Sequence:
-        step_succeeded = EvaluateSequenceStep(step, parts, start_id, depth, context);
+        step_succeeded = EvaluateSequenceStep(step, parts, start_id, depth,
+                                              context, typed_result);
         break;
       case ArchetypeStepKind::AtLeastNOf:
         step_succeeded = EvaluateAtLeastNOfStep(step, parts, start_sockets,

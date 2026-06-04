@@ -151,6 +151,17 @@ inline AnalysisEvent make_moving_to_neighbour_event(
 }
 
 inline AnalysisEvent
+make_machina_part_result_event(const std::string predicate_name,
+                               const bool result, uint32_t depth) {
+  AnalysisEvent event{};
+  event.kind = TraceEventKind::MachinaPartResult;
+  event.depth = depth;
+  event.predicate_name = std::move(predicate_name);
+  event.result = result;
+  return event;
+}
+
+inline AnalysisEvent
 make_moving_to_neighbour_event(uint32_t depth, uint32_t from_id,
                                uint32_t from_socket_id, uint32_t to_id,
                                uint32_t to_socket_id, const PartGraph &parts) {
