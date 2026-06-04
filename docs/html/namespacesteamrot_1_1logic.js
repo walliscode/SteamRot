@@ -1,8 +1,8 @@
 var namespacesteamrot_1_1logic =
 [
     [ "action", "namespacesteamrot_1_1logic_1_1action.html", "namespacesteamrot_1_1logic_1_1action" ],
-    [ "analysis", "namespacesteamrot_1_1logic_1_1analysis.html", "namespacesteamrot_1_1logic_1_1analysis" ],
     [ "collision", "namespacesteamrot_1_1logic_1_1collision.html", "namespacesteamrot_1_1logic_1_1collision" ],
+    [ "descriptors", "namespacesteamrot_1_1logic_1_1descriptors.html", "namespacesteamrot_1_1logic_1_1descriptors" ],
     [ "positioning", "namespacesteamrot_1_1logic_1_1positioning.html", "namespacesteamrot_1_1logic_1_1positioning" ],
     [ "render", "namespacesteamrot_1_1logic_1_1render.html", "namespacesteamrot_1_1logic_1_1render" ],
     [ "state", "namespacesteamrot_1_1logic_1_1state.html", "namespacesteamrot_1_1logic_1_1state" ],

@@ -122,10 +122,25 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
     REQUIRE(steps.size() == 1);
     REQUIRE(steps[0].min_repetitions == 2);
   }
+
+  SECTION("AtLeastNOf supports method chaining") {
+    // act
+    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains)
+        .AtLeastNOf(make_test_chain("cd2"), 2, &TestArchetypeResult::chains);
+    // assert
+    REQUIRE(steps.size() == 2);
+    REQUIRE(steps[0].kind == ArchetypeStepKind::AtLeastNOf);
+    REQUIRE(steps[1].kind == ArchetypeStepKind::AtLeastNOf);
+    REQUIRE(steps[0].descriptor.GetName() == "cd1");
+    REQUIRE(steps[1].descriptor.GetName() == "cd2");
+    REQUIRE(steps[0].min_repetitions == 1);
+    REQUIRE(steps[1].min_repetitions == 2);
+  }
 }
 
-TEST_CASE("MachinaArchetypeBuilder passes depth through nested chain descriptors",
-          "[MachinaArchetypeBuilder]") {
+TEST_CASE(
+    "MachinaArchetypeBuilder passes depth through nested chain descriptors",
+    "[MachinaArchetypeBuilder]") {
   const ChainDescriptor inner_chain =
       ChainDescriptorBuilder{}.Then(is_joint).Build("inner_chain");
   const MachinaArchetype archetype =
@@ -146,6 +161,7 @@ TEST_CASE("MachinaArchetypeBuilder passes depth through nested chain descriptors
           .NodeResult("j0", is_joint.GetName(), true,
                       "node holds JointInstance", 4)
           .ScopeEnd("inner_chain", ScopeKind::Chain, true, 3)
+          .MachinaPartResult("inner_chain", true, 2)
           .ScopeEnd("outer_archetype", ScopeKind::MachinaArchetype, true, 2)
           .Build();
 
@@ -153,6 +169,36 @@ TEST_CASE("MachinaArchetypeBuilder passes depth through nested chain descriptors
       archetype(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 2);
 
   REQUIRE(result);
+  REQUIRE_THAT(result.m_trace,
+               steamrot::tests::EqualsTrace(expected_trace,
+                                            TerminalDescriptorFormatter{}));
+}
+
+TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
+          "[MachinaArchetypeBuilder]") {
+  const ChainDescriptor inner_chain =
+      ChainDescriptorBuilder{}.Then(is_joint).Build("inner_chain");
+  const MachinaArchetype archetype =
+      MachinaArchetypeBuilder<TestArchetypeResult>{}
+          .AtLeastNOf(inner_chain, 1, &TestArchetypeResult::chains)
+          .Build("outer_archetype");
+
+  const steamrot::tests::PartGraphPackage pkg =
+      steamrot::tests::PartGraphBuilder{}
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+          .Build();
+
+  const AnalysisTrace expected_trace =
+      steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+          .ScopeBegin("outer_archetype", ScopeKind::MachinaArchetype, 0, "j0")
+          .MachinaPartResult("inner_chain", false, 0)
+          .ScopeEnd("outer_archetype", ScopeKind::MachinaArchetype, false, 0)
+          .Build();
+
+  const MachinaArchetypeResult result =
+      archetype(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+
+  REQUIRE_FALSE(result);
   REQUIRE_THAT(result.m_trace,
                steamrot::tests::EqualsTrace(expected_trace,
                                             TerminalDescriptorFormatter{}));

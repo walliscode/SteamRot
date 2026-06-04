@@ -10,8 +10,11 @@ var searchData=
   ['fonts_7',['fonts',['../structsteamrot_1_1AssetConfig.html#a45c1b814ee6733b4c0d2ab769bb91ad6',1,'steamrot::AssetConfig']]],
   ['fonts_5fmap_8',['fonts_map',['../classsteamrot_1_1IUIStyleDataProvider.html#ab94d2b2218b3761962513ca0d6e903c8',1,'steamrot::IUIStyleDataProvider']]],
   ['fps_9',['fps',['../structsteamrot_1_1PerformanceMetrics.html#aa88be0bc2dff31b76259a186d0b1ae0b',1,'steamrot::PerformanceMetrics']]],
-  ['fragment_10',['fragment',['../structsteamrot_1_1FragmentInstance.html#ad6c2b13c24d29915d0d0366919762980',1,'steamrot::FragmentInstance']]],
+  ['fragment_10',['fragment',['../structsteamrot_1_1FragmentInstance.html#a3217a05bf074836e077884d8b9bcb3b0',1,'steamrot::FragmentInstance']]],
   ['frame_5ftime_5fms_11',['frame_time_ms',['../structsteamrot_1_1PerformanceMetrics.html#aa77ae9474ce02c63933cb1164adde68e',1,'steamrot::PerformanceMetrics']]],
   ['framerate_5flimit_12',['framerate_limit',['../structsteamrot_1_1DisplayConfig.html#a3f5a7122c9706976574ecd703f490f48',1,'steamrot::DisplayConfig::framerate_limit'],['../structsteamrot_1_1EngineResourcesConfig.html#a179466c09387e6a9b3938696cee7a653',1,'steamrot::EngineResourcesConfig::framerate_limit']]],
-  ['fullscreen_13',['fullscreen',['../structsteamrot_1_1DisplayConfig.html#a22b381a05faa8809a184c4d1f64ee45f',1,'steamrot::DisplayConfig']]]
+  ['from_5fid_13',['from_id',['../structsteamrot_1_1logic_1_1descriptors_1_1AnalysisEvent.html#a402bc21195285ce063c4d65c73b40179',1,'steamrot::logic::descriptors::AnalysisEvent']]],
+  ['from_5fid_5falias_14',['from_id_alias',['../structsteamrot_1_1logic_1_1descriptors_1_1AnalysisEvent.html#a4f264729fa07d26710bdad73ccb73c93',1,'steamrot::logic::descriptors::AnalysisEvent']]],
+  ['from_5fsocket_5fid_15',['from_socket_id',['../structsteamrot_1_1logic_1_1descriptors_1_1AnalysisEvent.html#a2b8b286bd01212373bb2f9c4c1d9c714',1,'steamrot::logic::descriptors::AnalysisEvent']]],
+  ['fullscreen_16',['fullscreen',['../structsteamrot_1_1DisplayConfig.html#a22b381a05faa8809a184c4d1f64ee45f',1,'steamrot::DisplayConfig']]]
 ];

@@ -40,9 +40,9 @@ Call sites always pass `scaffold.parts`.
 
 There are two descriptor levels:
 
-| Level | Class | Signature |
-| --- | --- | --- |
-| Node | `NodeDescriptor` | `NodeDescriptorResult(const PartGraph&, uint32_t)` |
+| Level | Class             | Signature                                           |
+| ----- | ----------------- | --------------------------------------------------- |
+| Node  | `NodeDescriptor`  | `NodeDescriptorResult(const PartGraph&, uint32_t)`  |
 | Chain | `ChainDescriptor` | `ChainDescriptorResult(const PartGraph&, uint32_t)` |
 
 `NodeDescriptor` and `ChainDescriptor` are wrapper classes with stable names,
@@ -69,19 +69,19 @@ Prefer the narrowest descriptor level that answers the question.
 
 ## Key Files
 
-| File | Purpose |
-| --- | --- |
-| `src/types/entity/MachinaFormScaffold.h` | `PartGraph`, `JointInstance`, `FragmentInstance`, `PartInstance`, `SocketMap`, `SocketData`, `SocketConnection` |
-| `src/types/logic/AnalysisEvent.h` | `TraceEventKind`, `ScopeKind`, `AnalysisEvent`, `AnalysisTrace`, `Merge()` |
-| `src/types/logic/DescriptorResult.h` | `DescriptorResult`, `NodeDescriptorResult`, `ChainDescriptorResult` |
-| `src/logic/descriptors/descriptors_node_descriptors.h/.cpp` | `NodeDescriptor` and concrete node predicates |
-| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp` | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates |
-| `src/logic/descriptors/descriptors_general.h` | `and_`, `or_`, `not_` combinators |
-| `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp` | `ChainDescriptorBuilder` |
-| `src/logic/descriptors/DescriptorFormatter.h` | Base trace formatter |
-| `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp` | Plain-text trace rendering |
-| `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests |
-| `tests/unit/logic/part_library.h/.cpp` | `TestPartLibrary`, `PartLibraryBuilder`, `CheckNodeDescriptorForAllScenarios` |
+| File                                                                 | Purpose                                                                                                         |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `src/types/entity/MachinaFormScaffold.h`                             | `PartGraph`, `JointInstance`, `FragmentInstance`, `PartInstance`, `SocketMap`, `SocketData`, `SocketConnection` |
+| `src/types/logic/AnalysisEvent.h`                                    | `TraceEventKind`, `ScopeKind`, `AnalysisEvent`, `AnalysisTrace`, `Merge()`                                      |
+| `src/types/logic/DescriptorResult.h`                                 | `DescriptorResult`, `NodeDescriptorResult`, `ChainDescriptorResult`                                             |
+| `src/logic/descriptors/descriptors_node_descriptors.h/.cpp`          | `NodeDescriptor` and concrete node predicates                                                                   |
+| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp`         | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates                                                   |
+| `src/logic/descriptors/descriptors_general.h`                        | `and_`, `or_`, `not_` combinators                                                                               |
+| `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp`                | `ChainDescriptorBuilder`                                                                                        |
+| `src/logic/descriptors/DescriptorFormatter.h`                        | Base trace formatter                                                                                            |
+| `src/logic/descriptors/TerminalDescriptorFormatter.h/.cpp`           | Plain-text trace rendering                                                                                      |
+| `tests/unit/logic/descriptors/descriptors_node_descriptors.test.cpp` | Descriptor unit tests                                                                                           |
+| `tests/unit/logic/part_library.h/.cpp`                               | `TestPartLibrary`, `PartLibraryBuilder`, `CheckNodeDescriptorForAllScenarios`                                   |
 
 ---
 
@@ -128,8 +128,8 @@ const NodeDescriptor my_descriptor{
 
 ## Adding a ChainDescriptor
 
-A `ChainDescriptor` answers a traversal-based question from one anchor node.
-Use `ChainDescriptorBuilder`.
+A `ChainDescriptor` answers a traversal-based question from one anchor node. Use
+`ChainDescriptorBuilder`.
 
 Chain evaluation is first-match only: traversal stops as soon as the first valid
 chain is found (based on DFS neighbour iteration order).
@@ -163,12 +163,12 @@ ChainDescriptor terminal_anchor = lift_to_chain(is_terminal);
 
 ## Composing Descriptors
 
-| Operation | Input → Output | Purpose |
-| --- | --- | --- |
+| Operation           | Input → Output                     | Purpose                                    |
+| ------------------- | ---------------------------------- | ------------------------------------------ |
 | `lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Reuse node logic inside a chain descriptor |
-| `and_(a, b)` | `Desc × Desc → Desc` | Both must be true |
-| `or_(a, b)` | `Desc × Desc → Desc` | Either may be true |
-| `not_(a)` | `Desc → Desc` | Negate a descriptor |
+| `and_(a, b)`        | `Desc × Desc → Desc`               | Both must be true                          |
+| `or_(a, b)`         | `Desc × Desc → Desc`               | Either may be true                         |
+| `not_(a)`           | `Desc → Desc`                      | Negate a descriptor                        |
 
 `and_`, `or_`, and `not_` only combine descriptors of the same level.
 
@@ -208,17 +208,18 @@ Every descriptor evaluation populates an `AnalysisTrace` in the result's
 `m_trace` field.
 
 `ChainDescriptorResult` also records path outputs:
+
 - `valid_subgraph` stores the first valid path, if one is found.
 - `invalid_subgraphs` stores rejected paths encountered during traversal.
 
-| `TraceEventKind` | When emitted | Key fields |
-| --- | --- | --- |
-| `NodeEval` | Before testing a predicate | `depth`, `part_id`, `predicate_name` |
-| `NodeResult` | After the predicate test | `depth`, `part_id`, `predicate_name`, `result`, `reason` |
-| `MovingToNeighbour` | DFS traverses an edge | `depth`, `from_id`, `to_id`, `socket_id` |
-| `Backtracking` | DFS returns from a neighbour | `depth`, `from_id` |
-| `ScopeBegin` | Chain evaluation starts | `depth=0`, `scope_name`, `scope_kind`, `anchor_id` |
-| `ScopeEnd` | Chain evaluation ends | `depth=0`, `scope_name`, `scope_kind`, `result` |
+| `TraceEventKind`    | When emitted                 | Key fields                                               |
+| ------------------- | ---------------------------- | -------------------------------------------------------- |
+| `NodeEval`          | Before testing a predicate   | `depth`, `part_id`, `predicate_name`                     |
+| `NodeResult`        | After the predicate test     | `depth`, `part_id`, `predicate_name`, `result`, `reason` |
+| `MovingToNeighbour` | DFS traverses an edge        | `depth`, `from_id`, `to_id`, `socket_id`                 |
+| `Backtracking`      | DFS returns from a neighbour | `depth`, `from_id`                                       |
+| `ScopeBegin`        | Chain evaluation starts      | `depth=0`, `scope_name`, `scope_kind`, `anchor_id`       |
+| `ScopeEnd`          | Chain evaluation ends        | `depth=0`, `scope_name`, `scope_kind`, `result`          |
 
 Use `TerminalDescriptorFormatter` to render a readable trace string.
 
@@ -244,13 +245,13 @@ Use `TerminalDescriptorFormatter` to render a readable trace string.
 
 ## Troubleshooting
 
-| Symptom | Likely Cause | Fix |
-| --- | --- | --- |
-| `and_()` / `or_()` compile error about deduced types | Both arguments must be the same descriptor level | Combine like-for-like descriptors only |
-| `CheckNodeDescriptorForAllScenarios` fails on one scenario | Node order mismatch | Arrays are fragments-first then joints |
-| Segfault in descriptor accessing FlatBuffers field | Unguarded optional access | Guard all string, vector, and nested-table accesses |
-| Linker error: undefined reference to descriptor | `extern const` declared but not defined | Add the definition in the matching `.cpp` file |
-| Trace is empty after evaluation | Descriptor constructed without a name | Pass the name as the first constructor argument |
+| Symptom                                                    | Likely Cause                                     | Fix                                                 |
+| ---------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| `and_()` / `or_()` compile error about deduced types       | Both arguments must be the same descriptor level | Combine like-for-like descriptors only              |
+| `CheckNodeDescriptorForAllScenarios` fails on one scenario | Node order mismatch                              | Arrays are fragments-first then joints              |
+| Segfault in descriptor accessing FlatBuffers field         | Unguarded optional access                        | Guard all string, vector, and nested-table accesses |
+| Linker error: undefined reference to descriptor            | `extern const` declared but not defined          | Add the definition in the matching `.cpp` file      |
+| Trace is empty after evaluation                            | Descriptor constructed without a name            | Pass the name as the first constructor argument     |
 
 ## Summary Checklist
 

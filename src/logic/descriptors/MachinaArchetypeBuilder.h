@@ -120,6 +120,162 @@ template <typename T> class MachinaArchetypeBuilder {
   };
 
 private:
+  static T &GetTypedResult(MachinaArchetypeResult &result) {
+    return std::get<T>(result.result_sub_graphs);
+  }
+
+  static bool EvaluateSequenceStep(const ArchetypeStep &step,
+                                   const PartGraph &parts,
+                                   uint32_t graph_cursor, uint32_t depth,
+                                   ArchetypeAnalysisContext &context,
+                                   T &typed_result) {
+
+    // guard statement for invalid pointer type; should never happen because
+    // Then() only accepts SubGraph T::*, but added defensively to fail safely
+    // if that invariant is ever broken.
+    if (!std::holds_alternative<SubGraph T::*>(step.result_storage)) {
+      return false;
+    }
+    SubGraph &result_field =
+        typed_result.*std::get<SubGraph T::*>(step.result_storage);
+
+    // analyise node with descriptor
+    ChainDescriptorResult step_result =
+        step.descriptor(parts, graph_cursor, depth + 1);
+
+    // merge trace to parent context
+    Merge(context.trace, std::move(step_result.m_trace));
+
+    // assign valid subgraph to result field if it exists
+    if (step_result && step_result.valid_subgraph.has_value())
+      result_field = step_result.valid_subgraph.value();
+
+    // add event showing whether result assignment happened
+    add_machina_part_result_event(context, step.descriptor.GetName(),
+                                  static_cast<bool>(step_result), depth);
+
+    return static_cast<bool>(step_result);
+  }
+
+  static bool EvaluateAtLeastNOfStep(const ArchetypeStep &step,
+                                     const PartGraph &parts,
+                                     const SocketMap &sockets, uint32_t depth,
+                                     ArchetypeAnalysisContext &context,
+                                     T &typed_result) {
+    // This should never happen because AtLeastNOf always stores a vector
+    // pointer; keep this defensive guard to fail safely if that invariant
+    // is ever broken.
+    if (!std::holds_alternative<std::vector<SubGraph> T::*>(
+            step.result_storage))
+      return false;
+
+    // count matches and store valid subgraphs in the result vector
+    size_t matches_found = 0;
+    std::vector<SubGraph> &result_vector =
+        typed_result.*std::get<std::vector<SubGraph> T::*>(step.result_storage);
+
+    // iterate over all connected neighbours and apply the descriptor to each
+    // one;
+    for (const auto &[socket_id, socket_data] : sockets) {
+      (void)socket_id;
+
+      // if the socket isn't connected, skip it
+      if (!socket_data.connected_to.has_value()) {
+        continue;
+      }
+
+      // extract neighbour ID and apply descriptor
+      const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
+      ChainDescriptorResult step_result =
+          step.descriptor(parts, neighbour_id, depth + 1);
+
+      // merge trace to parent context
+      Merge(context.trace, std::move(step_result.m_trace));
+
+      // if the descriptor matched and the result includes a valid subgraph, add
+      // it to the result vector and increment the match count
+      if (step_result && step_result.valid_subgraph.has_value()) {
+        result_vector.push_back(*step_result.valid_subgraph);
+        matches_found++;
+      }
+    }
+
+    // step succeeds if the number of matches found meets the minimum
+    // repetitions
+    const bool step_succeeded = matches_found >= step.min_repetitions;
+
+    // add event for step result
+    add_machina_part_result_event(context, step.descriptor.GetName(),
+                                  step_succeeded, depth);
+    return step_succeeded;
+  }
+
+  static MachinaArchetypeResult
+  Evaluate(const std::vector<ArchetypeStep> &steps,
+           const std::string &archetype_name, const PartGraph &parts,
+           uint32_t start_id, uint32_t depth) {
+    MachinaArchetypeResult result{false, T{}};
+    ArchetypeAnalysisContext context{};
+
+    if (parts.empty()) {
+      add_empty_part_graph_event(context);
+      result.m_trace = std::move(context.trace);
+      return result;
+    }
+
+    if (steps.empty()) {
+      add_empty_chain_steps_event(context);
+      result.m_trace = std::move(context.trace);
+      return result;
+    }
+
+    add_scope_begin_event(context, archetype_name, ScopeKind::MachinaArchetype,
+                          parts, depth, start_id);
+
+    const auto start_node_it = parts.find(start_id);
+    if (start_node_it == parts.end()) {
+      add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
+                          false, depth);
+      result.m_trace = std::move(context.trace);
+      return result;
+    }
+
+    const SocketMap &start_sockets = std::visit(
+        [](const auto &instance) -> const SocketMap & {
+          return instance.sockets;
+        },
+        start_node_it->second);
+
+    result.m_result = true;
+    T &typed_result = GetTypedResult(result);
+
+    for (const ArchetypeStep &step : steps) {
+      bool step_succeeded = false;
+      switch (step.kind) {
+      case ArchetypeStepKind::Sequence:
+        step_succeeded = EvaluateSequenceStep(step, parts, start_id, depth,
+                                              context, typed_result);
+        break;
+      case ArchetypeStepKind::AtLeastNOf:
+        step_succeeded = EvaluateAtLeastNOfStep(step, parts, start_sockets,
+                                                depth, context, typed_result);
+        break;
+      }
+
+      result.m_result = result.m_result && step_succeeded;
+
+      // if any step fails, we can short-circuit and end the archetype
+      // evaluation if (!step_succeeded) {
+      //   break;
+      // }
+    }
+
+    add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
+                        result.m_result, depth);
+    result.m_trace = std::move(context.trace);
+    return result;
+  }
+
   /////////////////////////////////////////////////
   /// @brief Ordered steps appended via @c Then().
   /////////////////////////////////////////////////
@@ -188,91 +344,11 @@ public:
     return MachinaArchetype{
         archetype_name,
         [steps = std::move(steps), archetype_name = archetype_name](
-            const PartGraph &parts,
-            uint32_t start_id,
+            const PartGraph &parts, uint32_t start_id,
             uint32_t depth) -> MachinaArchetypeResult {
-          // create MachinaArchetypeResult to accumulate the final result and
-          // trace
-          MachinaArchetypeResult result{false, T{}};
-
-          // create context to hold the trace and any other state we want to
-          // pass
-          ArchetypeAnalysisContext context{};
-
-          // Check for empty PartGraph
-          if (parts.empty()) {
-
-            // this is automatically a failed result
-            result.m_result = false;
-
-            // set up EmtpyGraph event in the trace
-            add_empty_part_graph_event(context);
-            result.m_trace = std::move(context.trace);
-
-            // return early since there's no graph to traverse
-            return result;
-          }
-
-          // Check for empty steps
-          if (steps.empty()) {
-
-            // this is automatically a failed result since a chain with no
-            // steps can't be satisfied
-            result.m_result = false;
-
-            // set up EmptyChainSteps event in the trace to explain why the
-            // result is false
-            add_empty_chain_steps_event(context);
-            result.m_trace = std::move(context.trace);
-
-            // return early since there's no steps to evaluate
-            return result;
-          }
-
-          add_scope_begin_event(context, archetype_name,
-                                ScopeKind::MachinaArchetype, parts, depth,
-                                start_id);
-
-          // create cursor
-          uint32_t graph_cursor = start_id;
-          // set starting result to true
-          result.m_result = true;
-
-          // cycle through the steps and evalute each one depending on its
-          // kind
-          for (const auto &step : steps) {
-            switch (step.kind) {
-            case ArchetypeStepKind::Sequence: {
-
-              // evalute the current node with the step's descriptor
-              ChainDescriptorResult step_result =
-                  step.descriptor(parts, graph_cursor, depth + 1);
-
-              // for a simple sequence step, if the result is false then the
-              // whole archetype fails and we can break early; if it's true then
-              // we can continue to the next step
-              if (!step_result)
-                result.m_result = false;
-
-              // append the step's trace to the overall trace
-              Merge(context.trace, std::move(step_result.m_trace));
-              break;
-            }
-            case ArchetypeStepKind::AtLeastNOf: {
-              break;
-            }
-            }
-            // if result is false then break early without evaluating further
-            // steps
-            if (!result.m_result)
-              break;
-          }
-          add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
-                              result.m_result, depth);
-          // scope events complete; move trace and return result
-          result.m_trace = std::move(context.trace);
-          return result;
-        }};
+          return Evaluate(steps, archetype_name, parts, start_id, depth);
+        },
+        m_steps.size()};
   }
 };
 } // namespace steamrot::logic::descriptors

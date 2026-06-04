@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['pandirection_0',['PanDirection',['../structsteamrot_1_1CameraPayload.html#ab0e842864c2c7e79135c576822501ce7',1,'steamrot::CameraPayload']]]
+  ['mouseinputfbs_0',['MouseInputFbs',['../namespacesteamrot.html#a9988f6567647326b95182ccc2a9fdd86',1,'steamrot']]]
 ];

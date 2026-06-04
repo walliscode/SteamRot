@@ -117,13 +117,19 @@ std::string FormatEvent(const AnalysisEvent &ev) {
   case TraceEventKind::InvalidSubgraphIsolated: {
     return indent + "[FAIL]  invalid subgraph is isolated";
   }
+  case TraceEventKind::MachinaPartResult: {
+    std::string line = indent;
+    line += ev.result ? "[PASS]" : "[FAIL]";
+    line +=
+        "  " + ev.predicate_name + " part assigned to archetype result field";
+    return line;
   }
 
-  return indent + "[?]";
+  default:
+    return indent + "[?]";
+  }
 }
-
 } // namespace
-
 /////////////////////////////////////////////////
 std::string
 TerminalDescriptorFormatter::Format(const AnalysisTrace &trace) const {

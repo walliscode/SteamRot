@@ -70,8 +70,9 @@ TEST_CASE("append_event and add_* helpers append to context trace",
   add_empty_chain_steps_event(context);
   add_invalid_subgraph_isolated_event(context, 4);
   add_scope_end_event(context, "test_chain", ScopeKind::Chain, false, 1);
+  add_machina_part_result_event(context, "is_joint", true, 2);
 
-  REQUIRE(context.trace.size() == 4);
+  REQUIRE(context.trace.size() == 5);
   REQUIRE(context.trace[0].kind == TraceEventKind::EmtpyPartGraph);
   REQUIRE(context.trace[1].kind == TraceEventKind::EmtpyChainSteps);
   REQUIRE(context.trace[2].kind == TraceEventKind::InvalidSubgraphIsolated);
@@ -81,6 +82,10 @@ TEST_CASE("append_event and add_* helpers append to context trace",
   REQUIRE(context.trace[3].scope_kind == ScopeKind::Chain);
   REQUIRE_FALSE(context.trace[3].result);
   REQUIRE(context.trace[3].depth == 1);
+  REQUIRE(context.trace[4].kind == TraceEventKind::MachinaPartResult);
+  REQUIRE(context.trace[4].predicate_name == "is_joint");
+  REQUIRE(context.trace[4].result);
+  REQUIRE(context.trace[4].depth == 2);
 }
 
 TEST_CASE("append_event appends to raw trace",

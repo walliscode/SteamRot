@@ -145,8 +145,7 @@ public:
   AnalysisTraceBuilder &Backtracking(const std::string &from_id_alias,
                                      uint32_t from_socket_id,
                                      const std::string &to_id_alias,
-                                     uint32_t to_socket_id,
-                                     uint32_t depth);
+                                     uint32_t to_socket_id, uint32_t depth);
 
   AnalysisTraceBuilder &ValidSubgraphIsolated();
 
@@ -184,6 +183,16 @@ public:
                                        uint32_t depth = 0);
 
   /////////////////////////////////////////////////
+  /// @brief Append an event indicating success in assigning a valid subgraph to
+  /// an archetype result field.
+  ///
+  /// @return Reference to this builder for method chaining.
+  /////////////////////////////////////////////////
+  AnalysisTraceBuilder &MachinaPartResult(const std::string predicate_name,
+                                          const bool result,
+                                          uint32_t depth = 0);
+
+  /////////////////////////////////////////////////
   /// @brief Return a copy of the accumulated trace.
   ///
   /// The builder remains usable after this call; further events may be
@@ -192,15 +201,12 @@ public:
   steamrot::logic::descriptors::AnalysisTrace Build() const;
 
 private:
-  AnalysisTraceBuilder &MovingToNeighbourById(uint32_t from_id,
-                                              uint32_t from_socket_id,
-                                              uint32_t to_id,
-                                              uint32_t to_socket_id,
-                                              uint32_t depth);
+  AnalysisTraceBuilder &
+  MovingToNeighbourById(uint32_t from_id, uint32_t from_socket_id,
+                        uint32_t to_id, uint32_t to_socket_id, uint32_t depth);
   AnalysisTraceBuilder &BacktrackingById(uint32_t from_id,
                                          uint32_t from_socket_id,
-                                         uint32_t to_id,
-                                         uint32_t to_socket_id,
+                                         uint32_t to_id, uint32_t to_socket_id,
                                          uint32_t depth);
   uint32_t ResolvePartId(const std::string &part_id_alias) const;
 

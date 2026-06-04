@@ -7,10 +7,12 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "descriptors_machina_archetypes.h"
+#include "AnalysisEvent.h"
 #include "AnalysisTraceBuilder.h"
 #include "PartGraphBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
+#include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -19,6 +21,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
 
   // some general assertions about the descriptor instance
   REQUIRE(grab.GetName() == "Grab");
+  REQUIRE(grab.GetNumberOfSteps() == 2);
 
   SECTION("Grab returns false on empty graph") {
     // test predicate
@@ -51,7 +54,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .NodeEval("j0", is_joint.GetName(), 1)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 1)
-            .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, true, 0)
+            .MachinaPartResult(is_joint.GetName(), 1)
+            .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
+                               false, 0)
+            .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
             .Build();
 
     // test predicate
@@ -62,32 +68,44 @@ TEST_CASE("MachinaArchetype Grab tests") {
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
-    REQUIRE(result);
+    REQUIRE_FALSE(result);
   }
 
-  SECTION("Grab offsets trace depth when requested") {
-
+  SECTION("Grab evalutes a serial chain of length 2") {
+    // build part graph with a serial chain of length 2
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
             .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .Connect("j0", 0, "f0", 0) // j0.socket[0] ↔ f0.socket[0]
             .Build();
+    // test predicate
+    MachinaArchetypeResult result =
+        grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
 
+    // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 2, "j0")
-            .NodeEval("j0", is_joint.GetName(), 3)
+            .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 0, "j0")
+            .NodeEval("j0", is_joint.GetName(), 1)
             .NodeResult("j0", is_joint.GetName(), true,
-                        "node holds JointInstance", 3)
-
-            .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, true, 2)
+                        "node holds JointInstance", 1)
+            .MachinaPartResult(is_joint.GetName(), true, 0)
+            .ScopeBegin(is_serial_chain_with_minimum_length_2.GetName(),
+                        ScopeKind::Chain, 1, "f0")
+            .NodeEval("f0", is_serial.GetName(), 2)
+            .NodeResult("f0", is_serial.GetName(), false,
+                        "connection_count=1, expected==2", 2)
+            .ScopeEnd(is_serial_chain_with_minimum_length_2.GetName(),
+                      ScopeKind::Chain, false, 2)
+            .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
+                               false, 0)
+            .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
             .Build();
-
-    MachinaArchetypeResult result =
-        grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 2);
-
+    // assert result
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
                                               TerminalDescriptorFormatter{}));
-    REQUIRE(result);
+    REQUIRE_FALSE(result);
   }
 }

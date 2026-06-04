@@ -127,35 +127,35 @@ Functions</h2></td></tr>
 <tr class="memitem:a0a4ef1b301b0ccbe6934eb665e8da7a8" id="r_a0a4ef1b301b0ccbe6934eb665e8da7a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0a4ef1b301b0ccbe6934eb665e8da7a8">place_first_piece</a> (<a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a> &amp;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html">grimoire_machina</a>, const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
 <tr class="memdesc:a0a4ef1b301b0ccbe6934eb665e8da7a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place the currently selected ghost item as the very first piece on the active scaffold.  <br /></td></tr>
 <tr class="memitem:a32026a52a09e2bd05d1db2497a5625e0" id="r_a32026a52a09e2bd05d1db2497a5625e0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a32026a52a09e2bd05d1db2497a5625e0">place_next_piece</a> (<a class="el" href="structsteamrot_1_1MachinaFormScaffold.html">MachinaFormScaffold</a> &amp;scaffold, const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
-<tr class="memdesc:a32026a52a09e2bd05d1db2497a5625e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place the current ghost item onto the scaffold as the next piece, creating a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> when both the ghost and the scaffold have sockets ready to connect.  <br /></td></tr>
+<tr class="memdesc:a32026a52a09e2bd05d1db2497a5625e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place the current ghost item onto the scaffold as the next piece, creating a connection when both the ghost and the scaffold have sockets ready to connect.  <br /></td></tr>
 <tr class="memitem:a5ac44bf50994db4a66b5cd6716bbd60d" id="r_a5ac44bf50994db4a66b5cd6716bbd60d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5ac44bf50994db4a66b5cd6716bbd60d">place_ghost_on_scaffold</a> (<a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a> &amp;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html">grimoire_machina</a>, const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
 <tr class="memdesc:a5ac44bf50994db4a66b5cd6716bbd60d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place the currently selected ghost item onto the active scaffold.  <br /></td></tr>
 <tr class="memitem:aa511f65e7136ed1e2b63992e3eb0424a" id="r_aa511f65e7136ed1e2b63992e3eb0424a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa511f65e7136ed1e2b63992e3eb0424a">proces_user_input_events</a> (<a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &amp;subscriber, const <a class="el" href="structsteamrot_1_1SceneContext.html">SceneContext</a> &amp;scene_context, <a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a> &amp;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html">grimoire_machina</a>)</td></tr>
 <tr class="memdesc:aa511f65e7136ed1e2b63992e3eb0424a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a single USER_INPUT SELECT subscriber and, when all placement guards pass, place the ghost item on the active scaffold.  <br /></td></tr>
 <tr class="memitem:a39b8adb5061ddfc957ac607b4084527f" id="r_a39b8adb5061ddfc957ac607b4084527f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a39b8adb5061ddfc957ac607b4084527f">process_subscribers</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structsteamrot_1_1Subscriber.html">Subscriber</a> &gt; &gt; &amp;subscribers, const <a class="el" href="structsteamrot_1_1SceneContext.html">SceneContext</a> &amp;scene_context, <a class="el" href="structsteamrot_1_1GrimoireMachina.html">GrimoireMachina</a> &amp;<a class="el" href="namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html">grimoire_machina</a>)</td></tr>
 <tr class="memdesc:a39b8adb5061ddfc957ac607b4084527f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all active subscribers by iterating the list, checking active state and event type, then dispatching each subscriber to the appropriate event-type handler.  <br /></td></tr>
-<tr class="memitem:a015aaaac2c55039ed8eeae1b088d7089" id="r_a015aaaac2c55039ed8eeae1b088d7089"><td class="memItemLeft">std::expected&lt; <a class="el" href="structsteamrot_1_1Connection.html">Connection</a>, std::string &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a015aaaac2c55039ed8eeae1b088d7089">create_connection</a> (<a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a> &amp;fragment_instance, size_t socket_index_a, <a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a> &amp;joint_instance, size_t socket_index_b)</td></tr>
-<tr class="memdesc:a015aaaac2c55039ed8eeae1b088d7089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and returns a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> between specific <a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a> on two PartInstances. returns an error string if object creation fails.  <br /></td></tr>
+<tr class="memitem:a267ea526cda19a6b3aad4bd7589a9daf" id="r_a267ea526cda19a6b3aad4bd7589a9daf"><td class="memItemLeft">std::expected&lt; std::monostate, std::string &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a267ea526cda19a6b3aad4bd7589a9daf">create_connection</a> (<a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a> &amp;fragment_instance, uint32_t socket_id_a, <a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a> &amp;joint_instance, uint32_t socket_id_b)</td></tr>
+<tr class="memdesc:a267ea526cda19a6b3aad4bd7589a9daf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a connection between specific <a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a> on two PartInstances by setting <code><a class="el" href="structsteamrot_1_1SocketData.html#a717a2753a489449173e0144bd801826a" title="When state is SocketState::Connected, holds the peer endpoint of this connection. std::nullopt otherw...">SocketData::connected_to</a></code> on both ends symmetrically and marking both sockets as <code><a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7" title="Socket is currently connected.">SocketState::Connected</a></code>. Returns an error string if validation fails.  <br /></td></tr>
 <tr class="memitem:aa0c928e0020861fd6d00dfe07bd75cbf" id="r_aa0c928e0020861fd6d00dfe07bd75cbf"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aa0c928e0020861fd6d00dfe07bd75cbf">check_socket_for_connection_readiness</a> (const <a class="el" href="structsteamrot_1_1SocketData.html">SocketData</a> &amp;socket)</td></tr>
 <tr class="memdesc:aa0c928e0020861fd6d00dfe07bd75cbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the given <a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a> is in a state that allows it to be connected to another socket.  <br /></td></tr>
-<tr class="memitem:ac335f904174682cba04257f5d9143b4f" id="r_ac335f904174682cba04257f5d9143b4f"><td class="memItemLeft">std::optional&lt; size_t &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ac335f904174682cba04257f5d9143b4f">check_MrGhost_for_connection_readiness</a> (const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
-<tr class="memdesc:ac335f904174682cba04257f5d9143b4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether any of the selections on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> are ready to be connected to the active <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <br /></td></tr>
-<tr class="memitem:a0b038b40b0b0e3f9f5f22da8fe1b80dc" id="r_a0b038b40b0b0e3f9f5f22da8fe1b80dc"><td class="memItemLeft">std::optional&lt; std::pair&lt; uint32_t, size_t &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a0b038b40b0b0e3f9f5f22da8fe1b80dc">check_PartMap_for_connection_readiness</a> (const <a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;part_map)</td></tr>
-<tr class="memdesc:a0b038b40b0b0e3f9f5f22da8fe1b80dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether any of the sockets on the active <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> are ready to be connected to. Returns the part ID and socket index of the first ready socket, or std::nullopt if no sockets are ready.  <br /></td></tr>
+<tr class="memitem:acc372b53be709f3c3d23f7f55a595999" id="r_acc372b53be709f3c3d23f7f55a595999"><td class="memItemLeft">std::optional&lt; uint32_t &gt;&#160;</td><td class="memItemRight"><a class="el" href="#acc372b53be709f3c3d23f7f55a595999">check_MrGhost_for_connection_readiness</a> (const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;mr_ghost)</td></tr>
+<tr class="memdesc:acc372b53be709f3c3d23f7f55a595999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether any of the selections on <a class="el" href="structsteamrot_1_1MrGhost.html" title="Per-scene state object tracking the current ghost item.">MrGhost</a> are ready to be connected to the active <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <br /></td></tr>
+<tr class="memitem:a86fef2fe2433179b05934d6affac4e75" id="r_a86fef2fe2433179b05934d6affac4e75"><td class="memItemLeft">std::optional&lt; std::pair&lt; uint32_t, uint32_t &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a86fef2fe2433179b05934d6affac4e75">check_PartGraph_for_connection_readiness</a> (const <a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;part_graph)</td></tr>
+<tr class="memdesc:a86fef2fe2433179b05934d6affac4e75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether any of the sockets on the active <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> are ready to be connected to. Returns the part ID and socket index of the first ready socket, or std::nullopt if no sockets are ready.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Headers. </p>
 <p>Preprocessor Directives.</p>
 <p>Headers </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ac335f904174682cba04257f5d9143b4f" name="ac335f904174682cba04257f5d9143b4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac335f904174682cba04257f5d9143b4f">&#9670;&#160;</a></span>check_MrGhost_for_connection_readiness()</h2>
+<a id="acc372b53be709f3c3d23f7f55a595999" name="acc372b53be709f3c3d23f7f55a595999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc372b53be709f3c3d23f7f55a595999">&#9670;&#160;</a></span>check_MrGhost_for_connection_readiness()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; size_t &gt; steamrot::logic::action::grimoire_machina::check_MrGhost_for_connection_readiness </td>
+          <td class="memname">std::optional&lt; uint32_t &gt; steamrot::logic::action::grimoire_machina::check_MrGhost_for_connection_readiness </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structsteamrot_1_1MrGhost.html">MrGhost</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mr_ghost</em></span></td><td>)</td>
           <td></td>
@@ -173,16 +173,16 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0b038b40b0b0e3f9f5f22da8fe1b80dc" name="a0b038b40b0b0e3f9f5f22da8fe1b80dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b038b40b0b0e3f9f5f22da8fe1b80dc">&#9670;&#160;</a></span>check_PartMap_for_connection_readiness()</h2>
+<a id="a86fef2fe2433179b05934d6affac4e75" name="a86fef2fe2433179b05934d6affac4e75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86fef2fe2433179b05934d6affac4e75">&#9670;&#160;</a></span>check_PartGraph_for_connection_readiness()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; std::pair&lt; uint32_t, size_t &gt; &gt; steamrot::logic::action::grimoire_machina::check_PartMap_for_connection_readiness </td>
+          <td class="memname">std::optional&lt; std::pair&lt; uint32_t, uint32_t &gt; &gt; steamrot::logic::action::grimoire_machina::check_PartGraph_for_connection_readiness </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>part_map</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>part_graph</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -191,7 +191,7 @@ Functions</h2></td></tr>
 <p>Checks whether any of the sockets on the active <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> are ready to be connected to. Returns the part ID and socket index of the first ready socket, or std::nullopt if no sockets are ready. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">part_map</td><td><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8" title="using helpers ///">PartMap</a> to check </td></tr>
+    <tr><td class="paramname">part_graph</td><td><a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48" title="using helpers ///">PartGraph</a> to check </td></tr>
   </table>
   </dd>
 </dl>
@@ -249,21 +249,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a015aaaac2c55039ed8eeae1b088d7089" name="a015aaaac2c55039ed8eeae1b088d7089"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a015aaaac2c55039ed8eeae1b088d7089">&#9670;&#160;</a></span>create_connection()</h2>
+<a id="a267ea526cda19a6b3aad4bd7589a9daf" name="a267ea526cda19a6b3aad4bd7589a9daf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a267ea526cda19a6b3aad4bd7589a9daf">&#9670;&#160;</a></span>create_connection()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::expected&lt; <a class="el" href="structsteamrot_1_1Connection.html">Connection</a>, std::string &gt; steamrot::logic::action::grimoire_machina::create_connection </td>
+          <td class="memname">std::expected&lt; std::monostate, std::string &gt; steamrot::logic::action::grimoire_machina::create_connection </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structsteamrot_1_1FragmentInstance.html">FragmentInstance</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>fragment_instance</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>socket_index_a</em></span>, </td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>socket_id_a</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -273,22 +273,22 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>socket_index_b</em></span>&#160;)</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>socket_id_b</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Creates and returns a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> between specific <a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a> on two PartInstances. returns an error string if object creation fails. </p>
-<p>Connections are ,by convention, only between a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> and a <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a>. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Creates a connection between specific <a class="el" href="structsteamrot_1_1SocketData.html" title="Bundles the local position and mutable runtime state for a single socket on a placed part instance.">SocketData</a> on two PartInstances by setting <code><a class="el" href="structsteamrot_1_1SocketData.html#a717a2753a489449173e0144bd801826a" title="When state is SocketState::Connected, holds the peer endpoint of this connection. std::nullopt otherw...">SocketData::connected_to</a></code> on both ends symmetrically and marking both sockets as <code><a class="el" href="namespacesteamrot.html#ae5029d8abb2c43f7bf14bf38c4ff08a1a2ec0d16e4ca169baedb9b2d50ec5c6d7" title="Socket is currently connected.">SocketState::Connected</a></code>. Returns an error string if validation fails. </p>
+<p>Connections are, by convention, only between a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> and a <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a>. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">fragment</td><td><a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> to connect. </td></tr>
-    <tr><td class="paramname">socket_index_a</td><td>Socket index of the <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> to connect. </td></tr>
+    <tr><td class="paramname">socket_id_a</td><td>Stable socket ID of the <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> to connect. </td></tr>
     <tr><td class="paramname">joint</td><td><a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> to connect. </td></tr>
-    <tr><td class="paramname">socket_index_b</td><td>Socket index of the <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> to connect. </td></tr>
+    <tr><td class="paramname">socket_id_b</td><td>Stable socket ID of the <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> to connect. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> struct representing the connection between the specified sockets. return by value </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>std::monostate</code> on success, or an error string if either part has no sockets or a socket ID is not found. </dd></dl>
 
 </div>
 </div>
@@ -449,14 +449,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Place the current ghost item onto the scaffold as the next piece, creating a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> when both the ghost and the scaffold have sockets ready to connect. </p>
-<p>Calls <a class="el" href="#ac335f904174682cba04257f5d9143b4f" title="check_MrGhost_for_connection_readiness">check_MrGhost_for_connection_readiness</a> and <a class="el" href="#a0b038b40b0b0e3f9f5f22da8fe1b80dc" title="check_PartMap_for_connection_readiness">check_PartMap_for_connection_readiness</a>. If both return a value the ghost instance is copied into <code class="param">scaffold</code> (with a new stable ID) and a <a class="el" href="structsteamrot_1_1Connection.html" title="Represents a connection between two sockets on the scaffold.">Connection</a> between the two ready sockets is created via <a class="el" href="#a015aaaac2c55039ed8eeae1b088d7089" title="create_connection">create_connection</a> and appended to <code class="param">scaffold.connections</code>.</p>
-<p>By convention connections are only between a <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> and a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a>. Does nothing if the ghost and the <a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8" title="using helpers ///">PartMap</a> part have the same type (both <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or both <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>).</p>
+<p>Place the current ghost item onto the scaffold as the next piece, creating a connection when both the ghost and the scaffold have sockets ready to connect. </p>
+<p>Calls <a class="el" href="#acc372b53be709f3c3d23f7f55a595999" title="check_MrGhost_for_connection_readiness">check_MrGhost_for_connection_readiness</a> and <a class="el" href="#a86fef2fe2433179b05934d6affac4e75" title="check_PartGraph_for_connection_readiness">check_PartGraph_for_connection_readiness</a>. If both return a value the ghost instance is copied into <code class="param">scaffold</code> (with a new stable ID) and the connection is recorded directly on both sockets via <a class="el" href="#a267ea526cda19a6b3aad4bd7589a9daf" title="create_connection">create_connection</a> (setting <code><a class="el" href="structsteamrot_1_1SocketData.html#a717a2753a489449173e0144bd801826a" title="When state is SocketState::Connected, holds the peer endpoint of this connection. std::nullopt otherw...">SocketData::connected_to</a></code> on each end).</p>
+<p>By convention connections are only between a <a class="el" href="structsteamrot_1_1FragmentInstance.html" title="A placed instance of a Fragment on the MachinaFormScaffold.">FragmentInstance</a> and a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a>. Does nothing if the ghost and the <a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48" title="using helpers ///">PartGraph</a> part have the same type (both <a class="el" href="structsteamrot_1_1Fragment.html" title="Contains the data for a Fragment.">Fragment</a> or both <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a>).</p>
 <p>Does nothing if:</p><ul>
 <li><code class="param">scaffold.parts</code> is empty (use <a class="el" href="#a0a4ef1b301b0ccbe6934eb665e8da7a8" title="place_first_piece">place_first_piece</a> instead),</li>
 <li>the ghost instance is monostate or its part pointer is null,</li>
 <li>either readiness check returns <code>std::nullopt</code>, or</li>
-<li>the ghost type and the ready <a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8" title="using helpers ///">PartMap</a> part type are the same.</li>
+<li>the ghost type and the ready <a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48" title="using helpers ///">PartGraph</a> part type are the same.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

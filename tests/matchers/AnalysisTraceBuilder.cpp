@@ -136,12 +136,9 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::MovingToNeighbourById(
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
-                                        uint32_t from_socket_id,
-                                        const std::string &to_id_alias,
-                                        uint32_t to_socket_id,
-                                        uint32_t depth) {
+AnalysisTraceBuilder &AnalysisTraceBuilder::MovingToNeighbour(
+    const std::string &from_id_alias, uint32_t from_socket_id,
+    const std::string &to_id_alias, uint32_t to_socket_id, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::MovingToNeighbour;
   ev.depth = depth;
@@ -156,9 +153,10 @@ AnalysisTraceBuilder::MovingToNeighbour(const std::string &from_id_alias,
 }
 
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(
-    uint32_t from_id, uint32_t from_socket_id, uint32_t to_id,
-    uint32_t to_socket_id, uint32_t depth) {
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::BacktrackingById(uint32_t from_id,
+                                       uint32_t from_socket_id, uint32_t to_id,
+                                       uint32_t to_socket_id, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -170,12 +168,10 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::BacktrackingById(
   return *this;
 }
 /////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::Backtracking(const std::string &from_id_alias,
-                                   uint32_t from_socket_id,
-                                   const std::string &to_id_alias,
-                                   uint32_t to_socket_id,
-                                   uint32_t depth) {
+AnalysisTraceBuilder &AnalysisTraceBuilder::Backtracking(
+    const std::string &from_id_alias, uint32_t from_socket_id,
+    const std::string &to_id_alias, uint32_t to_socket_id, uint32_t depth) {
+
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::Backtracking;
   ev.depth = depth;
@@ -193,6 +189,22 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ValidSubgraphIsolated() {
 
   return *this;
 }
+
+/////////////////////////////////////////////////
+AnalysisTraceBuilder &
+AnalysisTraceBuilder::MachinaPartResult(const std::string predicate_name,
+                                        const bool result, uint32_t depth) {
+
+  AnalysisEvent ev{};
+  ev.kind = TraceEventKind::MachinaPartResult;
+  ev.depth = depth;
+  ev.predicate_name = std::move(predicate_name);
+  ev.result = result;
+  m_trace.push_back(std::move(ev));
+
+  return *this;
+}
+
 /////////////////////////////////////////////////
 AnalysisTrace AnalysisTraceBuilder::Build() const { return m_trace; }
 

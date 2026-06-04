@@ -42,6 +42,7 @@ enum class TraceEventKind {
   Backtracking,
   ScopeBegin,
   ScopeEnd,
+  MachinaPartResult,
   ValidSubgraphIsolated,
   InvalidSubgraphIsolated,
 };

@@ -39,6 +39,7 @@ var NAVTREE =
         [ "Enumerator", "namespacemembers_eval.html", null ]
       ] ]
     ] ],
+    [ "Concepts", "concepts.html", "concepts" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -67,30 +68,31 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"ArchetypeManager_8cpp.html",
-"SceneConfig_8h.html",
-"classsteamrot_1_1CraftingScene.html#ad374acd801ee86e5d92806982ab1d4da",
-"classsteamrot_1_1FlatbuffersUIElementProvider.html#a8d57425c8642dbf8e9e2dee13985abdd",
-"classsteamrot_1_1SceneFactory.html#ad58751375c3d2eae36e5326c52b4b9bf",
-"coordinate_spaces.html#autotoc_md5",
-"input__data__generated_8h.html#a9c2916b727692350166863c814b09e51",
-"namespacesteamrot.html#a59b93b975fa2db45bce74b56dbad105b",
-"namespacesteamrot.html#aa9ecd7df59f699a33a2bd8678f690270ae93f994f01c537c4e2f7d8528c3eb5e9",
-"namespacesteamrot_1_1data_1_1configure.html#a4fe99da06915555a7e9258a73aa58cfd",
-"render__ghost_8h.html",
-"structsteamrot_1_1CameraPayloadFbsBuilder.html#a0b118f940959819a80b0f08616cfe549",
-"structsteamrot_1_1DropDownItemStyleDataFbsBuilder.html#a468d188c0bfd8d3778ac9afa9b8c42d7",
-"structsteamrot_1_1EntityCollectionFbsBuilder.html#aeba7b939dd7e9d2e82e990a6b56ddf12",
-"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a35bffa6d0d304b0466d3c81bdaa01bed",
-"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a535479885a0f66afc07d852713ff85c7",
-"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#aa744bea508ef113cabaf3c57e9cda077",
-"structsteamrot_1_1FragmentFbsBuilder.html#a78a508a42d6afb492896ba752ff055d9",
-"structsteamrot_1_1JointFbsBuilder.html#aa3793fc271f598d06cdc7b22650430fd",
-"structsteamrot_1_1PerformanceMetrics.html#a7997cbb8cc6ccb3ed6e106759f37861f",
-"structsteamrot_1_1ScenePayloadFbsBuilder.html#ae7e610b6a75c2c658893a0267110655f",
-"structsteamrot_1_1TestData.html#a742811c8a2450b346a52b0dd54a3cb60",
-"structsteamrot_1_1UIStateCollectionDataFbsBuilder.html#a492c05b274c5f0e15db2b2c31502fa86",
-"structsteamrot_1_1ViewTable.html#ac8d3f19cace7dab3ecada5e7179d4283"
+"AnalysisEvent_8h.html",
+"Part_8h.html",
+"classsteamrot_1_1ArchetypeManager.html#a29750709697aebb8358623bef281b479",
+"classsteamrot_1_1FlatbuffersSceneDataProvider.html#a48c786601fc5a52b4d7a6cf3207d749f",
+"classsteamrot_1_1Scene.html#aace72bb27f976f9bf22d4ef1f887c0a6",
+"classsteamrot_1_1logic_1_1descriptors_1_1DescriptorFormatter.html#a5719af5d854f3ffdeff2fa05e4752d09",
+"event__context__generated_8h.html",
+"namespacesteamrot.html#a141fe10c075fcb7c1257106cc1f0b76d",
+"namespacesteamrot.html#a78694e86584530fd9a22ef1689a2018b",
+"namespacesteamrot.html#ad7d618a1f630265bc4d64c4803bdd46bab76345259332478183d11ed8d7c92546",
+"namespacesteamrot_1_1logic_1_1action_1_1grimoire__machina.html#a39b8adb5061ddfc957ac607b4084527f",
+"structButtonStyle.html#aa0ed6aeb7d38d396df703e2c98ce8ed0",
+"structsteamrot_1_1ChildDataFbsBuilder.html#ae34ba8867ed6342999d2870d0af4d2dc",
+"structsteamrot_1_1DropDownListStyleDataFbsBuilder.html#ae54da9680d2045641500adb21253dd79",
+"structsteamrot_1_1EventPacketFbsBuilder.html#a002de2599cfeb95066826db2a1708261",
+"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a47e4ddac5430827c42a03fd18f4489e5",
+"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#a6ed77294c213352bbafc4ef63552ad56",
+"structsteamrot_1_1FLATBUFFERS__FINAL__CLASS.html#ac4d3c402ff1a08549e1ade62b4f1e091",
+"structsteamrot_1_1GhostPayloadFbsBuilder.html#a25f80f7e92ef027ffeca64201ee21c6b",
+"structsteamrot_1_1LogicConfigFbsBuilder.html#a0253afbd7b38eed6eb3f3f3c3f8c29f6",
+"structsteamrot_1_1SceneContext.html#a34e04b5fac708496affb0800d21e64fc",
+"structsteamrot_1_1SimulationStepFbsBuilder.html#af036ec6c7c8f57e500dfd28342437245",
+"structsteamrot_1_1TickInputsPairFbsBuilder.html#a62e5a58e5a6e1c2a45e1bbaa585bab88",
+"structsteamrot_1_1UserInputBitset.html#a84884b2956997d9f7dfbf991b5b205f6",
+"structsteamrot_1_1logic_1_1descriptors_1_1DFSContext.html#ab827e0eb0b78f6bc4af803b45096be2b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

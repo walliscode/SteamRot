@@ -114,20 +114,20 @@ $(function() {
 Functions</h2></td></tr>
 <tr class="memitem:a445dd43b82a91cb930333938ec788083" id="r_a445dd43b82a91cb930333938ec788083"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a445dd43b82a91cb930333938ec788083">initialize_joint_socket_positions</a> (<a class="el" href="structsteamrot_1_1JointInstance.html">JointInstance</a> &amp;instance)</td></tr>
 <tr class="memdesc:a445dd43b82a91cb930333938ec788083"><td class="mdescLeft">&#160;</td><td class="mdescRight">Populates the socket local positions of a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> using the even-spread algorithm.  <br /></td></tr>
-<tr class="memitem:a89d803047dab52faba33f961c58902d1" id="r_a89d803047dab52faba33f961c58902d1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a89d803047dab52faba33f961c58902d1">compute_socket_local_positions_even_spread</a> (const <a class="el" href="structsteamrot_1_1SocketConfig.html">SocketConfig</a> &amp;config, sf::Vector2f &amp;origin, std::vector&lt; sf::Vector2f &gt; &amp;local_positions)</td></tr>
-<tr class="memdesc:a89d803047dab52faba33f961c58902d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates an even spread of socket local positions for a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> based on its <a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a>.  <br /></td></tr>
-<tr class="memitem:ac226c81d26533da2162bd3e88bf8bf7f" id="r_ac226c81d26533da2162bd3e88bf8bf7f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac226c81d26533da2162bd3e88bf8bf7f">position_first_part_of_machina_form_scaffold</a> (<a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;parts)</td></tr>
-<tr class="memdesc:ac226c81d26533da2162bd3e88bf8bf7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifies the <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> with a socket index of 0 and positions at 0,0 of the canvas.  <br /></td></tr>
-<tr class="memitem:a5037acd78b5bc3215919831342543522" id="r_a5037acd78b5bc3215919831342543522"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5037acd78b5bc3215919831342543522">position_machina_form_scaffold</a> (<a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;parts)</td></tr>
-<tr class="memdesc:a5037acd78b5bc3215919831342543522"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper function to completely position the parts of the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <br /></td></tr>
+<tr class="memitem:ab98a03429d89c4cfbff32a3cf78a780d" id="r_ab98a03429d89c4cfbff32a3cf78a780d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab98a03429d89c4cfbff32a3cf78a780d">compute_socket_local_positions_even_spread</a> (const <a class="el" href="structsteamrot_1_1SocketConfig.html">SocketConfig</a> &amp;config, const sf::Vector2f &amp;origin, std::vector&lt; sf::Vector2f &gt; &amp;local_positions)</td></tr>
+<tr class="memdesc:ab98a03429d89c4cfbff32a3cf78a780d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates an even spread of socket local positions for a <a class="el" href="structsteamrot_1_1Joint.html" title="Contains the data for a Joint.">Joint</a> based on its <a class="el" href="structsteamrot_1_1SocketConfig.html" title="Procedural description of a Joint&#39;s socket layout.">SocketConfig</a>.  <br /></td></tr>
+<tr class="memitem:a388a350df91aaec50730048845a5712c" id="r_a388a350df91aaec50730048845a5712c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a388a350df91aaec50730048845a5712c">position_first_part_of_machina_form_scaffold</a> (<a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;parts)</td></tr>
+<tr class="memdesc:a388a350df91aaec50730048845a5712c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifies the <a class="el" href="structsteamrot_1_1PartInstance.html" title="Common base for all placed instances on the MachinaFormScaffold.">PartInstance</a> with a socket index of 0 and positions at 0,0 of the canvas.  <br /></td></tr>
+<tr class="memitem:a82daa0245f91469b5ecd3584c466e169" id="r_a82daa0245f91469b5ecd3584c466e169"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a82daa0245f91469b5ecd3584c466e169">position_machina_form_scaffold</a> (<a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;parts)</td></tr>
+<tr class="memdesc:a82daa0245f91469b5ecd3584c466e169"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper function to completely position the parts of the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Headers. </p>
 <p>Preprocessor Directives.</p>
 <p>Headers </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a89d803047dab52faba33f961c58902d1" name="a89d803047dab52faba33f961c58902d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89d803047dab52faba33f961c58902d1">&#9670;&#160;</a></span>compute_socket_local_positions_even_spread()</h2>
+<a id="ab98a03429d89c4cfbff32a3cf78a780d" name="ab98a03429d89c4cfbff32a3cf78a780d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab98a03429d89c4cfbff32a3cf78a780d">&#9670;&#160;</a></span>compute_socket_local_positions_even_spread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -140,7 +140,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">sf::Vector2f &amp;</td>          <td class="paramname"><span class="paramname"><em>origin</em></span>, </td>
+          <td class="paramtype">const sf::Vector2f &amp;</td>          <td class="paramname"><span class="paramname"><em>origin</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -179,7 +179,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Populates the socket local positions of a <a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> using the even-spread algorithm. </p>
-<p>Calls <code>compute_socket_local_positions_even_spread</code> internally and writes the resulting positions back into <code>instance.sockets</code>[i].local_position. This must be called after construction to give the sockets their correct positions.</p>
+<p>Calls <code>compute_socket_local_positions_even_spread</code> internally and writes the resulting positions back into <code>instance.sockets</code>[id].local_position. This must be called after construction to give the sockets their correct positions.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">instance</td><td><a class="el" href="structsteamrot_1_1JointInstance.html" title="A placed instance of a Joint on the MachinaFormScaffold.">JointInstance</a> whose sockets should be positioned. </td></tr>
@@ -189,8 +189,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ac226c81d26533da2162bd3e88bf8bf7f" name="ac226c81d26533da2162bd3e88bf8bf7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac226c81d26533da2162bd3e88bf8bf7f">&#9670;&#160;</a></span>position_first_part_of_machina_form_scaffold()</h2>
+<a id="a388a350df91aaec50730048845a5712c" name="a388a350df91aaec50730048845a5712c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a388a350df91aaec50730048845a5712c">&#9670;&#160;</a></span>position_first_part_of_machina_form_scaffold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -198,7 +198,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void steamrot::logic::positioning::grimoire_machina::position_first_part_of_machina_form_scaffold </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>parts</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>parts</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -208,8 +208,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5037acd78b5bc3215919831342543522" name="a5037acd78b5bc3215919831342543522"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5037acd78b5bc3215919831342543522">&#9670;&#160;</a></span>position_machina_form_scaffold()</h2>
+<a id="a82daa0245f91469b5ecd3584c466e169" name="a82daa0245f91469b5ecd3584c466e169"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82daa0245f91469b5ecd3584c466e169">&#9670;&#160;</a></span>position_machina_form_scaffold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,7 +217,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void steamrot::logic::positioning::grimoire_machina::position_machina_form_scaffold </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8">PartMap</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>parts</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48">PartGraph</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>parts</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -226,7 +226,7 @@ Functions</h2></td></tr>
 <p>Wrapper function to completely position the parts of the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">parts</td><td>The <a class="el" href="namespacesteamrot.html#a2d79be77cf3265cb98c2911a4c1911a8" title="using helpers ///">PartMap</a> of the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> to position </td></tr>
+    <tr><td class="paramname">parts</td><td>The <a class="el" href="namespacesteamrot.html#aca730b175aa64a4ef04b2f7b37419f48" title="using helpers ///">PartGraph</a> of the <a class="el" href="structsteamrot_1_1MachinaFormScaffold.html" title="Contains all data necessary to create a MachinaForm.">MachinaFormScaffold</a> to position </td></tr>
   </table>
   </dd>
 </dl>

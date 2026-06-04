@@ -21,5 +21,6 @@ var searchData=
   ['inputtypefbs_5fmouserelease_18',['InputTypeFbs_MouseRelease',['../namespacesteamrot.html#a6da95f6f3f45b9f1969ebef3226ea1f4a85d69dd58654ca652cd5a4297f126140',1,'steamrot']]],
   ['invalidcast_19',['InvalidCast',['../namespacesteamrot.html#a8ea71d456c3f953d0ed805c971f59143abad18673c2b7c9bf67f4f57879b8e1e9',1,'steamrot']]],
   ['invalidinput_20',['InvalidInput',['../namespacesteamrot.html#a8ea71d456c3f953d0ed805c971f59143ad8f78ca9a692a9411afbc7584b69d043',1,'steamrot']]],
-  ['invaliduuid_21',['InvalidUUID',['../namespacesteamrot.html#a8ea71d456c3f953d0ed805c971f59143a50b745e914a3d77d658e105ab843737c',1,'steamrot']]]
+  ['invalidsubgraphisolated_21',['InvalidSubgraphIsolated',['../namespacesteamrot_1_1logic_1_1descriptors.html#ab59dce36e56c3360f0c52b7149777147a78c59efdb8f3f00581992df3cbaba75c',1,'steamrot::logic::descriptors']]],
+  ['invaliduuid_22',['InvalidUUID',['../namespacesteamrot.html#a8ea71d456c3f953d0ed805c971f59143a50b745e914a3d77d658e105ab843737c',1,'steamrot']]]
 ];

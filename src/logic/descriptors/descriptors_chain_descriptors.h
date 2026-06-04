@@ -30,8 +30,7 @@ namespace steamrot::logic::descriptors {
 inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
   return ChainDescriptor{
       nd.GetName(),
-      [nd = std::move(nd)](const PartGraph &parts,
-                           uint32_t id,
+      [nd = std::move(nd)](const PartGraph &parts, uint32_t id,
                            uint32_t depth) -> ChainDescriptorResult {
         auto node_result = nd(parts, id, depth);
         ChainDescriptorResult result{static_cast<bool>(node_result)};
@@ -48,4 +47,18 @@ inline ChainDescriptor lift_to_chain(NodeDescriptor nd) {
 /////////////////////////////////////////////////
 extern const ChainDescriptor is_serial_chain;
 
+/////////////////////////////////////////////////
+/// @brief Returns a ChainDescriptor that checks whether a serial chain of at
+/// least @p n
+///
+/// @param n Minimum length of the serial chain, including the anchor node.
+/// @return ChainDescriptor object
+/////////////////////////////////////////////////
+ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n);
+
+/////////////////////////////////////////////////
+/// @brief ChainDescriptor that checks whether a serial chain of at least 2
+/// nodes
+/////////////////////////////////////////////////
+extern const ChainDescriptor is_serial_chain_with_minimum_length_2;
 } // namespace steamrot::logic::descriptors

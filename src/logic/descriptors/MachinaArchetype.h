@@ -28,9 +28,8 @@ class MachinaArchetype {
   /////////////////////////////////////////////////
   /// @brief Underlying callable type.
   /////////////////////////////////////////////////
-  using FnType =
-      std::function<MachinaArchetypeResult(const PartGraph &, uint32_t,
-                                           uint32_t)>;
+  using FnType = std::function<MachinaArchetypeResult(const PartGraph &,
+                                                      uint32_t, uint32_t)>;
 
 private:
   /////////////////////////////////////////////////
@@ -44,6 +43,11 @@ private:
   /////////////////////////////////////////////////
   const FnType m_fn;
 
+  /////////////////////////////////////////////////
+  /// @brief Number of steps in this archetype, used for trace formatting
+  /////////////////////////////////////////////////
+  const size_t number_of_steps{0};
+
 public:
   MachinaArchetype() = default;
   /////////////////////////////////////////////////
@@ -52,8 +56,9 @@ public:
   /// @param name Human-readable descriptor name used in trace events.
   /// @param fn   Callable implementing the chain walk.
   /////////////////////////////////////////////////
-  MachinaArchetype(std::string name, FnType fn)
-      : m_name(std::move(name)), m_fn(std::move(fn)) {}
+  MachinaArchetype(std::string name, FnType fn, const size_t num_steps)
+      : m_name(std::move(name)), m_fn(std::move(fn)),
+        number_of_steps(num_steps) {}
 
   /////////////////////////////////////////////////
   /// @brief Evaluate the chain descriptor from @p id as anchor.
@@ -75,6 +80,13 @@ public:
   /////////////////////////////////////////////////
   const std::string &GetName() const noexcept { return m_name; }
 
+  /////////////////////////////////////////////////
+  /// @brief Return the number of steps in this archetype, used for trace
+  /// formatting and debugging
+  ///
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
+  const size_t GetNumberOfSteps() const noexcept { return number_of_steps; }
   /////////////////////////////////////////////////
   /// @brief Return the underlying std::function.
   /////////////////////////////////////////////////

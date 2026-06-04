@@ -38,14 +38,14 @@ enum class ChainStepKind {
   /////////////////////////////////////////////////
   WhileIsTrue,
 
-  //////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   /// Consume at least n nodes that satisfy the predicate, and continue
-  /// consuming as long as the
-  /// predicate is satisfied. Once the predicate fails, stop consuming then pass
-  /// the first non-matching node to the next step.
-  /// Used by @c WhileIsTrueForN().
-  ////////////////////////////////////////////////////
-  WhileIsTrueForN
+  /// consuming as
+  /// long as the predicate is satisfied. Once the predicate fails, stop
+  /// consuming
+  /// then pass the first non-matching node to the next step.
+  /////////////////////////////////////////////////
+  WhileIsTrueForMinimumN
 };
 
 /////////////////////////////////////////////////

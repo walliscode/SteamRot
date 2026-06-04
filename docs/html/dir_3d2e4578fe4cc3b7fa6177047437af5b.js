@@ -1,5 +1,6 @@
 var dir_3d2e4578fe4cc3b7fa6177047437af5b =
 [
+    [ "descriptors", "dir_fb314687e648b3a3bc7462a73f76d557.html", "dir_fb314687e648b3a3bc7462a73f76d557" ],
     [ "action_camera.cpp", "action__camera_8cpp.html", "action__camera_8cpp" ],
     [ "action_camera.h", "action__camera_8h.html", "action__camera_8h" ],
     [ "action_ghost.cpp", "action__ghost_8cpp.html", "action__ghost_8cpp" ],
@@ -8,8 +9,6 @@ var dir_3d2e4578fe4cc3b7fa6177047437af5b =
     [ "action_grimoire_machina.h", "action__grimoire__machina_8h.html", "action__grimoire__machina_8h" ],
     [ "action_ui.cpp", "action__ui_8cpp.html", "action__ui_8cpp" ],
     [ "action_ui.h", "action__ui_8h.html", "action__ui_8h" ],
-    [ "analysis_grimoire_machina.cpp", "analysis__grimoire__machina_8cpp.html", "analysis__grimoire__machina_8cpp" ],
-    [ "analysis_grimoire_machina.h", "analysis__grimoire__machina_8h.html", "analysis__grimoire__machina_8h" ],
     [ "CameraActionLogic.cpp", "CameraActionLogic_8cpp.html", null ],
     [ "CameraActionLogic.h", "CameraActionLogic_8h.html", "CameraActionLogic_8h" ],
     [ "CameraPositioningLogic.cpp", "CameraPositioningLogic_8cpp.html", null ],

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['inputactionregistry_0',['InputActionRegistry',['../namespacesteamrot.html#af33d736d39c814827131608029cf38a1',1,'steamrot']]]
+  ['ghostinstance_0',['GhostInstance',['../namespacesteamrot.html#a229897ac32baf73be6d5cfa35241f63e',1,'steamrot']]],
+  ['ghostselection_1',['GhostSelection',['../namespacesteamrot.html#a492d0f6e26c9eed5a949733e85fd359d',1,'steamrot']]]
 ];

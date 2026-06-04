@@ -151,6 +151,17 @@ inline AnalysisEvent make_moving_to_neighbour_event(
 }
 
 inline AnalysisEvent
+make_machina_part_result_event(const std::string predicate_name,
+                               const bool result, uint32_t depth) {
+  AnalysisEvent event{};
+  event.kind = TraceEventKind::MachinaPartResult;
+  event.depth = depth;
+  event.predicate_name = std::move(predicate_name);
+  event.result = result;
+  return event;
+}
+
+inline AnalysisEvent
 make_moving_to_neighbour_event(uint32_t depth, uint32_t from_id,
                                uint32_t from_socket_id, uint32_t to_id,
                                uint32_t to_socket_id, const PartGraph &parts) {
@@ -231,6 +242,15 @@ inline void add_scope_end_event(Context &context, std::string scope_name,
                                 uint32_t depth = 0) {
   append_event(context, make_scope_end_event(std::move(scope_name), scope_kind,
                                              result, depth));
+}
+
+template <typename Context>
+inline void add_machina_part_result_event(Context &context,
+                                          const std::string &predicate_name,
+                                          const bool result,
+                                          uint32_t depth = 0) {
+  append_event(context,
+               make_machina_part_result_event(predicate_name, result, depth));
 }
 
 } // namespace steamrot::logic::descriptors

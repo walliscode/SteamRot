@@ -64,6 +64,27 @@ public:
   ChainDescriptorBuilder &WhileIsTrue(NodeDescriptor nd);
 
   /////////////////////////////////////////////////
+  /// @brief Append a repeating predicate that matches zero or more consecutive
+  /// nodes while
+  ///       @p nd holds, with a minimum number of repetitions.
+  ///
+  ///       This will keep consuming nodes satisfying @p nd until the first node
+  ///       that does not satisfy it, then passes that node to the subsequent
+  ///       step. The step is only satisfied if at least @p min_repetitions
+  ///       nodes were consumed but will record further matches beyond that.
+  ///
+  /// @param nd NodeDescriptor evaluated repeatedly during the walk.
+  /// @param min_repetitions Minimum number of nodes that must satisfy @p nd for
+  /// this step to be satisfied.
+  /// @return *this for method chaining.
+  /////////////////////////////////////////////////
+  ChainDescriptorBuilder &WhileIsTrueForMinimumN(NodeDescriptor nd,
+                                                 uint32_t min_repetitions) {
+    m_steps.push_back({std::move(nd), ChainStepKind::WhileIsTrueForMinimumN,
+                       min_repetitions});
+    return *this;
+  }
+  /////////////////////////////////////////////////
   /// @brief Returns a ChainDescriptor containing the steps added to this
   /// builder.
   ///

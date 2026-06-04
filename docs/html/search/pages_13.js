@@ -1,13 +1,13 @@
 var searchData=
 [
-  ['map_0',['Class and File Map',['../adding_sfml_event_conversions.html#autotoc_md182',1,'']]],
+  ['map_0',['Class and File Map',['../adding_sfml_event_conversions.html#autotoc_md205',1,'']]],
   ['map_20this_1',['GrimoireMachina Logic Responsibility Map This',['../grimoire_machina_logic_map.html',1,'design']]],
   ['mappixeltocoords_20with_20the_20wrong_20view_2',['❌ Calling &lt;span class=&quot;tt&quot;&gt;mapPixelToCoords&lt;/span&gt; with the wrong view',['../coordinate_spaces_in_SteamRot.html#autotoc_md38',1,'']]],
   ['match_20the_20rendering_20pass_3',['4. The View Must Match the Rendering Pass',['../coordinate_spaces.html#autotoc_md17',1,'']]],
-  ['match_20wrong_20action_20fires_4',['Two patterns both match, wrong action fires',['../adding_sfml_event_conversions.html#autotoc_md208',1,'']]],
+  ['match_20wrong_20action_20fires_4',['Two patterns both match, wrong action fires',['../adding_sfml_event_conversions.html#autotoc_md231',1,'']]],
   ['member_20functions_5',['Free Functions vs. Member Functions',['../logic_decomposition.html#autotoc_md88',1,'']]],
   ['member_20functions_20are_20acceptable_6',['When member functions are acceptable',['../logic_decomposition.html#autotoc_md90',1,'']]],
-  ['method_7',['Method',['../adding_logic_classes.html#autotoc_md125',1,'3.2 Add to CreateLogicObject Method'],['../adding_logic_classes.html#autotoc_md126',1,'3.3 Add to Scene Configuration Method']]],
+  ['method_7',['Method',['../adding_logic_classes.html#autotoc_md148',1,'3.2 Add to CreateLogicObject Method'],['../adding_logic_classes.html#autotoc_md149',1,'3.3 Add to Scene Configuration Method']]],
   ['minimal_20parameter_20list_8',['Step 3 – Determine the minimal parameter list',['../logic_decomposition.html#autotoc_md95',1,'']]],
   ['module_9',['Step 2 – Locate or create the free-function module',['../logic_decomposition.html#autotoc_md94',1,'']]],
   ['modules_10',['Free-Function Modules',['../grimoire_machina_logic_map.html#autotoc_md62',1,'']]],
