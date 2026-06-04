@@ -145,4 +145,12 @@ template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
   }
 };
 
+template <> struct StringMaker<steamrot::logic::descriptors::AnalysisTrace> {
+  static std::string
+  convert(const steamrot::logic::descriptors::AnalysisTrace &trace) {
+    return "AnalysisTrace{" + std::to_string(trace.size()) +
+           " events; see EqualsTrace diff below}";
+  }
+};
+
 } // namespace Catch
