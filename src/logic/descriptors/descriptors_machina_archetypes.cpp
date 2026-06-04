@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "descriptors_machina_archetypes.h"
 #include "DescriptorResult.h"
-#include "ChainDescriptorBuilder.h"
 #include "MachinaArchetypeBuilder.h"
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
@@ -18,8 +17,7 @@ namespace steamrot::logic::descriptors {
 /////////////////////////////////////////////////
 const MachinaArchetype grab =
     MachinaArchetypeBuilder<GrabResult>{}
-        .Then(ChainDescriptorBuilder{}.Then(is_joint).Build(is_joint.GetName()),
-              &GrabResult::anchor)
+        .Then(is_joint_chain, &GrabResult::anchor)
         .AtLeastNOf(is_serial_chain_with_minimum_length_2, 2, &GrabResult::arms)
         .Build("Grab");
 

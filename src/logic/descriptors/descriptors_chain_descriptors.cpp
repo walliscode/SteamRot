@@ -30,4 +30,8 @@ ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n) {
 /////////////////////////////////////////////////
 const ChainDescriptor is_serial_chain_with_minimum_length_2 =
     is_serial_chain_with_minimum_length_n(2);
+
+/////////////////////////////////////////////////
+const ChainDescriptor is_joint_chain =
+    ChainDescriptorBuilder{}.Then(is_joint).Build(is_joint.GetName());
 } // namespace steamrot::logic::descriptors

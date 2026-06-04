@@ -51,12 +51,12 @@ TEST_CASE("MachinaArchetype Grab tests") {
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 0, "j0")
-            .ScopeBegin(is_joint.GetName(), ScopeKind::Chain, 1, "j0")
+            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
             .NodeEval("j0", is_joint.GetName(), 2)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 2)
-            .ScopeEnd(is_joint.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint.GetName(), 1)
+            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain.GetName(), 1)
             .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
                                false, 0)
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
@@ -89,12 +89,12 @@ TEST_CASE("MachinaArchetype Grab tests") {
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .ScopeBegin(grab.GetName(), ScopeKind::MachinaArchetype, 0, "j0")
-            .ScopeBegin(is_joint.GetName(), ScopeKind::Chain, 1, "j0")
+            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
             .NodeEval("j0", is_joint.GetName(), 2)
             .NodeResult("j0", is_joint.GetName(), true,
                         "node holds JointInstance", 2)
-            .ScopeEnd(is_joint.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint.GetName(), true, 0)
+            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain.GetName(), true, 0)
             .ScopeBegin(is_serial_chain_with_minimum_length_2.GetName(),
                         ScopeKind::Chain, 1, "f0")
             .NodeEval("f0", is_serial.GetName(), 2)

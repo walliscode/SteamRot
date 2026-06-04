@@ -37,4 +37,12 @@ ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n);
 /// nodes
 /////////////////////////////////////////////////
 extern const ChainDescriptor is_serial_chain_with_minimum_length_2;
+
+/////////////////////////////////////////////////
+/// @brief ChainDescriptor that checks whether a node is a JointInstance
+///
+/// Wraps the @p is_joint NodeDescriptor in a chain scope, emitting
+/// ScopeBegin/ScopeEnd trace events for consistent trace output.
+/////////////////////////////////////////////////
+extern const ChainDescriptor is_joint_chain;
 } // namespace steamrot::logic::descriptors
