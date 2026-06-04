@@ -77,6 +77,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
         steamrot::tests::PartGraphBuilder{}
             .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
             .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .Connect("j0", 0, "f0", 0) // j0.socket[0] ↔ f0.socket[0]
             .Build();
     // test predicate
     MachinaArchetypeResult result =
@@ -92,6 +93,9 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .MachinaPartResult(is_joint.GetName(), true, 0)
             .ScopeBegin(is_serial_chain_with_minimum_length_2.GetName(),
                         ScopeKind::Chain, 1, "f0")
+            .NodeEval("f0", is_serial.GetName(), 2)
+            .NodeResult("f0", is_serial.GetName(), false,
+                        "connection_count=1, expected==2", 2)
             .ScopeEnd(is_serial_chain_with_minimum_length_2.GetName(),
                       ScopeKind::Chain, false, 2)
             .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),

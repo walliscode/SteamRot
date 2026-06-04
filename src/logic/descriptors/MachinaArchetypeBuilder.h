@@ -169,27 +169,42 @@ private:
             step.result_storage))
       return false;
 
+    // count matches and store valid subgraphs in the result vector
     size_t matches_found = 0;
     std::vector<SubGraph> &result_vector =
         typed_result.*std::get<std::vector<SubGraph> T::*>(step.result_storage);
 
+    // iterate over all connected neighbours and apply the descriptor to each
+    // one;
     for (const auto &[socket_id, socket_data] : sockets) {
       (void)socket_id;
-      if (!socket_data.connected_to.has_value())
-        continue;
 
+      // if the socket isn't connected, skip it
+      if (!socket_data.connected_to.has_value()) {
+        continue;
+      }
+
+      // extract neighbour ID and apply descriptor
       const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
       ChainDescriptorResult step_result =
           step.descriptor(parts, neighbour_id, depth + 1);
+
+      // merge trace to parent context
       Merge(context.trace, std::move(step_result.m_trace));
 
+      // if the descriptor matched and the result includes a valid subgraph, add
+      // it to the result vector and increment the match count
       if (step_result && step_result.valid_subgraph.has_value()) {
         result_vector.push_back(*step_result.valid_subgraph);
         matches_found++;
       }
     }
 
+    // step succeeds if the number of matches found meets the minimum
+    // repetitions
     const bool step_succeeded = matches_found >= step.min_repetitions;
+
+    // add event for step result
     add_machina_part_result_event(context, step.descriptor.GetName(),
                                   step_succeeded, depth);
     return step_succeeded;
@@ -248,6 +263,11 @@ private:
       }
 
       result.m_result = result.m_result && step_succeeded;
+
+      // if any step fails, we can short-circuit and end the archetype
+      // evaluation if (!step_succeeded) {
+      //   break;
+      // }
     }
 
     add_scope_end_event(context, archetype_name, ScopeKind::MachinaArchetype,
