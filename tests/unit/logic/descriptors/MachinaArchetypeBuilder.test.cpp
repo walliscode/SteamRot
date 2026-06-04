@@ -173,3 +173,33 @@ TEST_CASE(
                steamrot::tests::EqualsTrace(expected_trace,
                                             TerminalDescriptorFormatter{}));
 }
+
+TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
+          "[MachinaArchetypeBuilder]") {
+  const ChainDescriptor inner_chain =
+      ChainDescriptorBuilder{}.Then(is_joint).Build("inner_chain");
+  const MachinaArchetype archetype =
+      MachinaArchetypeBuilder<TestArchetypeResult>{}
+          .AtLeastNOf(inner_chain, 1, &TestArchetypeResult::chains)
+          .Build("outer_archetype");
+
+  const steamrot::tests::PartGraphPackage pkg =
+      steamrot::tests::PartGraphBuilder{}
+          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+          .Build();
+
+  const AnalysisTrace expected_trace =
+      steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+          .ScopeBegin("outer_archetype", ScopeKind::MachinaArchetype, 0, "j0")
+          .MachinaPartResult("inner_chain", false, 0)
+          .ScopeEnd("outer_archetype", ScopeKind::MachinaArchetype, false, 0)
+          .Build();
+
+  const MachinaArchetypeResult result =
+      archetype(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+
+  REQUIRE_FALSE(result);
+  REQUIRE_THAT(result.m_trace,
+               steamrot::tests::EqualsTrace(expected_trace,
+                                            TerminalDescriptorFormatter{}));
+}

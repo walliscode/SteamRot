@@ -189,7 +189,10 @@ private:
       }
     }
 
-    return matches_found >= step.min_repetitions;
+    const bool step_succeeded = matches_found >= step.min_repetitions;
+    add_machina_part_result_event(context, step.descriptor.GetName(),
+                                  step_succeeded, depth);
+    return step_succeeded;
   }
 
   static MachinaArchetypeResult
