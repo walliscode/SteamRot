@@ -75,7 +75,7 @@ Prefer the narrowest descriptor level that answers the question.
 | `src/types/logic/AnalysisEvent.h`                                    | `TraceEventKind`, `ScopeKind`, `AnalysisEvent`, `AnalysisTrace`, `Merge()`                                      |
 | `src/types/logic/DescriptorResult.h`                                 | `DescriptorResult`, `NodeDescriptorResult`, `ChainDescriptorResult`                                             |
 | `src/logic/descriptors/descriptors_node_descriptors.h/.cpp`          | `NodeDescriptor` and concrete node predicates                                                                   |
-| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp`         | `ChainDescriptor`, `lift_to_chain`, concrete chain predicates                                                   |
+| `src/logic/descriptors/descriptors_chain_descriptors.h/.cpp`         | `ChainDescriptor` and concrete chain predicates                                                                 |
 | `src/logic/descriptors/descriptors_general.h`                        | `and_`, `or_`, `not_` combinators                                                                               |
 | `src/logic/descriptors/ChainDescriptorBuilder.h/.cpp`                | `ChainDescriptorBuilder`                                                                                        |
 | `src/logic/descriptors/DescriptorFormatter.h`                        | Base trace formatter                                                                                            |
@@ -154,21 +154,21 @@ const ChainDescriptor my_chain = ChainDescriptorBuilder{}
     .value();
 ```
 
-If you only need to reuse node logic at the anchor node, convert it with
-`lift_to_chain()`:
+If you only need to run node logic on the anchor node with chain trace wrapping,
+use a single-step `ChainDescriptorBuilder`:
 
 ```cpp
-ChainDescriptor terminal_anchor = lift_to_chain(is_terminal);
+ChainDescriptor terminal_anchor =
+    ChainDescriptorBuilder{}.Then(is_terminal).Build("is_terminal");
 ```
 
 ## Composing Descriptors
 
-| Operation           | Input → Output                     | Purpose                                    |
-| ------------------- | ---------------------------------- | ------------------------------------------ |
-| `lift_to_chain(nd)` | `NodeDescriptor → ChainDescriptor` | Reuse node logic inside a chain descriptor |
-| `and_(a, b)`        | `Desc × Desc → Desc`               | Both must be true                          |
-| `or_(a, b)`         | `Desc × Desc → Desc`               | Either may be true                         |
-| `not_(a)`           | `Desc → Desc`                      | Negate a descriptor                        |
+| Operation    | Input → Output       | Purpose               |
+| ------------ | -------------------- | --------------------- |
+| `and_(a, b)` | `Desc × Desc → Desc` | Both must be true     |
+| `or_(a, b)`  | `Desc × Desc → Desc` | Either may be true    |
+| `not_(a)`    | `Desc → Desc`        | Negate a descriptor   |
 
 `and_`, `or_`, and `not_` only combine descriptors of the same level.
 

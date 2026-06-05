@@ -223,6 +223,98 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
   }
 }
 
+TEST_CASE("ChainDescriptor is_joint_chain tests") {
+  using namespace steamrot::logic::descriptors;
+
+  // some general assertions about the descriptor instance
+  REQUIRE(is_joint_chain.GetName() == "is_joint");
+
+  SECTION("is_joint_chain returns false with empty part graph") {
+    steamrot::PartGraph empty_graph;
+    ChainDescriptorResult result = is_joint_chain(empty_graph, 0);
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{{}}.EmptyPartGraph().Build();
+
+    REQUIRE_FALSE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("is_joint_chain returns true for a joint node") {
+    const steamrot::tests::PartGraphPackage pkg =
+        steamrot::tests::PartGraphBuilder{}
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .Build();
+
+    ChainDescriptorResult result =
+        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"));
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 0, "j0")
+            .NodeEval("j0", is_joint.GetName(), 1)
+            .NodeResult("j0", is_joint.GetName(), true,
+                        "node holds JointInstance", 1)
+            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 0)
+            .Build();
+
+    REQUIRE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("is_joint_chain returns false for a fragment node") {
+    const steamrot::tests::PartGraphPackage pkg =
+        steamrot::tests::PartGraphBuilder{}
+            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .Build();
+
+    ChainDescriptorResult result =
+        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("f0"));
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 0, "f0")
+            .NodeEval("f0", is_joint.GetName(), 1)
+            .NodeResult("f0", is_joint.GetName(), false,
+                        "node holds FragmentInstance", 1)
+            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, false, 0)
+            .Build();
+
+    REQUIRE_FALSE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("is_joint_chain offsets trace depth when requested") {
+    const steamrot::tests::PartGraphPackage pkg =
+        steamrot::tests::PartGraphBuilder{}
+            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .Build();
+
+    ChainDescriptorResult result =
+        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 2);
+
+    AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 2, "j0")
+            .NodeEval("j0", is_joint.GetName(), 3)
+            .NodeResult("j0", is_joint.GetName(), true,
+                        "node holds JointInstance", 3)
+            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 2)
+            .Build();
+
+    REQUIRE(result);
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+}
+
 TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
   using namespace steamrot::logic::descriptors;
 

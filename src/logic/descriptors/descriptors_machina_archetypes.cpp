@@ -17,7 +17,7 @@ namespace steamrot::logic::descriptors {
 /////////////////////////////////////////////////
 const MachinaArchetype grab =
     MachinaArchetypeBuilder<GrabResult>{}
-        .Then(lift_to_chain(is_joint), &GrabResult::anchor)
+        .Then(is_joint_chain, &GrabResult::anchor)
         .AtLeastNOf(is_serial_chain_with_minimum_length_2, 2, &GrabResult::arms)
         .Build("Grab");
 
