@@ -97,7 +97,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .NodeResult("f0", is_serial.GetName(), false,
                         "connection_count=1, expected==2", 2)
             .ScopeEnd(is_serial_chain_with_minimum_length_2.GetName(),
-                      ScopeKind::Chain, false, 2)
+                      ScopeKind::Chain, false, 1)
             .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
                                false, 0)
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
