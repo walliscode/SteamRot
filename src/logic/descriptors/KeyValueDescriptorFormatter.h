@@ -1,0 +1,34 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of KeyValueDescriptorFormatter.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include "DescriptorFormatter.h"
+
+namespace steamrot::logic::descriptors {
+
+/////////////////////////////////////////////////
+/// @class KeyValueDescriptorFormatter
+/// @brief Formats an @c AnalysisTrace as event blocks with labelled key-value
+///        fields.
+/////////////////////////////////////////////////
+class KeyValueDescriptorFormatter : public DescriptorFormatter {
+public:
+  /////////////////////////////////////////////////
+  /// @brief Render @p trace as event-oriented key-value blocks.
+  ///
+  /// @param trace The analysis trace to format.
+  /// @return Newline-terminated string containing one block per event.
+  /////////////////////////////////////////////////
+  std::string Format(const AnalysisTrace &trace) const override;
+};
+
+} // namespace steamrot::logic::descriptors

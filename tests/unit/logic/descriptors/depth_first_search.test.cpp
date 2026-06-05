@@ -13,7 +13,7 @@
 #include "depth_first_search.h"
 #include "AnalysisTraceBuilder.h"
 #include "PartGraphBuilder.h"
-#include "TerminalDescriptorFormatter.h"
+#include "KeyValueDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include "part_graph_library.h"
@@ -241,7 +241,7 @@ TEST_CASE(
 
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION(
@@ -276,7 +276,7 @@ TEST_CASE(
 
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 }
 
@@ -341,7 +341,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
 
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
@@ -377,7 +377,7 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
 
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 }
 

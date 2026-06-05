@@ -11,7 +11,7 @@
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
 #include "PartGraphBuilder.h"
-#include "TerminalDescriptorFormatter.h"
+#include "KeyValueDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include <catch2/catch_test_macros.hpp>
@@ -171,7 +171,7 @@ TEST_CASE(
   REQUIRE(result);
   REQUIRE_THAT(result.m_trace,
                steamrot::tests::EqualsTrace(expected_trace,
-                                            TerminalDescriptorFormatter{}));
+                                            KeyValueDescriptorFormatter{}));
 }
 
 TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
@@ -201,5 +201,5 @@ TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
   REQUIRE_FALSE(result);
   REQUIRE_THAT(result.m_trace,
                steamrot::tests::EqualsTrace(expected_trace,
-                                            TerminalDescriptorFormatter{}));
+                                            KeyValueDescriptorFormatter{}));
 }

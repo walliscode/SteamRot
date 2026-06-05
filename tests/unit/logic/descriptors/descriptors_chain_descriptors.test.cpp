@@ -11,7 +11,7 @@
 #include "AnalysisTraceBuilder.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
-#include "TerminalDescriptorFormatter.h"
+#include "KeyValueDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include "part_graph_library.h"
@@ -44,7 +44,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain evaluates IsolatedPair") {
@@ -69,7 +69,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain offsets trace depth when requested") {
@@ -91,7 +91,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain evaluates LinearChain") {
@@ -146,7 +146,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
     REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 0});
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain evalutes serial chain that is 5 parts long") {
@@ -187,7 +187,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
       REQUIRE_FALSE(result.valid_subgraph.has_value());
       REQUIRE_THAT(result.m_trace,
                    steamrot::tests::EqualsTrace(expected_trace,
-                                                TerminalDescriptorFormatter{}));
+                                                KeyValueDescriptorFormatter{}));
     }
 
     SECTION("is_serial_chain evalutes from node j0") {
@@ -215,7 +215,7 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
       // assert result/
       REQUIRE_THAT(result.m_trace,
                    steamrot::tests::EqualsTrace(expected_trace,
-                                                TerminalDescriptorFormatter{}));
+                                                KeyValueDescriptorFormatter{}));
       REQUIRE(result);
       REQUIRE(result.valid_subgraph.has_value());
       REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{3, 0});
@@ -244,7 +244,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain_with_minimum_length_2 evalutes a chain that is one "
@@ -273,7 +273,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
     REQUIRE_FALSE(result);
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
   }
 
   SECTION("is_serial_chain_with_minimum_length_2 evalutes a chain that is three"
@@ -319,7 +319,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
     REQUIRE_FALSE(result);
   }
 
@@ -386,7 +386,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
     REQUIRE(result);
     REQUIRE(result.valid_subgraph.has_value());
     REQUIRE(result.valid_subgraph.value() ==

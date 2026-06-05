@@ -10,7 +10,7 @@
 #include "AnalysisEvent.h"
 #include "AnalysisTraceBuilder.h"
 #include "PartGraphBuilder.h"
-#include "TerminalDescriptorFormatter.h"
+#include "KeyValueDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_chain_descriptors.h"
 #include "descriptors_node_descriptors.h"
@@ -35,7 +35,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
     REQUIRE_FALSE(result);
   }
 
@@ -67,7 +67,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
     REQUIRE_FALSE(result);
   }
 
@@ -105,7 +105,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // assert result
     REQUIRE_THAT(result.m_trace,
                  steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
+                                              KeyValueDescriptorFormatter{}));
     REQUIRE_FALSE(result);
   }
 }

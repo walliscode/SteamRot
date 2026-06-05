@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////
 #include "AnalysisTraceBuilder.h"
 #include "PartGraphBuilder.h"
-#include "TerminalDescriptorFormatter.h"
+#include "KeyValueDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include "part_graph_library.h"
@@ -25,7 +25,7 @@ namespace descriptors = steamrot::logic::descriptors;
 namespace tests = steamrot::tests;
 
 namespace {
-const descriptors::TerminalDescriptorFormatter kFmt{};
+const descriptors::KeyValueDescriptorFormatter kFmt{};
 } // namespace
 
 /////////////////////////////////////////////////

@@ -23,13 +23,6 @@ collision_grimoire_machina.test.cpp
 # pixel_render.test.cpp
 
 # descriptors tests
-descriptors/descriptors_node_descriptors.test.cpp
-descriptors/descriptors_chain_descriptors.test.cpp
-descriptors/descriptors_machina_archetypes.test.cpp
-descriptors/descriptors_analysis_event_helpers.test.cpp
-descriptors/ChainDescriptorBuilder.test.cpp
-descriptors/depth_first_search.test.cpp
-descriptors/MachinaArchetypeBuilder.test.cpp
 )
 
 target_include_directories(test_logic

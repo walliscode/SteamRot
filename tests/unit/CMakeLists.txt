@@ -3,6 +3,7 @@
 add_subdirectory(assets)
 add_subdirectory(data_providers)
 # add_subdirectory(display)
+add_subdirectory(descriptors)
 add_subdirectory(entity)
 add_subdirectory(harness)
 add_subdirectory(events)

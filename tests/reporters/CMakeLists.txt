@@ -3,6 +3,7 @@
 
 
 add_library(reporters_objects OBJECT
+  DescriptorReporter.cpp
   HarnessReporter.cpp
 )
 
