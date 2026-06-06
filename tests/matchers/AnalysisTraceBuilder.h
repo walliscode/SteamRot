@@ -94,11 +94,14 @@ public:
   ///
   /// @param part_id_alias   User-friendly string alias for the part ID.
   /// @param predicate_name  Name of the predicate applied to the node.
+  /// @param result          Outcome of the predicate.
+  /// @param reason          Human-readable explanation of the outcome.
   /// @param depth           Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(const std::string &part_id_alias,
                                  std::string predicate_name, const bool result,
+                                 std::string reason = {},
                                  uint32_t depth = 0);
 
   /////////////////////////////////////////////////
@@ -143,12 +146,16 @@ public:
   ///
   /// @param part_id        Raw numeric part ID.
   /// @param predicate_name Name of the predicate applied to the node.
+  /// @param result         Outcome of the predicate.
+  /// @param reason         Human-readable explanation of the outcome.
   /// @param depth          Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEvalById(uint32_t part_id,
                                      std::string predicate_name,
-                                     const bool result, uint32_t depth = 0);
+                                     const bool result,
+                                     std::string reason = {},
+                                     uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append an event indicating success in assigning a valid subgraph to

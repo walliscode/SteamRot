@@ -31,7 +31,8 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
     result = m_fn(parts, id);
   }
   AnalysisEvent eval_event =
-      make_node_eval_event(depth, id, m_name, parts, static_cast<bool>(result));
+      make_node_eval_event(depth, id, m_name, parts, static_cast<bool>(result),
+                           result.m_reason);
 
   result.m_trace.push_back(std::move(eval_event));
 

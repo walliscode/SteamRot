@@ -101,22 +101,26 @@ inline AnalysisEvent make_scope_end_event(std::string scope_name,
 
 inline AnalysisEvent make_node_eval_event(uint32_t depth, uint32_t part_id,
                                           std::string predicate_name,
-                                          const bool result) {
+                                          const bool result,
+                                          std::string reason = {}) {
   AnalysisEvent event{};
   event.kind = TraceEventKind::NodeEval;
   event.depth = depth;
   event.part_id = part_id;
   event.predicate_name = std::move(predicate_name);
   event.result = result;
+  event.reason = std::move(reason);
   return event;
 }
 
 inline AnalysisEvent make_node_eval_event(uint32_t depth, uint32_t part_id,
                                           std::string predicate_name,
                                           const PartGraph &parts,
-                                          const bool result) {
-  AnalysisEvent event =
-      make_node_eval_event(depth, part_id, std::move(predicate_name), result);
+                                          const bool result,
+                                          std::string reason = {}) {
+  AnalysisEvent event = make_node_eval_event(depth, part_id,
+                                             std::move(predicate_name), result,
+                                             std::move(reason));
   event.part_id_alias = detail::resolve_part_alias(parts, part_id);
   return event;
 }
