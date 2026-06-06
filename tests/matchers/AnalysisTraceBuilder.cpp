@@ -61,8 +61,8 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeEvalById(uint32_t part_id, std::string predicate_name,
-                                   const bool result, std::string reason,
-                                   uint32_t depth) {
+                                   const bool result, uint32_t depth,
+                                   std::string reason) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
   ev.depth = depth;
@@ -78,8 +78,7 @@ AnalysisTraceBuilder::NodeEvalById(uint32_t part_id, std::string predicate_name,
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
                                std::string predicate_name, const bool result,
-                               std::string reason,
-                               uint32_t depth) {
+                               uint32_t depth, std::string reason) {
 
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;

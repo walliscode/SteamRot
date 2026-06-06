@@ -229,9 +229,9 @@ TEST_CASE(
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", true, 1)
+            .NodeEval("j0", "is_serial", true, 1, "connection_count=2, expected==2")
             .MovingToNeighbour("j0", 0, "f0", 1, 1)
-            .NodeEval("f0", "is_serial", true, 2)
+            .NodeEval("f0", "is_serial", true, 2, "connection_count=2, expected==2")
             .Backtracking("f0", 1, "j0", 0, 1)
             .Build();
 
@@ -257,10 +257,10 @@ TEST_CASE(
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", true, 1)
+            .NodeEval("j0", "is_serial", true, 1, "connection_count=2, expected==2")
             .MovingToNeighbour("j0", 0, "f0", 1, 1)
-            .NodeEval("f0", "is_serial", true, 2)
-            .NodeEval("f0", "is_terminal", true, 2)
+            .NodeEval("f0", "is_serial", true, 2, "connection_count=2, expected==2")
+            .NodeEval("f0", "is_terminal", true, 2, "connection_count=1, expected==1")
             .Backtracking("f0", 1, "j0", 0, 1)
             .Build();
 
@@ -306,15 +306,15 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", true, 1)
+            .NodeEval("j0", "is_serial", true, 1, "connection_count=2, expected==2")
             .MovingToNeighbour("j0", 0, "f0", 0, 1)
-            .NodeEval("f0", "is_serial", true, 2)
+            .NodeEval("f0", "is_serial", true, 2, "connection_count=2, expected==2")
             .Backtracking("f0", 0, "j0", 0, 1)
             .MovingToNeighbour("j0", 1, "j1", 0, 1)
-            .NodeEval("j1", "is_serial", true, 2)
+            .NodeEval("j1", "is_serial", true, 2, "connection_count=2, expected==2")
             .MovingToNeighbour("j1", 1, "f1", 0, 2)
-            .NodeEval("f1", "is_serial", true, 3)
-            .NodeEval("f1", "is_terminal", true, 3)
+            .NodeEval("f1", "is_serial", true, 3, "connection_count=2, expected==2")
+            .NodeEval("f1", "is_terminal", true, 3, "connection_count=1, expected==1")
             .Backtracking("f1", 0, "j1", 1, 2)
             .Backtracking("j1", 0, "j0", 1, 1)
             .Build();
@@ -335,14 +335,14 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", false, 1)
+            .NodeEval("j0", "is_serial", false, 1, "connection_count=1, expected==2")
             .MovingToNeighbour("j0", 0, "f0", 0, 1)
-            .NodeEval("f0", "is_serial", false, 2)
+            .NodeEval("f0", "is_serial", false, 2, "connection_count=1, expected==2")
             .Backtracking("f0", 0, "j0", 0, 1)
             .MovingToNeighbour("j0", 1, "j1", 0, 1)
-            .NodeEval("j1", "is_serial", false, 2)
+            .NodeEval("j1", "is_serial", false, 2, "connection_count=1, expected==2")
             .MovingToNeighbour("j1", 1, "f1", 0, 2)
-            .NodeEval("f1", "is_serial", false, 3)
+            .NodeEval("f1", "is_serial", false, 3, "connection_count=1, expected==2")
             .Backtracking("f1", 0, "j1", 1, 2)
             .Backtracking("j1", 0, "j0", 1, 1)
             .Build();
