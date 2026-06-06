@@ -157,9 +157,7 @@ TEST_CASE(
       steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
           .ScopeBegin("outer_archetype", ScopeKind::MachinaArchetype, 2, "j0")
           .ScopeBegin("inner_chain", ScopeKind::Chain, 3, "j0")
-          .NodeEval("j0", is_joint.GetName(), 4)
-          .NodeResult("j0", is_joint.GetName(), true,
-                      "node holds JointInstance", 4)
+          .NodeEval("j0", is_joint.GetName(), true, 4)
           .ScopeEnd("inner_chain", ScopeKind::Chain, true, 3)
           .MachinaPartResult("inner_chain", true, 2)
           .ScopeEnd("outer_archetype", ScopeKind::MachinaArchetype, true, 2)

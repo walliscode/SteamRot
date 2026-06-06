@@ -61,28 +61,13 @@ AnalysisTraceBuilder &AnalysisTraceBuilder::ScopeEnd(std::string name,
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeEvalById(uint32_t part_id, std::string predicate_name,
-                                   uint32_t depth) {
+                                   const bool result, uint32_t depth) {
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
   ev.depth = depth;
   ev.part_id = part_id;
   ev.predicate_name = std::move(predicate_name);
-  m_trace.push_back(std::move(ev));
-  return *this;
-}
-
-/////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResultById(uint32_t part_id,
-                                     std::string predicate_name, bool result,
-                                     std::string reason, uint32_t depth) {
-  AnalysisEvent ev{};
-  ev.kind = TraceEventKind::NodeResult;
-  ev.depth = depth;
-  ev.part_id = part_id;
-  ev.predicate_name = std::move(predicate_name);
   ev.result = result;
-  ev.reason = std::move(reason);
   m_trace.push_back(std::move(ev));
   return *this;
 }
@@ -90,7 +75,8 @@ AnalysisTraceBuilder::NodeResultById(uint32_t part_id,
 /////////////////////////////////////////////////
 AnalysisTraceBuilder &
 AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
-                               std::string predicate_name, uint32_t depth) {
+                               std::string predicate_name, const bool result,
+                               uint32_t depth) {
 
   AnalysisEvent ev{};
   ev.kind = TraceEventKind::NodeEval;
@@ -98,24 +84,7 @@ AnalysisTraceBuilder::NodeEval(const std::string &part_id_alias,
   ev.part_id = ResolvePartId(part_id_alias);
   ev.part_id_alias = part_id_alias;
   ev.predicate_name = std::move(predicate_name);
-  m_trace.push_back(std::move(ev));
-  return *this;
-}
-
-/////////////////////////////////////////////////
-AnalysisTraceBuilder &
-AnalysisTraceBuilder::NodeResult(const std::string &part_id_alias,
-                                 std::string predicate_name, bool result,
-                                 std::string reason, uint32_t depth) {
-
-  AnalysisEvent ev{};
-  ev.kind = TraceEventKind::NodeResult;
-  ev.depth = depth;
-  ev.part_id = ResolvePartId(part_id_alias);
-  ev.part_id_alias = part_id_alias;
-  ev.predicate_name = std::move(predicate_name);
   ev.result = result;
-  ev.reason = std::move(reason);
   m_trace.push_back(std::move(ev));
   return *this;
 }

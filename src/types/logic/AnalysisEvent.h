@@ -37,7 +37,6 @@ enum class TraceEventKind {
   EmtpyPartGraph,
   EmtpyChainSteps,
   NodeEval,
-  NodeResult,
   MovingToNeighbour,
   Backtracking,
   ScopeBegin,

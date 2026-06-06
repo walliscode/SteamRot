@@ -98,22 +98,8 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(const std::string &part_id_alias,
-                                 std::string predicate_name,
+                                 std::string predicate_name, const bool result,
                                  uint32_t depth = 0);
-
-  /////////////////////////////////////////////////
-  /// @brief Append a NodeResult event using a string part alias.
-  ///
-  /// @param part_id_alias   User-friendly string alias for the part ID.
-  /// @param predicate_name  Name of the predicate.
-  /// @param result          Outcome of the predicate evaluation.
-  /// @param reason          Human-readable explanation of the outcome.
-  /// @param depth           Nesting depth of this event.
-  /// @return Reference to this builder for method chaining.
-  /////////////////////////////////////////////////
-  AnalysisTraceBuilder &NodeResult(const std::string &part_id_alias,
-                                   std::string predicate_name, bool result,
-                                   std::string reason = {}, uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append a MovingToNeighbour event using string part aliases.
@@ -162,25 +148,7 @@ public:
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEvalById(uint32_t part_id,
                                      std::string predicate_name,
-                                     uint32_t depth = 0);
-
-  /////////////////////////////////////////////////
-  /// @brief Append a NodeResult event using a raw numeric part ID (no alias).
-  ///
-  /// Use this overload when the part does not exist in the PartGraph (e.g.
-  /// for missing-key error tests), so there is no alias to resolve.
-  ///
-  /// @param part_id        Raw numeric part ID.
-  /// @param predicate_name Name of the predicate.
-  /// @param result         Outcome of the predicate evaluation.
-  /// @param reason         Human-readable explanation of the outcome.
-  /// @param depth          Nesting depth of this event.
-  /// @return Reference to this builder for method chaining.
-  /////////////////////////////////////////////////
-  AnalysisTraceBuilder &NodeResultById(uint32_t part_id,
-                                       std::string predicate_name, bool result,
-                                       std::string reason = {},
-                                       uint32_t depth = 0);
+                                     const bool result, uint32_t depth = 0);
 
   /////////////////////////////////////////////////
   /// @brief Append an event indicating success in assigning a valid subgraph to
