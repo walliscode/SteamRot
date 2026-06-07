@@ -12,14 +12,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "descriptors_node_descriptors.h"
 #include "AnalysisTraceBuilder.h"
 #include "PartGraphBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
-#include "descriptors_node_descriptors.h"
 #include "part_graph_library.h"
 #include <catch2/catch_test_macros.hpp>
-#include <unordered_map>
 
 namespace descriptors = steamrot::logic::descriptors;
 namespace tests = steamrot::tests;
@@ -41,9 +40,8 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("f0", descriptors::is_fragment.GetName())
-            .NodeResult("f0", descriptors::is_fragment.GetName(), true,
-                        "node holds FragmentInstance")
+            .NodeEval("f0", descriptors::is_fragment.GetName(), true, 0,
+                      "node holds FragmentInstance")
             .Build();
 
     REQUIRE(result);
@@ -57,9 +55,8 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("j0", descriptors::is_fragment.GetName())
-            .NodeResult("j0", descriptors::is_fragment.GetName(), false,
-                        "node holds JointInstance")
+            .NodeEval("j0", descriptors::is_fragment.GetName(), false, 0,
+                      "node holds JointInstance")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -76,9 +73,8 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
     tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
     const descriptors::AnalysisTrace expected =
         builder
-            .NodeEvalById(kMissingId, descriptors::is_fragment.GetName())
-            .NodeResultById(kMissingId, descriptors::is_fragment.GetName(),
-                            false, "incorrect key: part_id=99")
+            .NodeEvalById(kMissingId, descriptors::is_fragment.GetName(), false,
+                          0, "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -99,9 +95,8 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("j0", descriptors::is_joint.GetName())
-            .NodeResult("j0", descriptors::is_joint.GetName(), true,
-                        "node holds JointInstance")
+            .NodeEval("j0", descriptors::is_joint.GetName(), true, 0,
+                      "node holds JointInstance")
             .Build();
 
     REQUIRE(result);
@@ -115,9 +110,8 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("f0", descriptors::is_joint.GetName())
-            .NodeResult("f0", descriptors::is_joint.GetName(), false,
-                        "node holds FragmentInstance")
+            .NodeEval("f0", descriptors::is_joint.GetName(), false, 0,
+                      "node holds FragmentInstance")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -133,10 +127,8 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
     // the numeric-ID overloads to match the actual trace formatting.
     tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
     const descriptors::AnalysisTrace expected =
-        builder
-            .NodeEvalById(kMissingId, descriptors::is_joint.GetName())
-            .NodeResultById(kMissingId, descriptors::is_joint.GetName(), false,
-                            "incorrect key: part_id=99")
+        builder.NodeEvalById(kMissingId, descriptors::is_joint.GetName(), false,
+                             0, "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -157,9 +149,8 @@ TEST_CASE("is_terminal", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("f0", descriptors::is_terminal.GetName())
-            .NodeResult("f0", descriptors::is_terminal.GetName(), true,
-                        "connection_count=1, expected==1")
+            .NodeEval("f0", descriptors::is_terminal.GetName(), true, 0,
+                      "connection_count=1, expected==1")
             .Build();
 
     REQUIRE(result);
@@ -173,9 +164,8 @@ TEST_CASE("is_terminal", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::linear_chain_3.id_to_part_graph_id}
-            .NodeEval("j0", descriptors::is_terminal.GetName())
-            .NodeResult("j0", descriptors::is_terminal.GetName(), false,
-                        "connection_count=2, expected==1")
+            .NodeEval("j0", descriptors::is_terminal.GetName(), false, 0,
+                      "connection_count=2, expected==1")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -196,9 +186,8 @@ TEST_CASE("is_serial", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::linear_chain_3.id_to_part_graph_id}
-            .NodeEval("j0", descriptors::is_serial.GetName())
-            .NodeResult("j0", descriptors::is_serial.GetName(), true,
-                        "connection_count=2, expected==2")
+            .NodeEval("j0", descriptors::is_serial.GetName(), true, 0,
+                      "connection_count=2, expected==2")
             .Build();
 
     REQUIRE(result);
@@ -212,9 +201,8 @@ TEST_CASE("is_serial", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
-            .NodeEval("f0", descriptors::is_serial.GetName())
-            .NodeResult("f0", descriptors::is_serial.GetName(), false,
-                        "connection_count=1, expected==2")
+            .NodeEval("f0", descriptors::is_serial.GetName(), false, 0,
+                      "connection_count=1, expected==2")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -247,9 +235,8 @@ TEST_CASE("is_branched", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", descriptors::is_branched.GetName())
-            .NodeResult("j0", descriptors::is_branched.GetName(), true,
-                        "connection_count=3, expected>=3")
+            .NodeEval("j0", descriptors::is_branched.GetName(), true, 0,
+                      "connection_count=3, expected>=3")
             .Build();
 
     REQUIRE(result);
@@ -263,9 +250,8 @@ TEST_CASE("is_branched", "[unit][logic][descriptors]") {
 
     const descriptors::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("f0", descriptors::is_branched.GetName())
-            .NodeResult("f0", descriptors::is_branched.GetName(), false,
-                        "connection_count=1, expected>=3")
+            .NodeEval("f0", descriptors::is_branched.GetName(), false, 0,
+                      "connection_count=1, expected>=3")
             .Build();
 
     REQUIRE_FALSE(result);

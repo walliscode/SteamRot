@@ -20,7 +20,7 @@ NodeDescriptor::NodeDescriptor(std::string name, FnType fn)
 NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
                                                 uint32_t id,
                                                 uint32_t depth) const {
-  AnalysisEvent eval_event = make_node_eval_event(depth, id, m_name, parts);
+
   const auto part_it = parts.find(id);
 
   NodeDescriptorResult result{};
@@ -30,13 +30,11 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
   } else {
     result = m_fn(parts, id);
   }
-
-  AnalysisEvent result_event = make_node_result_event(
-      depth, id, m_name, static_cast<bool>(result), result.m_reason,
-      eval_event.part_id_alias);
+  AnalysisEvent eval_event =
+      make_node_eval_event(depth, id, m_name, parts, static_cast<bool>(result),
+                           result.m_reason);
 
   result.m_trace.push_back(std::move(eval_event));
-  result.m_trace.push_back(std::move(result_event));
 
   return result;
 }

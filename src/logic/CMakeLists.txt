@@ -70,5 +70,6 @@ target_link_libraries(logic
   magic_enum
   context
   resources
+  conmat::conmat
 
 )

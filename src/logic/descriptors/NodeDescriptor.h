@@ -24,8 +24,8 @@ namespace steamrot::logic::descriptors {
 /// @c NodeDescriptorResult(const PartGraph&, uint32_t part_id)
 /// and a stable string name used in analysis traces.
 ///
-/// @c operator() calls the underlying function and records @c NodeEval and
-/// @c NodeResult trace events in the returned result.
+/// @c operator() calls the underlying function and records a @c NodeEval trace
+/// event in the returned result.
 ///
 /// Example:
 /// @code
@@ -65,8 +65,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Evaluate the predicate and record trace events.
   ///
-  /// Emits a @c NodeEval event before and a @c NodeResult event after
-  /// calling the underlying function. Both events carry @p depth so that
+  /// Emits a @c NodeEval event after calling the underlying function. The
+  /// event carries @p depth so that
   /// callers (e.g. the DFS in ChainDescriptorBuilder) can control nesting.
   ///
   /// @param parts The PartGraph to query.

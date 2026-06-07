@@ -214,8 +214,7 @@ Every descriptor evaluation populates an `AnalysisTrace` in the result's
 
 | `TraceEventKind`    | When emitted                 | Key fields                                               |
 | ------------------- | ---------------------------- | -------------------------------------------------------- |
-| `NodeEval`          | Before testing a predicate   | `depth`, `part_id`, `predicate_name`                     |
-| `NodeResult`        | After the predicate test     | `depth`, `part_id`, `predicate_name`, `result`, `reason` |
+| `NodeEval`          | Before testing a predicate   | `depth`, `part_id`, `predicate_name`, `result`, `reason` |
 | `MovingToNeighbour` | DFS traverses an edge        | `depth`, `from_id`, `to_id`, `socket_id`                 |
 | `Backtracking`      | DFS returns from a neighbour | `depth`, `from_id`                                       |
 | `ScopeBegin`        | Chain evaluation starts      | `depth=0`, `scope_name`, `scope_kind`, `anchor_id`       |

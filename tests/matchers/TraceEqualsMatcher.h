@@ -111,12 +111,9 @@ template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
     case TraceEventKind::NodeEval:
       return "AnalysisEvent{kind=NodeEval, part_id=" +
              std::to_string(event.part_id) + ", predicate=\"" +
-             event.predicate_name + "\"}";
-    case TraceEventKind::NodeResult:
-      return "AnalysisEvent{kind=NodeResult, part_id=" +
-             std::to_string(event.part_id) + ", predicate=\"" +
-             event.predicate_name +
-             "\", result=" + (event.result ? "true" : "false") + "}";
+             event.predicate_name + "\", result=" +
+             (event.result ? "true" : "false") + ", reason=\"" +
+             event.reason + "\"}";
     case TraceEventKind::MovingToNeighbour:
       return "AnalysisEvent{kind=MovingToNeighbour, from_id=" +
              std::to_string(event.from_id) +

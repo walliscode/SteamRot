@@ -37,7 +37,6 @@ enum class TraceEventKind {
   EmtpyPartGraph,
   EmtpyChainSteps,
   NodeEval,
-  NodeResult,
   MovingToNeighbour,
   Backtracking,
   ScopeBegin,
@@ -56,8 +55,7 @@ enum class TraceEventKind {
 ///
 /// | kind               | fields used |
 /// |--------------------|------------------------------------------------------|
-/// | NodeEval           | depth, part_id, predicate_name |
-/// | NodeResult         | depth, part_id, predicate_name, result, reason |
+/// | NodeEval           | depth, part_id, predicate_name, result, reason |
 /// | MovingToNeighbour  | depth, from_id, to_id, from_socket_id, to_socket_id |
 /// | Backtracking       | depth, from_id, to_id, from_socket_id, to_socket_id |
 /// | ScopeBegin         | depth, scope_name, scope_kind, anchor_id (optional) |
@@ -106,7 +104,7 @@ struct AnalysisEvent {
 
   /////////////////////////////////////////////////
   /// @brief Human-readable explanation of the predicate outcome.
-  /// Populated for NodeResult.
+  /// Populated for NodeEval.
   /////////////////////////////////////////////////
   std::string reason{};
 
