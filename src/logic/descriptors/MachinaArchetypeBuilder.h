@@ -50,7 +50,16 @@ enum class ArchetypeStepKind {
 };
 
 struct ArchetypeAnalysisContext {
+  /////////////////////////////////////////////////
+  /// @brief Vector of structured events produced during archetype evaluation
+  /////////////////////////////////////////////////
   AnalysisTrace trace;
+
+  /////////////////////////////////////////////////
+  /// @brief Set of part IDs visited during archetype evaluation, used to
+  /// prevent cycles
+  /////////////////////////////////////////////////
+  std::unordered_set<uint32_t> visited_nodes{};
 };
 
 /////////////////////////////////////////////////
@@ -136,12 +145,21 @@ private:
     if (!std::holds_alternative<SubGraph T::*>(step.result_storage)) {
       return false;
     }
+
+    // return early if the node has already been visited to prevent cycles
+    if (context.visited_nodes.contains(graph_cursor)) {
+      // could add some kind of detection event in the future
+      return false;
+    }
     SubGraph &result_field =
         typed_result.*std::get<SubGraph T::*>(step.result_storage);
 
     // analyise node with descriptor
     ChainDescriptorResult step_result =
-        step.descriptor(parts, graph_cursor, depth + 1);
+        step.descriptor(parts, graph_cursor, context.visited_nodes, depth + 1);
+
+    // mark node as visited
+    context.visited_nodes.insert(graph_cursor);
 
     // merge trace to parent context
     Merge(context.trace, std::move(step_result.m_trace));
@@ -186,8 +204,18 @@ private:
 
       // extract neighbour ID and apply descriptor
       const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
-      ChainDescriptorResult step_result =
-          step.descriptor(parts, neighbour_id, depth + 1);
+
+      // check if node has already been visited to prevent cycles; if so, skip
+      // it
+      if (context.visited_nodes.contains(neighbour_id)) {
+        // could add some kind of detection event in the future
+        continue;
+      }
+      ChainDescriptorResult step_result = step.descriptor(
+          parts, neighbour_id, context.visited_nodes, depth + 1);
+
+      // mark neighbour as visited
+      context.visited_nodes.insert(neighbour_id);
 
       // merge trace to parent context
       Merge(context.trace, std::move(step_result.m_trace));

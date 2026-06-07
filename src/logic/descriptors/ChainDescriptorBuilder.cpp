@@ -34,14 +34,15 @@ ChainDescriptor ChainDescriptorBuilder::Build(std::string name) {
 
   return ChainDescriptor{
       name,
-      [steps = std::move(steps), chain_name = std::move(name)](
-          const PartGraph &parts, uint32_t start_id,
-          uint32_t depth) -> ChainDescriptorResult {
+      [steps = std::move(steps),
+       chain_name = std::move(name)](const PartGraph &parts, uint32_t start_id,
+                                     std::unordered_set<uint32_t> visited,
+                                     uint32_t depth) -> ChainDescriptorResult {
         ChainDescriptorResult result{false};
 
         // create DFSContext to hold the trace and any other state we want to
         // pass
-        DFSContext context{steps};
+        DFSContext context{steps, visited};
 
         // Check for empty PartGraph
         if (parts.empty()) {

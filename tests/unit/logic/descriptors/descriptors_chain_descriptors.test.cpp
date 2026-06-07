@@ -17,6 +17,7 @@
 #include "part_graph_library.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 #include <vector>
 
 namespace {
@@ -34,7 +35,8 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
           "graph") {
     // test predicate
     steamrot::PartGraph empty_graph;
-    ChainDescriptorResult result = is_serial_chain(empty_graph, 0);
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_serial_chain(empty_graph, 0, visited);
 
     // build expected trace
     AnalysisTrace expected_trace =
@@ -51,8 +53,9 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
     // test predicate: node 0 (fragment, connection_count=1) fails is_serial
     const steamrot::PartGraph &parts = steamrot::tests::pair.part_graph;
 
+    std::unordered_set<uint32_t> visited;
     ChainDescriptorResult result = is_serial_chain(
-        parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"));
+        parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"), visited);
 
     // build expected trace
     AnalysisTrace expected_trace =
@@ -74,8 +77,9 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
   SECTION("is_serial_chain offsets trace depth when requested") {
     const steamrot::PartGraph &parts = steamrot::tests::pair.part_graph;
 
+    std::unordered_set<uint32_t> visited;
     ChainDescriptorResult result = is_serial_chain(
-        parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"), 3);
+        parts, steamrot::tests::pair.id_to_part_graph_id.at("f0"), visited, 3);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{
@@ -111,8 +115,9 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
 
     // feed the middle joint node of the LinearChain to prevent it failing
     // straight away on the first node; the joint has id=2
+    std::unordered_set<uint32_t> visited;
     ChainDescriptorResult result =
-        is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"));
+        is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"), visited);
 
     // build expected trace
     AnalysisTrace expected_trace =
@@ -174,8 +179,9 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
                         "connection_count=1, expected==2")
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, false, 0)
               .Build();
+      std::unordered_set<uint32_t> visited;
       ChainDescriptorResult result =
-          is_serial_chain(parts, pkg.id_to_part_graph_id.at("f0"));
+          is_serial_chain(parts, pkg.id_to_part_graph_id.at("f0"), visited);
       // assert result
       REQUIRE_FALSE(result);
       REQUIRE_FALSE(result.valid_subgraph.has_value());
@@ -201,8 +207,9 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
               .Backtracking("f0", 0, "j0", 0, 1)
               .ScopeEnd(is_serial_chain.GetName(), ScopeKind::Chain, true, 0)
               .Build();
+      std::unordered_set<uint32_t> visited;
       ChainDescriptorResult result =
-          is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"));
+          is_serial_chain(parts, pkg.id_to_part_graph_id.at("j0"), visited);
       // assert result/
       REQUIRE_THAT(result.m_trace,
                    steamrot::tests::EqualsTrace(expected_trace,
@@ -222,7 +229,8 @@ TEST_CASE("ChainDescriptor is_joint_chain tests") {
 
   SECTION("is_joint_chain returns false with empty part graph") {
     steamrot::PartGraph empty_graph;
-    ChainDescriptorResult result = is_joint_chain(empty_graph, 0);
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_joint_chain(empty_graph, 0, visited);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{{}}.EmptyPartGraph().Build();
@@ -239,8 +247,9 @@ TEST_CASE("ChainDescriptor is_joint_chain tests") {
             .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
             .Build();
 
-    ChainDescriptorResult result =
-        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"));
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_joint_chain(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), visited);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -262,8 +271,9 @@ TEST_CASE("ChainDescriptor is_joint_chain tests") {
             .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
             .Build();
 
-    ChainDescriptorResult result =
-        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("f0"));
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_joint_chain(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("f0"), visited);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -285,8 +295,9 @@ TEST_CASE("ChainDescriptor is_joint_chain tests") {
             .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
             .Build();
 
-    ChainDescriptorResult result =
-        is_joint_chain(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 2);
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_joint_chain(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), visited, 2);
 
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
@@ -303,20 +314,21 @@ TEST_CASE("ChainDescriptor is_joint_chain tests") {
   }
 }
 
-TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
+TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_3 tests") {
   using namespace steamrot::logic::descriptors;
 
   // some general assertions about the descriptor instance
-  REQUIRE(is_serial_chain_with_minimum_length_2.GetName() ==
-          "is_serial_chain_with_minimum_length_2");
+  REQUIRE(is_serial_chain_with_minimum_length_3.GetName() ==
+          "is_serial_chain_with_minimum_length_3");
 
   SECTION(
-      "is_serial_chain_with_minimum_length_2 returns result and correct trace "
+      "is_serial_chain_with_minimum_length_3 returns result and correct trace "
       "with empty part graph") {
     // test predicate
     steamrot::PartGraph empty_graph;
+    std::unordered_set<uint32_t> visited;
     ChainDescriptorResult result =
-        is_serial_chain_with_minimum_length_2(empty_graph, 0);
+        is_serial_chain_with_minimum_length_3(empty_graph, 0, visited);
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{{}}.EmptyPartGraph().Build();
@@ -327,7 +339,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
                                               TerminalDescriptorFormatter{}));
   }
 
-  SECTION("is_serial_chain_with_minimum_length_2 evalutes a chain that is one "
+  SECTION("is_serial_chain_with_minimum_length_3 evalutes a chain that is one "
           "node long") {
     // test predicate: node 0 (fragment, connection_count=1) fails is_serial
 
@@ -335,17 +347,18 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
         steamrot::tests::PartGraphBuilder{}
             .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
             .Build();
-    ChainDescriptorResult result = is_serial_chain_with_minimum_length_2(
-        pkg.part_graph, pkg.id_to_part_graph_id.at("f0"));
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_serial_chain_with_minimum_length_3(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("f0"), visited);
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{
             steamrot::tests::pair.id_to_part_graph_id}
-            .ScopeBegin("is_serial_chain_with_minimum_length_2",
+            .ScopeBegin("is_serial_chain_with_minimum_length_3",
                         ScopeKind::Chain, 0, "f0")
             .NodeEval("f0", "is_serial", false, 1,
                       "connection_count=0, expected==2")
-            .ScopeEnd("is_serial_chain_with_minimum_length_2", ScopeKind::Chain,
+            .ScopeEnd("is_serial_chain_with_minimum_length_3", ScopeKind::Chain,
                       false, 0)
             .Build();
     // assert result and trace
@@ -355,7 +368,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
                                               TerminalDescriptorFormatter{}));
   }
 
-  SECTION("is_serial_chain_with_minimum_length_2 evalutes a chain that is three"
+  SECTION("is_serial_chain_with_minimum_length_3 evalutes a chain that is three"
           "nodes long") {
     // test predicate: f0(id=0, terminal) ─ j0(id=1, serial) ─ f1(id=2,
     // terminal)
@@ -369,12 +382,13 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
             .Connect("f0", 0, "j0", 0) // f0.socket[0] ↔ j0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
             .Build();
-    ChainDescriptorResult result = is_serial_chain_with_minimum_length_2(
-        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"));
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_serial_chain_with_minimum_length_3(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), visited);
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin("is_serial_chain_with_minimum_length_2",
+            .ScopeBegin("is_serial_chain_with_minimum_length_3",
                         ScopeKind::Chain, 0, "j0")
             .NodeEval("j0", "is_serial", true, 1,
                       "connection_count=2, expected==2")
@@ -388,7 +402,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
             .NodeEval("f1", "is_serial", false, 2,
                       "connection_count=1, expected==2")
             .Backtracking("f1", 0, "j0", 1, 1)
-            .ScopeEnd("is_serial_chain_with_minimum_length_2", ScopeKind::Chain,
+            .ScopeEnd("is_serial_chain_with_minimum_length_3", ScopeKind::Chain,
                       false, 0)
             .Build();
 
@@ -399,7 +413,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
     REQUIRE_FALSE(result);
   }
 
-  SECTION("is_serial_chain_with_minimum_length_2 evaluates a chain that is 5 "
+  SECTION("is_serial_chain_with_minimum_length_3 evaluates a chain that is 5 "
           "nodes long") {
     // f0(id=0, terminal) ─ j0(id=3, serial) ─ f1(id=1, serial) ─ j1(id=4,
     // serial) ─ f2(id=2, terminal)
@@ -419,13 +433,14 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
             .Connect("f1", 1, "j1", 0) // f1.socket[1] ↔ j1.socket[0]
             .Connect("j1", 1, "f2", 0) // j1.socket[1] ↔ f2.socket[0]
             .Build();
-    ChainDescriptorResult result = is_serial_chain_with_minimum_length_2(
-        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"));
+    std::unordered_set<uint32_t> visited;
+    ChainDescriptorResult result = is_serial_chain_with_minimum_length_3(
+        pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), visited);
 
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin("is_serial_chain_with_minimum_length_2",
+            .ScopeBegin("is_serial_chain_with_minimum_length_3",
                         ScopeKind::Chain, 0, "j0")
             .NodeEval("j0", "is_serial", true, 1,
                       "connection_count=2, expected==2")
@@ -449,7 +464,7 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_2 tests") {
             .Backtracking("f2", 0, "j1", 1, 3)
             .Backtracking("j1", 0, "f1", 1, 2)
             .Backtracking("f1", 0, "j0", 1, 1)
-            .ScopeEnd("is_serial_chain_with_minimum_length_2", ScopeKind::Chain,
+            .ScopeEnd("is_serial_chain_with_minimum_length_3", ScopeKind::Chain,
                       true, 0)
             .Build();
 

@@ -36,7 +36,7 @@ ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n);
 /// @brief ChainDescriptor that checks whether a serial chain of at least 2
 /// nodes
 /////////////////////////////////////////////////
-extern const ChainDescriptor is_serial_chain_with_minimum_length_2;
+extern const ChainDescriptor is_serial_chain_with_minimum_length_3;
 
 /////////////////////////////////////////////////
 /// @brief ChainDescriptor that checks whether a node is a JointInstance

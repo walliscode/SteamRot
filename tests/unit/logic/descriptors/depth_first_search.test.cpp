@@ -41,6 +41,7 @@ ChainStep make_step(NodeDescriptor predicate, ChainStepKind kind,
 /////////////////////////////////////////////////
 ChainDescriptorResult run_dfs(uint32_t start_id, std::vector<ChainStep> steps,
                               const steamrot::PartGraph &parts) {
+
   DFSContext context{steps};
   Cursor start{};
   start.current_id = start_id;

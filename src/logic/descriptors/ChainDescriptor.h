@@ -15,6 +15,7 @@
 #include "MachinaFormScaffold.h"
 #include <cstdint>
 #include <functional>
+#include <unordered_set>
 
 namespace steamrot::logic::descriptors {
 
@@ -36,9 +37,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Underlying callable type.
   /////////////////////////////////////////////////
-  using FnType =
-      std::function<ChainDescriptorResult(const PartGraph &, uint32_t,
-                                          uint32_t)>;
+  using FnType = std::function<ChainDescriptorResult(
+      const PartGraph &, uint32_t, std::unordered_set<uint32_t>, uint32_t)>;
 
   ChainDescriptor() = default;
 
@@ -59,11 +59,14 @@ public:
   ///
   /// @param parts The PartGraph to query.
   /// @param id    Stable part ID of the anchor node.
+  /// @param visited copy of Set of part IDs already visited, this could be from
+  /// a MachinaArchetype
   /// @param depth Nesting depth used for chain-scope trace events.
   /////////////////////////////////////////////////
   ChainDescriptorResult operator()(const PartGraph &parts, uint32_t id,
+                                   std::unordered_set<uint32_t> visited = {},
                                    uint32_t depth = 0) const {
-    return m_fn(parts, id, depth);
+    return m_fn(parts, id, visited, depth);
   }
 
   /////////////////////////////////////////////////

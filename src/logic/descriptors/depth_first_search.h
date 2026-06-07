@@ -132,8 +132,25 @@ struct Cursor {
 /////////////////////////////////////////////////
 struct DFSContext {
 
-  DFSContext(std::vector<ChainStep> steps)
-      : steps(std::move(steps)), steps_end(this->steps.cend()) {}
+  /////////////////////////////////////////////////
+  /// @brief Ensure DFSContext is always constructed with the necessary state
+  /// and prevent default construction.
+  /////////////////////////////////////////////////
+  DFSContext() = delete;
+
+  /////////////////////////////////////////////////
+  /// @brief Construct a DFSContext with the given walk pattern steps and
+  /// visited set reference.
+  ///
+  /// @param steps Walk pattern steps generated from the builder, governing the
+  /// walk pattern of the DFS.
+  /// @param visited Visited set reference to track part IDs already on the
+  /// current path (cycle guard).
+  /////////////////////////////////////////////////
+  DFSContext(std::vector<ChainStep> steps,
+             std::unordered_set<uint32_t> visited = {})
+      : steps(std::move(steps)), steps_end(this->steps.cend()),
+        visited(visited) {}
 
   /////////////////////////////////////////////////
   /// @brief Steps generated from the builder, governing the walk pattern of the
@@ -149,7 +166,7 @@ struct DFSContext {
   /////////////////////////////////////////////////
   /// @brief Part IDs already on the current path (cycle guard).
   /////////////////////////////////////////////////
-  std::unordered_set<uint32_t> visited;
+  std::unordered_set<uint32_t> visited{};
 
   /////////////////////////////////////////////////
   /// @brief Ordered part IDs forming the current candidate subgraph path.
