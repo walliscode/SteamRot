@@ -83,27 +83,68 @@ void TerminalDescriptorFormatter::AddNodeEval(std::string &indented_string,
                                               const uint32_t depth) const {
   const std::string node_label =
       ev.part_id_alias.empty() ? std::to_string(ev.part_id) : ev.part_id_alias;
-  indented_string += "[NODE EVAL]";
+  indented_string += "[";
+  indented_string += conmat::Colorize("NODE EVAL", conmat::Color::Yellow);
+  indented_string += "]";
   indented_string += "\n";
   indented_string += Indent(depth + 1);
-  indented_string += "node: " + node_label;
-  indented_string += "\n";
-  indented_string += Indent(depth + 1);
-  indented_string += "predicate: " + ev.predicate_name;
+  indented_string += conmat::Stylize("node: ", conmat::Style::Dim) + node_label;
   indented_string += "\n";
   indented_string += Indent(depth + 1);
   indented_string +=
-      "result: " +
+      conmat::Stylize("predicate: ", conmat::Style::Dim) + ev.predicate_name;
+  indented_string += "\n";
+  indented_string += Indent(depth + 1);
+  indented_string +=
+
+      conmat::Stylize("result: ", conmat::Style::Dim) +
       std::string(ev.result ? conmat::Colorize("PASS", conmat::Color::Green)
                             : conmat::Colorize("FAIL", conmat::Color::Red));
   indented_string += "\n";
   indented_string += Indent(depth + 1);
-  indented_string += "reason: \"" + ev.reason + "\"";
+  indented_string +=
+      conmat::Stylize("reason: ", conmat::Style::Dim) + ev.reason;
+}
+
+/////////////////////////////////////////////////
+void TerminalDescriptorFormatter::AddMovingToNeighbour(
+    std::string &indented_string, const AnalysisEvent &ev) const {
+  const std::string from_label = ev.from_id_alias.empty()
+                                     ? "node#" + std::to_string(ev.from_id)
+                                     : ev.from_id_alias;
+  const std::string to_label = ev.to_id_alias.empty()
+                                   ? "node#" + std::to_string(ev.to_id)
+                                   : ev.to_id_alias;
+  indented_string += "[";
+  indented_string += conmat::Colorize("MOVE", conmat::Color::Cyan);
+  indented_string += "]";
+  indented_string += Indent(1);
+  indented_string += FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
+                     FormatEndpoint(to_label, ev.to_socket_id);
+}
+
+/////////////////////////////////////////////////
+void TerminalDescriptorFormatter::AddBacktracking(
+    std::string &indented_string, const AnalysisEvent &ev) const {
+  const std::string from_label = ev.from_id_alias.empty()
+                                     ? "node#" + std::to_string(ev.from_id)
+                                     : ev.from_id_alias;
+  const std::string to_label = ev.to_id_alias.empty()
+                                   ? "node#" + std::to_string(ev.to_id)
+                                   : ev.to_id_alias;
+  indented_string += "[";
+  indented_string += conmat::Colorize("BACK", conmat::Color::Red);
+  indented_string += "]";
+  indented_string += Indent(1);
+  indented_string += FormatEndpoint(from_label, ev.from_socket_id) + " -> " +
+                     FormatEndpoint(to_label, ev.to_socket_id);
 }
 /////////////////////////////////////////////////
 /// @brief Format a node/socket endpoint label.
 /////////////////////////////////////////////////
-std::string FormatEndpoint(const std::string &node_label, uint32_t socket_id) {
+std::string
+TerminalDescriptorFormatter::FormatEndpoint(const std::string &node_label,
+                                            uint32_t socket_id) const {
   return node_label + ".socket#" + std::to_string(socket_id);
 }
 
@@ -146,25 +187,13 @@ TerminalDescriptorFormatter::FormatEvent(const AnalysisEvent &ev) const {
   }
 
   case TraceEventKind::MovingToNeighbour: {
-    const std::string from_label = ev.from_id_alias.empty()
-                                       ? "node#" + std::to_string(ev.from_id)
-                                       : ev.from_id_alias;
-    const std::string to_label = ev.to_id_alias.empty()
-                                     ? "node#" + std::to_string(ev.to_id)
-                                     : ev.to_id_alias;
-    return indent + "[MOVE]  " + FormatEndpoint(from_label, ev.from_socket_id) +
-           " -> " + FormatEndpoint(to_label, ev.to_socket_id);
+    AddMovingToNeighbour(indent, ev);
+    return indent;
   }
 
   case TraceEventKind::Backtracking: {
-    const std::string from_label = ev.from_id_alias.empty()
-                                       ? "node#" + std::to_string(ev.from_id)
-                                       : ev.from_id_alias;
-    const std::string to_label = ev.to_id_alias.empty()
-                                     ? "node#" + std::to_string(ev.to_id)
-                                     : ev.to_id_alias;
-    return indent + "[BACK]  " + FormatEndpoint(from_label, ev.from_socket_id) +
-           " -> " + FormatEndpoint(to_label, ev.to_socket_id);
+    AddBacktracking(indent, ev);
+    return indent;
   }
 
   case TraceEventKind::ValidSubgraphIsolated: {
@@ -174,10 +203,19 @@ TerminalDescriptorFormatter::FormatEvent(const AnalysisEvent &ev) const {
     return indent + "[FAIL]  invalid subgraph is isolated";
   }
   case TraceEventKind::MachinaPartResult: {
-    std::string line = indent;
-    line += ev.result ? "[PASS]" : "[FAIL]";
-    line +=
-        "  " + ev.predicate_name + " part assigned to archetype result field";
+    std::string line = Indent(ev.depth + 1);
+
+    if (ev.result) {
+      line += "[";
+      line += conmat::Colorize("ASSIGNMENT", conmat::Color::Green);
+      line += "]";
+      line += " part successfully assigned to archtype storage";
+    } else {
+      line += "[";
+      line += conmat::Colorize("ASSIGNMENT", conmat::Color::Red);
+      line += "]";
+      line += " part failed to be assigned to archetype storage";
+    }
     return line;
   }
 

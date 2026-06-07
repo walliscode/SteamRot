@@ -91,20 +91,16 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
             .NodeEval("j0", is_joint.GetName(), true, 2,
                       "node holds JointInstance")
-            .NodeResult("j0", is_joint.GetName(), true,
-                        "node holds JointInstance", 2)
             .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
             .MachinaPartResult(is_joint_chain.GetName(), true, 0)
             .ScopeBegin(is_serial_chain_with_minimum_length_2.GetName(),
                         ScopeKind::Chain, 1, "f0")
             .NodeEval("f0", is_serial.GetName(), false, 2,
                       "connection_count=1, expected==2")
-            .NodeResult("f0", is_serial.GetName(), false,
-                        "connection_count=1, expected==2", 2)
             .ScopeEnd(is_serial_chain_with_minimum_length_2.GetName(),
                       ScopeKind::Chain, false, 1)
-            // .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
-            //                    false, 0)
+            .MachinaPartResult(is_serial_chain_with_minimum_length_2.GetName(),
+                               false, 0)
             .ScopeEnd(grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
             .Build();
     // assert result
