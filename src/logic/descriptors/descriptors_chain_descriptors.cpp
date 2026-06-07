@@ -22,14 +22,15 @@ const ChainDescriptor is_serial_chain = ChainDescriptorBuilder{}
 /////////////////////////////////////////////////
 ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n) {
   return ChainDescriptorBuilder{}
-      .WhileIsTrueForMinimumN(is_serial, n)
+      // we make sure to account for the terminal node by using n-1
+      .WhileIsTrueForMinimumN(is_serial, n - 1)
       .Then(is_terminal)
       .Build("is_serial_chain_with_minimum_length_" + std::to_string(n));
 }
 
 /////////////////////////////////////////////////
-const ChainDescriptor is_serial_chain_with_minimum_length_2 =
-    is_serial_chain_with_minimum_length_n(2);
+const ChainDescriptor is_serial_chain_with_minimum_length_3 =
+    is_serial_chain_with_minimum_length_n(3);
 
 /////////////////////////////////////////////////
 const ChainDescriptor is_joint_chain =

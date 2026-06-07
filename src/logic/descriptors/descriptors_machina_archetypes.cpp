@@ -10,15 +10,14 @@
 #include "DescriptorResult.h"
 #include "MachinaArchetypeBuilder.h"
 #include "descriptors_chain_descriptors.h"
-#include "descriptors_node_descriptors.h"
 
-namespace steamrot::logic::descriptors {
+namespace steamrot::logic::descriptors::MA {
 
 /////////////////////////////////////////////////
-const MachinaArchetype grab =
+const MachinaArchetype Grab =
     MachinaArchetypeBuilder<GrabResult>{}
         .Then(is_joint_chain, &GrabResult::anchor)
-        .AtLeastNOf(is_serial_chain_with_minimum_length_2, 2, &GrabResult::arms)
+        .AtLeastNOf(is_serial_chain_with_minimum_length_3, 2, &GrabResult::arms)
         .Build("Grab");
 
-} // namespace steamrot::logic::descriptors
+} // namespace steamrot::logic::descriptors::MA

@@ -14,11 +14,11 @@
 /////////////////////////////////////////////////
 #include "MachinaArchetype.h"
 
-namespace steamrot::logic::descriptors {
+namespace steamrot::logic::descriptors::MA {
 
 /////////////////////////////////////////////////
 /// @brief Evaluates whether a PartGraph contains a grab archetype
 /////////////////////////////////////////////////
-extern const MachinaArchetype grab;
+extern const MachinaArchetype Grab;
 
-} // namespace steamrot::logic::descriptors
+} // namespace steamrot::logic::descriptors::MA
