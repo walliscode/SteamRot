@@ -142,7 +142,7 @@ TEST_CASE(
     "MachinaArchetypeBuilder passes depth through nested chain descriptors",
     "[MachinaArchetypeBuilder]") {
   const ChainDescriptor inner_chain =
-      ChainDescriptorBuilder{}.Then(is_joint).Build("inner_chain");
+      ChainDescriptorBuilder{}.Then(is_joint()).Build("inner_chain");
   const MachinaArchetype archetype =
       MachinaArchetypeBuilder<TestArchetypeResult>{}
           .Then(inner_chain, &TestArchetypeResult::chain1)
@@ -157,7 +157,7 @@ TEST_CASE(
       steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
           .ScopeBegin("outer_archetype", ScopeKind::MachinaArchetype, 2, "j0")
           .ScopeBegin("inner_chain", ScopeKind::Chain, 3, "j0")
-          .NodeEval("j0", is_joint.GetName(), true, 4,
+          .NodeEval("j0", is_joint().GetName(), true, 4,
                     "node holds JointInstance")
           .ScopeEnd("inner_chain", ScopeKind::Chain, true, 3)
           .MachinaPartResult("inner_chain", true, 2)
@@ -176,7 +176,7 @@ TEST_CASE(
 TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
           "[MachinaArchetypeBuilder]") {
   const ChainDescriptor inner_chain =
-      ChainDescriptorBuilder{}.Then(is_joint).Build("inner_chain");
+      ChainDescriptorBuilder{}.Then(is_joint()).Build("inner_chain");
   const MachinaArchetype archetype =
       MachinaArchetypeBuilder<TestArchetypeResult>{}
           .AtLeastNOf(inner_chain, 1, &TestArchetypeResult::chains)

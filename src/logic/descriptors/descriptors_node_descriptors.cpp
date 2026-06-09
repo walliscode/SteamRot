@@ -40,31 +40,38 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_fragment{
-    "is_fragment",
-    [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-      const auto part_it = parts.find(id);
-      if (part_it == parts.end())
-        return NodeDescriptorResult{false, "incorrect key: part_id=" +
-                                               std::to_string(id)};
-      const bool holds =
-          std::holds_alternative<FragmentInstance>(part_it->second);
-      return NodeDescriptorResult{holds, holds ? "node holds FragmentInstance"
-                                               : "node holds JointInstance"};
-    }};
+const NodeDescriptor &is_fragment() {
+  static const NodeDescriptor instance{
+      "is_fragment",
+      [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const auto part_it = parts.find(id);
+        if (part_it == parts.end())
+          return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                                 std::to_string(id)};
+        const bool holds =
+            std::holds_alternative<FragmentInstance>(part_it->second);
+        return NodeDescriptorResult{holds, holds ? "node holds FragmentInstance"
+                                                 : "node holds JointInstance"};
+      }};
+  return instance;
+}
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_joint{
-    "is_joint",
-    [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
-      const auto part_it = parts.find(id);
-      if (part_it == parts.end())
-        return NodeDescriptorResult{false, "incorrect key: part_id=" +
-                                               std::to_string(id)};
-      const bool holds = std::holds_alternative<JointInstance>(part_it->second);
-      return NodeDescriptorResult{holds, holds ? "node holds JointInstance"
-                                               : "node holds FragmentInstance"};
-    }};
+const NodeDescriptor &is_joint() {
+  static const NodeDescriptor instance{
+      "is_joint",
+      [](const PartGraph &parts, uint32_t id) -> NodeDescriptorResult {
+        const auto part_it = parts.find(id);
+        if (part_it == parts.end())
+          return NodeDescriptorResult{false, "incorrect key: part_id=" +
+                                                 std::to_string(id)};
+        const bool holds =
+            std::holds_alternative<JointInstance>(part_it->second);
+        return NodeDescriptorResult{holds, holds ? "node holds JointInstance"
+                                                 : "node holds FragmentInstance"};
+      }};
+  return instance;
+}
 
 /////////////////////////////////////////////////
 NodeDescriptor has_exactly_n_edges(size_t n, std::string name) {
@@ -84,7 +91,10 @@ NodeDescriptor has_exactly_n_edges(size_t n, std::string name) {
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_serial = has_exactly_n_edges(2, "is_serial");
+const NodeDescriptor &is_serial() {
+  static const NodeDescriptor instance = has_exactly_n_edges(2, "is_serial");
+  return instance;
+}
 
 /////////////////////////////////////////////////
 NodeDescriptor has_minimum_n_edges(size_t n) {
@@ -105,7 +115,10 @@ NodeDescriptor has_minimum_n_edges(size_t n) {
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_branched = has_minimum_n_edges(3);
+const NodeDescriptor &is_branched() {
+  static const NodeDescriptor instance = has_minimum_n_edges(3);
+  return instance;
+}
 
 /////////////////////////////////////////////////
 NodeDescriptor has_maximum_n_edges(size_t n) {
@@ -126,5 +139,9 @@ NodeDescriptor has_maximum_n_edges(size_t n) {
 }
 
 /////////////////////////////////////////////////
-const NodeDescriptor is_terminal = has_exactly_n_edges(1, "is_terminal");
+const NodeDescriptor &is_terminal() {
+  static const NodeDescriptor instance =
+      has_exactly_n_edges(1, "is_terminal");
+  return instance;
+}
 } // namespace steamrot::logic::descriptors

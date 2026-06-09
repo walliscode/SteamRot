@@ -37,7 +37,7 @@ steamrot::tests::PartGraphPackage create_valid_grab_pkg() {
 TEST_CASE("valid_grab_pkg passes grab structural tests") {
   steamrot::tests::PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
   descriptors::MachinaArchetypeResult result =
-      descriptors::MA::Grab(valid_grab_pkg.part_graph,
+      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                             valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
 
   REQUIRE(true);

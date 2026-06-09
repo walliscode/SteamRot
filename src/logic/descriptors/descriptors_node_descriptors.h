@@ -21,13 +21,13 @@ namespace steamrot::logic::descriptors {
 /// @brief NodeDescriptor that returns true when the node holds a
 /// FragmentInstance.
 /////////////////////////////////////////////////
-extern const NodeDescriptor is_fragment;
+const NodeDescriptor &is_fragment();
 
 /////////////////////////////////////////////////
 /// @brief NodeDescriptor that returns true when the node holds a
 /// JointInstance.
 /////////////////////////////////////////////////
-extern const NodeDescriptor is_joint;
+const NodeDescriptor &is_joint();
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has exactly
@@ -45,7 +45,7 @@ NodeDescriptor has_exactly_n_edges(size_t n, std::string name);
 ///
 /// serial is used to indicate part of a serial chain
 /////////////////////////////////////////////////
-extern const NodeDescriptor is_serial;
+const NodeDescriptor &is_serial();
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at least
@@ -61,7 +61,7 @@ NodeDescriptor has_minimum_n_edges(size_t n);
 /// connections (i.e., at least 3 connected sockets), indicating a "branching"
 /// point
 /////////////////////////////////////////////////
-extern const NodeDescriptor is_branched;
+const NodeDescriptor &is_branched();
 
 /////////////////////////////////////////////////
 /// @brief Returns a NodeDescriptor that returns true when the node has at
@@ -76,5 +76,5 @@ NodeDescriptor has_maximum_n_edges(size_t n);
 /// @brief NodeDescriptor that returns true for nodes with at most 1 connected
 /// socket (i.e., at the "end" of a chain of connections).
 /////////////////////////////////////////////////
-extern const NodeDescriptor is_terminal;
+const NodeDescriptor &is_terminal();
 } // namespace steamrot::logic::descriptors
