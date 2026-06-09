@@ -1,3 +1,5 @@
+add_subdirectory(spatial_analysis)
+
 add_library(logic
   LogicFactory.cpp
   UIRenderLogic.cpp
