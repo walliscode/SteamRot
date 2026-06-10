@@ -10,6 +10,7 @@
 #include "AnalysisTraceBuilder.h"
 #include "ChainDescriptorBuilder.h"
 #include "DescriptorResult.h"
+#include "NodeDescriptor.h"
 #include "PartGraphBuilder.h"
 #include "TerminalDescriptorFormatter.h"
 #include "TraceEqualsMatcher.h"
@@ -19,13 +20,25 @@
 
 using namespace steamrot::logic::descriptors;
 
-// Helper that builds a named ChainDescriptor via ChainDescriptorBuilder
-static ChainDescriptor make_test_chain(const std::string &name) {
-  NodeDescriptor always_true = [](const steamrot::PartGraph & /*parts*/,
-                                  uint32_t /*id*/) -> NodeDescriptorResult {
-    return NodeDescriptorResult{true};
-  };
-  return ChainDescriptorBuilder{}.Then(always_true).Build(name);
+const NodeDescriptor &always_true() {
+  static const NodeDescriptor instance =
+      NodeDescriptor{"always_true",
+                     [](const steamrot::PartGraph & /*parts*/,
+                        uint32_t /*id*/) -> NodeDescriptorResult {
+                       return NodeDescriptorResult{true};
+                     }};
+  return instance;
+};
+// // Helper that builds a named ChainDescriptor via ChainDescriptorBuilder
+// static ChainDescriptor make_test_chain(const std::string &name) {
+//   NodeDescriptor always_true = [](const steamrot::PartGraph & /*parts*/,
+//                                   uint32_t /*id*/) -> NodeDescriptorResult {
+//     return NodeDescriptorResult{true};
+//   };
+//   return ChainDescriptorBuilder{}.Then(always_true).Build(name);
+// }
+const ChainDescriptor make_test_chain(const std::string &name) {
+  return ChainDescriptorBuilder{}.Then(always_true()).Build(name);
 }
 
 TEST_CASE("MachinaArchetypeBuilder default construction",
