@@ -32,13 +32,12 @@ std::vector<std::string> SplitLines(const std::string &s) {
 
 /////////////////////////////////////////////////
 TraceEqualsMatcher::TraceEqualsMatcher(
-    const steamrot::logic::descriptors::AnalysisTrace &expected,
+    const AnalysisTrace &expected,
     const steamrot::logic::descriptors::DescriptorFormatter &formatter)
     : m_expected(expected), m_formatter(formatter) {}
 
 /////////////////////////////////////////////////
-bool TraceEqualsMatcher::match(
-    const steamrot::logic::descriptors::AnalysisTrace &actual) const {
+bool TraceEqualsMatcher::match(const AnalysisTrace &actual) const {
   m_mismatch_description.clear();
 
   const std::string expected_str = m_formatter.Format(m_expected);
@@ -49,8 +48,7 @@ bool TraceEqualsMatcher::match(
 
   const auto expected_lines = SplitLines(expected_str);
   const auto actual_lines = SplitLines(actual_str);
-  const size_t max_lines =
-      std::max(expected_lines.size(), actual_lines.size());
+  const size_t max_lines = std::max(expected_lines.size(), actual_lines.size());
 
   std::ostringstream oss;
   oss << "expected formatted output:\n";

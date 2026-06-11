@@ -35,10 +35,10 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
 
   SECTION("returns true for a FragmentInstance") {
     // pair: f0=id0 (fragment), j0=id1 (joint), both connected
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_fragment()(tests::pair.part_graph, 0);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("f0", descriptors::is_fragment().GetName(), true, 0,
                       "node holds FragmentInstance")
@@ -50,10 +50,10 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a JointInstance") {
     // pair: j0=id1
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_fragment()(tests::pair.part_graph, 1);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("j0", descriptors::is_fragment().GetName(), false, 0,
                       "node holds JointInstance")
@@ -65,16 +65,16 @@ TEST_CASE("is_fragment", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a missing part ID") {
     constexpr uint32_t kMissingId{99};
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_fragment()(tests::pair.part_graph, kMissingId);
 
     // The missing part has no alias in the graph, so the expected trace uses
     // the numeric-ID overloads to match the actual trace formatting.
     tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         builder
-            .NodeEvalById(kMissingId, descriptors::is_fragment().GetName(), false,
-                          0, "incorrect key: part_id=99")
+            .NodeEvalById(kMissingId, descriptors::is_fragment().GetName(),
+                          false, 0, "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -90,10 +90,10 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
 
   SECTION("returns true for a JointInstance") {
     // pair: j0=id1
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_joint()(tests::pair.part_graph, 1);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("j0", descriptors::is_joint().GetName(), true, 0,
                       "node holds JointInstance")
@@ -105,10 +105,10 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a FragmentInstance") {
     // pair: f0=id0
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_joint()(tests::pair.part_graph, 0);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("f0", descriptors::is_joint().GetName(), false, 0,
                       "node holds FragmentInstance")
@@ -120,15 +120,16 @@ TEST_CASE("is_joint", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a missing part ID") {
     constexpr uint32_t kMissingId{99};
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_joint()(tests::pair.part_graph, kMissingId);
 
     // The missing part has no alias in the graph, so the expected trace uses
     // the numeric-ID overloads to match the actual trace formatting.
     tests::AnalysisTraceBuilder builder{tests::pair.id_to_part_graph_id};
-    const descriptors::AnalysisTrace expected =
-        builder.NodeEvalById(kMissingId, descriptors::is_joint().GetName(), false,
-                             0, "incorrect key: part_id=99")
+    const steamrot::AnalysisTrace expected =
+        builder
+            .NodeEvalById(kMissingId, descriptors::is_joint().GetName(), false,
+                          0, "incorrect key: part_id=99")
             .Build();
 
     REQUIRE_FALSE(result);
@@ -144,10 +145,10 @@ TEST_CASE("is_terminal", "[unit][logic][descriptors]") {
 
   SECTION("returns true for a terminal node (connection_count == 1)") {
     // pair: f0=id0, connection_count=1
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_terminal()(tests::pair.part_graph, 0);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("f0", descriptors::is_terminal().GetName(), true, 0,
                       "connection_count=1, expected==1")
@@ -159,10 +160,10 @@ TEST_CASE("is_terminal", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a serial node (connection_count == 2)") {
     // linear_chain_3: j0=id1, connection_count=2
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_terminal()(tests::linear_chain_3.part_graph, 1);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::linear_chain_3.id_to_part_graph_id}
             .NodeEval("j0", descriptors::is_terminal().GetName(), false, 0,
                       "connection_count=2, expected==1")
@@ -181,10 +182,10 @@ TEST_CASE("is_serial", "[unit][logic][descriptors]") {
 
   SECTION("returns true for a serial node (connection_count == 2)") {
     // linear_chain_3: j0=id1, connection_count=2
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_serial()(tests::linear_chain_3.part_graph, 1);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::linear_chain_3.id_to_part_graph_id}
             .NodeEval("j0", descriptors::is_serial().GetName(), true, 0,
                       "connection_count=2, expected==2")
@@ -196,10 +197,10 @@ TEST_CASE("is_serial", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a terminal node (connection_count == 1)") {
     // pair: f0=id0, connection_count=1
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_serial()(tests::pair.part_graph, 0);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{tests::pair.id_to_part_graph_id}
             .NodeEval("f0", descriptors::is_serial().GetName(), false, 0,
                       "connection_count=1, expected==2")
@@ -230,10 +231,10 @@ TEST_CASE("is_branched", "[unit][logic][descriptors]") {
 
   SECTION("returns true for a branching node (connection_count == 3)") {
     // j0=id0, connection_count=3
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_branched()(pkg.part_graph, 0);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("j0", descriptors::is_branched().GetName(), true, 0,
                       "connection_count=3, expected>=3")
@@ -245,10 +246,10 @@ TEST_CASE("is_branched", "[unit][logic][descriptors]") {
 
   SECTION("returns false for a terminal node (connection_count == 1)") {
     // f0=id1, connection_count=1
-    const descriptors::NodeDescriptorResult result =
+    const steamrot::NodeDescriptorResult result =
         descriptors::is_branched()(pkg.part_graph, 1);
 
-    const descriptors::AnalysisTrace expected =
+    const steamrot::AnalysisTrace expected =
         tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
             .NodeEval("f0", descriptors::is_branched().GetName(), false, 0,
                       "connection_count=1, expected>=3")

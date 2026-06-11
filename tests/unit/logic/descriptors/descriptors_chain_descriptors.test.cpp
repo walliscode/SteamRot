@@ -20,6 +20,7 @@
 #include <unordered_set>
 #include <vector>
 
+namespace steamrot::tests {
 namespace {
 constexpr uint32_t kMissingPartId{9999};
 }
@@ -174,7 +175,8 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
       // build expected trace
       AnalysisTrace expected_trace =
           steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-              .ScopeBegin(is_serial_chain().GetName(), ScopeKind::Chain, 0, "f0")
+              .ScopeBegin(is_serial_chain().GetName(), ScopeKind::Chain, 0,
+                          "f0")
               .NodeEval("f0", is_serial().GetName(), false, 1,
                         "connection_count=1, expected==2")
               .ScopeEnd(is_serial_chain().GetName(), ScopeKind::Chain, false, 0)
@@ -194,7 +196,8 @@ TEST_CASE("ChainDescriptor is_serial_chain tests") {
       // build expected trace
       AnalysisTrace expected_trace =
           steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-              .ScopeBegin(is_serial_chain().GetName(), ScopeKind::Chain, 0, "j0")
+              .ScopeBegin(is_serial_chain().GetName(), ScopeKind::Chain, 0,
+                          "j0")
               .NodeEval("j0", is_serial().GetName(), true, 1,
                         "connection_count=2, expected==2")
               // this is going to try socket[0] first
@@ -481,3 +484,4 @@ TEST_CASE("ChainDescriptor is_serial_chain_with_minimum_length_3 tests") {
                                   pkg.id_to_part_graph_id.at("f2")});
   }
 }
+} // namespace steamrot::tests

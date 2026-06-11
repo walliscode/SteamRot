@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////
+////////////////////////////////////////////////
 /// @file
 /// @brief Catch2 matcher that compares AnalysisTrace values via a formatter.
 /////////////////////////////////////////////////
@@ -40,8 +40,7 @@ namespace steamrot::tests {
 ///              steamrot::tests::EqualsTrace(expected_trace, fmt));
 /// @endcode
 /////////////////////////////////////////////////
-class TraceEqualsMatcher : public Catch::Matchers::MatcherBase<
-                               steamrot::logic::descriptors::AnalysisTrace> {
+class TraceEqualsMatcher : public Catch::Matchers::MatcherBase<AnalysisTrace> {
 public:
   /////////////////////////////////////////////////
   /// @brief Construct a matcher with an expected trace and a formatter.
@@ -50,7 +49,7 @@ public:
   /// @param formatter Formatter used to render both traces for comparison.
   /////////////////////////////////////////////////
   TraceEqualsMatcher(
-      const steamrot::logic::descriptors::AnalysisTrace &expected,
+      const AnalysisTrace &expected,
       const steamrot::logic::descriptors::DescriptorFormatter &formatter);
 
   /////////////////////////////////////////////////
@@ -63,8 +62,7 @@ public:
   /// @param actual The @c AnalysisTrace produced by the descriptor under test.
   /// @return @c true if the formatted outputs match exactly.
   /////////////////////////////////////////////////
-  bool match(
-      const steamrot::logic::descriptors::AnalysisTrace &actual) const override;
+  bool match(const AnalysisTrace &actual) const override;
 
   /////////////////////////////////////////////////
   /// @brief Return a description for Catch2 failure output.
@@ -76,7 +74,7 @@ public:
   std::string describe() const override;
 
 private:
-  const steamrot::logic::descriptors::AnalysisTrace &m_expected;
+  const AnalysisTrace &m_expected;
   const steamrot::logic::descriptors::DescriptorFormatter &m_formatter;
   mutable std::string m_mismatch_description{};
 };
@@ -89,7 +87,7 @@ private:
 /// @return @c TraceEqualsMatcher instance.
 /////////////////////////////////////////////////
 inline TraceEqualsMatcher EqualsTrace(
-    const steamrot::logic::descriptors::AnalysisTrace &expected,
+    const AnalysisTrace &expected,
     const steamrot::logic::descriptors::DescriptorFormatter &formatter) {
   return TraceEqualsMatcher(expected, formatter);
 }
@@ -98,10 +96,9 @@ inline TraceEqualsMatcher EqualsTrace(
 
 namespace Catch {
 
-template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
-  static std::string
-  convert(const steamrot::logic::descriptors::AnalysisEvent &event) {
-    using steamrot::logic::descriptors::TraceEventKind;
+template <> struct StringMaker<steamrot::AnalysisEvent> {
+  static std::string convert(const steamrot::AnalysisEvent &event) {
+    using steamrot::TraceEventKind;
 
     switch (event.kind) {
     case TraceEventKind::EmtpyPartGraph:
@@ -111,8 +108,8 @@ template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
     case TraceEventKind::NodeEval:
       return "AnalysisEvent{kind=NodeEval, part_id=" +
              std::to_string(event.part_id) + ", predicate=\"" +
-             event.predicate_name + "\", result=" +
-             (event.result ? "true" : "false") + ", reason=\"" +
+             event.predicate_name +
+             "\", result=" + (event.result ? "true" : "false") + ", reason=\"" +
              event.reason + "\"}";
     case TraceEventKind::MovingToNeighbour:
       return "AnalysisEvent{kind=MovingToNeighbour, from_id=" +
@@ -142,9 +139,8 @@ template <> struct StringMaker<steamrot::logic::descriptors::AnalysisEvent> {
   }
 };
 
-template <> struct StringMaker<steamrot::logic::descriptors::AnalysisTrace> {
-  static std::string
-  convert(const steamrot::logic::descriptors::AnalysisTrace &trace) {
+template <> struct StringMaker<steamrot::AnalysisTrace> {
+  static std::string convert(const steamrot::AnalysisTrace &trace) {
     return "AnalysisTrace{" + std::to_string(trace.size()) +
            " events; see EqualsTrace diff below}";
   }

@@ -10,13 +10,12 @@
 #include "part_graph_library.h"
 #include <catch2/catch_test_macros.hpp>
 
-using namespace steamrot::logic::descriptors;
+namespace steamrot::tests {
 
-namespace {
+using namespace steamrot::logic::descriptors;
 struct TestContext {
   AnalysisTrace trace{};
 };
-} // namespace
 
 TEST_CASE("make_scope_begin_event resolves anchor alias from part graph",
           "[unit][logic][descriptors]") {
@@ -34,9 +33,9 @@ TEST_CASE("make_scope_begin_event resolves anchor alias from part graph",
 
 TEST_CASE("node and traversal helpers resolve aliases from part graph",
           "[unit][logic][descriptors]") {
-  const AnalysisEvent node_eval = make_node_eval_event(
-      1, 1, "is_joint", steamrot::tests::pair.part_graph, true,
-      "node holds JointInstance");
+  const AnalysisEvent node_eval =
+      make_node_eval_event(1, 1, "is_joint", steamrot::tests::pair.part_graph,
+                           true, "node holds JointInstance");
   REQUIRE(node_eval.kind == TraceEventKind::NodeEval);
   REQUIRE(node_eval.part_id == 1);
   REQUIRE(node_eval.predicate_name == "is_joint");
@@ -89,3 +88,4 @@ TEST_CASE("append_event and add_* helpers append to context trace",
   REQUIRE(context.trace[4].result);
   REQUIRE(context.trace[4].depth == 2);
 }
+} // namespace steamrot::tests

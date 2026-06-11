@@ -16,8 +16,8 @@ const NodeDescriptor &make_test_predicate() {
   static const NodeDescriptor instance =
       NodeDescriptor{"test_predicate",
                      [](const steamrot::PartGraph & /*parts*/,
-                        uint32_t /*id*/) -> NodeDescriptorResult {
-                       return NodeDescriptorResult{true};
+                        uint32_t /*id*/) -> steamrot::NodeDescriptorResult {
+                       return steamrot::NodeDescriptorResult{true};
                      }};
   return instance;
 }

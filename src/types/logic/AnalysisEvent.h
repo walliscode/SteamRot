@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace steamrot::logic::descriptors {
+namespace steamrot {
 
 /////////////////////////////////////////////////
 /// @enum ScopeKind
@@ -185,4 +185,4 @@ inline void Merge(AnalysisTrace &target, AnalysisTrace &&source) {
   source.clear();
 }
 
-} // namespace steamrot::logic::descriptors
+} // namespace steamrot

@@ -12,6 +12,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DescriptorResult.h"
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::spatial_analysis {
 
@@ -21,5 +23,6 @@ namespace steamrot::logic::spatial_analysis {
 /// The anchor point is aligned to an/the origin and rotated until the y azis
 /// bisects its rotation arc.
 /////////////////////////////////////////////////
-void align_grab_structure();
+void align_grab_structure(const GrabResult &grab_result,
+                          const sf::Vector2f &anchor_point);
 } // namespace steamrot::logic::spatial_analysis

@@ -18,6 +18,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
+namespace steamrot::tests {
+
 using namespace steamrot::logic::descriptors;
 TEST_CASE("MachinaArchetype Grab tests") {
 
@@ -59,9 +61,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
                       "node holds JointInstance")
             .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
             .MachinaPartResult(is_joint_chain().GetName(), 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3().GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
 
     // test predicate
@@ -103,9 +106,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
                       "connection_count=1, expected==2")
             .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3().GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert result
     REQUIRE_THAT(result.m_trace,
@@ -151,9 +155,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
                       "connection_count=1, expected==2")
             .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3().GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert
     REQUIRE_THAT(result.m_trace,
@@ -211,9 +216,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Backtracking("j2", 0, "f1", 1, 2)
             .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3().GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert
     REQUIRE_THAT(result.m_trace,
@@ -289,9 +295,10 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Backtracking("j5", 0, "f4", 1, 2)
             .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3().GetName(),
-                               true, 0)
-            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, true, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), true, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, true,
+                      0)
             .Build();
 
     // assert
@@ -304,8 +311,8 @@ TEST_CASE("MachinaArchetype Grab tests") {
     const GrabResult *grab_result =
         std::get_if<GrabResult>(&result.result_sub_graphs);
     REQUIRE(grab_result);
-    REQUIRE(grab_result->anchor.size() == 1);
-    REQUIRE(grab_result->anchor[0] == pkg.id_to_part_graph_id.at("j3"));
+    REQUIRE(grab_result->anchor == pkg.id_to_part_graph_id.at("j3"));
     REQUIRE(grab_result->arms.size() == 2);
   }
 }
+} // namespace steamrot::tests

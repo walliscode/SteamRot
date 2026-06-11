@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <vector>
 
+namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
 
 namespace {
@@ -395,3 +396,4 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
     REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 }
+} // namespace steamrot::tests

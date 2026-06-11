@@ -16,8 +16,10 @@
 #include "TraceEqualsMatcher.h"
 #include "descriptors_node_descriptors.h"
 #include <catch2/catch_test_macros.hpp>
+#include <cstdint>
 #include <vector>
 
+namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
 
 const NodeDescriptor &always_true() {
@@ -29,15 +31,8 @@ const NodeDescriptor &always_true() {
                      }};
   return instance;
 };
-// // Helper that builds a named ChainDescriptor via ChainDescriptorBuilder
-// static ChainDescriptor make_test_chain(const std::string &name) {
-//   NodeDescriptor always_true = [](const steamrot::PartGraph & /*parts*/,
-//                                   uint32_t /*id*/) -> NodeDescriptorResult {
-//     return NodeDescriptorResult{true};
-//   };
-//   return ChainDescriptorBuilder{}.Then(always_true).Build(name);
-// }
-const ChainDescriptor make_test_chain(const std::string &name) {
+
+const ChainDescriptor make_test_chain_descriptor(const std::string &name) {
   return ChainDescriptorBuilder{}.Then(always_true()).Build(name);
 }
 
@@ -57,7 +52,8 @@ TEST_CASE("MachinaArchetypeBuilder::Then tests", "[MachinaArchetypeBuilder]") {
 
   SECTION("Then adds a step with Sequence kind") {
     // act
-    builder.Then(make_test_chain("cd1"), &TestArchetypeResult::chain1);
+    builder.Then(make_test_chain_descriptor("cd1"),
+                 &TestArchetypeResult::test_node);
     // assert
     REQUIRE(steps.size() == 1);
     REQUIRE(steps[0].kind == ArchetypeStepKind::Sequence);
@@ -65,7 +61,8 @@ TEST_CASE("MachinaArchetypeBuilder::Then tests", "[MachinaArchetypeBuilder]") {
 
   SECTION("Then stores the correct descriptor name") {
     // act
-    builder.Then(make_test_chain("my_chain"), &TestArchetypeResult::chain1);
+    builder.Then(make_test_chain_descriptor("my_chain"),
+                 &TestArchetypeResult::test_node);
     // assert
     REQUIRE(steps.size() == 1);
     REQUIRE(steps[0].descriptor.GetName() == "my_chain");
@@ -73,20 +70,25 @@ TEST_CASE("MachinaArchetypeBuilder::Then tests", "[MachinaArchetypeBuilder]") {
 
   SECTION("Then stores the correct member pointer") {
     // act
-    builder.Then(make_test_chain("cd1"), &TestArchetypeResult::chain1);
-    builder.Then(make_test_chain("cd2"), &TestArchetypeResult::chain2);
+    builder.Then(make_test_chain_descriptor("cd1"),
+                 &TestArchetypeResult::test_node);
+    builder.Then(make_test_chain_descriptor("cd2"),
+                 &TestArchetypeResult::test_node);
     // assert
     REQUIRE(steps.size() == 2);
-    REQUIRE(std::get<SubGraph TestArchetypeResult::*>(
-                steps[0].result_storage) == &TestArchetypeResult::chain1);
-    REQUIRE(std::get<SubGraph TestArchetypeResult::*>(
-                steps[1].result_storage) == &TestArchetypeResult::chain2);
+    REQUIRE(std::get<uint32_t TestArchetypeResult::*>(
+                steps[0].result_storage) == &TestArchetypeResult::test_node);
+    REQUIRE(std::get<uint32_t TestArchetypeResult::*>(
+                steps[1].result_storage) == &TestArchetypeResult::test_node);
   }
 
   SECTION("Then supports method chaining") {
     // act
-    builder.Then(make_test_chain("cd1"), &TestArchetypeResult::chain1)
-        .Then(make_test_chain("cd2"), &TestArchetypeResult::chain2);
+    builder
+        .Then(make_test_chain_descriptor("cd1"),
+              &TestArchetypeResult::test_node)
+        .Then(make_test_chain_descriptor("cd2"),
+              &TestArchetypeResult::test_node);
     // assert
     REQUIRE(steps.size() == 2);
     REQUIRE(steps[0].kind == ArchetypeStepKind::Sequence);
@@ -104,7 +106,8 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
 
   SECTION("AtLeastNOf adds a step with AtLeastNOf kind") {
     // act
-    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains);
+    builder.AtLeastNOf(make_test_chain_descriptor("cd1"), 1,
+                       &TestArchetypeResult::chains);
     // assert
     REQUIRE(steps.size() == 1);
     REQUIRE(steps[0].kind == ArchetypeStepKind::AtLeastNOf);
@@ -112,7 +115,7 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
 
   SECTION("AtLeastNOf stores the correct descriptor name") {
     // act
-    builder.AtLeastNOf(make_test_chain("my_chain"), 1,
+    builder.AtLeastNOf(make_test_chain_descriptor("my_chain"), 1,
                        &TestArchetypeResult::chains);
     // assert
     REQUIRE(steps.size() == 1);
@@ -121,7 +124,8 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
 
   SECTION("AtLeastNOf stores the correct member pointer") {
     // act
-    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains);
+    builder.AtLeastNOf(make_test_chain_descriptor("cd1"), 1,
+                       &TestArchetypeResult::chains);
     // assert
     REQUIRE(steps.size() == 1);
     REQUIRE(std::get<std::vector<SubGraph> TestArchetypeResult::*>(
@@ -130,7 +134,8 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
 
   SECTION("AtLeastNOf adds min repetitions correctly") {
     // act
-    builder.AtLeastNOf(make_test_chain("cd1"), 2, &TestArchetypeResult::chains);
+    builder.AtLeastNOf(make_test_chain_descriptor("cd1"), 2,
+                       &TestArchetypeResult::chains);
     // assert
     REQUIRE(steps.size() == 1);
     REQUIRE(steps[0].min_repetitions == 2);
@@ -138,8 +143,11 @@ TEST_CASE("MachinaArchetypeBuilder::AtLeastNOf tests",
 
   SECTION("AtLeastNOf supports method chaining") {
     // act
-    builder.AtLeastNOf(make_test_chain("cd1"), 1, &TestArchetypeResult::chains)
-        .AtLeastNOf(make_test_chain("cd2"), 2, &TestArchetypeResult::chains);
+    builder
+        .AtLeastNOf(make_test_chain_descriptor("cd1"), 1,
+                    &TestArchetypeResult::chains)
+        .AtLeastNOf(make_test_chain_descriptor("cd2"), 2,
+                    &TestArchetypeResult::chains);
     // assert
     REQUIRE(steps.size() == 2);
     REQUIRE(steps[0].kind == ArchetypeStepKind::AtLeastNOf);
@@ -158,7 +166,7 @@ TEST_CASE(
       ChainDescriptorBuilder{}.Then(is_joint()).Build("inner_chain");
   const MachinaArchetype archetype =
       MachinaArchetypeBuilder<TestArchetypeResult>{}
-          .Then(inner_chain, &TestArchetypeResult::chain1)
+          .Then(inner_chain, &TestArchetypeResult::test_node)
           .Build("outer_archetype");
 
   const steamrot::tests::PartGraphPackage pkg =
@@ -215,3 +223,4 @@ TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
                steamrot::tests::EqualsTrace(expected_trace,
                                             TerminalDescriptorFormatter{}));
 }
+} // namespace steamrot::tests
