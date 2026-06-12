@@ -4,7 +4,7 @@ add_executable(test_spatial_analysis
 
 
 target_include_directories(test_spatial_analysis
-PRIVATE
+PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -13,6 +13,7 @@ target_link_libraries(test_spatial_analysis
   Catch2::Catch2WithMain
   spatial_analysis
   part_graphs
+  matchers
 )
 
 catch_discover_tests(test_spatial_analysis)

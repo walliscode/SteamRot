@@ -10,6 +10,7 @@
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
+#include "Vector2fEqualsMatcher.h"
 #include "descriptors_machina_archetypes.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -81,14 +82,28 @@ TEST_CASE("align_grab_structure tests") {
             sf::Vector2f{100.f, 50.f});
 
     // act
-    std::vector<sf::Vector2f> target_positions{{{0.f, 0.f}, {0.f, 100.f}}};
+    std::vector<sf::Vector2f> target_positions{
+        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
 
     for (const sf::Vector2f &target_position : target_positions) {
-      steamrot::logic::spatial_analysis::align_grab_structure(grab_result,
-                                                              target_position);
+      steamrot::logic::spatial_analysis::align_grab_structure(
+          grab_result, graph, target_position);
       // assert
-      REQUIRE(anchor_transform.transformPoint({0.f, 0.f}) == target_position);
+      REQUIRE_THAT(anchor_transform.transformPoint({0.f, 0.f}),
+                   EqualsVector2f(target_position));
     }
   }
+}
+
+TEST_CASE("get_end_of_arm tests") {
+  // arrange
+  SubGraph arm1{1, 2, 3, 4};
+  SubGraph arm2{5};
+  SubGraph arm3{};
+
+  // act and assert
+  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm1) == 4);
+  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm2) == 5);
+  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm3) == 0);
 }
 } // namespace steamrot::tests
