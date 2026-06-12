@@ -13,8 +13,8 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <unordered_map>
 
+namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
-namespace tests = steamrot::tests;
 
 namespace {
 const std::unordered_map<std::string, uint32_t> kPartIds{
@@ -291,3 +291,4 @@ TEST_CASE("TraceEqualsMatcher rejects non-empty trace against empty expected",
   const AnalysisTrace empty;
   REQUIRE_THAT(builder.Build(), !tests::EqualsTrace(empty, fmt));
 }
+} // namespace steamrot::tests

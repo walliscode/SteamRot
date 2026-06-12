@@ -18,7 +18,7 @@
 #include <variant>
 #include <vector>
 
-namespace steamrot::logic::descriptors {
+namespace steamrot {
 
 /////////////////////////////////////////////////
 /// @brief An ordered list of part IDs produced by a successful DFS walk.
@@ -115,6 +115,7 @@ struct ChainDescriptorResult : DescriptorResult {
 };
 
 struct TestArchetypeResult {
+  uint32_t test_node;
   SubGraph chain1;
   SubGraph chain2;
   std::vector<SubGraph> chains;
@@ -127,7 +128,7 @@ struct GrabResult {
   /////////////////////////////////////////////////
   /// @brief Anchor node from which the arms extend
   /////////////////////////////////////////////////
-  SubGraph anchor;
+  uint32_t anchor;
 
   /////////////////////////////////////////////////
   /// @brief Collection of grabbing arms
@@ -162,4 +163,4 @@ struct MachinaArchetypeResult : DescriptorResult {
   /////////////////////////////////////////////////
   ArchetypeVariant result_sub_graphs;
 };
-} // namespace steamrot::logic::descriptors
+} // namespace steamrot

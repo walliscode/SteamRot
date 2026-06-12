@@ -21,7 +21,7 @@ namespace steamrot::logic::descriptors {
 /// A serial chain is that in which the node has exactly 2 connections and then
 /// finally a terminal node
 /////////////////////////////////////////////////
-extern const ChainDescriptor is_serial_chain;
+const ChainDescriptor &is_serial_chain();
 
 /////////////////////////////////////////////////
 /// @brief Returns a ChainDescriptor that checks whether a serial chain of at
@@ -36,7 +36,7 @@ ChainDescriptor is_serial_chain_with_minimum_length_n(uint32_t n);
 /// @brief ChainDescriptor that checks whether a serial chain of at least 2
 /// nodes
 /////////////////////////////////////////////////
-extern const ChainDescriptor is_serial_chain_with_minimum_length_3;
+const ChainDescriptor &is_serial_chain_with_minimum_length_3();
 
 /////////////////////////////////////////////////
 /// @brief ChainDescriptor that checks whether a node is a JointInstance
@@ -44,5 +44,5 @@ extern const ChainDescriptor is_serial_chain_with_minimum_length_3;
 /// Wraps the @p is_joint NodeDescriptor in a chain scope, emitting
 /// ScopeBegin/ScopeEnd trace events for consistent trace output.
 /////////////////////////////////////////////////
-extern const ChainDescriptor is_joint_chain;
+const ChainDescriptor &is_joint_chain();
 } // namespace steamrot::logic::descriptors

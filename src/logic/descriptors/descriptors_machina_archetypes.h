@@ -19,6 +19,6 @@ namespace steamrot::logic::descriptors::MA {
 /////////////////////////////////////////////////
 /// @brief Evaluates whether a PartGraph contains a grab archetype
 /////////////////////////////////////////////////
-extern const MachinaArchetype Grab;
+const MachinaArchetype &Grab();
 
 } // namespace steamrot::logic::descriptors::MA

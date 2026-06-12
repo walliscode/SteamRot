@@ -14,10 +14,14 @@
 namespace steamrot::logic::descriptors::MA {
 
 /////////////////////////////////////////////////
-const MachinaArchetype Grab =
-    MachinaArchetypeBuilder<GrabResult>{}
-        .Then(is_joint_chain, &GrabResult::anchor)
-        .AtLeastNOf(is_serial_chain_with_minimum_length_3, 2, &GrabResult::arms)
-        .Build("Grab");
+const MachinaArchetype &Grab() {
+  static const MachinaArchetype instance =
+      MachinaArchetypeBuilder<GrabResult>{}
+          .Then(is_joint_chain(), &GrabResult::anchor)
+          .AtLeastNOf(is_serial_chain_with_minimum_length_3(), 2,
+                      &GrabResult::arms)
+          .Build("Grab");
+  return instance;
+}
 
 } // namespace steamrot::logic::descriptors::MA

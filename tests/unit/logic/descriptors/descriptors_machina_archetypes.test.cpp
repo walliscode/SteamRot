@@ -18,17 +18,19 @@
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
 
+namespace steamrot::tests {
+
 using namespace steamrot::logic::descriptors;
 TEST_CASE("MachinaArchetype Grab tests") {
 
   // some general assertions about the descriptor instance
-  REQUIRE(MA::Grab.GetName() == "Grab");
-  REQUIRE(MA::Grab.GetNumberOfSteps() == 2);
+  REQUIRE(MA::Grab().GetName() == "Grab");
+  REQUIRE(MA::Grab().GetNumberOfSteps() == 2);
 
   SECTION("Grab returns false on empty graph") {
     // test predicate
     steamrot::PartGraph empty_graph;
-    MachinaArchetypeResult result = MA::Grab(empty_graph, 0);
+    MachinaArchetypeResult result = MA::Grab()(empty_graph, 0);
 
     // build expected trace
     AnalysisTrace expected_trace =
@@ -52,21 +54,22 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(MA::Grab.GetName(), ScopeKind::MachinaArchetype, 0,
+            .ScopeBegin(MA::Grab().GetName(), ScopeKind::MachinaArchetype, 0,
                         "j0")
-            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
-            .NodeEval("j0", is_joint.GetName(), true, 2,
+            .ScopeBegin(is_joint_chain().GetName(), ScopeKind::Chain, 1, "j0")
+            .NodeEval("j0", is_joint().GetName(), true, 2,
                       "node holds JointInstance")
-            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint_chain.GetName(), 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3.GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain().GetName(), 1)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
 
     // test predicate
     MachinaArchetypeResult result =
-        MA::Grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+        MA::Grab()(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
 
     // assert result and trace
     REQUIRE_THAT(result.m_trace,
@@ -85,27 +88,28 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Build();
     // test predicate
     MachinaArchetypeResult result =
-        MA::Grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+        MA::Grab()(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
 
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(MA::Grab.GetName(), ScopeKind::MachinaArchetype, 0,
+            .ScopeBegin(MA::Grab().GetName(), ScopeKind::MachinaArchetype, 0,
                         "j0")
-            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
-            .NodeEval("j0", is_joint.GetName(), true, 2,
+            .ScopeBegin(is_joint_chain().GetName(), ScopeKind::Chain, 1, "j0")
+            .NodeEval("j0", is_joint().GetName(), true, 2,
                       "node holds JointInstance")
-            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint_chain.GetName(), true, 0)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain().GetName(), true, 0)
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f0")
-            .NodeEval("f0", is_serial.GetName(), false, 2,
+            .NodeEval("f0", is_serial().GetName(), false, 2,
                       "connection_count=1, expected==2")
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3.GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert result
     REQUIRE_THAT(result.m_trace,
@@ -128,32 +132,33 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Build();
     // test predicate
     MachinaArchetypeResult result =
-        MA::Grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+        MA::Grab()(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(MA::Grab.GetName(), ScopeKind::MachinaArchetype, 0,
+            .ScopeBegin(MA::Grab().GetName(), ScopeKind::MachinaArchetype, 0,
                         "j0")
-            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
-            .NodeEval("j0", is_joint.GetName(), true, 2,
+            .ScopeBegin(is_joint_chain().GetName(), ScopeKind::Chain, 1, "j0")
+            .NodeEval("j0", is_joint().GetName(), true, 2,
                       "node holds JointInstance")
-            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint_chain.GetName(), true, 0)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain().GetName(), true, 0)
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f0")
-            .NodeEval("f0", is_serial.GetName(), false, 2,
+            .NodeEval("f0", is_serial().GetName(), false, 2,
                       "connection_count=1, expected==2")
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f1")
-            .NodeEval("f1", is_serial.GetName(), false, 2,
+            .NodeEval("f1", is_serial().GetName(), false, 2,
                       "connection_count=1, expected==2")
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3.GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert
     REQUIRE_THAT(result.m_trace,
@@ -180,40 +185,41 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Build();
     // test predicate
     MachinaArchetypeResult result =
-        MA::Grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
+        MA::Grab()(pkg.part_graph, pkg.id_to_part_graph_id.at("j0"), 0);
     // build expected trace
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(MA::Grab.GetName(), ScopeKind::MachinaArchetype, 0,
+            .ScopeBegin(MA::Grab().GetName(), ScopeKind::MachinaArchetype, 0,
                         "j0")
-            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j0")
-            .NodeEval("j0", is_joint.GetName(), true, 2,
+            .ScopeBegin(is_joint_chain().GetName(), ScopeKind::Chain, 1, "j0")
+            .NodeEval("j0", is_joint().GetName(), true, 2,
                       "node holds JointInstance")
-            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint_chain.GetName(), true, 0)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain().GetName(), true, 0)
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f0")
-            .NodeEval("f0", is_serial.GetName(), true, 2,
+            .NodeEval("f0", is_serial().GetName(), true, 2,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("f0", 1, "j1", 0, 2)
-            .NodeEval("j1", is_serial.GetName(), false, 3,
+            .NodeEval("j1", is_serial().GetName(), false, 3,
                       "connection_count=1, expected==2")
             .Backtracking("j1", 0, "f0", 1, 2)
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f1")
-            .NodeEval("f1", is_serial.GetName(), true, 2,
+            .NodeEval("f1", is_serial().GetName(), true, 2,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("f1", 1, "j2", 0, 2)
-            .NodeEval("j2", is_serial.GetName(), false, 3,
+            .NodeEval("j2", is_serial().GetName(), false, 3,
                       "connection_count=1, expected==2")
             .Backtracking("j2", 0, "f1", 1, 2)
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, false, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3.GetName(),
-                               false, 0)
-            .ScopeEnd(MA::Grab.GetName(), ScopeKind::MachinaArchetype, false, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), false, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, false,
+                      0)
             .Build();
     // assert
     REQUIRE_THAT(result.m_trace,
@@ -244,54 +250,55 @@ TEST_CASE("MachinaArchetype Grab tests") {
             .Build();
     // test predicate, feed it the middle joint node
     MachinaArchetypeResult result =
-        MA::Grab(pkg.part_graph, pkg.id_to_part_graph_id.at("j3"), 0);
+        MA::Grab()(pkg.part_graph, pkg.id_to_part_graph_id.at("j3"), 0);
 
     // build expected trace: we expect the joint node to be found and two chains
     // of length 3 to be found which should suceed
     AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .ScopeBegin(MA::Grab.GetName(), ScopeKind::MachinaArchetype, 0,
+            .ScopeBegin(MA::Grab().GetName(), ScopeKind::MachinaArchetype, 0,
                         "j3")
-            .ScopeBegin(is_joint_chain.GetName(), ScopeKind::Chain, 1, "j3")
-            .NodeEval("j3", is_joint.GetName(), true, 2,
+            .ScopeBegin(is_joint_chain().GetName(), ScopeKind::Chain, 1, "j3")
+            .NodeEval("j3", is_joint().GetName(), true, 2,
                       "node holds JointInstance")
-            .ScopeEnd(is_joint_chain.GetName(), ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_joint_chain.GetName(), true, 0)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_joint_chain().GetName(), ScopeKind::Chain, true, 1)
+            .MachinaPartResult(is_joint_chain().GetName(), true, 0)
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f2")
-            .NodeEval("f2", is_serial.GetName(), true, 2,
+            .NodeEval("f2", is_serial().GetName(), true, 2,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("f2", 0, "j1", 1, 2)
-            .NodeEval("j1", is_serial.GetName(), true, 3,
+            .NodeEval("j1", is_serial().GetName(), true, 3,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("j1", 0, "f0", 0, 3)
-            .NodeEval("f0", is_serial.GetName(), false, 4,
+            .NodeEval("f0", is_serial().GetName(), false, 4,
                       "connection_count=1, expected==2")
-            .NodeEval("f0", is_terminal.GetName(), true, 4,
+            .NodeEval("f0", is_terminal().GetName(), true, 4,
                       "connection_count=1, expected==1")
             .Backtracking("f0", 0, "j1", 0, 3)
             .Backtracking("j1", 1, "f2", 0, 2)
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, true, 1)
-            .ScopeBegin(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeBegin(is_serial_chain_with_minimum_length_3().GetName(),
                         ScopeKind::Chain, 1, "f4")
-            .NodeEval("f4", is_serial.GetName(), true, 2,
+            .NodeEval("f4", is_serial().GetName(), true, 2,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("f4", 1, "j5", 0, 2)
-            .NodeEval("j5", is_serial.GetName(), true, 3,
+            .NodeEval("j5", is_serial().GetName(), true, 3,
                       "connection_count=2, expected==2")
             .MovingToNeighbour("j5", 1, "f6", 0, 3)
-            .NodeEval("f6", is_serial.GetName(), false, 4,
+            .NodeEval("f6", is_serial().GetName(), false, 4,
                       "connection_count=1, expected==2")
-            .NodeEval("f6", is_terminal.GetName(), true, 4,
+            .NodeEval("f6", is_terminal().GetName(), true, 4,
                       "connection_count=1, expected==1")
             .Backtracking("f6", 0, "j5", 1, 3)
             .Backtracking("j5", 0, "f4", 1, 2)
-            .ScopeEnd(is_serial_chain_with_minimum_length_3.GetName(),
+            .ScopeEnd(is_serial_chain_with_minimum_length_3().GetName(),
                       ScopeKind::Chain, true, 1)
-            .MachinaPartResult(is_serial_chain_with_minimum_length_3.GetName(),
-                               true, 0)
-            .ScopeEnd(MA::Grab.GetName(), ScopeKind::MachinaArchetype, true, 0)
+            .MachinaPartResult(
+                is_serial_chain_with_minimum_length_3().GetName(), true, 0)
+            .ScopeEnd(MA::Grab().GetName(), ScopeKind::MachinaArchetype, true,
+                      0)
             .Build();
 
     // assert
@@ -304,8 +311,8 @@ TEST_CASE("MachinaArchetype Grab tests") {
     const GrabResult *grab_result =
         std::get_if<GrabResult>(&result.result_sub_graphs);
     REQUIRE(grab_result);
-    REQUIRE(grab_result->anchor.size() == 1);
-    REQUIRE(grab_result->anchor[0] == pkg.id_to_part_graph_id.at("j3"));
+    REQUIRE(grab_result->anchor == pkg.id_to_part_graph_id.at("j3"));
     REQUIRE(grab_result->arms.size() == 2);
   }
 }
+} // namespace steamrot::tests

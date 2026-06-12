@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <vector>
 
+namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
 
 namespace {
@@ -63,7 +64,7 @@ ChainDescriptorResult run_dfs(uint32_t start_id, std::vector<ChainStep> steps,
 TEST_CASE("resolve_transition: Sequence steps",
           "[unit][logic][descriptors][dfs]") {
 
-  ChainStep step{is_fragment, ChainStepKind::Sequence};
+  ChainStep step{is_fragment(), ChainStepKind::Sequence};
 
   SECTION("predicate passes → ConsumeNodeAndAdvanceStep") {
     const Transition t = resolve_transition(step, true, {});
@@ -82,7 +83,7 @@ TEST_CASE("resolve_transition: Sequence steps",
 TEST_CASE("resolve_transition: WhileIsTrue steps",
           "[unit][logic][descriptors][dfs]") {
 
-  ChainStep step{is_serial, ChainStepKind::WhileIsTrue};
+  ChainStep step{is_serial(), ChainStepKind::WhileIsTrue};
 
   SECTION(
       "predicate passes first time → ConsumeNodeAndHoldStep, match_count=1") {
@@ -117,7 +118,7 @@ TEST_CASE("resolve_transition: WhileIsTrueForMinimumN steps",
 
   SECTION("predicate passes → ConsumeNodeAndHoldStep, count incremented") {
     ChainStep step =
-        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
+        make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, true, StepProgress{1});
     REQUIRE(t.kind == TransitionKind::ConsumeNodeAndHoldStep);
     REQUIRE(t.progress.match_count == 2);
@@ -125,7 +126,7 @@ TEST_CASE("resolve_transition: WhileIsTrueForMinimumN steps",
 
   SECTION("predicate fails, count below minimum → Reject") {
     ChainStep step =
-        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 3);
+        make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 3);
     const Transition t = resolve_transition(step, false, StepProgress{2});
     REQUIRE(t.kind == TransitionKind::Reject);
   }
@@ -133,14 +134,14 @@ TEST_CASE("resolve_transition: WhileIsTrueForMinimumN steps",
   SECTION(
       "predicate fails, count exactly at minimum → HoldNodeAndAdvanceStep") {
     ChainStep step =
-        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
+        make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, false, StepProgress{2});
     REQUIRE(t.kind == TransitionKind::HoldNodeAndAdvanceStep);
   }
 
   SECTION("predicate fails, count exceeds minimum → HoldNodeAndAdvanceStep") {
     ChainStep step =
-        make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2);
+        make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2);
     const Transition t = resolve_transition(step, false, StepProgress{5});
     REQUIRE(t.kind == TransitionKind::HoldNodeAndAdvanceStep);
   }
@@ -161,7 +162,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
             .Build()
             .part_graph;
     const ChainDescriptorResult result =
-        run_dfs(0, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
+        run_dfs(0, {make_step(is_fragment(), ChainStepKind::Sequence)}, parts);
 
     REQUIRE(result.valid_subgraph.has_value());
     REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{0});
@@ -175,7 +176,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
             .Build()
             .part_graph;
     const ChainDescriptorResult result =
-        run_dfs(0, {make_step(is_joint, ChainStepKind::Sequence)}, parts);
+        run_dfs(0, {make_step(is_joint(), ChainStepKind::Sequence)}, parts);
 
     REQUIRE_FALSE(result.valid_subgraph.has_value());
     REQUIRE(result.invalid_subgraphs.size() == 1);
@@ -188,8 +189,8 @@ TEST_CASE("depth_first_search: single-node scenarios",
             .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
             .Build()
             .part_graph;
-    const ChainDescriptorResult result =
-        run_dfs(9999, {make_step(is_fragment, ChainStepKind::Sequence)}, parts);
+    const ChainDescriptorResult result = run_dfs(
+        9999, {make_step(is_fragment(), ChainStepKind::Sequence)}, parts);
 
     REQUIRE_FALSE(result.valid_subgraph.has_value());
     REQUIRE(result.invalid_subgraphs.size() == 1);
@@ -223,7 +224,7 @@ TEST_CASE(
     // fail is_serial; since match_count=1 >= 1 they trigger
     // HoldNodeAndAdvanceStep which re-enters with steps_end → records {joint0}.
     const ChainDescriptorResult result =
-        run_dfs(2, {make_step(is_serial, ChainStepKind::WhileIsTrue)}, parts);
+        run_dfs(2, {make_step(is_serial(), ChainStepKind::WhileIsTrue)}, parts);
 
     REQUIRE(result.valid_subgraph.has_value());
     REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2});
@@ -251,8 +252,8 @@ TEST_CASE(
     // HoldNodeAndAdvanceStep (match_count=1 >= 1) rather than Reject.
     const ChainDescriptorResult result =
         run_dfs(2,
-                {make_step(is_serial, ChainStepKind::WhileIsTrue),
-                 make_step(is_terminal, ChainStepKind::Sequence)},
+                {make_step(is_serial(), ChainStepKind::WhileIsTrue),
+                 make_step(is_terminal(), ChainStepKind::Sequence)},
                 parts);
 
     REQUIRE(result.valid_subgraph.has_value());
@@ -301,11 +302,11 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
   // IDs: frag0=0, frag1=1, joint0=2, joint1=3
 
   SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
-    const ChainDescriptorResult result =
-        run_dfs(2,
-                {make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 2),
-                 make_step(is_terminal, ChainStepKind::Sequence)},
-                parts);
+    const ChainDescriptorResult result = run_dfs(
+        2,
+        {make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2),
+         make_step(is_terminal(), ChainStepKind::Sequence)},
+        parts);
 
     REQUIRE(result.valid_subgraph.has_value());
     REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 3, 1});
@@ -336,11 +337,11 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
   }
 
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
-    const ChainDescriptorResult result =
-        run_dfs(2,
-                {make_step(is_serial, ChainStepKind::WhileIsTrueForMinimumN, 3),
-                 make_step(is_terminal, ChainStepKind::Sequence)},
-                parts);
+    const ChainDescriptorResult result = run_dfs(
+        2,
+        {make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 3),
+         make_step(is_terminal(), ChainStepKind::Sequence)},
+        parts);
 
     REQUIRE_FALSE(result.valid_subgraph.has_value());
 
@@ -378,7 +379,7 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
     // All joints in the Ring are serial so HoldNodeAndAdvanceStep never fires
     // (no failing node exists). The cycle guard ensures the DFS terminates.
     const ChainDescriptorResult result =
-        run_dfs(0, {make_step(is_serial, ChainStepKind::WhileIsTrue)},
+        run_dfs(0, {make_step(is_serial(), ChainStepKind::WhileIsTrue)},
                 steamrot::tests::ring.part_graph);
     REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
@@ -389,9 +390,10 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
     // satisfied; no valid subgraph can be found.
     const ChainDescriptorResult result =
         run_dfs(0,
-                {make_step(is_serial, ChainStepKind::WhileIsTrue),
-                 make_step(is_terminal, ChainStepKind::Sequence)},
+                {make_step(is_serial(), ChainStepKind::WhileIsTrue),
+                 make_step(is_terminal(), ChainStepKind::Sequence)},
                 steamrot::tests::ring.part_graph);
     REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 }
+} // namespace steamrot::tests

@@ -72,8 +72,7 @@ public:
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &
-  ScopeBegin(std::string name, steamrot::logic::descriptors::ScopeKind kind,
-             uint32_t depth = 0,
+  ScopeBegin(std::string name, steamrot::ScopeKind kind, uint32_t depth = 0,
              std::optional<std::string> anchor_id_alias = std::nullopt);
 
   /////////////////////////////////////////////////
@@ -85,8 +84,7 @@ public:
   /// @param depth  Nesting depth of this event.
   /// @return Reference to this builder for method chaining.
   /////////////////////////////////////////////////
-  AnalysisTraceBuilder &ScopeEnd(std::string name,
-                                 steamrot::logic::descriptors::ScopeKind kind,
+  AnalysisTraceBuilder &ScopeEnd(std::string name, steamrot::ScopeKind kind,
                                  bool result, uint32_t depth);
 
   /////////////////////////////////////////////////
@@ -101,8 +99,7 @@ public:
   /////////////////////////////////////////////////
   AnalysisTraceBuilder &NodeEval(const std::string &part_id_alias,
                                  std::string predicate_name,
-                                 const bool result = false,
-                                 uint32_t depth = 0,
+                                 const bool result = false, uint32_t depth = 0,
                                  std::string reason = {});
 
   /////////////////////////////////////////////////
@@ -174,7 +171,7 @@ public:
   /// The builder remains usable after this call; further events may be
   /// appended and @c Build() called again.
   /////////////////////////////////////////////////
-  steamrot::logic::descriptors::AnalysisTrace Build() const;
+  steamrot::AnalysisTrace Build() const;
 
 private:
   AnalysisTraceBuilder &
@@ -188,7 +185,7 @@ private:
 
   const std::unordered_map<std::string, uint32_t> *m_id_to_part_graph_id{
       nullptr};
-  steamrot::logic::descriptors::AnalysisTrace m_trace{};
+  steamrot::AnalysisTrace m_trace{};
 };
 
 } // namespace steamrot::tests

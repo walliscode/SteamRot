@@ -12,12 +12,14 @@
 using namespace steamrot::logic::descriptors;
 
 // Helper function to create a simple NodeDescriptor for testing
-steamrot::logic::descriptors::NodeDescriptor make_test_predicate() {
-
-  return [](const steamrot::PartGraph & /*parts*/, uint32_t /*id*/)
-             -> steamrot::logic::descriptors::NodeDescriptorResult {
-    return steamrot::logic::descriptors::NodeDescriptorResult{true};
-  };
+const NodeDescriptor &make_test_predicate() {
+  static const NodeDescriptor instance =
+      NodeDescriptor{"test_predicate",
+                     [](const steamrot::PartGraph & /*parts*/,
+                        uint32_t /*id*/) -> steamrot::NodeDescriptorResult {
+                       return steamrot::NodeDescriptorResult{true};
+                     }};
+  return instance;
 }
 
 TEST_CASE("ChainDescriptorBuilder::Then tests", "[ChainDescriptorBuilder]") {

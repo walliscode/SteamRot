@@ -11,8 +11,6 @@
 
 namespace steamrot::tests {
 
-using namespace steamrot::logic::descriptors;
-
 /////////////////////////////////////////////////
 AnalysisTraceBuilder::AnalysisTraceBuilder(
     const std::unordered_map<std::string, uint32_t> &id_to_part_graph_id)

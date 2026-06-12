@@ -104,6 +104,8 @@ template <typename T> class MachinaArchetypeBuilder {
     /////////////////////////////////////////////////
     ArchetypeStepKind kind;
 
+    using ResultStorageVariant =
+        std::variant<uint32_t T::*, SubGraph T::*, std::vector<SubGraph> T::*>;
     /////////////////////////////////////////////////
     /// @brief Destination field in the result struct @c T.
     ///
@@ -111,7 +113,7 @@ template <typename T> class MachinaArchetypeBuilder {
     /// @c std::vector<SubGraph> @c T::* stores multiple paths (reserved for
     /// future step kinds).
     /////////////////////////////////////////////////
-    std::variant<SubGraph T::*, std::vector<SubGraph> T::*> result_storage;
+    ResultStorageVariant result_storage;
 
     /////////////////////////////////////////////////
     /// @brief For use with step kinds that match multiple subgraphs, the
@@ -119,10 +121,9 @@ template <typename T> class MachinaArchetypeBuilder {
     /////////////////////////////////////////////////
     size_t min_repetitions{};
 
-    explicit ArchetypeStep(
-        ChainDescriptor descriptor, ArchetypeStepKind kind,
-        std::variant<SubGraph T::*, std::vector<SubGraph> T::*> result_storage,
-        size_t min_repetitions = 0)
+    explicit ArchetypeStep(ChainDescriptor descriptor, ArchetypeStepKind kind,
+                           ResultStorageVariant result_storage,
+                           size_t min_repetitions = 0)
         : descriptor(std::move(descriptor)), kind(kind),
           result_storage(std::move(result_storage)),
           min_repetitions(min_repetitions) {};
@@ -142,7 +143,7 @@ private:
     // guard statement for invalid pointer type; should never happen because
     // Then() only accepts SubGraph T::*, but added defensively to fail safely
     // if that invariant is ever broken.
-    if (!std::holds_alternative<SubGraph T::*>(step.result_storage)) {
+    if (!std::holds_alternative<uint32_t T::*>(step.result_storage)) {
       return false;
     }
 
@@ -151,8 +152,8 @@ private:
       // could add some kind of detection event in the future
       return false;
     }
-    SubGraph &result_field =
-        typed_result.*std::get<SubGraph T::*>(step.result_storage);
+    uint32_t &result_field =
+        typed_result.*std::get<uint32_t T::*>(step.result_storage);
 
     // analyise node with descriptor
     ChainDescriptorResult step_result =
@@ -166,7 +167,7 @@ private:
 
     // assign valid subgraph to result field if it exists
     if (step_result && step_result.valid_subgraph.has_value())
-      result_field = step_result.valid_subgraph.value();
+      result_field = step_result.valid_subgraph.value()[0];
 
     // add event showing whether result assignment happened
     add_machina_part_result_event(context, step.descriptor.GetName(),
@@ -329,11 +330,11 @@ public:
   /// times before @c Build().
   ///
   /// @param cd  ChainDescriptor to evaluate at this step.
-  /// @param ptr Pointer-to-member of @c T where the matching SubGraph is
+  /// @param ptr Pointer-to-member of @c T where the matching node id is
   ///            stored.
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
-  MachinaArchetypeBuilder &Then(ChainDescriptor cd, SubGraph T::*ptr) {
+  MachinaArchetypeBuilder &Then(ChainDescriptor cd, uint32_t T::*ptr) {
     m_steps.push_back(
         ArchetypeStep{std::move(cd), ArchetypeStepKind::Sequence, ptr});
     return *this;

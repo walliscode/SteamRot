@@ -52,17 +52,6 @@ public:
   NodeDescriptor(std::string name, FnType fn);
 
   /////////////////////////////////////////////////
-  /// @brief Construct an unnamed descriptor from any compatible callable.
-  ///
-  /// Enabled only for types other than @c NodeDescriptor itself so as not
-  /// to shadow the copy/move constructors.
-  /////////////////////////////////////////////////
-  template <typename F, typename = std::enable_if_t<
-                            !std::is_same_v<std::decay_t<F>, NodeDescriptor>>>
-  NodeDescriptor(F &&fn) // NOLINT(google-explicit-constructor)
-      : m_fn(std::forward<F>(fn)) {}
-
-  /////////////////////////////////////////////////
   /// @brief Evaluate the predicate and record trace events.
   ///
   /// Emits a @c NodeEval event after calling the underlying function. The
