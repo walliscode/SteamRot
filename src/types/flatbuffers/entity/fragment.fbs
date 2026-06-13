@@ -3,9 +3,15 @@ include "view_direction.fbs";
 
 namespace steamrot;
 
+
+table SocketFbs{
+local_position: Vector2fDataFbs (required);
+alignment_vector: Vector2fDataFbs (required);
+  }
+
 table FragmentFbs{
 name: string (required);
-sockets: [Vector2fDataFbs] (required);
+sockets: [SocketFbs] (required);
 positioning_views: [ViewFbs] (required);
   }
 

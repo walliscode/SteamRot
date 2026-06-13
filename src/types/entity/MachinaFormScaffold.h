@@ -236,7 +236,8 @@ struct JointInstance : public PartInstance {
       : PartInstance{initial_transform}, joint{joint_ptr} {
     if (!joint_ptr)
       return;
-    for (uint32_t i = 0; i < static_cast<uint32_t>(joint_ptr->socket_config.socket_count); ++i)
+    for (uint32_t i = 0;
+         i < static_cast<uint32_t>(joint_ptr->socket_config.socket_count); ++i)
       sockets.emplace(i, SocketData{sf::Vector2f{0.f, 0.f}});
   }
 
@@ -272,8 +273,9 @@ struct FragmentInstance : public PartInstance {
                    sf::Transform initial_transform = sf::Transform::Identity)
       : PartInstance{initial_transform}, fragment{fragment_ptr} {
     if (fragment_ptr) {
-      for (uint32_t i = 0; i < static_cast<uint32_t>(fragment_ptr->sockets.size()); ++i)
-        sockets.emplace(i, SocketData{fragment_ptr->sockets[i]});
+      for (uint32_t i = 0;
+           i < static_cast<uint32_t>(fragment_ptr->sockets.size()); ++i)
+        sockets.emplace(i, SocketData{fragment_ptr->sockets[i].local_position});
     }
   }
 

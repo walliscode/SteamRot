@@ -102,7 +102,9 @@ inline const Fragment fragment_one_socket = []() {
   f.name = "fragment_one_socket";
   f.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                        detail::MakeGreenOriginTriangle());
-  f.sockets = {{5.f, 5.f}};
+
+  Socket socket{{5.f, 5.f}, {1.f, 0.f}};
+  f.sockets.push_back(socket);
   return f;
 }();
 
@@ -116,7 +118,10 @@ inline const Fragment fragment_two_sockets = []() {
   f.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       detail::MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  f.sockets = {{0.f, 10.f}, {20.f, 10.f}};
+  Socket socket1{{0.f, 10.f}, {1.f, 0.f}};
+  Socket socket2{{20.f, 10.f}, {-1.f, 0.f}};
+  f.sockets.push_back(socket1);
+  f.sockets.push_back(socket2);
   return f;
 }();
 
@@ -130,7 +135,13 @@ inline const Fragment fragment_three_sockets = []() {
   f.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       detail::MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  f.sockets = {{0.f, 10.f}, {10.f, 10.f}, {20.f, 10.f}};
+  Socket socket1{{0.f, 10.f}, {1.f, 0.f}};
+  Socket socket2{{10.f, 10.f}, {0.f, 1.f}};
+  Socket socket3{{20.f, 10.f}, {-1.f, 0.f}};
+  f.sockets.push_back(socket1);
+  f.sockets.push_back(socket2);
+  f.sockets.push_back(socket3);
+
   return f;
 }();
 

@@ -4,8 +4,7 @@ add_executable(test_types
   core/EngineConfig.test.cpp
   core/SceneInfo.test.cpp
 
-
-
+  entity/Fragment.test.cpp
 
   components/CUIState.test.cpp
   components/CMeta.test.cpp
@@ -35,6 +34,7 @@ add_executable(test_types
 target_link_libraries(test_types PRIVATE
   Catch2::Catch2WithMain
   types
+  matchers
 )
 
 catch_discover_tests(test_types)

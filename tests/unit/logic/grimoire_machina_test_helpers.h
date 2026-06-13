@@ -56,7 +56,8 @@ steamrot::Fragment MakeFragment();
 /// @param colour Fill colour of the triangle. Defaults to green.
 /// @return Fragment with one Front view entry.
 /////////////////////////////////////////////////
-steamrot::Fragment MakeFragmentWithFrontView(sf::Color colour = sf::Color::Green);
+steamrot::Fragment
+MakeFragmentWithFrontView(sf::Color colour = sf::Color::Green);
 
 /////////////////////////////////////////////////
 /// @brief Build a Fragment with an origin-aligned coloured triangle in the
@@ -76,8 +77,7 @@ MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green);
 /// @param sockets Local socket positions to assign.
 /// @return Fragment whose sockets vector matches the argument.
 /////////////////////////////////////////////////
-steamrot::Fragment
-MakeFragmentWithSockets(std::vector<sf::Vector2f> sockets);
+steamrot::Fragment MakeFragmentWithSockets(std::vector<Socket> sockets);
 
 /////////////////////////////////////////////////
 /// @brief Build a vector of N default-constructed empty Fragments.
@@ -125,7 +125,8 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour = sf::Color::Blue);
 /// @param radius            Distance of sockets from the Joint's origin.
 /// @param has_fixed_socket  Whether socket index 0 is a fixed anchor.
 /// @param arc_min           Minimum rotation arc angle in degrees (default 0).
-/// @param arc_max           Maximum rotation arc angle in degrees (default 360).
+/// @param arc_max           Maximum rotation arc angle in degrees (default
+/// 360).
 /// @return Joint with the specified SocketConfig.
 /////////////////////////////////////////////////
 steamrot::Joint MakeJointWithSocketConfig(uint8_t socket_count, float radius,
@@ -152,7 +153,8 @@ std::vector<steamrot::Joint> MakeJoints(size_t count);
 /// @param name Key under which the Fragment is stored.
 /// @return GrimoireMachina with one empty Fragment.
 /////////////////////////////////////////////////
-steamrot::GrimoireMachina MakeGrimoireWithEmptyFragment(const std::string &name);
+steamrot::GrimoireMachina
+MakeGrimoireWithEmptyFragment(const std::string &name);
 
 /////////////////////////////////////////////////
 /// @brief Build a GrimoireMachina containing one named Fragment whose Front

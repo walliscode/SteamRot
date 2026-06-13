@@ -18,8 +18,66 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 25 &&
 
 namespace steamrot {
 
+struct SocketFbs;
+struct SocketFbsBuilder;
+
 struct FragmentFbs;
 struct FragmentFbsBuilder;
+
+struct SocketFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SocketFbsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LOCAL_POSITION = 4,
+    VT_ALIGNMENT_VECTOR = 6
+  };
+  const steamrot::Vector2fDataFbs *local_position() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_LOCAL_POSITION);
+  }
+  const steamrot::Vector2fDataFbs *alignment_vector() const {
+    return GetPointer<const steamrot::Vector2fDataFbs *>(VT_ALIGNMENT_VECTOR);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_LOCAL_POSITION) &&
+           verifier.VerifyTable(local_position()) &&
+           VerifyOffsetRequired(verifier, VT_ALIGNMENT_VECTOR) &&
+           verifier.VerifyTable(alignment_vector()) &&
+           verifier.EndTable();
+  }
+};
+
+struct SocketFbsBuilder {
+  typedef SocketFbs Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_local_position(::flatbuffers::Offset<steamrot::Vector2fDataFbs> local_position) {
+    fbb_.AddOffset(SocketFbs::VT_LOCAL_POSITION, local_position);
+  }
+  void add_alignment_vector(::flatbuffers::Offset<steamrot::Vector2fDataFbs> alignment_vector) {
+    fbb_.AddOffset(SocketFbs::VT_ALIGNMENT_VECTOR, alignment_vector);
+  }
+  explicit SocketFbsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SocketFbs> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SocketFbs>(end);
+    fbb_.Required(o, SocketFbs::VT_LOCAL_POSITION);
+    fbb_.Required(o, SocketFbs::VT_ALIGNMENT_VECTOR);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SocketFbs> CreateSocketFbs(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> local_position = 0,
+    ::flatbuffers::Offset<steamrot::Vector2fDataFbs> alignment_vector = 0) {
+  SocketFbsBuilder builder_(_fbb);
+  builder_.add_alignment_vector(alignment_vector);
+  builder_.add_local_position(local_position);
+  return builder_.Finish();
+}
 
 struct FragmentFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef FragmentFbsBuilder Builder;
@@ -31,8 +89,8 @@ struct FragmentFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *sockets() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *>(VT_SOCKETS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SocketFbs>> *sockets() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SocketFbs>> *>(VT_SOCKETS);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>> *positioning_views() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>> *>(VT_POSITIONING_VIEWS);
@@ -58,7 +116,7 @@ struct FragmentFbsBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(FragmentFbs::VT_NAME, name);
   }
-  void add_sockets(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>> sockets) {
+  void add_sockets(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SocketFbs>>> sockets) {
     fbb_.AddOffset(FragmentFbs::VT_SOCKETS, sockets);
   }
   void add_positioning_views(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>>> positioning_views) {
@@ -81,7 +139,7 @@ struct FragmentFbsBuilder {
 inline ::flatbuffers::Offset<FragmentFbs> CreateFragmentFbs(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>> sockets = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::SocketFbs>>> sockets = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ViewFbs>>> positioning_views = 0) {
   FragmentFbsBuilder builder_(_fbb);
   builder_.add_positioning_views(positioning_views);
@@ -93,10 +151,10 @@ inline ::flatbuffers::Offset<FragmentFbs> CreateFragmentFbs(
 inline ::flatbuffers::Offset<FragmentFbs> CreateFragmentFbsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     const char *name = nullptr,
-    const std::vector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>> *sockets = nullptr,
+    const std::vector<::flatbuffers::Offset<steamrot::SocketFbs>> *sockets = nullptr,
     const std::vector<::flatbuffers::Offset<steamrot::ViewFbs>> *positioning_views = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
-  auto sockets__ = sockets ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::Vector2fDataFbs>>(*sockets) : 0;
+  auto sockets__ = sockets ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::SocketFbs>>(*sockets) : 0;
   auto positioning_views__ = positioning_views ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ViewFbs>>(*positioning_views) : 0;
   return steamrot::CreateFragmentFbs(
       _fbb,

@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "configure_grimoire.h"
+#include "Fragment.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -39,8 +40,14 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
     fragment.sockets.reserve(sockets_fbs->size());
 
     for (const auto *socket_fbs : *sockets_fbs) {
+
       if (socket_fbs) {
-        fragment.sockets.emplace_back(socket_fbs->x(), socket_fbs->y());
+        fragment.sockets.emplace_back(
+            Socket{sf::Vector2f(socket_fbs->local_position()->x(),
+                                socket_fbs->local_position()->y()),
+                   sf::Vector2f(socket_fbs->alignment_vector()->x(),
+                                socket_fbs->alignment_vector()->y())});
+
       } else {
         return std::unexpected(
             FailInfo{FailMode::FlatbuffersDataNotFound, "Socket data is null"});
@@ -137,7 +144,7 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
       }
 
       fragment.positioning_views.insert_or_assign(direction,
-                                               std::move(vertex_array));
+                                                  std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
@@ -282,7 +289,8 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
         }
       }
 
-      joint.positioning_views.insert_or_assign(direction, std::move(vertex_array));
+      joint.positioning_views.insert_or_assign(direction,
+                                               std::move(vertex_array));
     }
   } else {
     return std::unexpected(FailInfo{FailMode::FlatbuffersDataNotFound,
