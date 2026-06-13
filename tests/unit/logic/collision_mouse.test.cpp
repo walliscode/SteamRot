@@ -46,7 +46,8 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is over a socket on the fragment") {
     steamrot::Fragment fragment;
-    fragment.sockets = {{100.f, 100.f}};
+    steamrot::Socket socket{{100.f, 100.f}, {1.f, 1.f}};
+    fragment.sockets.push_back(socket);
     steamrot::FragmentInstance fragment_instance{&fragment};
     sf::Vector2f world_mouse{103.f, 103.f};
     steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
@@ -56,7 +57,8 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is not over any socket on the fragment") {
     steamrot::Fragment fragment;
-    fragment.sockets = {{100.f, 100.f}};
+    steamrot::Socket socket{{100.f, 100.f}, {1.f, 1.f}};
+    fragment.sockets.push_back(socket);
     steamrot::FragmentInstance fragment_instance{&fragment};
     sf::Vector2f world_mouse{200.f, 200.f};
     steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,

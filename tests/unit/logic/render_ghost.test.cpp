@@ -6,17 +6,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "grimoire_machina_test_helpers.h"
 #include "render_ghost.h"
 #include "Fragment.h"
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
 #include "MrGhost.h"
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
@@ -259,7 +254,8 @@ TEST_CASE("draw_ghost_item draws socket circle for a FragmentInstance",
 
   // Fragment with a 20x20 white square and one socket at local (25, 10)
   steamrot::Fragment fragment = MakePopulatedFragment("leaf");
-  fragment.sockets.push_back({25.f, 10.f});
+  steamrot::Socket socket{{25.f, 10.f}, {1.f, 0.f}};
+  fragment.sockets.push_back(socket);
 
   steamrot::FragmentInstance instance{&fragment};
   instance.transform = sf::Transform::Identity;
@@ -308,4 +304,3 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment has no sockets",
   // painted — with no sockets it must remain black.
   REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
 }
-

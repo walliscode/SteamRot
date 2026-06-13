@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "configure_grimoire.h"
 #include "FailInfo.h"
+#include "flatbuffers/buffer.h"
 #include "types_generated.h"
 #include "view_direction_generated.h"
 #include <SFML/System/Vector2.hpp>
@@ -75,15 +76,24 @@ CreateTestView(flatbuffers::FlatBufferBuilder &builder,
 /// @return Offset to the created sockets vector
 /////////////////////////////////////////////////
 flatbuffers::Offset<
-    flatbuffers::Vector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>>
+    flatbuffers::Vector<flatbuffers::Offset<steamrot::SocketFbs>>>
 CreateTestSockets(flatbuffers::FlatBufferBuilder &builder,
                   size_t num_sockets = 2) {
-  std::vector<flatbuffers::Offset<steamrot::Vector2fDataFbs>> sockets;
+  std::vector<flatbuffers::Offset<steamrot::SocketFbs>> sockets;
+
+  // create sockets with positions (0,0), (10,20), (20,40), etc.
   for (size_t i = 0; i < num_sockets; ++i) {
-    sockets.push_back(steamrot::CreateVector2fDataFbs(
-        builder, static_cast<float>(i * 10), static_cast<float>(i * 20)));
+    flatbuffers::Offset<steamrot::Vector2fDataFbs> local_pos =
+        steamrot::CreateVector2fDataFbs(builder, static_cast<float>(i * 10),
+                                        static_cast<float>(i * 20));
+
+    flatbuffers::Offset<steamrot::Vector2fDataFbs> align_vec =
+        steamrot::CreateVector2fDataFbs(builder, 1.0f,
+                                        0.0f); // default alignment
+    //
+    sockets.push_back(steamrot::CreateSocketFbs(builder, local_pos, align_vec));
   }
-  return builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>(
+  return builder.CreateVector<flatbuffers::Offset<steamrot::SocketFbs>>(
       sockets);
 }
 
@@ -229,10 +239,14 @@ TEST_CASE("ConfigureFragment configures sockets successfully",
 
   REQUIRE(result.has_value());
   REQUIRE(fragment.sockets.size() == 4);
-  REQUIRE(fragment.sockets[0].x == 0.0f);
-  REQUIRE(fragment.sockets[0].y == 0.0f);
-  REQUIRE(fragment.sockets[1].x == 10.0f);
-  REQUIRE(fragment.sockets[1].y == 20.0f);
+  REQUIRE(fragment.sockets[0].local_position.x == 0.0f);
+  REQUIRE(fragment.sockets[0].local_position.y == 0.0f);
+  REQUIRE(fragment.sockets[0].alignment_vector.x == 1.0f);
+  REQUIRE(fragment.sockets[0].alignment_vector.y == 0.0f);
+  REQUIRE(fragment.sockets[1].local_position.x == 10.0f);
+  REQUIRE(fragment.sockets[1].local_position.y == 20.0f);
+  REQUIRE(fragment.sockets[1].alignment_vector.x == 1.0f);
+  REQUIRE(fragment.sockets[1].alignment_vector.y == 0.0f);
 }
 
 TEST_CASE("ConfigureFragment returns unexpected when sockets are missing",
@@ -243,9 +257,10 @@ TEST_CASE("ConfigureFragment returns unexpected when sockets are missing",
   auto view = CreateTestView(builder, steamrot::ViewDirectionFbs_FRONT, 2);
   auto views_vector =
       builder.CreateVector<flatbuffers::Offset<steamrot::ViewFbs>>({view});
+
   // create empty sockets vector
   auto empty_sockets_vector =
-      builder.CreateVector<flatbuffers::Offset<steamrot::Vector2fDataFbs>>({});
+      builder.CreateVector<flatbuffers::Offset<steamrot::SocketFbs>>({});
 
   // Create FragmentFbs without sockets (nullptr)
   auto fragment_fbs_offset = steamrot::CreateFragmentFbs(
@@ -279,7 +294,8 @@ TEST_CASE("ConfigureFragment configures positioning_views successfully",
 
   REQUIRE(result.has_value());
   REQUIRE(fragment.positioning_views.size() == 1);
-  REQUIRE(fragment.positioning_views.count(steamrot::ViewDirection::Front) == 1);
+  REQUIRE(fragment.positioning_views.count(steamrot::ViewDirection::Front) ==
+          1);
 
   const auto &vertex_array =
       fragment.positioning_views[steamrot::ViewDirection::Front];
@@ -499,8 +515,9 @@ TEST_CASE("ConfigureJoint configures positioning_views successfully",
   REQUIRE(vertex_array.getVertexCount() == 6);
 }
 
-TEST_CASE("ConfigureJoint returns unexpected when positioning_views are missing",
-          "[unit][ConfigureJoint]") {
+TEST_CASE(
+    "ConfigureJoint returns unexpected when positioning_views are missing",
+    "[unit][ConfigureJoint]") {
   flatbuffers::FlatBufferBuilder builder;
 
   auto name_offset = builder.CreateString("test_joint");

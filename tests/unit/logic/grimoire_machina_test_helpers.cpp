@@ -62,7 +62,7 @@ steamrot::Fragment MakeFragmentWithFrontView(sf::Color colour) {
 
   steamrot::Fragment fragment;
   fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           std::move(va));
+                                              std::move(va));
   return fragment;
 }
 
@@ -75,13 +75,14 @@ steamrot::Fragment MakeFragmentWithOriginTriangle(sf::Color colour) {
 
   steamrot::Fragment fragment;
   fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                           std::move(va));
-  fragment.sockets = {{5.f, 5.f}};
+                                              std::move(va));
+  Socket socket{{5.f, 5.f}, {1.f, 0.f}};
+  fragment.sockets.push_back(socket);
   return fragment;
 }
 
 /////////////////////////////////////////////////
-steamrot::Fragment MakeFragmentWithSockets(std::vector<sf::Vector2f> sockets) {
+steamrot::Fragment MakeFragmentWithSockets(std::vector<Socket> sockets) {
   steamrot::Fragment fragment;
   fragment.sockets = std::move(sockets);
   return fragment;
@@ -104,7 +105,7 @@ steamrot::Joint MakeJointWithFrontView(sf::Color colour) {
 
   steamrot::Joint joint;
   joint.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        std::move(va));
+                                           std::move(va));
   return joint;
 }
 
@@ -117,7 +118,7 @@ steamrot::Joint MakeJointWithOriginTriangle(sf::Color colour) {
 
   steamrot::Joint joint;
   joint.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                        std::move(va));
+                                           std::move(va));
   joint.socket_config.socket_count = 1;
   joint.socket_config.radius = 5.f;
   joint.socket_config.has_fixed_socket = false;
@@ -197,7 +198,8 @@ MakeGrimoireWithFragmentAndSocket(const std::string &name,
   fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  fragment.sockets.push_back(socket_local_pos);
+  Socket socket{{socket_local_pos.x, socket_local_pos.y}, {1.f, 0.f}};
+  fragment.sockets.push_back(socket);
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
 }
@@ -212,7 +214,11 @@ MakeGrimoireWithFragmentAndSockets(const std::string &name,
   fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  fragment.sockets = std::move(socket_positions);
+  for (const auto &pos : socket_positions) {
+    Socket socket{{pos.x, pos.y}, {1.f, 0.f}};
+    fragment.sockets.push_back(socket);
+  }
+
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
 }
@@ -254,8 +260,8 @@ PartGraphJointFixture MakePartGraphWithSingleJointInstance() {
 
   steamrot::JointInstance instance{fixture.joint.get()};
   instance.id = 0;
-  steamrot::logic::positioning::grimoire_machina::initialize_joint_socket_positions(
-      instance);
+  steamrot::logic::positioning::grimoire_machina::
+      initialize_joint_socket_positions(instance);
   fixture.parts.emplace(0, std::move(instance));
 
   return fixture;

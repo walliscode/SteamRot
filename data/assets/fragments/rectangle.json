@@ -2,9 +2,16 @@
   "name": "rectangle",
 
   "sockets": [
-    { "x": 0, "y": 5 },
-    { "x": 50, "y": 5 }
+    {
+      "local_position": { "x": 0, "y": 5 },
+      "alignment_vector": { "x": 1, "y": 0 }
+    },
+    {
+      "local_position": { "x": 50, "y": 5 },
+      "alignment_vector": { "x": -1, "y": 0 }
+    }
   ],
+
   "positioning_views": [
     {
       "direction": "FRONT",

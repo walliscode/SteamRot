@@ -41,7 +41,7 @@ FlatbuffersGrimoireMachinaProvider::ConfigureGrimoireMachina(
     if (!configure_result.has_value()) {
       return std::unexpected(configure_result.error());
     }
-    grimoire_machina.m_all_fragments[fragment.name] = fragment;
+    grimoire_machina.m_all_fragments.insert({fragment.name, fragment});
   }
 
   // load all the Joints from the flatbuffers data source
