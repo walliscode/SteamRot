@@ -1,0 +1,69 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of ColorEqualsMatcher for comparing sf::Color objects in
+/// Catch2 tests
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor Directives
+/////////////////////////////////////////////////
+#pragma once
+
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
+#include <SFML/Graphics/Color.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
+
+namespace steamrot::tests {
+
+/////////////////////////////////////////////////
+/// @class ColorEqualsMatcher
+/// @brief Class for comparing sf::Color objects in Catch2 tests
+/////////////////////////////////////////////////
+class ColorEqualsMatcher : public Catch::Matchers::MatcherBase<sf::Color> {
+
+private:
+  ///////////////////////////////////////////////////
+  /// @brief Expected color to compare against
+  ///////////////////////////////////////////////////
+  sf::Color m_expected;
+
+  /////////////////////////////////////////////////
+  /// @brief Store mismatch description for reporting
+  ///
+  /// @note mutable to allow modification in const match method
+  /////////////////////////////////////////////////
+  mutable std::string m_mismatch_description;
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Constructor for ColorEqualsMatcher
+  ///
+  /// @param expected Expected sf::Color to compare against
+  /////////////////////////////////////////////////
+  explicit ColorEqualsMatcher(const sf::Color &expected);
+
+  /////////////////////////////////////////////////
+  /// @brief Match method to compare actual color with expected
+  ///
+  /// @param actual sf::Color to compare
+  /// @return Whether the actual color matches the expected
+  /////////////////////////////////////////////////
+  bool match(const sf::Color &actual) const override;
+
+  /////////////////////////////////////////////////
+  /// @brief Describe the matcher for reporting
+  ///
+  /// @return Description of the matcher
+  /////////////////////////////////////////////////
+  std::string describe() const override;
+};
+
+/////////////////////////////////////////////////
+/// @brief Helper function to create a ColorEqualsMatcher
+/////////////////////////////////////////////
+inline ColorEqualsMatcher EqualsColor(const sf::Color &expected) {
+  return ColorEqualsMatcher(expected);
+}
+} // namespace steamrot::tests

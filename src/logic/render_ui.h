@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////
 
 #include "ButtonElement.h"
-#include "CUserInterface.h"
 #include "DropDownButtonElement.h"
 #include "DropDownContainerElement.h"
 #include "DropDownItemElement.h"
@@ -21,7 +20,8 @@
 #include "PanelElement.h"
 #include "UIElement.h"
 #include "UIStyle.h"
-#include "entity_memory.h"
+#include "containers.h"
+
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
@@ -160,9 +160,9 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 /// @param scene_texture  Render texture to draw to.
 /// @param ui_styles      Map of all available UIStyles (keyed by name).
 /////////////////////////////////////////////////
-void DrawAllUIEntities(const std::vector<size_t> &entity_indexes,
-                       EntityMemoryPool &scene_entities,
-                       sf::RenderTexture &scene_texture,
-                       const std::unordered_map<std::string, UIStyle> &ui_styles);
+void DrawAllUIEntities(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    sf::RenderTexture &scene_texture,
+    const std::unordered_map<std::string, UIStyle> &ui_styles);
 
 } // namespace steamrot::logic::render::ui

@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Vector2fEqualsMatcher.h"
-#include "conmat.h"
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
