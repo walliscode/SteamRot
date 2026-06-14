@@ -187,10 +187,13 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   // Create the rectangle using the element's position and size
   sf::RectangleShape rectangle(element.size);
   rectangle.setPosition(element.position);
+
   // Change color if hovered
   element.is_mouse_over ? rectangle.setFillColor(style.hover_color)
                         : rectangle.setFillColor(style.background_color);
+
   rectangle.setOutlineColor(style.border_color);
+
   // Border thickness is negative to draw inwards
   rectangle.setOutlineThickness(-style.border_thickness);
 
@@ -198,8 +201,7 @@ void DrawBorderAndBackground(sf::RenderTexture &texture,
   texture.draw(rectangle);
 }
 /////////////////////////////////////////////////
-void DrawDisabledOverlay(sf::RenderTexture &texture,
-                         const UIElement &element) {
+void DrawDisabledOverlay(sf::RenderTexture &texture, const UIElement &element) {
   sf::RectangleShape overlay(element.size);
   overlay.setPosition(element.position);
   overlay.setFillColor(sf::Color(128, 128, 128, 160));
@@ -229,10 +231,10 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 }
 
 /////////////////////////////////////////////////
-void DrawAllUIEntities(const std::vector<size_t> &entity_indexes,
-                       EntityMemoryPool &scene_entities,
-                       sf::RenderTexture &scene_texture,
-                       const std::unordered_map<std::string, UIStyle> &ui_styles) {
+void DrawAllUIEntities(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    sf::RenderTexture &scene_texture,
+    const std::unordered_map<std::string, UIStyle> &ui_styles) {
 
   for (size_t entity_id : entity_indexes) {
     CUserInterface &ui_component =

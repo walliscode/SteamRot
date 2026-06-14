@@ -371,6 +371,7 @@ CMakeUserPresets.json
 # CMake build directory
 build/
 !build/.gitkeep
+__cmake_systeminformation/
 
 # CodeQL build directory
 _codeql_build_dir/

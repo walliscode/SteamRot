@@ -16,6 +16,7 @@ add_executable(test_matchers
   EngineSnapshotEqualsMatcher.test.cpp
   Vector2fEqualsMatcher.test.cpp
   TraceEqualsMatcher.test.cpp
+  ColorEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers

@@ -19,6 +19,7 @@ add_library(matchers
   Vector2fEqualsMatcher.cpp
   AnalysisTraceBuilder.cpp
   TraceEqualsMatcher.cpp
+  ColorEqualsMatcher.cpp
 )
 
 target_include_directories(matchers

@@ -8,13 +8,19 @@
 /////////////////////////////////////////////////
 
 #include "render_ui.h"
+#include "ColorEqualsMatcher.h"
 #include "FailInfo.h"
 #include "logic_render_test_helpers.h"
 #include "paths.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <expected>
 
+namespace steamrot::tests {
+namespace {
 // Helper functions
 std::expected<sf::Font, steamrot::FailInfo> ProvideDefaultFont() {
   sf::Font font;
@@ -29,6 +35,20 @@ std::expected<sf::Font, steamrot::FailInfo> ProvideDefaultFont() {
   return font;
 }
 
+Style ProvideDefaultStyle() {
+  Style style;
+  style.background_color = sf::Color::White;
+  style.border_color = sf::Color::Blue;
+  style.border_thickness = 2.f;
+  style.radius_resolution = 5;
+  style.inner_margin = {5.f, 5.f};
+  style.minimum_size = {10.f, 10.f};
+  style.maximum_size = {100.f, 100.f};
+  style.hover_color = sf::Color::Green;
+
+  return style;
+}
+} // namespace
 TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
           "[unit][logic_render]") {
 
@@ -92,7 +112,7 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
   uint8_t font_size = 24;
   sf::Color color = sf::Color::White;
   steamrot::logic::render::ui::DrawText(render_texture, text, position,
-                                    {50.f, 50.f}, font, font_size, color);
+                                        {50.f, 50.f}, font, font_size, color);
   // get the image from the RenderTexture
   sf::Image image = render_texture.getTexture().copyToImage();
   // test that some pixels in the area where the text was drawn are not black
@@ -100,389 +120,33 @@ TEST_CASE("drawn text can be detected", "[unit][logic_render]") {
                                      sf::Color::White);
 }
 
-// TEST_CASE("steamrot::logic_render::DrawBorderAndBackground draws the hover "
-//           "color for a button",
-//
-//           "[unit][logic_render]") {
-//
-//   // create a RenderTexture
-//   size_t width = 100;
-//   size_t height = 100;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a ButtonElement
-//   steamrot::ButtonElement button;
-//   button.position = {25.0f, 25.0f};
-//   button.size = {50.0f, 50.0f};
-//   button.is_mouse_over = true;
-//
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//   // draw the button on the RenderTexture
-//   steamrot::logic::render::ui::DrawBorderAndBackground(render_texture, button,
-//                                                    style.button_style);
-//
-//   // get the image from the RenderTexture
-//   sf::Image image = render_texture.getTexture().copyToImage();
-//   // test that the correct pixels are drawn
-//   auto pixel_color = image.getPixel({50, 50});
-//   REQUIRE(pixel_color == style.button_style.hover_color);
-// }
+TEST_CASE("DrawBorderAndBackground tests") {
 
-// TEST_CASE("steamrot::logic_render::DrawUIELement draws a panel on a "
-//           "RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//
-//   // create a RenderTexture
-//   size_t width = 100;
-//   size_t height = 100;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//
-//   // create a PanelElement
-//   steamrot::PanelElement panel;
-//   panel.position = {25.0f, 25.0f};
-//   panel.size = {50.0f, 50.0f};
-//
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//
-//   // draw the panel on the RenderTexture
-//   steamrot::logic::render::ui::DrawPanelElement(render_texture, panel, style);
-//
-//   // display the Panel for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-//   // get the image from the RenderTexture
-//   sf::Image image = render_texture.getTexture().copyToImage();
-//
-//   steamrot::tests::TestDrawPanel(image, panel, style);
-// }
-//
-// TEST_CASE("steamrot::logic_render::DrawUIELement draws a ButtonElement on a "
-//           "RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a ButtonElement
-//   steamrot::ButtonElement button;
-//   button.label = "Click Me";
-//   button.position = {25.0f, 25.0f};
-//   button.size = {50.0f, 50.0f};
-//
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//
-//   // draw the button on the RenderTexture
-//   steamrot::logic::render::ui::DrawButtonElement(render_texture, button, style);
-//
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-//   // get the image from the RenderTexture
-//   sf::Image image = render_texture.getTexture().copyToImage();
-//   // test that the correct pixels are drawn
-//   // steamrot::tests::TestDrawButton(image, button, style);
-// }
-//
-// TEST_CASE("steamrot::logic_render::DrawUIElement draws a "
-//           "DropdownContainerElement "
-//           "on a RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//
-//   // create a DropDownContainerElement
-//   steamrot::DropDownContainerElement dd_container;
-//   dd_container.position = {25.0f, 25.0f};
-//   dd_container.size = {150.0f, 50.0f};
-//   dd_container.is_expanded = false;
-//
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//
-//   auto style = asset_manager.GetDefaultUIStyle();
-//
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//
-//   // draw the DropDownContainerElement on the RenderTexture
-//   steamrot::logic::render::ui::DrawDropDownContainerElement(render_texture,
-//                                                         dd_container, style);
-//
-//   // display the button for visual
-//   // inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-// TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
-//           "DropDownListElement "
-//           "on a RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownListElement
-//   steamrot::DropDownListElement dd_list;
-//   dd_list.position = {25.0f, 25.0f};
-//   dd_list.size = {100.0f, 25.0f};
-//   dd_list.is_expanded = false;
-//   dd_list.unexpanded_label = "...open up";
-//   dd_list.expanded_label = "...select";
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//   // draw the DropDownListElement on the RenderTexture
-//   steamrot::logic::render::ui::DrawDropDownListElement(render_texture, dd_list,
-//                                                    style);
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-// TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
-//           "DropDownListElement "
-//           "on a RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownListElement
-//   steamrot::DropDownListElement dd_list;
-//   dd_list.position = {25.0f, 25.0f};
-//   dd_list.size = {100.0f, 100.0f};
-//   dd_list.is_expanded = true;
-//   dd_list.unexpanded_label = "...open up";
-//   dd_list.expanded_label = "...select";
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//   // draw the DropDownListElement on the RenderTexture
-//   steamrot::logic::render::ui::DrawDropDownListElement(render_texture, dd_list,
-//                                                    style);
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-// TEST_CASE("steamrot::logic_render::DrawUIElement draws an unexpanded "
-//           "DropDownButtonElement on a RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownButtonElement
-//   steamrot::DropDownButtonElement dd_button;
-//
-//   dd_button.position = {25.0f, 25.0f};
-//   dd_button.size = {100.0f, 100.0f};
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//
-//   // draw the button on the RenderTexture
-//   steamrot::logic::render::ui::DrawDropDownButtonElement(render_texture,
-//   dd_button,
-//                                                      style);
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-//
-// TEST_CASE("steamrot::logic_render::DrawUIElement draws an expanded "
-//           "DropdownButtonElement "
-//           "on a RenderTexture",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownButtonElement
-//   steamrot::DropDownButtonElement dd_button;
-//   dd_button.position = {25.0f, 25.0f};
-//   dd_button.size = {100.0f, 100.0f};
-//   dd_button.is_expanded = true;
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//
-//   // draw the button on the RenderTexture
-//   steamrot::logic::render::ui::DrawDropDownButtonElement(render_texture,
-//   dd_button,
-//                                                      style);
-//
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-//
-// TEST_CASE("steamrot::logic_render::DrawNestedUIElements draws a unexpanded "
-//           "drop down setup",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownContainerElement
-//   steamrot::DropDownContainerElement dd_container;
-//   dd_container.position = {25.0f, 25.0f};
-//   dd_container.size = {150.0f, 25.0f};
-//   dd_container.is_expanded = false;
-//   dd_container.children_active = true;
-//   dd_container.layout = steamrot::LayoutType::LayoutType_Horizontal;
-//   // create a DropDownListElement
-//   std::unique_ptr<steamrot::DropDownListElement> dd_list =
-//       std::make_unique<steamrot::DropDownListElement>();
-//   dd_list->position = {0.0f, 50.0f};
-//   dd_list->size = {150.0f, 100.0f};
-//   dd_list->is_expanded = false;
-//
-//   // add the DropDownListElement to the DropDownContainerElement
-//   // as a child
-//   dd_container.child_elements.push_back(std::move(dd_list));
-//   // create a DropDownButtonElement
-//   std::unique_ptr<steamrot::DropDownButtonElement> dd_button =
-//       std::make_unique<steamrot::DropDownButtonElement>();
-//   dd_button->position = {0.0f, 0.0f};
-//   dd_button->size = {150.0f, 50.0f};
-//   dd_button->is_expanded = false;
-//   // add the DropDownButtonElement to the DropDownContainerElement
-//   // as a child
-//   dd_container.child_elements.push_back(std::move(dd_button));
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-//   // draw the DropDownContainerElement and its children on the RenderTexture
-//   steamrot::logic::render::ui::DrawNestedUIElements(render_texture, dd_container,
-//                                                 style);
-//   // display the button for visual inspection
-//   steamrot::tests::DisplayRenderTexture(render_texture);
-// }
-//
-// TEST_CASE("steamrot::logic_render::DrawNestedUIElements draws an expanded "
-//           "drop down setup",
-//           "[unit][logic_render][.visual]") {
-//   // create a RenderTexture
-//   size_t width = 200;
-//   size_t height = 200;
-//   sf::RenderTexture render_texture{sf::Vector2u(
-//       {static_cast<unsigned int>(width), static_cast<unsigned
-//       int>(height)})};
-//   // create a DropDownContainerElement
-//   steamrot::DropDownContainerElement dd_container;
-//   dd_container.position = {25.0f, 25.0f};
-//   dd_container.size = {150.0f, 100.0f};
-//   dd_container.is_expanded = true;
-//   dd_container.children_active = true;
-//   dd_container.layout = steamrot::LayoutType::LayoutType_Horizontal;
-//   // create a DropDownListElement
-//   std::unique_ptr<steamrot::DropDownListElement> dd_list =
-//       std::make_unique<steamrot::DropDownListElement>();
-//   dd_list->position = {0.0f, 50.0f};
-//   dd_list->size = {150.0f, 100.0f};
-//   dd_list->is_expanded = true;
-//   // add the DropDownListElement to the DropDownContainerElement
-//   // as a child
-//   dd_container.child_elements.push_back(std::move(dd_list));
-//   // create a DropDownButtonElement
-//   std::unique_ptr<steamrot::DropDownButtonElement> dd_button =
-//       std::make_unique<steamrot::DropDownButtonElement>();
-//   dd_button->position = {0.0f, 0.0f};
-//   dd_button->size = {150.0f, 50.0f};
-//   dd_button->is_expanded = false;
-//   // add the DropDownButtonElement to the DropDownContainerElement
-//   // as a child
-//   dd_container.child_elements.push_back(std::move(dd_button));
-//
-//   // add three DropDownL
-//   // load the default UIStyle
-//   steamrot::AssetManager asset_manager;
-//   auto load_default_assets_result = asset_manager.LoadDefaultAssets();
-//   if (!load_default_assets_result) {
-//     FAIL(load_default_assets_result.error().message);
-//   }
-//   auto style = asset_manager.GetDefaultUIStyle();
-//   // clear the RenderTexture
-//   render_texture.clear(sf::Color::Black);
-// }
+  // arrange
+  Style style = ProvideDefaultStyle();
+  sf::RenderTexture render_texture{sf::Vector2u{600, 800}};
+  render_texture.clear(sf::Color::Black);
 
-// ---------------------------------------------------------------------------
-// is_disabled rendering tests
-// ---------------------------------------------------------------------------
+  SECTION("DrawBorderAndBackground draws PanelElement with correct background "
+          "and border") {
+    // arrange
+    PanelElement panel;
+    panel.position = {100.f, 100.f};
+    panel.size = {200.f, 150.f};
 
+    // act
+    steamrot::logic::render::ui::DrawBorderAndBackground(render_texture, panel,
+                                                         style);
+    render_texture.display();
+
+    // test pixels in the border and background areas are correct
+    sf::Image image = render_texture.getTexture().copyToImage();
+    REQUIRE_THAT(image.getPixel({150, 101}),
+                 steamrot::tests::EqualsColor(style.border_color));
+    REQUIRE_THAT(image.getPixel({150, 150}),
+                 steamrot::tests::EqualsColor(style.background_color));
+  }
+}
 TEST_CASE(
     "DrawDisabledOverlay paints a semi-transparent grey rectangle over the "
     "element bounds",
@@ -554,3 +218,4 @@ TEST_CASE(
   // white either
   REQUIRE(centre_pixel != sf::Color::White);
 }
+} // namespace steamrot::tests

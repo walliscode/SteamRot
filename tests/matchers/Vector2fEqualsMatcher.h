@@ -8,6 +8,9 @@
 /////////////////////////////////////////////////
 #pragma once
 
+/////////////////////////////////////////////////
+/// Headers
+/////////////////////////////////////////////////
 #include <SFML/System/Vector2.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <string>
@@ -18,7 +21,8 @@ namespace steamrot::tests {
 /// @class Vector2fEqualsMatcher
 /// @brief Matcher for comparing sf::Vector2f with epsilon tolerance
 /////////////////////////////////////////////////
-class Vector2fEqualsMatcher : public Catch::Matchers::MatcherBase<sf::Vector2f> {
+class Vector2fEqualsMatcher
+    : public Catch::Matchers::MatcherBase<sf::Vector2f> {
 private:
   /////////////////////////////////////////////////
   /// @brief Expected vector to compare against
