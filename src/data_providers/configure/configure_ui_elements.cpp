@@ -18,6 +18,17 @@ namespace steamrot::data::configure {
 namespace {
 
 ////////////////////////////////////////////////////////////
+/// @brief Convert legacy integer UI element priority into tier ordering.
+///
+/// Legacy values are mapped as:
+/// - priority < 0  -> UIPriorityTier::Background
+/// - priority == 0 -> UIPriorityTier::Normal
+/// - priority == 1 -> UIPriorityTier::Elevated
+/// - priority >= 2 -> UIPriorityTier::Modal
+///
+/// @param priority Legacy integer priority from FlatBuffers data.
+/// @return Converted UIPriorityTier for fixed-pass UI processing.
+////////////////////////////////////////////////////////////
 UIPriorityTier PriorityTierFromLegacyPriority(const int priority) {
   if (priority < 0)
     return UIPriorityTier::Background;
