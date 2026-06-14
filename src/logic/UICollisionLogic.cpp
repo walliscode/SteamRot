@@ -25,6 +25,8 @@ void UICollisionLogic::ProcessLogic() {
   for (size_t entity_id : entity_indexes) {
     CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
         entity_id, m_scene_context.scene_entities);
+    if (!ui_component.m_visible)
+      continue;
     collision::mouse::ClearMouseOver(*ui_component.m_root_element);
   }
   m_scene_context.scene_state.is_mouse_over_ui_layer = false;

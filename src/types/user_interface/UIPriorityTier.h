@@ -13,7 +13,8 @@ namespace steamrot {
 /////////////////////////////////////////////////
 /// @brief Tier used for UI multipass rendering and collision ordering.
 ///
-/// Lower tiers are processed first for rendering and later for collision/action.
+/// Rendering processes lower tiers first; collision/action process tiers in the
+/// reverse order.
 /////////////////////////////////////////////////
 enum class UIPriorityTier {
   Background = 0,
