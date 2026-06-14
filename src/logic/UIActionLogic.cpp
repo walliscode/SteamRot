@@ -10,7 +10,9 @@
 #include "entity_memory.h"
 #include "action_ui.h"
 #include <SFML/Window/Mouse.hpp>
+#include <array>
 #include <magic_enum/magic_enum.hpp>
+#include <set>
 
 using namespace magic_enum::bitwise_operators;
 namespace steamrot::logic {
@@ -21,42 +23,43 @@ UIActionLogic::UIActionLogic(const SceneContext scene_context)
 /////////////////////////////////////////////////
 void UIActionLogic::ProcessLogic() {
 
-  // get entity indexes sorted by priority, highest first, so that the
-  // highest-priority entity processes actions before lower-priority ones.
-  // collision::UICollisionLogic already clears is_mouse_over on lower-priority
-  // entities, so this early-exit is a defensive measure only.
-  std::vector<size_t> entity_indexes =
-      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
-          m_scene_context.archetypes, m_scene_context.scene_entities,
-          /*ascending=*/false);
+  std::set<size_t> entity_index_set =
+      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
+          m_scene_context.archetypes, true);
+  std::vector<size_t> entity_indexes(entity_index_set.begin(),
+                                     entity_index_set.end());
 
-  for (size_t entity_id : entity_indexes) {
+  static constexpr std::array k_action_pass_order{
+      UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
+      UIPriorityTier::Background};
 
-    // get the CUserInterface component
-    CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-        entity_id, m_scene_context.scene_entities);
+  for (const UIPriorityTier tier : k_action_pass_order) {
+    for (size_t entity_id : entity_indexes) {
 
-    // skip if not visible
-    if (!ui_component.m_visible) {
-      continue;
-    }
+      // get the CUserInterface component
+      CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
+          entity_id, m_scene_context.scene_entities);
 
-    // check hover state BEFORE processing actions: we need to know whether this
-    // entity owned the mouse going into this frame so we can stop processing
-    // lower-priority entities afterwards. Actions cannot retroactively change
-    // another entity's hover state, and UICollisionLogic has already cleared
-    // is_mouse_over on all lower-priority entities.
-    bool entity_has_hover =
-        collision::mouse::AnyMouseOver(*ui_component.m_root_element);
+      // skip entities outside the active pass
+      if (ui_component.m_priority_tier != tier || !ui_component.m_visible) {
+        continue;
+      }
 
-    // Perform any action logic here, processing nested elements recursively
-    action::ui::ProcessNestedUIActionsAndEvents(
-        *ui_component.m_root_element, m_scene_context.event_handler,
-        m_scene_context);
+      // check hover state BEFORE processing actions: we need to know whether
+      // this entity owned the mouse going into this frame so we can stop
+      // processing lower-tier entities afterwards.
+      bool entity_has_hover =
+          collision::mouse::AnyMouseOver(*ui_component.m_root_element);
 
-    // if this entity had a hovered element, stop processing further entities
-    if (entity_has_hover) {
-      break;
+      // Perform any action logic here, processing nested elements recursively
+      action::ui::ProcessNestedUIActionsAndEvents(
+          *ui_component.m_root_element, m_scene_context.event_handler,
+          m_scene_context);
+
+      // if this entity had a hovered element, stop processing further entities
+      if (entity_has_hover) {
+        return;
+      }
     }
   }
 }

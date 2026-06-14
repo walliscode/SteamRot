@@ -13,6 +13,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
+#include "UIPriorityTier.h"
 #include "UIElement.h"
 #include "containers.h"
 #include <SFML/Graphics/Rect.hpp>
@@ -121,6 +122,26 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance);
 void CheckMouseOverAllCUserInterfaceComponents(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     const sf::Vector2i &mouse_position, bool &is_mouse_over_ui_layer);
+
+/////////////////////////////////////////////////
+/// @brief Process collision for one CUserInterface tier pass.
+///
+/// Iterates all entity indexes and processes only components whose
+/// CUserInterface::m_priority_tier matches @p tier. If a higher tier has
+/// already claimed mouse input, this pass only clears stale hover state.
+///
+/// @param entity_indexes All UI entity indices.
+/// @param scene_entities EntityMemoryPool containing CUserInterface components.
+/// @param mouse_position Current mouse cursor position in window coordinates.
+/// @param tier Current pass tier to process.
+/// @param higher_tier_claimed_mouse True when a previous pass already claimed
+///                                  mouse ownership.
+/// @param is_mouse_over_ui_layer Scene flag updated when any hovered UI exists.
+/////////////////////////////////////////////////
+void CheckMouseOverAllCUserInterfaceComponentsInTier(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, UIPriorityTier tier,
+    bool &higher_tier_claimed_mouse, bool &is_mouse_over_ui_layer);
 
 /////////////////////////////////////////////////
 /// @brief Run mouse-collision checks for all parts of an active

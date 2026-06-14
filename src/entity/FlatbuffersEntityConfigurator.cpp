@@ -18,6 +18,24 @@
 #include <variant>
 
 namespace steamrot {
+
+namespace {
+
+/////////////////////////////////////////////////
+/// @brief Convert legacy integer UI priority to enum tier.
+/////////////////////////////////////////////////
+UIPriorityTier PriorityTierFromLegacyPriority(const int priority) {
+  if (priority < 0)
+    return UIPriorityTier::Background;
+  if (priority == 0)
+    return UIPriorityTier::Normal;
+  if (priority == 1)
+    return UIPriorityTier::Elevated;
+  return UIPriorityTier::Modal;
+}
+
+} // namespace
+
 /////////////////////////////////////////////////
 FlatbuffersEntityConfigurator::FlatbuffersEntityConfigurator(
     EventHandler &event_handler)
@@ -162,9 +180,9 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
   // Always read the boolean value, not just when it's true
   ui_component.m_visible = ui_data->is_visible();
 
-  // Read priority (z-order) for rendering and collision ordering
-  if (ui_data->priority())
-    ui_component.m_priority = ui_data->priority();
+  // Read legacy priority int and map it to tier-based multipass ordering.
+  ui_component.m_priority_tier =
+      PriorityTierFromLegacyPriority(ui_data->priority());
 
   // Read the style name for per-entity style selection
   if (ui_data->ui_style_name())

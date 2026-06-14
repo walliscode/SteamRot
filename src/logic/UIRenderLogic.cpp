@@ -7,6 +7,8 @@
 #include "entity_memory.h"
 #include "render_ui.h"
 #include <SFML/Graphics.hpp>
+#include <array>
+#include <set>
 
 namespace steamrot::logic {
 
@@ -22,20 +24,27 @@ void UIRenderLogic::ProcessLogic() {
   m_scene_context.scene_texture.setView(
       m_scene_context.scene_texture.getDefaultView());
 
-  // Generate entity indexes sorted by priority ascending so that
-  // higher-priority entities are drawn last (on top)
-  auto entity_indexes =
-      archetypes::GetEntitiesSortedByPriority<CUserInterface>(
-          m_scene_context.archetypes, m_scene_context.scene_entities,
-          /*ascending=*/true);
+  // Get all UI entities once; draw order is controlled by fixed tier passes.
+  std::set<size_t> entity_index_set =
+      archetypes::GenerateEntityIndexesFromComponents<CUserInterface>(
+          m_scene_context.archetypes, true);
+
+  std::vector<size_t> entity_indexes(entity_index_set.begin(),
+                                     entity_index_set.end());
 
   if (entity_indexes.empty())
     return;
 
-  render::ui::DrawAllUIEntities(
-      entity_indexes, m_scene_context.scene_entities,
-      m_scene_context.scene_texture,
-      m_scene_context.asset_manager.GetAllUIStyles());
+  static constexpr std::array k_render_pass_order{
+      UIPriorityTier::Background, UIPriorityTier::Normal,
+      UIPriorityTier::Elevated, UIPriorityTier::Modal};
+
+  for (const UIPriorityTier tier : k_render_pass_order) {
+    render::ui::DrawAllUIEntitiesInTier(
+        entity_indexes, m_scene_context.scene_entities,
+        m_scene_context.scene_texture,
+        m_scene_context.asset_manager.GetAllUIStyles(), tier);
+  }
 }
 
 } // namespace steamrot::logic

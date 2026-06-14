@@ -1,0 +1,25 @@
+/////////////////////////////////////////////////
+/// @file
+/// @brief Declaration of UIPriorityTier enum for UI pass ordering.
+/////////////////////////////////////////////////
+
+/////////////////////////////////////////////////
+/// Preprocessor directives
+/////////////////////////////////////////////////
+#pragma once
+
+namespace steamrot {
+
+/////////////////////////////////////////////////
+/// @brief Tier used for UI multipass rendering and collision ordering.
+///
+/// Lower tiers are processed first for rendering and later for collision/action.
+/////////////////////////////////////////////////
+enum class UIPriorityTier {
+  Background = 0,
+  Normal = 1,
+  Elevated = 2,
+  Modal = 3
+};
+
+} // namespace steamrot

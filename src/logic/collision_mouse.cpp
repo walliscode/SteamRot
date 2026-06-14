@@ -196,6 +196,32 @@ void CheckMouseOverAllCUserInterfaceComponents(
 }
 
 /////////////////////////////////////////////////
+void CheckMouseOverAllCUserInterfaceComponentsInTier(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, const UIPriorityTier tier,
+    bool &higher_tier_claimed_mouse, bool &is_mouse_over_ui_layer) {
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+
+    if (ui_component.m_priority_tier != tier || !ui_component.m_visible) {
+      continue;
+    }
+
+    if (higher_tier_claimed_mouse) {
+      ClearMouseOver(*ui_component.m_root_element);
+      continue;
+    }
+
+    CheckMouseOver(mouse_position, *ui_component.m_root_element);
+    if (AnyMouseOver(*ui_component.m_root_element)) {
+      higher_tier_claimed_mouse = true;
+      is_mouse_over_ui_layer = true;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
                                sf::Vector2f world_mouse) {
   for (auto &[id, part] : scaffold.parts) {

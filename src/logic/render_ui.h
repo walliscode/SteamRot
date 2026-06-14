@@ -18,6 +18,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include "UIPriorityTier.h"
 #include "UIElement.h"
 #include "UIStyle.h"
 #include "containers.h"
@@ -148,21 +149,21 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
               const sf::Color &color);
 
 /////////////////////////////////////////////////
-/// @brief Draw all visible UI entities to a render texture.
+/// @brief Draw all visible UI entities in a single tier pass.
 ///
-/// Iterates the provided entity indices (in ascending priority order so that
-/// higher-priority entities are drawn on top), retrieves each entity's
-/// CUserInterface component, and calls DrawNestedUIElements for every visible
-/// entity using the style named by CUserInterface::m_style_name.
+/// Iterates all provided entity indices and draws only entities whose
+/// CUserInterface::m_priority_tier matches the requested tier.
 ///
-/// @param entity_indexes Entity indices in ascending priority order.
+/// @param entity_indexes Entity indices to inspect for this pass.
 /// @param scene_entities EntityMemoryPool containing CUserInterface components.
 /// @param scene_texture  Render texture to draw to.
 /// @param ui_styles      Map of all available UIStyles (keyed by name).
+/// @param tier           Tier being drawn in this pass.
 /////////////////////////////////////////////////
-void DrawAllUIEntities(
+void DrawAllUIEntitiesInTier(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     sf::RenderTexture &scene_texture,
-    const std::unordered_map<std::string, UIStyle> &ui_styles);
+    const std::unordered_map<std::string, UIStyle> &ui_styles,
+    UIPriorityTier tier);
 
 } // namespace steamrot::logic::render::ui

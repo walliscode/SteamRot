@@ -231,24 +231,26 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 }
 
 /////////////////////////////////////////////////
-void DrawAllUIEntities(
+void DrawAllUIEntitiesInTier(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     sf::RenderTexture &scene_texture,
-    const std::unordered_map<std::string, UIStyle> &ui_styles) {
+    const std::unordered_map<std::string, UIStyle> &ui_styles,
+    const UIPriorityTier tier) {
 
   for (size_t entity_id : entity_indexes) {
     CUserInterface &ui_component =
         entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
 
-    if (ui_component.m_visible) {
-      auto it = ui_styles.find(ui_component.m_style_name);
-      if (it == ui_styles.end())
-        it = ui_styles.find("default");
-      if (it == ui_styles.end())
-        continue;
-      DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
-                           it->second);
-    }
+    if (!ui_component.m_visible || ui_component.m_priority_tier != tier)
+      continue;
+
+    auto it = ui_styles.find(ui_component.m_style_name);
+    if (it == ui_styles.end())
+      it = ui_styles.find("default");
+    if (it == ui_styles.end())
+      continue;
+    DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
+                         it->second);
   }
 }
 
