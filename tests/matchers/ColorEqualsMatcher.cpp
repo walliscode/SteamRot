@@ -26,28 +26,36 @@ bool ColorEqualsMatcher::match(const sf::Color &actual) const {
   if (actual != m_expected) {
     oss << conmat::Indent(1) << conmat::TestFailed() << "\n";
     oss << conmat::Indent(2)
-        << "actual.r: " << conmat::Colorize(actual.r, conmat::Color::Red)
+        << "actual.r: "
+        << conmat::Colorize(static_cast<int>(actual.r), conmat::Color::Red)
         << "\n";
     oss << conmat::Indent(2)
-        << "expected.r: " << conmat::Colorize(m_expected.r, conmat::Color::Blue)
+        << "expected.r: "
+        << conmat::Colorize(static_cast<int>(m_expected.r), conmat::Color::Blue)
         << "\n";
     oss << conmat ::Indent(2)
-        << "actual.g: " << conmat::Colorize(actual.g, conmat::Color::Red)
+        << "actual.g: "
+        << conmat::Colorize(static_cast<int>(actual.g), conmat::Color::Red)
         << "\n";
     oss << conmat::Indent(2)
-        << "expected.g: " << conmat::Colorize(m_expected.g, conmat::Color::Blue)
+        << "expected.g: "
+        << conmat::Colorize(static_cast<int>(m_expected.g), conmat::Color::Blue)
         << "\n";
     oss << conmat::Indent(2)
-        << "actual.b: " << conmat::Colorize(actual.b, conmat::Color::Red)
+        << "actual.b: "
+        << conmat::Colorize(static_cast<int>(actual.b), conmat::Color::Red)
         << "\n";
     oss << conmat::Indent(2)
-        << "expected.b: " << conmat::Colorize(m_expected.b, conmat::Color::Blue)
+        << "expected.b: "
+        << conmat::Colorize(static_cast<int>(m_expected.b), conmat::Color::Blue)
         << "\n";
     oss << conmat::Indent(2)
-        << "actual.a: " << conmat::Colorize(actual.a, conmat::Color::Red)
+        << "actual.a: "
+        << conmat::Colorize(static_cast<int>(actual.a), conmat::Color::Red)
         << "\n";
     oss << conmat::Indent(2)
-        << "expected.a: " << conmat::Colorize(m_expected.a, conmat::Color::Blue)
+        << "expected.a: "
+        << conmat::Colorize(static_cast<int>(m_expected.a), conmat::Color::Blue)
         << "\n";
   }
 

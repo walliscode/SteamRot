@@ -137,11 +137,14 @@ TEST_CASE("DrawBorderAndBackground tests") {
     // act
     steamrot::logic::render::ui::DrawBorderAndBackground(render_texture, panel,
                                                          style);
+    render_texture.display();
 
     // test pixels in the border and background areas are correct
     sf::Image image = render_texture.getTexture().copyToImage();
-    REQUIRE_THAT(image.getPixel({101, 101}),
+    REQUIRE_THAT(image.getPixel({150, 101}),
                  steamrot::tests::EqualsColor(style.border_color));
+    REQUIRE_THAT(image.getPixel({150, 150}),
+                 steamrot::tests::EqualsColor(style.background_color));
   }
 }
 TEST_CASE(
