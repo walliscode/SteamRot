@@ -36,11 +36,11 @@ bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
 /// @brief Checks if the mouse is over a UIElement or any of its nested
 /// children, and sets each element's is_mouse_over accordingly.
 ///
-/// Children are evaluated in descending priority order only when
-/// element.children_active is true. When children are inactive, their stale
-/// hover state is cleared and the element itself is tested against the mouse
-/// bounds. If a descendant is hovered the parent's is_mouse_over is set to
-/// false.
+/// Children are evaluated by fixed tier passes (Modal -> Elevated -> Normal ->
+/// Background) only when element.children_active is true. When children are
+/// inactive, their stale hover state is cleared and the element itself is
+/// tested against the mouse bounds. If a descendant is hovered the parent's
+/// is_mouse_over is set to false.
 ///
 /// @param mouse_position The current global mouse position.
 /// @param element UIElement to check against (recurses into children).

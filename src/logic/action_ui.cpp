@@ -10,7 +10,9 @@
 #include "DataPopulationFunctions.h"
 #include "DropDownButtonElement.h"
 #include "DropDownItemElement.h"
+#include "UIPriorityTier.h"
 #include "action_grimoire_machina.h"
+#include <array>
 
 namespace steamrot::logic::action::ui {
 
@@ -72,25 +74,36 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
   // inactive, their hover state has already been cleared by CheckMouseOver so
   // we fall through to process the parent element directly.
   if (ui_element.children_active) {
-    // cycle through all child elements and process recursively
-    for (auto &child : ui_element.child_elements) {
+    static constexpr std::array k_action_pass_order{
+        UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
+        UIPriorityTier::Background};
 
-      // Check if this child is ready to be processed (compound boolean)
-      // This needs to be checked before the recursive call as the subscription
-      // will be set  inactive after processing
-      bool child_has_active_subscription = child->subscription &&
-                                           child->subscription->m_active &&
-                                           child->is_mouse_over;
+    for (const UIPriorityTier tier : k_action_pass_order) {
+      // cycle through all child elements and process recursively
+      for (auto &child : ui_element.child_elements) {
+        if (!child || child->m_priority_tier != tier)
+          continue;
 
-      // go as deep as possible first, this will stop when no children are
-      // detected
-      ProcessNestedUIActionsAndEvents(*child, event_handler, scene_context);
+        // Check if this child is ready to be processed (compound boolean)
+        // This needs to be checked before the recursive call as the subscription
+        // will be set  inactive after processing
+        bool child_has_active_subscription = child->subscription &&
+                                             child->subscription->m_active &&
+                                             child->is_mouse_over;
 
-      if (child_has_active_subscription) {
-        // that means that UIElement was processed and we don't want to process
-        // any sibling, parents or descendants
-        child_processed = true;
-        // if a child was processed, no need to check further children
+        // go as deep as possible first, this will stop when no children are
+        // detected
+        ProcessNestedUIActionsAndEvents(*child, event_handler, scene_context);
+
+        if (child_has_active_subscription) {
+          // that means that UIElement was processed and we don't want to process
+          // any sibling, parents or descendants
+          child_processed = true;
+          // if a child was processed, no need to check further children
+          break;
+        }
+      }
+      if (child_processed) {
         break;
       }
     }
@@ -247,7 +260,7 @@ void ProcessDropDownListElementActions(
     // create a new DropDownItemElement for each fragment name and add to the
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
-    dropdown_item->priority = 2;
+    dropdown_item->m_priority_tier = UIPriorityTier::Modal;
     dropdown_item->label = fragment_name;
 
     // store a lightweight tag; action_ghost resolves it to a FragmentInstance
@@ -270,7 +283,7 @@ void ProcessDropDownListElementActions(
     // create a new DropDownItemElement for each joint name and add to the
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
-    dropdown_item->priority = 2;
+    dropdown_item->m_priority_tier = UIPriorityTier::Modal;
     dropdown_item->label = joint_name;
 
     // store a lightweight tag; action_ghost resolves it to a JointInstance

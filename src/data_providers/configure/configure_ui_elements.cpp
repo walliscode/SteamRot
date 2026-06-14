@@ -15,6 +15,21 @@
 
 namespace steamrot::data::configure {
 
+namespace {
+
+////////////////////////////////////////////////////////////
+UIPriorityTier PriorityTierFromLegacyPriority(const int priority) {
+  if (priority < 0)
+    return UIPriorityTier::Background;
+  if (priority == 0)
+    return UIPriorityTier::Normal;
+  if (priority == 1)
+    return UIPriorityTier::Elevated;
+  return UIPriorityTier::Modal;
+}
+
+} // namespace
+
 ////////////////////////////////////////////////////////////
 Layout ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
@@ -124,7 +139,7 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   }
 
   element.children_active = data.children_active();
-  element.priority = data.priority();
+  element.m_priority_tier = PriorityTierFromLegacyPriority(data.priority());
   element.is_disabled = data.is_disabled();
 
   // Recursively create and attach children

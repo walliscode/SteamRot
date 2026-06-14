@@ -308,12 +308,12 @@ TEST_CASE(
   auto low_priority = std::make_unique<steamrot::PanelElement>();
   low_priority->position = {50, 50};
   low_priority->size = {100, 100};
-  low_priority->priority = 0;
+  low_priority->m_priority_tier = steamrot::UIPriorityTier::Normal;
 
   auto high_priority = std::make_unique<steamrot::PanelElement>();
   high_priority->position = {50, 50};
   high_priority->size = {100, 100};
-  high_priority->priority = 10;
+  high_priority->m_priority_tier = steamrot::UIPriorityTier::Modal;
 
   // Insert low-priority first so that insertion order alone would give it
   // hover; priority must override this
@@ -356,13 +356,13 @@ TEST_CASE("CheckMouseOver UIElement selects lower priority sibling when higher "
   auto high_priority = std::make_unique<steamrot::PanelElement>();
   high_priority->position = {150, 0};
   high_priority->size = {100, 100};
-  high_priority->priority = 10;
+  high_priority->m_priority_tier = steamrot::UIPriorityTier::Modal;
 
   // Low priority child on the left - mouse WILL be over it
   auto low_priority = std::make_unique<steamrot::PanelElement>();
   low_priority->position = {0, 0};
   low_priority->size = {100, 100};
-  low_priority->priority = 0;
+  low_priority->m_priority_tier = steamrot::UIPriorityTier::Normal;
 
   parent.child_elements.push_back(std::move(low_priority));
   parent.child_elements.push_back(std::move(high_priority));
@@ -403,13 +403,13 @@ TEST_CASE("CheckMouseOver UIElement with high-priority container having nested "
   auto exit_button = std::make_unique<steamrot::PanelElement>();
   exit_button->position = {50, 50};
   exit_button->size = {100, 100};
-  exit_button->priority = 0;
+  exit_button->m_priority_tier = steamrot::UIPriorityTier::Normal;
 
   // High-priority dropdown container that overlaps the exit button area
   auto dropdown_container = std::make_unique<steamrot::PanelElement>();
   dropdown_container->position = {0, 0};
   dropdown_container->size = {200, 200};
-  dropdown_container->priority = 10;
+  dropdown_container->m_priority_tier = steamrot::UIPriorityTier::Modal;
   dropdown_container->children_active = true;
 
   // Dropdown item nested inside the container, overlapping the exit button
@@ -603,7 +603,7 @@ TEST_CASE("CheckMouseOver UIElement with inactive high-priority sibling does "
   auto high_pri = std::make_unique<steamrot::PanelElement>();
   high_pri->position = {200, 0};
   high_pri->size = {100, 100};
-  high_pri->priority = 10;
+  high_pri->m_priority_tier = steamrot::UIPriorityTier::Modal;
   high_pri->children_active = false;
 
   // High-priority also has a child whose bounds DO cover the mouse position –
@@ -617,7 +617,7 @@ TEST_CASE("CheckMouseOver UIElement with inactive high-priority sibling does "
   auto low_pri = std::make_unique<steamrot::PanelElement>();
   low_pri->position = {0, 0};
   low_pri->size = {100, 100};
-  low_pri->priority = 0;
+  low_pri->m_priority_tier = steamrot::UIPriorityTier::Normal;
   low_pri->children_active = true;
 
   parent.child_elements.push_back(std::move(high_pri));
