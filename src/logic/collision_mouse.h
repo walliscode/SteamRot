@@ -13,6 +13,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
+#include "UIPriorityTier.h"
 #include "UIElement.h"
 #include "containers.h"
 #include <SFML/Graphics/Rect.hpp>
@@ -35,11 +36,11 @@ bool IsMouseOverBounds(const sf::Vector2i &mouse_position,
 /// @brief Checks if the mouse is over a UIElement or any of its nested
 /// children, and sets each element's is_mouse_over accordingly.
 ///
-/// Children are evaluated in descending priority order only when
-/// element.children_active is true. When children are inactive, their stale
-/// hover state is cleared and the element itself is tested against the mouse
-/// bounds. If a descendant is hovered the parent's is_mouse_over is set to
-/// false.
+/// Children are evaluated by fixed tier passes (Modal -> Elevated -> Normal ->
+/// Background) only when element.children_active is true. When children are
+/// inactive, their stale hover state is cleared and the element itself is
+/// tested against the mouse bounds. If a descendant is hovered the parent's
+/// is_mouse_over is set to false.
 ///
 /// @param mouse_position The current global mouse position.
 /// @param element UIElement to check against (recurses into children).
@@ -121,6 +122,26 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance);
 void CheckMouseOverAllCUserInterfaceComponents(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     const sf::Vector2i &mouse_position, bool &is_mouse_over_ui_layer);
+
+/////////////////////////////////////////////////
+/// @brief Process collision for one CUserInterface tier pass.
+///
+/// Iterates all entity indexes and processes only components whose
+/// CUserInterface::m_priority_tier matches @p tier. If a higher tier has
+/// already claimed mouse input, this pass only clears stale hover state.
+///
+/// @param entity_indexes All UI entity indices.
+/// @param scene_entities EntityMemoryPool containing CUserInterface components.
+/// @param mouse_position Current mouse cursor position in window coordinates.
+/// @param tier Current pass tier to process.
+/// @param higher_tier_claimed_mouse True when a previous pass already claimed
+///                                  mouse ownership.
+/// @param is_mouse_over_ui_layer Scene flag updated when any hovered UI exists.
+/////////////////////////////////////////////////
+void CheckMouseOverAllCUserInterfaceComponentsInTier(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, UIPriorityTier tier,
+    bool &higher_tier_claimed_mouse, bool &is_mouse_over_ui_layer);
 
 /////////////////////////////////////////////////
 /// @brief Run mouse-collision checks for all parts of an active

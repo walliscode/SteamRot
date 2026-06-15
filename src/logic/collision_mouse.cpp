@@ -11,7 +11,7 @@
 #include "MachinaFormScaffold.h"
 #include "UIElement.h"
 #include "entity_memory.h"
-#include <algorithm>
+#include <array>
 #include <vector>
 
 namespace steamrot::logic::collision::mouse {
@@ -56,28 +56,28 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   bool child_hovered = false;
 
   if (element.children_active) {
-    // Build a sorted view of children in descending priority order so that
-    // higher-priority siblings are evaluated before lower-priority ones
-    std::vector<UIElement *> sorted_children;
-    sorted_children.reserve(element.child_elements.size());
-    for (auto &child : element.child_elements) {
-      sorted_children.push_back(child.get());
-    }
-    std::stable_sort(sorted_children.begin(), sorted_children.end(),
-                     [](const UIElement *a, const UIElement *b) {
-                       return a->priority > b->priority;
-                     });
+    static constexpr std::array k_collision_pass_order{UIPriorityTier::Modal,
+                                                       UIPriorityTier::Elevated,
+                                                       UIPriorityTier::Normal};
 
-    // cycle through all child elements and check if any are hovered
-    for (auto *child : sorted_children) {
-      // go as deep as possible first; stops when no children are detected
-      CheckMouseOver(mouse_position, *child);
-      // Use AnyMouseOver so that a hover on any descendant (not just the
-      // immediate child) short-circuits the remaining lower-priority siblings
-      if (AnyMouseOver(*child)) {
-        // for the parent to evaluate
-        child_hovered = true;
-        // if any descendant is hovered, no need to check further siblings
+    for (const UIPriorityTier tier : k_collision_pass_order) {
+      // cycle through all child elements and check if any are hovered
+      for (auto &child : element.child_elements) {
+        if (!child || child->m_priority_tier != tier)
+          continue;
+
+        // go as deep as possible first; stops when no children are detected
+        CheckMouseOver(mouse_position, *child);
+        // Use AnyMouseOver so that a hover on any descendant (not just the
+        // immediate child) short-circuits the remaining lower-priority siblings
+        if (AnyMouseOver(*child)) {
+          // for the parent to evaluate
+          child_hovered = true;
+          // if any descendant is hovered, no need to check further siblings
+          break;
+        }
+      }
+      if (child_hovered) {
         break;
       }
     }
@@ -125,8 +125,8 @@ void CheckMouseOver(sf::Vector2f world_mouse,
 
     // get the world position of the socket by applying the fragment's transform
     // to the socket's local position
-    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
@@ -142,8 +142,8 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 
     // get the world position of the socket by applying the joint's transform
     // to the stored local socket position
-    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
@@ -191,6 +191,32 @@ void CheckMouseOverAllCUserInterfaceComponents(
         // layer
         is_mouse_over_ui_layer = true;
       }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void CheckMouseOverAllCUserInterfaceComponentsInTier(
+    const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
+    const sf::Vector2i &mouse_position, const UIPriorityTier tier,
+    bool &higher_tier_claimed_mouse, bool &is_mouse_over_ui_layer) {
+  for (size_t entity_id : entity_indexes) {
+    CUserInterface &ui_component =
+        entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
+
+    if (ui_component.m_priority_tier != tier || !ui_component.m_visible) {
+      continue;
+    }
+
+    if (higher_tier_claimed_mouse) {
+      ClearMouseOver(*ui_component.m_root_element);
+      continue;
+    }
+
+    CheckMouseOver(mouse_position, *ui_component.m_root_element);
+    if (AnyMouseOver(*ui_component.m_root_element)) {
+      higher_tier_claimed_mouse = true;
+      is_mouse_over_ui_layer = true;
     }
   }
 }

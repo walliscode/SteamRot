@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "Component.h"
+#include "UIPriorityTier.h"
 #include "UIElement.h"
 #include <memory>
 
@@ -29,7 +30,7 @@ struct CUserInterface : public Component {
       : Component(other), m_name(other.m_name),
         m_root_element(other.m_root_element ? other.m_root_element->Clone()
                                             : nullptr),
-        m_visible(other.m_visible), m_priority(other.m_priority),
+        m_visible(other.m_visible), m_priority_tier(other.m_priority_tier),
         m_style_name(other.m_style_name) {}
 
   /////////////////////////////////////////////////
@@ -45,7 +46,7 @@ struct CUserInterface : public Component {
       m_root_element =
           other.m_root_element ? other.m_root_element->Clone() : nullptr;
       m_visible = other.m_visible;
-      m_priority = other.m_priority;
+      m_priority_tier = other.m_priority_tier;
       m_style_name = other.m_style_name;
     }
     return *this;
@@ -69,11 +70,12 @@ struct CUserInterface : public Component {
   bool m_visible{false};
 
   /////////////////////////////////////////////////
-  /// @brief Rendering and collision priority (z-order). Higher values are
-  /// drawn on top and receive collision events first. Entities with higher
-  /// priority block collision from reaching lower-priority entities.
+  /// @brief UI tier used for multipass rendering/collision/action ordering.
+  ///
+  /// Rendering processes tiers from Background -> Modal, while collision/action
+  /// process tiers from Modal -> Background.
   /////////////////////////////////////////////////
-  int m_priority{0};
+  UIPriorityTier m_priority_tier{UIPriorityTier::Normal};
 
   /////////////////////////////////////////////////
   /// @brief Name of the UIStyle to use when rendering this component.

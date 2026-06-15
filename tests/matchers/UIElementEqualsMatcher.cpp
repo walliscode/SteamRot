@@ -226,6 +226,12 @@ bool UIElementEqualsMatcher::CompareUIElements(const UIElement &actual,
         << ", expected=" << expected.children_active << "; ";
   }
 
+  if (actual.m_priority_tier != expected.m_priority_tier) {
+    oss << prefix
+        << "m_priority_tier: actual=" << static_cast<int>(actual.m_priority_tier)
+        << ", expected=" << static_cast<int>(expected.m_priority_tier) << "; ";
+  }
+
   // Compare spacing_strategy and layout only for PanelElement
   if (const auto *actual_panel = dynamic_cast<const PanelElement *>(&actual)) {
     if (const auto *expected_panel =

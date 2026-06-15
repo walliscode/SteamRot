@@ -18,6 +18,7 @@
 #include <variant>
 
 namespace steamrot {
+
 /////////////////////////////////////////////////
 FlatbuffersEntityConfigurator::FlatbuffersEntityConfigurator(
     EventHandler &event_handler)
@@ -161,10 +162,6 @@ FlatbuffersEntityConfigurator::ConfigureCUserInterface(
 
   // Always read the boolean value, not just when it's true
   ui_component.m_visible = ui_data->is_visible();
-
-  // Read priority (z-order) for rendering and collision ordering
-  if (ui_data->priority())
-    ui_component.m_priority = ui_data->priority();
 
   // Read the style name for per-entity style selection
   if (ui_data->ui_style_name())

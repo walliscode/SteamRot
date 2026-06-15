@@ -124,7 +124,6 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   }
 
   element.children_active = data.children_active();
-  element.priority = data.priority();
   element.is_disabled = data.is_disabled();
 
   // Recursively create and attach children
@@ -152,7 +151,8 @@ ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
   // layout() and spacing_strategy() return scalar enum values (not pointers)
   // so no null-check is required; missing fields default to 0 (None/None).
   panel_element.layout = ConvertLayout(data.layout());
-  panel_element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
+  panel_element.spacing_strategy =
+      ConvertSpacingAndSizing(data.spacing_strategy());
   return std::monostate{};
 }
 

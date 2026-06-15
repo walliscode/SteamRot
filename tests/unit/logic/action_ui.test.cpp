@@ -1043,10 +1043,11 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
       dropdown.child_elements[0].get());
   REQUIRE(item != nullptr);
-  REQUIRE(item->priority ==
-          2); // priority should be set to 2 for any dropdown list item
-  REQUIRE(std::holds_alternative<steamrot::FragmentTag>(
-      item->ghost_selection_tag));
+  REQUIRE(item->m_priority_tier ==
+          steamrot::UIPriorityTier::Elevated); // dropdown list items are
+                                               // elevated tier
+  REQUIRE(
+      std::holds_alternative<steamrot::FragmentTag>(item->ghost_selection_tag));
   REQUIRE(std::get<steamrot::FragmentTag>(item->ghost_selection_tag).key ==
           "arm");
 }
@@ -1081,10 +1082,11 @@ TEST_CASE("logic::ui::action::ProcessDropDownListElementActions sets "
   auto *item = dynamic_cast<steamrot::DropDownItemElement *>(
       dropdown.child_elements[0].get());
   REQUIRE(item != nullptr);
-  REQUIRE(item->priority ==
-          2); // priority should be set to 2 for any dropdown list item
-  REQUIRE(std::holds_alternative<steamrot::JointTag>(
-      item->ghost_selection_tag));
+  REQUIRE(
+      item->m_priority_tier ==
+      steamrot::UIPriorityTier::Modal); // dropdown list items are modal tier
+  REQUIRE(
+      std::holds_alternative<steamrot::JointTag>(item->ghost_selection_tag));
   REQUIRE(std::get<steamrot::JointTag>(item->ghost_selection_tag).key ==
           "pivot");
 }

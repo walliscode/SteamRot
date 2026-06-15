@@ -8,14 +8,13 @@
 /// Preprocessor Directives
 /////////////////////////////////////////////////
 #include "EventPacket.h"
+#include "UIPriorityTier.h"
 #include "uuid.h"
 #pragma once
 
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Layout.h"
-#include "SpacingAndSizing.h"
 #include "Subscriber.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -67,10 +66,12 @@ struct UIElement {
   std::vector<std::unique_ptr<UIElement>> child_elements;
 
   /////////////////////////////////////////////////
-  /// @brief Priority for rendering and collision ordering among sibling
-  /// elements. Higher values are rendered on top and receive input first.
+  /// @brief Tier used for multipass ordering among sibling UI elements.
+  ///
+  /// Rendering processes tiers from Background -> Modal, while
+  /// collision/action process tiers from Modal -> Background.
   /////////////////////////////////////////////////
-  int priority{0};
+  UIPriorityTier m_priority_tier{UIPriorityTier::Normal};
 
   /////////////////////////////////////////////////
   /// @brief When true the element is greyed out: it cannot be interacted with
@@ -98,9 +99,8 @@ struct UIElement {
     target.response_events = response_events;
     target.is_mouse_over = is_mouse_over;
     target.children_active = children_active;
-    target.priority = priority;
+    target.m_priority_tier = m_priority_tier;
     target.is_disabled = is_disabled;
-
 
     // Deep copy children
     target.child_elements.clear();

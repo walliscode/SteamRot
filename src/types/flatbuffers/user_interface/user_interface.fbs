@@ -44,7 +44,6 @@ table UIElementDataFbs{
     children_active: bool ;
     children: [ChildDataFbs] (required);
     is_mouse_over: bool;
-    priority: int;
     is_disabled: bool;
 
   }
@@ -91,7 +90,6 @@ table UserInterfaceFbs{
     root_ui_element: PanelDataFbs (required); 
     ui_name: string; 
     is_visible: bool;
-    priority: int;
     ui_style_name: string;
   }
 

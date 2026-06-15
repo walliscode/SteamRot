@@ -304,8 +304,7 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CHILDREN_ACTIVE = 12,
     VT_CHILDREN = 14,
     VT_IS_MOUSE_OVER = 16,
-    VT_PRIORITY = 18,
-    VT_IS_DISABLED = 20
+    VT_IS_DISABLED = 18
   };
   const steamrot::Vector2fDataFbs *position() const {
     return GetPointer<const steamrot::Vector2fDataFbs *>(VT_POSITION);
@@ -328,9 +327,6 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool is_mouse_over() const {
     return GetField<uint8_t>(VT_IS_MOUSE_OVER, 0) != 0;
   }
-  int32_t priority() const {
-    return GetField<int32_t>(VT_PRIORITY, 0);
-  }
   bool is_disabled() const {
     return GetField<uint8_t>(VT_IS_DISABLED, 0) != 0;
   }
@@ -350,7 +346,6 @@ struct UIElementDataFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyVector(children()) &&
            verifier.VerifyVectorOfTables(children()) &&
            VerifyField<uint8_t>(verifier, VT_IS_MOUSE_OVER, 1) &&
-           VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
            VerifyField<uint8_t>(verifier, VT_IS_DISABLED, 1) &&
            verifier.EndTable();
   }
@@ -381,9 +376,6 @@ struct UIElementDataFbsBuilder {
   void add_is_mouse_over(bool is_mouse_over) {
     fbb_.AddElement<uint8_t>(UIElementDataFbs::VT_IS_MOUSE_OVER, static_cast<uint8_t>(is_mouse_over), 0);
   }
-  void add_priority(int32_t priority) {
-    fbb_.AddElement<int32_t>(UIElementDataFbs::VT_PRIORITY, priority, 0);
-  }
   void add_is_disabled(bool is_disabled) {
     fbb_.AddElement<uint8_t>(UIElementDataFbs::VT_IS_DISABLED, static_cast<uint8_t>(is_disabled), 0);
   }
@@ -410,10 +402,8 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbs(
     bool children_active = false,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<steamrot::ChildDataFbs>>> children = 0,
     bool is_mouse_over = false,
-    int32_t priority = 0,
     bool is_disabled = false) {
   UIElementDataFbsBuilder builder_(_fbb);
-  builder_.add_priority(priority);
   builder_.add_children(children);
   builder_.add_response_event_data(response_event_data);
   builder_.add_subscriber_data(subscriber_data);
@@ -434,7 +424,6 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
     bool children_active = false,
     const std::vector<::flatbuffers::Offset<steamrot::ChildDataFbs>> *children = nullptr,
     bool is_mouse_over = false,
-    int32_t priority = 0,
     bool is_disabled = false) {
   auto response_event_data__ = response_event_data ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::EventPacketFbs>>(*response_event_data) : 0;
   auto children__ = children ? _fbb.CreateVector<::flatbuffers::Offset<steamrot::ChildDataFbs>>(*children) : 0;
@@ -447,7 +436,6 @@ inline ::flatbuffers::Offset<UIElementDataFbs> CreateUIElementDataFbsDirect(
       children_active,
       children__,
       is_mouse_over,
-      priority,
       is_disabled);
 }
 
@@ -839,8 +827,7 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ROOT_UI_ELEMENT = 4,
     VT_UI_NAME = 6,
     VT_IS_VISIBLE = 8,
-    VT_PRIORITY = 10,
-    VT_UI_STYLE_NAME = 12
+    VT_UI_STYLE_NAME = 10
   };
   const steamrot::PanelDataFbs *root_ui_element() const {
     return GetPointer<const steamrot::PanelDataFbs *>(VT_ROOT_UI_ELEMENT);
@@ -850,9 +837,6 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool is_visible() const {
     return GetField<uint8_t>(VT_IS_VISIBLE, 0) != 0;
-  }
-  int32_t priority() const {
-    return GetField<int32_t>(VT_PRIORITY, 0);
   }
   const ::flatbuffers::String *ui_style_name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_UI_STYLE_NAME);
@@ -864,7 +848,6 @@ struct UserInterfaceFbs FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_UI_NAME) &&
            verifier.VerifyString(ui_name()) &&
            VerifyField<uint8_t>(verifier, VT_IS_VISIBLE, 1) &&
-           VerifyField<int32_t>(verifier, VT_PRIORITY, 4) &&
            VerifyOffset(verifier, VT_UI_STYLE_NAME) &&
            verifier.VerifyString(ui_style_name()) &&
            verifier.EndTable();
@@ -883,9 +866,6 @@ struct UserInterfaceFbsBuilder {
   }
   void add_is_visible(bool is_visible) {
     fbb_.AddElement<uint8_t>(UserInterfaceFbs::VT_IS_VISIBLE, static_cast<uint8_t>(is_visible), 0);
-  }
-  void add_priority(int32_t priority) {
-    fbb_.AddElement<int32_t>(UserInterfaceFbs::VT_PRIORITY, priority, 0);
   }
   void add_ui_style_name(::flatbuffers::Offset<::flatbuffers::String> ui_style_name) {
     fbb_.AddOffset(UserInterfaceFbs::VT_UI_STYLE_NAME, ui_style_name);
@@ -907,11 +887,9 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbs(
     ::flatbuffers::Offset<steamrot::PanelDataFbs> root_ui_element = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_name = 0,
     bool is_visible = false,
-    int32_t priority = 0,
     ::flatbuffers::Offset<::flatbuffers::String> ui_style_name = 0) {
   UserInterfaceFbsBuilder builder_(_fbb);
   builder_.add_ui_style_name(ui_style_name);
-  builder_.add_priority(priority);
   builder_.add_ui_name(ui_name);
   builder_.add_root_ui_element(root_ui_element);
   builder_.add_is_visible(is_visible);
@@ -923,7 +901,6 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbsDirect(
     ::flatbuffers::Offset<steamrot::PanelDataFbs> root_ui_element = 0,
     const char *ui_name = nullptr,
     bool is_visible = false,
-    int32_t priority = 0,
     const char *ui_style_name = nullptr) {
   auto ui_name__ = ui_name ? _fbb.CreateString(ui_name) : 0;
   auto ui_style_name__ = ui_style_name ? _fbb.CreateString(ui_style_name) : 0;
@@ -932,7 +909,6 @@ inline ::flatbuffers::Offset<UserInterfaceFbs> CreateUserInterfaceFbsDirect(
       root_ui_element,
       ui_name__,
       is_visible,
-      priority,
       ui_style_name__);
 }
 

@@ -15,9 +15,7 @@
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "entity_memory.h"
-#include <algorithm>
 #include <cstdint>
-#include <vector>
 
 namespace steamrot::logic::render::ui {
 
@@ -46,26 +44,18 @@ void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
 
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
-                          const UIStyle &style) {
-  // Draw the parent element first using dispatcher
-  DrawUIElementDispatch(texture, element, style);
+                          const UIStyle &style, const UIPriorityTier &tier) {
+
+  // only draw elements that match the current tier
+  if (element.m_priority_tier == tier) {
+    // Draw the parent element first using dispatcher
+    DrawUIElementDispatch(texture, element, style);
+  }
 
   // if children are active, draw them
   if (element.children_active) {
-    // Build a sorted view of children in ascending priority order so that
-    // lower-priority siblings are drawn first and higher-priority ones are
-    // drawn on top (painter's algorithm)
-    std::vector<const UIElement *> sorted_children;
-    sorted_children.reserve(element.child_elements.size());
     for (const auto &child : element.child_elements) {
-      sorted_children.push_back(child.get());
-    }
-    std::stable_sort(sorted_children.begin(), sorted_children.end(),
-                     [](const UIElement *a, const UIElement *b) {
-                       return a->priority < b->priority;
-                     });
-    for (const auto *child : sorted_children) {
-      DrawNestedUIElements(texture, *child, style);
+      DrawNestedUIElements(texture, *child, style, tier);
     }
   }
 
@@ -231,23 +221,31 @@ void DrawText(sf::RenderTexture &texture, const std::string &text,
 }
 
 /////////////////////////////////////////////////
-void DrawAllUIEntities(
+void DrawAllUIEntitiesInTier(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     sf::RenderTexture &scene_texture,
-    const std::unordered_map<std::string, UIStyle> &ui_styles) {
+    const std::unordered_map<std::string, UIStyle> &ui_styles,
+    const UIPriorityTier tier) {
 
   for (size_t entity_id : entity_indexes) {
     CUserInterface &ui_component =
         entity::memory::GetComponent<CUserInterface>(entity_id, scene_entities);
 
-    if (ui_component.m_visible) {
-      auto it = ui_styles.find(ui_component.m_style_name);
-      if (it == ui_styles.end())
-        it = ui_styles.find("default");
-      if (it == ui_styles.end())
-        continue;
+    if (!ui_component.m_visible || ui_component.m_priority_tier != tier)
+      continue;
+
+    auto it = ui_styles.find(ui_component.m_style_name);
+    if (it == ui_styles.end())
+      it = ui_styles.find("default");
+    if (it == ui_styles.end())
+      continue;
+
+    static constexpr std::array k_render_pass_order{UIPriorityTier::Normal,
+                                                    UIPriorityTier::Elevated,
+                                                    UIPriorityTier::Modal};
+    for (const UIPriorityTier tier : k_render_pass_order) {
       DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
-                           it->second);
+                           it->second, tier);
     }
   }
 }
