@@ -327,6 +327,83 @@
         }
       },
       {
+        "c_user_interface": {
+          "ui_name": "right_toolbar",
+          "is_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": {
+                "x": 700,
+                "y": 0
+              },
+              "size": {
+                "x": 100,
+                "y": 600
+              },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonDataFbs",
+                  "element": {
+                    "label": "Analyse",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": []
+                    }
+                  }
+                },
+                {
+                  "element_type": "ButtonDataFbs",
+                  "element": {
+                    "label": "Align",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": []
+                    }
+                  }
+                },
+                {
+                  "element_type": "ButtonDataFbs",
+                  "element": {
+                    "label": "Clear",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": []
+                    }
+                  }
+                }
+              ]
+            },
+            "layout": "Vertical",
+            "spacing_strategy": "Even"
+          }
+        }
+      },
+      {
         "c_ui_state": {
           "ui_states": [
             {
@@ -334,7 +411,8 @@
               "ui_state_changes": {
                 "ui_names_on": [
                   "new_construct_menu",
-                  "fragment_selection_menu"
+                  "fragment_selection_menu",
+                  "right_toolbar"
                 ],
                 "ui_names_off": ["initial_crafting_menu"]
               },
@@ -355,7 +433,8 @@
                 "ui_names_on": ["initial_crafting_menu"],
                 "ui_names_off": [
                   "new_construct_menu",
-                  "fragment_selection_menu"
+                  "fragment_selection_menu",
+                  "right_toolbar"
                 ]
               },
               "subscribers": [
