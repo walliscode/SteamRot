@@ -46,22 +46,26 @@ void compute_socket_local_positions_even_spread(
   const float arc_min = config.rotation_arc_min;
   const float arc_max = config.rotation_arc_max;
   const float arc_range = arc_max - arc_min;
-  const float angle_between_sockets = arc_range / (config.socket_count + 1);
 
-  // The following logic can change:
-  // sockets are not placed on the arc endpoints, so we add
-  // angle_between_sockets to arc_min to get the angle of the first socket, and
-  // then add angle_between_sockets for each subsequent socket
-
-  for (int i = 0; i < config.socket_count; ++i) {
-    const float angle_deg = arc_min + angle_between_sockets * (i + 1);
+  // for a single socket, place it at the midpoint of the arc
+  if (config.socket_count == 1) {
+    const float angle_deg = arc_min + arc_range / 2.f;
     const float angle_rad = sf::degrees(angle_deg).asRadians();
-
-    local_positions[i] =
+    local_positions[0] =
         origin +
         sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
+  } else {
+    const float angle_between_sockets = arc_range / (config.socket_count - 1);
+    // for greater that one socket, place them on the arc min/max range, evenly
+    // spaced
+    for (size_t i = 0; i < config.socket_count; ++i) {
+      const float angle_deg = arc_min + (i * angle_between_sockets);
+      const float angle_rad = sf::degrees(angle_deg).asRadians();
+      local_positions[i] =
+          origin + sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
+                       config.radius;
+    }
   }
-
   return;
 }
 
