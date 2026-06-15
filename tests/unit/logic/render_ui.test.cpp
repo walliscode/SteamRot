@@ -205,8 +205,8 @@ TEST_CASE(
   steamrot::UIStyle style;
   style.panel_style.background_color = sf::Color::White;
 
-  steamrot::logic::render::ui::DrawNestedUIElements(render_texture, panel,
-                                                    style);
+  steamrot::logic::render::ui::DrawNestedUIElements(
+      render_texture, panel, style, steamrot::UIPriorityTier::Normal);
   render_texture.display();
 
   sf::Image image = render_texture.getTexture().copyToImage();

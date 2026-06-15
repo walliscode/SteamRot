@@ -15,7 +15,6 @@
 #include "DropDownListElement.h"
 #include "PanelElement.h"
 #include "entity_memory.h"
-#include <array>
 #include <cstdint>
 
 namespace steamrot::logic::render::ui {
@@ -45,22 +44,18 @@ void DrawUIElementDispatch(sf::RenderTexture &texture, const UIElement &element,
 
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
-                          const UIStyle &style) {
-  // Draw the parent element first using dispatcher
-  DrawUIElementDispatch(texture, element, style);
+                          const UIStyle &style, const UIPriorityTier &tier) {
+
+  // only draw elements that match the current tier
+  if (element.m_priority_tier == tier) {
+    // Draw the parent element first using dispatcher
+    DrawUIElementDispatch(texture, element, style);
+  }
 
   // if children are active, draw them
   if (element.children_active) {
-    static constexpr std::array k_render_pass_order{
-        UIPriorityTier::Background, UIPriorityTier::Normal,
-        UIPriorityTier::Elevated, UIPriorityTier::Modal};
-
-    for (const UIPriorityTier tier : k_render_pass_order) {
-      for (const auto &child : element.child_elements) {
-        if (!child || child->m_priority_tier != tier)
-          continue;
-        DrawNestedUIElements(texture, *child, style);
-      }
+    for (const auto &child : element.child_elements) {
+      DrawNestedUIElements(texture, *child, style, tier);
     }
   }
 
@@ -244,8 +239,14 @@ void DrawAllUIEntitiesInTier(
       it = ui_styles.find("default");
     if (it == ui_styles.end())
       continue;
-    DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
-                         it->second);
+
+    static constexpr std::array k_render_pass_order{UIPriorityTier::Normal,
+                                                    UIPriorityTier::Elevated,
+                                                    UIPriorityTier::Modal};
+    for (const UIPriorityTier tier : k_render_pass_order) {
+      DrawNestedUIElements(scene_texture, *ui_component.m_root_element,
+                           it->second, tier);
+    }
   }
 }
 

@@ -3,8 +3,8 @@
 /////////////////////////////////////////////////
 #include "UIRenderLogic.h"
 #include "CUserInterface.h"
+#include "UIPriorityTier.h"
 #include "archetypes.h"
-#include "entity_memory.h"
 #include "render_ui.h"
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -35,9 +35,11 @@ void UIRenderLogic::ProcessLogic() {
   if (entity_indexes.empty())
     return;
 
+  // to prevent skipping over the elevated UIElements in a normal
+  // CUserInterface, we need cycle through the tiers here first before
+  // proceeeding to the next CUserInterface
   static constexpr std::array k_render_pass_order{
-      UIPriorityTier::Background, UIPriorityTier::Normal,
-      UIPriorityTier::Elevated, UIPriorityTier::Modal};
+      UIPriorityTier::Normal, UIPriorityTier::Elevated, UIPriorityTier::Modal};
 
   for (const UIPriorityTier tier : k_render_pass_order) {
     render::ui::DrawAllUIEntitiesInTier(

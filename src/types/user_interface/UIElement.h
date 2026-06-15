@@ -15,8 +15,6 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Layout.h"
-#include "SpacingAndSizing.h"
 #include "Subscriber.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
@@ -103,7 +101,6 @@ struct UIElement {
     target.children_active = children_active;
     target.m_priority_tier = m_priority_tier;
     target.is_disabled = is_disabled;
-
 
     // Deep copy children
     target.child_elements.clear();

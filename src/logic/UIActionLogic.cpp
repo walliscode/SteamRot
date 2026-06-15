@@ -5,10 +5,10 @@
 #include "UIActionLogic.h"
 #include "CUserInterface.h"
 #include "Logic.h"
+#include "action_ui.h"
 #include "archetypes.h"
 #include "collision_mouse.h"
 #include "entity_memory.h"
-#include "action_ui.h"
 #include <SFML/Window/Mouse.hpp>
 #include <array>
 #include <magic_enum/magic_enum.hpp>
@@ -30,15 +30,17 @@ void UIActionLogic::ProcessLogic() {
                                      entity_index_set.end());
 
   static constexpr std::array k_action_pass_order{
-      UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
-      UIPriorityTier::Background};
+      UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal};
 
   for (const UIPriorityTier tier : k_action_pass_order) {
+    // this is a bit brute force, but due to how few CUserInterface entities
+    // there are, it should be fine for now. Feel free to optimize
     for (size_t entity_id : entity_indexes) {
 
       // get the CUserInterface component
-      CUserInterface &ui_component = entity::memory::GetComponent<CUserInterface>(
-          entity_id, m_scene_context.scene_entities);
+      CUserInterface &ui_component =
+          entity::memory::GetComponent<CUserInterface>(
+              entity_id, m_scene_context.scene_entities);
 
       // skip entities outside the active pass
       if (ui_component.m_priority_tier != tier || !ui_component.m_visible) {
@@ -52,9 +54,9 @@ void UIActionLogic::ProcessLogic() {
           collision::mouse::AnyMouseOver(*ui_component.m_root_element);
 
       // Perform any action logic here, processing nested elements recursively
-      action::ui::ProcessNestedUIActionsAndEvents(
-          *ui_component.m_root_element, m_scene_context.event_handler,
-          m_scene_context);
+      action::ui::ProcessNestedUIActionsAndEvents(*ui_component.m_root_element,
+                                                  m_scene_context.event_handler,
+                                                  m_scene_context);
 
       // if this entity had a hovered element, stop processing further entities
       if (entity_has_hover) {

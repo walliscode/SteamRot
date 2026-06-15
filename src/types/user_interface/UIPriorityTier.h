@@ -16,11 +16,6 @@ namespace steamrot {
 /// Rendering processes lower tiers first; collision/action process tiers in the
 /// reverse order.
 /////////////////////////////////////////////////
-enum class UIPriorityTier {
-  Background = 0,
-  Normal = 1,
-  Elevated = 2,
-  Modal = 3
-};
+enum class UIPriorityTier { Normal = 0, Elevated = 1, Modal = 2 };
 
 } // namespace steamrot

@@ -74,9 +74,9 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
   // inactive, their hover state has already been cleared by CheckMouseOver so
   // we fall through to process the parent element directly.
   if (ui_element.children_active) {
-    static constexpr std::array k_action_pass_order{
-        UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
-        UIPriorityTier::Background};
+    static constexpr std::array k_action_pass_order{UIPriorityTier::Modal,
+                                                    UIPriorityTier::Elevated,
+                                                    UIPriorityTier::Normal};
 
     for (const UIPriorityTier tier : k_action_pass_order) {
       // cycle through all child elements and process recursively
@@ -85,8 +85,8 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
           continue;
 
         // Check if this child is ready to be processed (compound boolean)
-        // This needs to be checked before the recursive call as the subscription
-        // will be set  inactive after processing
+        // This needs to be checked before the recursive call as the
+        // subscription will be set  inactive after processing
         bool child_has_active_subscription = child->subscription &&
                                              child->subscription->m_active &&
                                              child->is_mouse_over;
@@ -96,8 +96,8 @@ void ProcessNestedUIActionsAndEvents(UIElement &ui_element,
         ProcessNestedUIActionsAndEvents(*child, event_handler, scene_context);
 
         if (child_has_active_subscription) {
-          // that means that UIElement was processed and we don't want to process
-          // any sibling, parents or descendants
+          // that means that UIElement was processed and we don't want to
+          // process any sibling, parents or descendants
           child_processed = true;
           // if a child was processed, no need to check further children
           break;
@@ -221,6 +221,7 @@ void ProcessDropDownListElementActions(
     // list is collapsing: clear items and deactivate children
     dropdown_list_element.child_elements.clear();
     dropdown_list_element.children_active = false;
+
     return;
   }
 
@@ -260,7 +261,7 @@ void ProcessDropDownListElementActions(
     // create a new DropDownItemElement for each fragment name and add to the
     // child elements of the list
     auto dropdown_item = std::make_unique<DropDownItemElement>();
-    dropdown_item->m_priority_tier = UIPriorityTier::Modal;
+    dropdown_item->m_priority_tier = UIPriorityTier::Elevated;
     dropdown_item->label = fragment_name;
 
     // store a lightweight tag; action_ghost resolves it to a FragmentInstance

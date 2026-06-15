@@ -56,9 +56,9 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
   bool child_hovered = false;
 
   if (element.children_active) {
-    static constexpr std::array k_collision_pass_order{
-        UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
-        UIPriorityTier::Background};
+    static constexpr std::array k_collision_pass_order{UIPriorityTier::Modal,
+                                                       UIPriorityTier::Elevated,
+                                                       UIPriorityTier::Normal};
 
     for (const UIPriorityTier tier : k_collision_pass_order) {
       // cycle through all child elements and check if any are hovered
@@ -125,8 +125,8 @@ void CheckMouseOver(sf::Vector2f world_mouse,
 
     // get the world position of the socket by applying the fragment's transform
     // to the socket's local position
-    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly
@@ -142,8 +142,8 @@ void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
 
     // get the world position of the socket by applying the joint's transform
     // to the stored local socket position
-    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(socket.local_position);
 
     // check if the mouse is over this socket and update the socket state
     // accordingly

@@ -15,32 +15,6 @@
 
 namespace steamrot::data::configure {
 
-namespace {
-
-////////////////////////////////////////////////////////////
-/// @brief Convert legacy integer UI element priority into tier ordering.
-///
-/// Legacy values are mapped as:
-/// - priority < 0  -> UIPriorityTier::Background
-/// - priority == 0 -> UIPriorityTier::Normal
-/// - priority == 1 -> UIPriorityTier::Elevated
-/// - priority >= 2 -> UIPriorityTier::Modal
-///
-/// @param priority Legacy integer priority from FlatBuffers data.
-/// @return Converted UIPriorityTier for fixed-pass UI processing.
-////////////////////////////////////////////////////////////
-UIPriorityTier PriorityTierFromLegacyPriority(const int priority) {
-  if (priority < 0)
-    return UIPriorityTier::Background;
-  if (priority == 0)
-    return UIPriorityTier::Normal;
-  if (priority == 1)
-    return UIPriorityTier::Elevated;
-  return UIPriorityTier::Modal;
-}
-
-} // namespace
-
 ////////////////////////////////////////////////////////////
 Layout ConvertLayout(int8_t fbs_layout) {
   switch (fbs_layout) {
@@ -150,7 +124,6 @@ std::expected<std::monostate, FailInfo> ConfigureBaseUIElement(
   }
 
   element.children_active = data.children_active();
-  element.m_priority_tier = PriorityTierFromLegacyPriority(data.priority());
   element.is_disabled = data.is_disabled();
 
   // Recursively create and attach children
@@ -178,7 +151,8 @@ ConfigurePanelElement(PanelElement &panel_element, const PanelDataFbs &data) {
   // layout() and spacing_strategy() return scalar enum values (not pointers)
   // so no null-check is required; missing fields default to 0 (None/None).
   panel_element.layout = ConvertLayout(data.layout());
-  panel_element.spacing_strategy = ConvertSpacingAndSizing(data.spacing_strategy());
+  panel_element.spacing_strategy =
+      ConvertSpacingAndSizing(data.spacing_strategy());
   return std::monostate{};
 }
 

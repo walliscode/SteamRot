@@ -13,6 +13,7 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
+#include "UIPriorityTier.h"
 #include "collision_mouse.h"
 #include "paths.h"
 #include "positioning_ui.h"
@@ -372,8 +373,13 @@ void UIExplorerScene::DrawCanvas() {
   logic::positioning::ui::PositionNestedUIElements(*m_active_element,
                                                    active_style);
 
+  static constexpr std::array k_render_pass_order{
+      UIPriorityTier::Normal, UIPriorityTier::Elevated, UIPriorityTier::Modal};
   // render the element using the stored UIStyle
-  logic::render::ui::DrawNestedUIElements(tex, *m_active_element, active_style);
+  for (const UIPriorityTier tier : k_render_pass_order) {
+    logic::render::ui::DrawNestedUIElements(tex, *m_active_element,
+                                            active_style, tier);
+  }
 }
 
 /////////////////////////////////////////////////

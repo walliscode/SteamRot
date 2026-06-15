@@ -18,8 +18,8 @@
 #include "DropDownItemElement.h"
 #include "DropDownListElement.h"
 #include "PanelElement.h"
-#include "UIPriorityTier.h"
 #include "UIElement.h"
+#include "UIPriorityTier.h"
 #include "UIStyle.h"
 #include "containers.h"
 
@@ -45,7 +45,7 @@ namespace steamrot::logic::render::ui {
 /// @param style Style to use for drawing
 /////////////////////////////////////////////////
 void DrawNestedUIElements(sf::RenderTexture &texture, const UIElement &element,
-                          const UIStyle &style);
+                          const UIStyle &style, const UIPriorityTier &tier);
 
 /////////////////////////////////////////////////
 /// @brief Internal dispatcher that dispatches to type-specific drawing

@@ -32,8 +32,7 @@ void UICollisionLogic::ProcessLogic() {
   m_scene_context.scene_state.is_mouse_over_ui_layer = false;
 
   static constexpr std::array k_collision_pass_order{
-      UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal,
-      UIPriorityTier::Background};
+      UIPriorityTier::Modal, UIPriorityTier::Elevated, UIPriorityTier::Normal};
 
   bool higher_tier_claimed_mouse = false;
   for (const UIPriorityTier tier : k_collision_pass_order) {
