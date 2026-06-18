@@ -13,6 +13,7 @@
 #include "Vector2fEqualsMatcher.h"
 #include "descriptors_machina_archetypes.h"
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <variant>
@@ -74,6 +75,8 @@ TEST_CASE("align_grab_structure tests") {
   SECTION("align_grab_structure sets the anchor's transform to the provided "
           "vector") {
     // arrange
+    // pull out the transform of the anchor joint instance, we can use this to
+    // check if the function is actually changing it
     sf::Transform &anchor_transform = anchor_instance.transform;
     // add an arbitrary transform to the anchor joint instance to make sure the
     // function is actually changing it
@@ -89,8 +92,69 @@ TEST_CASE("align_grab_structure tests") {
       steamrot::logic::spatial_analysis::align_grab_structure(
           grab_result, graph, target_position);
       // assert
+      // the transform of the anchor joint should be able to move a 0,0 point to
+      // the target position
       REQUIRE_THAT(anchor_transform.transformPoint({0.f, 0.f}),
                    EqualsVector2f(target_position));
+    }
+  }
+
+  SECTION("align_grab_structure rotates the anchor joint correctly") {
+    // The anchor joint should be rotated such that the middle of its available
+    // arc aligns with the y axis this particular Joint has arc_min = 0  and
+    // arc_max = 270
+
+    // arrange
+
+    // pull out the transform of the anchor joint instance, we can use this to
+    // check if the function is actually changing it
+    sf::Transform &anchor_transform = anchor_instance.transform;
+
+    // get rotation values from the anchor Joint pointer
+    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
+    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
+    const float arc_mid = (arc_min + arc_max) / 2.f;
+
+    // act
+    steamrot::logic::spatial_analysis::align_grab_structure(grab_result, graph,
+                                                            {0.f, 0.f});
+
+    // assert
+    // construct a transform that rotates by the arc_mid value and check that it
+    // is equal to the anchor joint's transform
+    sf::Transform expected_transform;
+    expected_transform.rotate(sf::degrees(90 - arc_mid));
+
+    REQUIRE(anchor_transform == expected_transform);
+  }
+
+  SECTION("align_grab_structure translates and rotates the anchor joint "
+          "correctly") {
+    // The anchor joint should be translated to the provided position and
+    // rotated such that the middle of its available arc aligns with the y axis
+    // this particular Joint has arc_min = 0  and arc_max = 270
+    // arrange
+    // pull out the transform of the anchor joint instance, we can use this to
+    // check if the function is actually changing it
+    sf::Transform &anchor_transform = anchor_instance.transform;
+    // get rotation values from the anchor Joint pointer
+    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
+    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
+    const float arc_mid = (arc_min + arc_max) / 2.f;
+    // act
+    std::vector<sf::Vector2f> target_positions{
+        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
+    for (const sf::Vector2f &target_position : target_positions) {
+      steamrot::logic::spatial_analysis::align_grab_structure(
+          grab_result, graph, target_position);
+      // assert
+      // construct a transform that translates to the target position and then
+      // rotates by the arc_mid value and check that it is equal to the anchor
+      // joint's transform
+      sf::Transform expected_transform;
+      expected_transform.translate(target_position);
+      expected_transform.rotate(sf::degrees(90 - arc_mid));
+      REQUIRE(anchor_transform == expected_transform);
     }
   }
 }
