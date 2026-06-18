@@ -76,6 +76,15 @@ void align_grab_structure(const GrabResult &grab_result, PartGraph &part_graph,
   // anchor point
   anchor_joint.transform = sf::Transform::Identity;
   anchor_joint.transform.translate(anchor_point);
+
+  // now we find the mid point of the Joint arc
+  const float arc_min = anchor_joint.joint->socket_config.rotation_arc_min;
+  const float arc_max = anchor_joint.joint->socket_config.rotation_arc_max;
+  const float arc_mid = (arc_min + arc_max) / 2.f;
+
+  // the downwards y axis is 90 degrees, so we need to rotate the anchor joint
+  // by 90 - arc_mid
+  anchor_joint.transform.rotate(sf::degrees(90.f - arc_mid));
 };
 
 /////////////////////////////////////////////////

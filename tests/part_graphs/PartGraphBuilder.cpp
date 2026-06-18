@@ -135,11 +135,9 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
   return *this;
 }
 /////////////////////////////////////////////////
-PartGraphBuilder &
-PartGraphBuilder::ConnectUnchecked(const std::string &from_id,
-                                   const uint32_t from_socket_id,
-                                   const std::string &to_id,
-                                   const uint32_t to_socket_id) {
+PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
+    const std::string &from_id, const uint32_t from_socket_id,
+    const std::string &to_id, const uint32_t to_socket_id) {
   const auto from_it = m_package.id_to_part_graph_id.find(from_id);
   if (from_it == m_package.id_to_part_graph_id.end())
     FAIL("ConnectUnchecked: from_id '" << from_id << "' not found");
@@ -153,11 +151,9 @@ PartGraphBuilder::ConnectUnchecked(const std::string &from_id,
 
   // directly wire both socket endpoints without type-checking
   auto set_connected = [this](uint32_t part_id, uint32_t socket_id,
-                               uint32_t peer_part_id,
-                               uint32_t peer_socket_id) {
+                              uint32_t peer_part_id, uint32_t peer_socket_id) {
     std::visit(
-        [part_id, socket_id, peer_part_id,
-         peer_socket_id](auto &instance) {
+        [part_id, socket_id, peer_part_id, peer_socket_id](auto &instance) {
           if (!instance.sockets.count(socket_id))
             FAIL("ConnectUnchecked: socket_id ("
                  << socket_id << ") not found for part " << part_id);

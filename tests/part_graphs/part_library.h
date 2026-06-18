@@ -178,7 +178,7 @@ inline const Joint joint_two_sockets = []() {
   j.socket_config.socket_count = 2;
   j.socket_config.radius = 15.f;
   j.socket_config.rotation_arc_min = 0.f;
-  j.socket_config.rotation_arc_max = 360.f;
+  j.socket_config.rotation_arc_max = 270.f;
   return j;
 }();
 
