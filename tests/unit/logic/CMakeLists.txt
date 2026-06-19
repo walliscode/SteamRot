@@ -30,6 +30,7 @@ descriptors/descriptors_analysis_event_helpers.test.cpp
 descriptors/ChainDescriptorBuilder.test.cpp
 descriptors/depth_first_search.test.cpp
 descriptors/MachinaArchetypeBuilder.test.cpp
+descriptors/descriptors_runner.test.cpp
 )
 
 target_include_directories(test_logic

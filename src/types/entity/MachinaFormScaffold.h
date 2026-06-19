@@ -291,6 +291,8 @@ struct FragmentInstance : public PartInstance {
 using PartGraph =
     std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
 
+using StructuralAnalysisResults =
+    std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;
 /////////////////////////////////////////////////
 /// 3struct MachinaFormScaffold
 /// @brief Contains all data necessary to create a MachinaForm.
@@ -334,8 +336,7 @@ struct MachinaFormScaffold {
   /// @brief Holds the results of an analysis run, keyed by archetype name. Each
   /// archetype may produce multiple results
   /////////////////////////////////////////////////
-  std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>
-      archetype_results{};
+  StructuralAnalysisResults archetype_results{};
 };
 
 } // namespace steamrot
