@@ -1,4 +1,5 @@
 add_subdirectory(spatial_analysis)
+add_subdirectory(render)
 
 add_library(logic
   LogicFactory.cpp
@@ -24,11 +25,9 @@ add_library(logic
 
   action_ui.cpp
   state_ui.cpp
+
   render_ui.cpp
-
-
   render_grimoire_machina.cpp
-
   render_ghost.cpp
 
   action_grimoire_machina.cpp
