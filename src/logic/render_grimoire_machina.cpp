@@ -12,6 +12,7 @@
 #include "MachinaFormScaffold.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
@@ -73,8 +74,8 @@ void draw_joint_instance(sf::RenderTexture &texture,
                          const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
-  draw_view(texture, joint_instance.joint->positioning_views, ViewDirection::Front,
-            states);
+  draw_view(texture, joint_instance.joint->positioning_views,
+            ViewDirection::Front, states);
   if (draw_sockets)
     draw_joint_instance_sockets(texture, joint_instance);
 }
@@ -83,8 +84,8 @@ void draw_joint_instance(sf::RenderTexture &texture,
 void draw_fragment_instance_sockets(sf::RenderTexture &texture,
                                     FragmentInstance &fragment_instance) {
   for (auto &[socket_id, socket] : fragment_instance.sockets) {
-    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(socket.local_position);
     draw_socket(texture, world_pos, socket);
   }
 }
@@ -95,8 +96,8 @@ void draw_joint_instance_sockets(sf::RenderTexture &texture,
   for (auto &[socket_id, socket] : joint_instance.sockets) {
     // transform the socket's local position to get its world position, then
     // draw
-    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(socket.local_position);
     draw_socket(texture, world_pos, socket);
   }
 }
@@ -155,4 +156,8 @@ void draw_view(sf::RenderTexture &texture, const Views &views,
   texture.draw(views[view_direction], states);
 }
 
+/////////////////////////////////////////////////
+void draw_status_box(sf::FloatRect box, sf::Color color,
+                     const std::string &text, const sf::Font &font,
+                     sf::RenderTexture &texture) {}
 } // namespace steamrot::logic::render::grimoire_machina

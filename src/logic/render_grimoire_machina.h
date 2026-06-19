@@ -16,6 +16,9 @@
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -148,5 +151,9 @@ void draw_view(sf::RenderTexture &texture, const Views &views,
 /////////////////////////////////////////////////
 void draw_view(sf::RenderTexture &texture, const Views &views,
                ViewDirection view_direction, const sf::RenderStates &states);
+
+void draw_status_box(sf::FloatRect box, sf::Color color,
+                     const std::string &text, const sf::Font &font,
+                     sf::RenderTexture &texture);
 
 } // namespace steamrot::logic::render::grimoire_machina

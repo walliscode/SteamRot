@@ -49,6 +49,7 @@ target_link_libraries(test_logic
   context_test_helpers
   harness
   part_graphs
+  assets_for_tests
 
 
 )

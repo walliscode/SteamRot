@@ -6,34 +6,17 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-
 #include "render_ui.h"
 #include "ColorEqualsMatcher.h"
-#include "FailInfo.h"
 #include "logic_render_test_helpers.h"
-#include "paths.h"
+#include "test_fonts.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <expected>
 
 namespace steamrot::tests {
-namespace {
-// Helper functions
-std::expected<sf::Font, steamrot::FailInfo> ProvideDefaultFont() {
-  sf::Font font;
-  std::filesystem::path font_path =
-      steamrot::paths::GetDataDirectory() /
-      std::filesystem::path{"assets/fonts/Roboto-Regular.ttf"};
-  if (!font.openFromFile(font_path.string())) {
-    return std::unexpected(
-        steamrot::FailInfo{steamrot::FailMode::FileNotFound,
-                           "Failed to load font from " + font_path.string()});
-  }
-  return font;
-}
 
 Style ProvideDefaultStyle() {
   Style style;
@@ -48,7 +31,7 @@ Style ProvideDefaultStyle() {
 
   return style;
 }
-} // namespace
+
 TEST_CASE("Determine whether pixels can be tested on a RenderTexture",
           "[unit][logic_render]") {
 
