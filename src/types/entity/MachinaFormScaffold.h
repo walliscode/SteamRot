@@ -12,6 +12,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "DescriptorResult.h"
 #include "Fragment.h"
 #include "Joint.h"
 #include <SFML/Graphics/Transform.hpp>
@@ -20,6 +21,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -326,6 +328,14 @@ struct MachinaFormScaffold {
   /// Joint and Fragments.
   /////////////////////////////////////////////////
   bool are_sockets_visible{false};
+
+  // Analysis Results //
+  /////////////////////////////////////////////////
+  /// @brief Holds the results of an analysis run, keyed by archetype name. Each
+  /// archetype may produce multiple results
+  /////////////////////////////////////////////////
+  std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>
+      archetype_results{};
 };
 
 } // namespace steamrot
