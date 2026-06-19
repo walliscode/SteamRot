@@ -1,6 +1,7 @@
 add_library(part_graphs
   PartGraphBuilder.cpp
   part_graph_library.cpp
+  machina_archetype_packages.cpp
 )
 
 target_include_directories(part_graphs

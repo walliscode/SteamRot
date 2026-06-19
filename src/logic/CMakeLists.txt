@@ -56,6 +56,7 @@ add_library(logic
   descriptors/descriptors_machina_archetypes.cpp
   descriptors/TerminalDescriptorFormatter.cpp
   descriptors/depth_first_search.cpp
+  descriptors/descriptors_runner.cpp
 )
 
 target_include_directories(logic
