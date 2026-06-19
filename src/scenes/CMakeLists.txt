@@ -24,6 +24,7 @@ SFML::Graphics
 entity
 context
 logic
+render_logic
 types
 data_providers
 assets

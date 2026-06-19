@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
 #include "LogicType.h"
+#include "render/render_background.h"
 #include <SFML/Graphics/Color.hpp>
 
 namespace steamrot {
@@ -49,6 +50,9 @@ void CraftingScene::sRender() {
   // clear the render texture
   m_scene_resources.scene_texture.clear(sf::Color::Black);
 
+  // draw the background grid
+  logic::render::draw_grid_background({50, 50}, 1, sf::Color(255, 255, 255, 50),
+                                      m_scene_resources.scene_texture);
   // process render logic
   for (auto &render_logic :
        m_scene_resources.logic_map[LogicGrouping::Render]) {
