@@ -172,12 +172,12 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
   }
   const auto &render_logics = render_it->second;
   REQUIRE(render_logics.size() == 3);
-  REQUIRE(
-      dynamic_cast<steamrot::logic::UIRenderLogic *>(render_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaRenderLogic *>(
-      render_logics[1].get()));
+      render_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GhostRenderLogic *>(
-      render_logics[2].get()));
+      render_logics[1].get()));
+  REQUIRE(
+      dynamic_cast<steamrot::logic::UIRenderLogic *>(render_logics[2].get()));
 
   ///// CHECKING POSITIONING LOGICS /////
   auto positioning_it =

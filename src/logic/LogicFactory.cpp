@@ -303,8 +303,8 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
       LogicType::GrimoireMachinaAction, LogicType::GhostAction};
 
   static constexpr std::array render_logic_types = {
-      LogicType::UIRender, LogicType::GrimoireMachinaRender,
-      LogicType::GhostRender};
+      LogicType::GrimoireMachinaRender, LogicType::GhostRender,
+      LogicType::UIRender};
 
   static constexpr std::array positioning_logic_types = {
       LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning,
