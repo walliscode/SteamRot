@@ -8,18 +8,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "render_grimoire_machina.h"
+#include "ColorEqualsMatcher.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
 #include "action_grimoire_machina.h"
 #include "grimoire_machina_test_helpers.h"
 #include "test_fonts.h"
+#include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Transform.hpp>
-#include <SFML/Graphics/Vertex.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
@@ -483,10 +479,18 @@ TEST_CASE("draw_status_box tests", "[unit][render_grimoire_machina]") {
   const sf::Font &font = font_result.value();
 
   SECTION("draw_status_box draws a red box with text") {
+    // arrange
     sf::FloatRect box{{10.f, 10.f}, {180.f, 80.f}};
     sf::Color color = sf::Color::Red;
     std::string text = "Test Status";
+
+    //
     REQUIRE_NOTHROW(draw_status_box(box, color, text, font, texture));
+    texture.display();
+    sf::Image image = texture.getTexture().copyToImage();
+
+    // test pixels at a few points
+    REQUIRE_THAT(image.getPixel({10, 10}), EqualsColor(sf::Color::Red));
   }
 }
 } // namespace steamrot::tests

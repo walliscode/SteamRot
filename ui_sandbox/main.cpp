@@ -17,7 +17,6 @@
 
 #include "SandboxEngine.h"
 #include "error_loop.h"
-#include "spdlog/spdlog.h"
 #include <iostream>
 
 int main() {
@@ -39,10 +38,10 @@ int main() {
 
   } catch (const std::exception &e) {
     std::cerr << "Exception caught: " << e.what() << std::endl;
-    spdlog::get("global_logger")->error("Exception: {}", e.what());
+    // spdlog::get("global_logger")->error("Exception: {}", e.what());
   } catch (...) {
     std::cerr << "Unknown exception caught" << std::endl;
-    spdlog::get("global_logger")->error("Unknown exception occurred");
+    // spdlog::get("global_logger")->error("Unknown exception occurred");
   }
 
   return 0;

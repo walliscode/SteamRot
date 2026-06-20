@@ -159,5 +159,18 @@ void draw_view(sf::RenderTexture &texture, const Views &views,
 /////////////////////////////////////////////////
 void draw_status_box(sf::FloatRect box, sf::Color color,
                      const std::string &text, const sf::Font &font,
-                     sf::RenderTexture &texture) {}
+                     sf::RenderTexture &texture) {
+
+  // set the thickness for the border
+  static const float thickness{5.f};
+
+  // create box to draw and populate variables
+  sf::RectangleShape border_box{box.size};
+  border_box.setPosition(box.position);
+  border_box.setOutlineThickness(-thickness);
+  border_box.setOutlineColor(color);
+
+  // draw to texture
+  texture.draw(border_box);
+}
 } // namespace steamrot::logic::render::grimoire_machina

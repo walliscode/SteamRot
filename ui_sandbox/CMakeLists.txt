@@ -11,5 +11,5 @@ target_link_libraries(UISandbox PRIVATE
     error_loop
     display
     types
-    logger
+    # logger
 )
