@@ -29,6 +29,7 @@ add_library(logic
   render_ui.cpp
   render_grimoire_machina.cpp
   render_ghost.cpp
+  render_text.cpp
 
   action_grimoire_machina.cpp
 

@@ -156,4 +156,7 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
                      const std::string &text, const sf::Font &font,
                      sf::RenderTexture &texture);
 
+void pick_and_draw_status_box(const StructuralAnalysisState state,
+                              const sf::FloatRect box, const sf::Font &font,
+                              sf::RenderTexture &texture);
 } // namespace steamrot::logic::render::grimoire_machina

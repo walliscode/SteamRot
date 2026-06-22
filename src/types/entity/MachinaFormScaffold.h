@@ -293,6 +293,10 @@ using PartGraph =
 
 using StructuralAnalysisResults =
     std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;
+
+enum class StructuralAnalysisState {
+  NotRun, ///< No analysis has been run yet.
+};
 /////////////////////////////////////////////////
 /// 3struct MachinaFormScaffold
 /// @brief Contains all data necessary to create a MachinaForm.
@@ -332,6 +336,11 @@ struct MachinaFormScaffold {
   bool are_sockets_visible{false};
 
   // Analysis Results //
+  /////////////////////////////////////////////////
+  /// @brief Holds the current state of the structural analysis.
+  /////////////////////////////////////////////////
+  StructuralAnalysisState analysis_state{StructuralAnalysisState::NotRun};
+
   /////////////////////////////////////////////////
   /// @brief Holds the results of an analysis run, keyed by archetype name. Each
   /// archetype may produce multiple results

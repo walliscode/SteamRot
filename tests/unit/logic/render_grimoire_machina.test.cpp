@@ -491,6 +491,42 @@ TEST_CASE("draw_status_box tests", "[unit][render_grimoire_machina]") {
 
     // test pixels at a few points
     REQUIRE_THAT(image.getPixel({10, 10}), EqualsColor(sf::Color::Red));
+    REQUIRE_THAT(image.getPixel({187, 10}), EqualsColor(sf::Color::Red));
+    REQUIRE_THAT(image.getPixel({10, 87}), EqualsColor(sf::Color::Red));
+    REQUIRE_THAT(image.getPixel({187, 87}), EqualsColor(sf::Color::Red));
+  }
+}
+
+TEST_CASE("pick_and_draw_status_box tests", "[unit][render_grimoire_machina]") {
+  // arrange
+  sf::RenderTexture texture{{200, 100}};
+  texture.clear(sf::Color::Black);
+  auto font_result = ProvideDefaultFont();
+  if (!font_result) {
+    FAIL("Failed to load default font: " + font_result.error().message);
+  }
+  const sf::Font &font = font_result.value();
+
+  SECTION("pick_and_draw_status_box draws a box for NotRun state") {
+    // arrange
+    sf::FloatRect box{{10.f, 10.f}, {180.f, 80.f}};
+
+    // act
+    pick_and_draw_status_box(StructuralAnalysisState::NotRun, box, font,
+                             texture);
+    texture.display();
+    sf::Image image = texture.getTexture().copyToImage();
+
+    // assert
+    // test pixels at a few points
+    REQUIRE_THAT(image.getPixel({10, 10}),
+                 EqualsColor(sf::Color(255, 255, 255, 50)));
+    REQUIRE_THAT(image.getPixel({190, 10}),
+                 EqualsColor(sf::Color(255, 255, 255, 50)));
+    REQUIRE_THAT(image.getPixel({10, 90}),
+                 EqualsColor(sf::Color(255, 255, 255, 50)));
+    REQUIRE_THAT(image.getPixel({190, 90}),
+                 EqualsColor(sf::Color(255, 255, 255, 50)));
   }
 }
 } // namespace steamrot::tests

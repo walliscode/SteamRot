@@ -12,8 +12,12 @@
 #include "MachinaFormScaffold.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
 
@@ -162,15 +166,59 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
                      sf::RenderTexture &texture) {
 
   // set the thickness for the border
-  static const float thickness{5.f};
+  static const float thickness{3.f};
 
   // create box to draw and populate variables
   sf::RectangleShape border_box{box.size};
   border_box.setPosition(box.position);
   border_box.setOutlineThickness(-thickness);
   border_box.setOutlineColor(color);
+  border_box.setFillColor(sf::Color::Transparent);
 
   // draw to texture
   texture.draw(border_box);
+
+  // pull out some unit of width from the box to use as increments
+  const float unit_width = box.size.x * 0.05f;
+  const float unit_height = box.size.y * 0.08f;
+
+  // create a 6 point convex shape to draw the trapezium shape above the box
+  sf::ConvexShape trapezium;
+  trapezium.setPointCount(4);
+  trapezium.setPoint(0, {box.position});
+  trapezium.setPoint(
+      1, {box.position.x + unit_width, box.position.y - unit_height});
+  trapezium.setPoint(
+      2, {box.position.x + (unit_width * 6), box.position.y - unit_height});
+  trapezium.setPoint(3, {box.position.x + (unit_width * 7), box.position.y});
+  trapezium.setFillColor(color);
+
+  // draw to texture
+  texture.draw(trapezium);
+
+  // create text to draw and populate variables
+  sf::Text text_to_draw{font, text, 10};
+  text_to_draw.setFillColor(sf::Color::White);
+  text_to_draw.setPosition(
+      {box.position.x + unit_width, box.position.y - (unit_height * 0.8f)});
+
+  // draw to texture
+  texture.draw(text_to_draw);
+}
+
+/////////////////////////////////////////////////
+void pick_and_draw_status_box(const StructuralAnalysisState state,
+                              const sf::FloatRect box, const sf::Font &font,
+                              sf::RenderTexture &texture) {
+  // switch on the state and draw the appropriate box
+  switch (state) {
+
+  case StructuralAnalysisState::NotRun:
+    // draw a grey box with "Analysis Not Run" text
+
+    draw_status_box(box, {255, 255, 255, 50}, "Analysis Not Run", font,
+                    texture);
+    break;
+  }
 }
 } // namespace steamrot::logic::render::grimoire_machina
