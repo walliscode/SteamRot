@@ -10,6 +10,7 @@
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
+#include "render_text.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
@@ -18,6 +19,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
 
@@ -197,11 +199,15 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
   texture.draw(trapezium);
 
   // create text to draw and populate variables
-  sf::Text text_to_draw{font, text, 10};
+  sf::Text text_to_draw{font, text};
   text_to_draw.setFillColor(sf::Color::White);
   text_to_draw.setPosition(
       {box.position.x + unit_width, box.position.y - (unit_height * 0.8f)});
 
+  // resize the text to fit within the box square part of the trapezium
+  sf::Vector2f text_box_size{unit_width * 5, unit_height};
+
+  fit_text_to_box(text_to_draw, text_box_size, 0);
   // draw to texture
   texture.draw(text_to_draw);
 }

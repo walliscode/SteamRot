@@ -25,12 +25,35 @@ TEST_CASE("fit_text_to_box tests", "[render_text]") {
 
   sf::Font &font = font_result.value();
 
-  SECTION("Text fits within the box") {
-    sf::Text text(font, "Test Text", 30);
-    sf::FloatRect box({0.f, 0.f}, {100.f, 20.f});
-    fit_text_to_box(text, box);
-    REQUIRE(text.getLocalBounds().size.x <= box.size.x);
-    REQUIRE(text.getLocalBounds().size.y <= box.size.y);
+  SECTION("Text is scaled down to fit within constraints") {
+    sf::Text text(font, "Test Text", 60);
+    // pull out the original local bounds before scaling down
+    const sf::FloatRect original_bounds = text.getLocalBounds();
+    // check that local bounds are larger than the box size to ensure scaling
+    // down is needed
+    REQUIRE(original_bounds.size.x > 200.f);
+    REQUIRE(original_bounds.size.y > 25.f);
+
+    sf::Vector2f box_size(200.f, 25.f);
+    fit_text_to_box(text, box_size);
+    REQUIRE(text.getLocalBounds().size.x <= box_size.x);
+    REQUIRE(text.getLocalBounds().size.y <= box_size.y);
+  }
+
+  SECTION("Text is scaled up to fit within constraints") {
+    sf::Text text(font, "Test Text", 10);
+
+    // store the original local bounds before scaling up
+    const sf::FloatRect original_bounds = text.getLocalBounds();
+    REQUIRE(original_bounds.size.x < 200.f);
+    REQUIRE(original_bounds.size.y < 50.f);
+
+    sf::Vector2f box_size(200.f, 50.f);
+    fit_text_to_box(text, box_size, 0, true);
+    REQUIRE(text.getLocalBounds().size.x <= box_size.x);
+    REQUIRE(text.getLocalBounds().size.y <= box_size.y);
+    REQUIRE(text.getLocalBounds().size.x > original_bounds.size.x);
+    REQUIRE(text.getLocalBounds().size.y > original_bounds.size.y);
   }
 }
 

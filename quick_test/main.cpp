@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "MachinaFormScaffold.h"
 #include "paths.h"
 #include "render_grimoire_machina.h"
 #include <SFML/Graphics.hpp>
@@ -22,9 +23,9 @@ int main() {
   if (!font.openFromFile(font_path.string()))
     return 1;
 
-  sf::FloatRect box{{100.f, 100.f}, {200.f, 100.f}};
+  sf::FloatRect box{{100.f, 100.f}, {400.f, 300.f}};
   sf::Color color{sf::Color::Red};
-  std::string text{"Hello, world!"};
+  std::string text{"Analysis not run"};
   sf::RenderTexture texture{{800, 600}};
 
   sf::RenderWindow window(sf::VideoMode({800, 600}), "Quick Test Window");
@@ -40,8 +41,8 @@ int main() {
     texture.clear(sf::Color::Black);
     /// CODE ///
 
-    steamrot::logic::render::grimoire_machina::draw_status_box(box, color, text,
-                                                               font, texture);
+    steamrot::logic::render::grimoire_machina::pick_and_draw_status_box(
+        steamrot::StructuralAnalysisState::NotRun, box, font, texture);
 
     /// END CODE ///
     texture.display();

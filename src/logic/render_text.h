@@ -13,8 +13,16 @@
 /////////////////////////////////////////////////
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
 namespace steamrot::logic::render {
 
-void fit_text_to_box(sf::Text &text, const sf::FloatRect &box,
-                     float padding = 0.f);
-}
+/////////////////////////////////////////////////
+/// @brief Takes a text object
+///
+/// @param text [TODO:parameter]
+/// @param box_size [TODO:parameter]
+/// @param padding [TODO:parameter]
+/////////////////////////////////////////////////
+void fit_text_to_box(sf::Text &text, const sf::Vector2f &box_size,
+                     float padding = 0.f, bool allow_scale_up = false);
+} // namespace steamrot::logic::render
