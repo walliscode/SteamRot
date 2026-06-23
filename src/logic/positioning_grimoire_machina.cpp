@@ -7,9 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
+#include <cstdlib>
 
 namespace steamrot::logic::positioning::grimoire_machina {
 
@@ -132,5 +134,59 @@ void position_machina_form_scaffold(PartGraph &parts) {
 
   // position the first part of the scaffold at 0,0
   position_first_part_of_machina_form_scaffold(parts);
+}
+
+/////////////////////////////////////////////////
+void calculate_composite_box(sf::FloatRect &compounding_box,
+                             const sf::FloatRect &next_box) {
+
+  // all 4 sides of the next box need to be accounted for
+  // right edge
+  if ((compounding_box.position.x + compounding_box.size.x) <
+      (next_box.position.x + next_box.size.x)) {
+    // position does NOT change
+    // size increases to match the right edge
+    compounding_box.size.x = next_box.position.x + next_box.size.x;
+  }
+
+  // bottom edge
+  if ((compounding_box.position.y + compounding_box.size.y) <
+      (next_box.position.y + next_box.size.y)) {
+    // position does NOT change
+    // size increases to match the bottom edge
+    compounding_box.size.y = next_box.position.y + next_box.size.y;
+  }
+
+  // left edge
+  if (compounding_box.position.x > next_box.position.x) {
+
+    // add the extra size to the compounding_box, this needs to come first
+    // before position is updated
+    compounding_box.size.x += compounding_box.position.x - next_box.position.x;
+
+    // match x position of compounding_box to next_box
+    compounding_box.position.x = next_box.position.x;
+  }
+
+  // top edge
+  if (compounding_box.position.y > next_box.position.y) {
+
+    // add the extra size to the compounding_box, this needs to come before
+    // position is updated
+    compounding_box.size.y += compounding_box.position.y - next_box.position.y;
+
+    // match y position of compounding_box to next_box
+    compounding_box.position.y = next_box.position.y;
+  }
+}
+
+/////////////////////////////////////////////////
+sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
+                                  const SubGraph &sub_graph) {
+  // return value
+  sf::FloatRect outer_box({0, 0}, {0, 0});
+
+  // if subraph is empty cycle through whole part graph
+  return outer_box;
 }
 } // namespace steamrot::logic::positioning::grimoire_machina

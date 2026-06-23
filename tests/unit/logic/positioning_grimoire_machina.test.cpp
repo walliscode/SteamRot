@@ -7,10 +7,14 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include "Fragment.h"
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
+#include "ViewDirection.h"
 #include "grimoire_machina_test_helpers.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -369,5 +373,73 @@ TEST_CASE("initialize_joint_socket_positions tests",
                         initialize_joint_socket_positions(instance));
     REQUIRE(instance.sockets.empty());
   }
+}
+
+TEST_CASE("calculate_composite_box tests") {
+
+  sf::FloatRect compounding_box{};
+  REQUIRE(compounding_box.position.x == 0);
+  REQUIRE(compounding_box.position.y == 0);
+  REQUIRE(compounding_box.size.x == 0);
+  REQUIRE(compounding_box.size.y == 0);
+
+  SECTION(" next box is added to compounding_box at origin and no size") {
+    sf::FloatRect next_box{{50, 50}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    // this box is to the right of the compounding_box at both x and y so
+    // position of compounding_box should not change
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 100);
+  }
+
+  SECTION("the next box has left edge further left ") {
+    compounding_box.position = {0, 0};
+    compounding_box.size = {100, 100};
+    sf::FloatRect next_box{{-25, 10}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == -25);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 125);
+    REQUIRE(compounding_box.size.y == 100);
+  }
+
+  SECTION("the next box has a top edge further up") {
+
+    compounding_box.position = {0, 0};
+    compounding_box.size = {100, 100};
+    sf::FloatRect next_box{{10, -30}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == -30);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 130);
+  }
+
+  SECTION("the next box is bigger in all dimensions") {
+
+    compounding_box.position = {0, 0};
+    compounding_box.size = {60, 60};
+    sf::FloatRect next_box{{-25, -30}, {130, 130}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == -25);
+    REQUIRE(compounding_box.position.y == -30);
+    REQUIRE(compounding_box.size.x == 130);
+    REQUIRE(compounding_box.size.y == 130);
+  }
+}
+TEST_CASE("calculate_outer_box tests") {
+
+  Fragment fragment;
+  const sf::VertexArray &array =
+      fragment.positioning_views[ViewDirection::Front];
+  auto bounds = array.getBounds();
+
+  SECTION("") {}
 }
 } // namespace steamrot::tests

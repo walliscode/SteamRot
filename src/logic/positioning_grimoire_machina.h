@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::grimoire_machina {
@@ -61,5 +62,11 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 /// @param parts The PartGraph of the MachinaFormScaffold to position
 /////////////////////////////////////////////////
 void position_machina_form_scaffold(PartGraph &parts);
+
+void calculate_composite_box(sf::FloatRect &compounding_box,
+                             const sf::FloatRect &next_box);
+
+sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
+                                  const SubGraph &sub_graph = {});
 
 } // namespace steamrot::logic::positioning::grimoire_machina
