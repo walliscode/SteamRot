@@ -225,6 +225,12 @@ void pick_and_draw_status_box(const StructuralAnalysisState state,
     draw_status_box(box, {255, 255, 255, 50}, "Analysis Not Run", font,
                     texture);
     break;
+
+  case StructuralAnalysisState::NothingFound:
+    // draw a red box with "No Archetypes Found" text
+    draw_status_box(box, {168, 50, 50, 255}, "No Archetypes Found", font,
+                    texture);
+    break;
   }
 }
 } // namespace steamrot::logic::render::grimoire_machina

@@ -295,7 +295,8 @@ using StructuralAnalysisResults =
     std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;
 
 enum class StructuralAnalysisState {
-  NotRun, ///< No analysis has been run yet.
+  NotRun,       ///< No analysis has been run yet.
+  NothingFound, ///< Analysis was run but no archetypes were found.
 };
 /////////////////////////////////////////////////
 /// 3struct MachinaFormScaffold

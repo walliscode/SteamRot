@@ -42,7 +42,7 @@ int main() {
     /// CODE ///
 
     steamrot::logic::render::grimoire_machina::pick_and_draw_status_box(
-        steamrot::StructuralAnalysisState::NotRun, box, font, texture);
+        steamrot::StructuralAnalysisState::NothingFound, box, font, texture);
 
     /// END CODE ///
     texture.display();
