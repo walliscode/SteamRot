@@ -15,6 +15,7 @@ positioning_grimoire_machina.test.cpp
 positioning_ghost.test.cpp
 render_grimoire_machina.test.cpp
 render_ghost.test.cpp
+render_text.test.cpp
 GhostRenderLogic.test.cpp
 positioning_ui.test.cpp
 collision_mouse.test.cpp
@@ -49,6 +50,7 @@ target_link_libraries(test_logic
   context_test_helpers
   harness
   part_graphs
+  assets_for_tests
 
 
 )

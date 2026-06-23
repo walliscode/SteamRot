@@ -12,7 +12,7 @@ target_link_libraries(SteamRot PRIVATE
     error_loop
     display
     types
-    logger
+    # logger
 
 )
 

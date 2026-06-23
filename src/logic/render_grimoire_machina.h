@@ -16,6 +16,9 @@
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
 #include "ViewDirection.h"
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 
@@ -148,5 +151,33 @@ void draw_view(sf::RenderTexture &texture, const Views &views,
 /////////////////////////////////////////////////
 void draw_view(sf::RenderTexture &texture, const Views &views,
                ViewDirection view_direction, const sf::RenderStates &states);
+
+/////////////////////////////////////////////////
+/// @brief Draw a status box with the given parameters.
+///
+/// the status box is a surrounding rectangle with a small trapezium to capture
+/// any associated text
+/// @param box The rectangle to draw the status box around in world space.
+/// @param color The color of the status box border.
+/// @param text  The text to display in the status box.
+/// @param font The font to use for the text in the status box.
+/// @param texture The render texture to draw on.
+/////////////////////////////////////////////////
+void draw_status_box(sf::FloatRect box, sf::Color color,
+                     const std::string &text, const sf::Font &font,
+                     sf::RenderTexture &texture);
+
+/////////////////////////////////////////////////
+/// @brief Switch container function to pick the correct status box to draw
+/// based on the current state of the structural analysis
+///
+/// @param state Enumeration of the current state of the structural analysis
+/// @param box FloatRect to pass to the draw_status_box function
+/// @param font Font to pass to the draw_status_box function
+/// @param texture RenderTexture to pass to the draw_status_box function
+/////////////////////////////////////////////////
+void pick_and_draw_status_box(const StructuralAnalysisState state,
+                              const sf::FloatRect box, const sf::Font &font,
+                              sf::RenderTexture &texture);
 
 } // namespace steamrot::logic::render::grimoire_machina

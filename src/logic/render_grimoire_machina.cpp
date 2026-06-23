@@ -10,9 +10,16 @@
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
+#include "render_text.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/PrimitiveType.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
 
@@ -73,8 +80,8 @@ void draw_joint_instance(sf::RenderTexture &texture,
                          const bool draw_sockets) {
   sf::RenderStates states;
   states.transform = joint_instance.transform;
-  draw_view(texture, joint_instance.joint->positioning_views, ViewDirection::Front,
-            states);
+  draw_view(texture, joint_instance.joint->positioning_views,
+            ViewDirection::Front, states);
   if (draw_sockets)
     draw_joint_instance_sockets(texture, joint_instance);
 }
@@ -83,8 +90,8 @@ void draw_joint_instance(sf::RenderTexture &texture,
 void draw_fragment_instance_sockets(sf::RenderTexture &texture,
                                     FragmentInstance &fragment_instance) {
   for (auto &[socket_id, socket] : fragment_instance.sockets) {
-    const sf::Vector2f world_pos = fragment_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        fragment_instance.transform.transformPoint(socket.local_position);
     draw_socket(texture, world_pos, socket);
   }
 }
@@ -95,8 +102,8 @@ void draw_joint_instance_sockets(sf::RenderTexture &texture,
   for (auto &[socket_id, socket] : joint_instance.sockets) {
     // transform the socket's local position to get its world position, then
     // draw
-    const sf::Vector2f world_pos = joint_instance.transform.transformPoint(
-        socket.local_position);
+    const sf::Vector2f world_pos =
+        joint_instance.transform.transformPoint(socket.local_position);
     draw_socket(texture, world_pos, socket);
   }
 }
@@ -155,4 +162,75 @@ void draw_view(sf::RenderTexture &texture, const Views &views,
   texture.draw(views[view_direction], states);
 }
 
+/////////////////////////////////////////////////
+void draw_status_box(sf::FloatRect box, sf::Color color,
+                     const std::string &text, const sf::Font &font,
+                     sf::RenderTexture &texture) {
+
+  // set the thickness for the border
+  static const float thickness{3.f};
+
+  // create box to draw and populate variables
+  sf::RectangleShape border_box{box.size};
+  border_box.setPosition(box.position);
+  border_box.setOutlineThickness(-thickness);
+  border_box.setOutlineColor(color);
+  border_box.setFillColor(sf::Color::Transparent);
+
+  // draw to texture
+  texture.draw(border_box);
+
+  // pull out some unit of width from the box to use as increments
+  const float unit_width = box.size.x * 0.05f;
+  const float unit_height = box.size.y * 0.08f;
+
+  // create a 6 point convex shape to draw the trapezium shape above the box
+  sf::ConvexShape trapezium;
+  trapezium.setPointCount(4);
+  trapezium.setPoint(0, {box.position});
+  trapezium.setPoint(
+      1, {box.position.x + unit_width, box.position.y - unit_height});
+  trapezium.setPoint(
+      2, {box.position.x + (unit_width * 6), box.position.y - unit_height});
+  trapezium.setPoint(3, {box.position.x + (unit_width * 7), box.position.y});
+  trapezium.setFillColor(color);
+
+  // draw to texture
+  texture.draw(trapezium);
+
+  // create text to draw and populate variables
+  sf::Text text_to_draw{font, text};
+  text_to_draw.setFillColor(sf::Color::White);
+  text_to_draw.setPosition(
+      {box.position.x + unit_width, box.position.y - (unit_height * 0.8f)});
+
+  // resize the text to fit within the box square part of the trapezium
+  sf::Vector2f text_box_size{unit_width * 5, unit_height};
+
+  fit_text_to_box(text_to_draw, text_box_size, 0);
+  // draw to texture
+  texture.draw(text_to_draw);
+}
+
+/////////////////////////////////////////////////
+void pick_and_draw_status_box(const StructuralAnalysisState state,
+                              const sf::FloatRect box, const sf::Font &font,
+                              sf::RenderTexture &texture) {
+  // switch on the state and draw the appropriate box
+  switch (state) {
+
+  case StructuralAnalysisState::NotRun:
+    // draw a grey box with "Analysis Not Run" text
+
+    draw_status_box(box, {255, 255, 255, 50}, "Analysis Not Run", font,
+                    texture);
+    break;
+
+  case StructuralAnalysisState::NothingFound:
+    // draw a red box with "No Archetypes Found" text
+    draw_status_box(box, {168, 50, 50, 255}, "No Archetypes Found", font,
+                    texture);
+    break;
+  }
+}
 } // namespace steamrot::logic::render::grimoire_machina

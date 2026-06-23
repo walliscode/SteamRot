@@ -1,7 +1,7 @@
 
 #include "GameEngine.h"
 #include "error_loop.h"
-#include "spdlog/spdlog.h"
+
 #include <iostream>
 int main() {
   // start the logger
@@ -36,12 +36,12 @@ int main() {
     // log the exception message
 
     std::cerr << "Exception caught: " << e.what() << std::endl;
-    spdlog::get("global_logger")->error("Exception: {}", e.what());
+    // spdlog::get("global_logger")->error("Exception: {}", e.what());
   } catch (...) {
     // log an unknown exception
 
     std::cerr << "Unknown exception caught" << std::endl;
-    spdlog::get("global_logger")->error("Unknown exception occurred");
+    // spdlog::get("global_logger")->error("Unknown exception occurred");
   }
 
   return 0;

@@ -57,6 +57,7 @@ endif()
 
 add_subdirectory(steamrot)
 add_subdirectory(ui_sandbox)
+add_subdirectory(quick_test)
 add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(docs)
