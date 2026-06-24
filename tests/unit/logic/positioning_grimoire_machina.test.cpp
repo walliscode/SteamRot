@@ -436,11 +436,90 @@ TEST_CASE("calculate_composite_box tests") {
 }
 TEST_CASE("calculate_outer_box tests") {
 
+  // set up a fragment wiht a single triangle in the front view
   Fragment fragment;
   sf::VertexArray &front_array =
       fragment.positioning_views[ViewDirection::Front];
   front_array.setPrimitiveType(sf::PrimitiveType::Triangles);
+  front_array.append(sf::Vertex(sf::Vector2f(0.f, 0.f)));
+  front_array.append(sf::Vertex(sf::Vector2f(30.f, 0.f)));
+  front_array.append(sf::Vertex(sf::Vector2f(15.f, 30.f)));
 
-  SECTION("") {}
+  Fragment fragment2;
+  sf::VertexArray &front_array2 =
+      fragment2.positioning_views[ViewDirection::Front];
+  front_array2.setPrimitiveType(sf::PrimitiveType::Triangles);
+  front_array2.append(sf::Vertex(sf::Vector2f(10.f, 10.f)));
+  front_array2.append(sf::Vertex(sf::Vector2f(40.f, 10.f)));
+  front_array2.append(sf::Vertex(sf::Vector2f(25.f, 40.f)));
+
+  SECTION("PartGraph has only one part and no subgraph provided") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment};
+    fragment_instance.id = 0;
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 0.f);
+    REQUIRE(outer_box.position.y == 0.f);
+  }
+
+  SECTION("PartGraph has only one part, no subgraph provided, and local "
+          "transform applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment};
+    fragment_instance.id = 0;
+    // apply a local transform to the fragment instance
+    fragment_instance.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 10.f);
+    REQUIRE(outer_box.position.y == 10.f);
+  }
+
+  SECTION("PartGraph has multiple parts, no subgraph provided and transforms "
+          "applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance1{&fragment};
+    fragment_instance1.id = 0;
+    fragment_instance1.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.id, fragment_instance1);
+    FragmentInstance fragment_instance2{&fragment2};
+    fragment_instance2.id = 1;
+    fragment_instance2.transform.translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    REQUIRE(outer_box.size.x == 35.f);
+    REQUIRE(outer_box.size.y == 35.f);
+    REQUIRE(outer_box.position.x == 5.f);
+    REQUIRE(outer_box.position.y == 5.f);
+  }
+
+  SECTION("PartGraph has multiple parts, subgraph provided and transforms "
+          "applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance1{&fragment};
+    fragment_instance1.id = 0;
+    fragment_instance1.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.id, fragment_instance1);
+    FragmentInstance fragment_instance2{&fragment2};
+    fragment_instance2.id = 1;
+    fragment_instance2.transform.translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    SubGraph sub_graph{0}; // only include the first part
+    sf::FloatRect outer_box = calculate_outer_box(part_graph, sub_graph);
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 10.f);
+    REQUIRE(outer_box.position.y == 10.f);
+  }
 }
+
 } // namespace steamrot::tests

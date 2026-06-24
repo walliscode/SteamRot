@@ -181,12 +181,80 @@ void calculate_composite_box(sf::FloatRect &compounding_box,
 }
 
 /////////////////////////////////////////////////
+sf::FloatRect
+get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
+  if (const FragmentInstance *fragment_instance =
+          std::get_if<FragmentInstance>(&part_variant)) {
+    // get the bounding box of the FRONT view of the fragment
+    sf::FloatRect box =
+        fragment_instance->fragment->positioning_views[ViewDirection::Front]
+            .getBounds();
+    // apply the local transform of the fragment instance to the bounding box
+    return fragment_instance->transform.transformRect(box);
+
+  } else if (const JointInstance *joint_instance =
+                 std::get_if<JointInstance>(&part_variant)) {
+    // get the bounding box of the FRONT view of the joint
+    sf::FloatRect box =
+        joint_instance->joint->positioning_views[ViewDirection::Front]
+            .getBounds();
+    // apply the local transform of the joint instance to the bounding box
+    return joint_instance->transform.transformRect(box);
+  }
+  // if part_variant is neither a FragmentInstance nor a JointInstance, return
+  // an empty bounding box
+  return sf::FloatRect{};
+}
+/////////////////////////////////////////////////
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
                                   const SubGraph &sub_graph) {
   // return value
-  sf::FloatRect outer_box({0, 0}, {0, 0});
+  sf::FloatRect outer_box;
 
-  // if subraph is empty cycle through whole part graph
+  // need a flag to show if the outer box has been initialized yet
+  bool outer_box_initialized{false};
+
+  // if PartGraph is empty, return early
+  if (part_graph.empty())
+    return outer_box;
+
+  // helper lambda for adding parts
+  auto add_part_to_outer_box = [&outer_box](const PartInstanceVariant &part) {
+    sf::FloatRect part_box = get_transformed_bounding_box(part);
+    calculate_composite_box(outer_box, part_box);
+  };
+
+  // if subgraph is empty, calculate outer box for all parts in the part graph
+  if (sub_graph.empty()) {
+    for (const auto &[id, part] : part_graph) {
+
+      // if outer box has not been initialized yet, initialize it with the first
+      // part's bounding box
+      if (!outer_box_initialized) {
+        outer_box = get_transformed_bounding_box(part);
+        outer_box_initialized = true;
+      } else {
+        add_part_to_outer_box(part);
+      }
+    }
+  } else {
+    // calculate outer box for only the parts in the subgraph
+    for (const auto &id : sub_graph) {
+      auto it = part_graph.find(id);
+      if (it != part_graph.end()) {
+
+        // if outer box has not been initialized yet, initialize it with the
+        // first part's bounding box
+        if (!outer_box_initialized) {
+          outer_box = get_transformed_bounding_box(it->second);
+          outer_box_initialized = true;
+        } else {
+          add_part_to_outer_box(it->second);
+        }
+      }
+    }
+  }
+
   return outer_box;
 }
 } // namespace steamrot::logic::positioning::grimoire_machina

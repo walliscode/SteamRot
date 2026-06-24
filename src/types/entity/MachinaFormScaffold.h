@@ -288,8 +288,9 @@ struct FragmentInstance : public PartInstance {
 };
 
 /// using helpers ///
-using PartGraph =
-    std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
+using PartInstanceVariant = std::variant<JointInstance, FragmentInstance>;
+
+using PartGraph = std::map<uint32_t, PartInstanceVariant>;
 
 using StructuralAnalysisResults =
     std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;

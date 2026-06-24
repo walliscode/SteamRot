@@ -66,6 +66,9 @@ void position_machina_form_scaffold(PartGraph &parts);
 void calculate_composite_box(sf::FloatRect &compounding_box,
                              const sf::FloatRect &next_box);
 
+sf::FloatRect
+get_transformed_bounding_box(const PartInstanceVariant &part_variant);
+
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
                                   const SubGraph &sub_graph = {});
 
