@@ -12,6 +12,7 @@
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
 #include "grimoire_machina_test_helpers.h"
+#include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -436,9 +437,9 @@ TEST_CASE("calculate_composite_box tests") {
 TEST_CASE("calculate_outer_box tests") {
 
   Fragment fragment;
-  const sf::VertexArray &array =
+  sf::VertexArray &front_array =
       fragment.positioning_views[ViewDirection::Front];
-  auto bounds = array.getBounds();
+  front_array.setPrimitiveType(sf::PrimitiveType::Triangles);
 
   SECTION("") {}
 }
