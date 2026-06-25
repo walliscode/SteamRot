@@ -341,7 +341,8 @@ struct MachinaFormScaffold {
   /////////////////////////////////////////////////
   /// @brief Holds the current state of the structural analysis.
   /////////////////////////////////////////////////
-  StructuralAnalysisState analysis_state{StructuralAnalysisState::NotRun};
+  StructuralAnalysisState structural_analysis_state{
+      StructuralAnalysisState::NotRun};
 
   /////////////////////////////////////////////////
   /// @brief Holds the results of an analysis run, keyed by archetype name. Each

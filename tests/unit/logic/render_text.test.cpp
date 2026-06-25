@@ -55,6 +55,16 @@ TEST_CASE("fit_text_to_box tests", "[render_text]") {
     REQUIRE(text.getLocalBounds().size.x > original_bounds.size.x);
     REQUIRE(text.getLocalBounds().size.y > original_bounds.size.y);
   }
+
+  SECTION("Text scaling does not go below minimum size") {
+    sf::Text text(font, "Test Text", 4);
+    // store the original local bounds before scaling down
+    const sf::FloatRect original_bounds = text.getLocalBounds();
+
+    sf::Vector2f box_size(1.f, 1.f);
+    fit_text_to_box(text, box_size);
+    REQUIRE(text.getCharacterSize() == 2);
+  }
 }
 
 } // namespace steamrot::tests

@@ -433,6 +433,21 @@ TEST_CASE("calculate_composite_box tests") {
     REQUIRE(compounding_box.size.x == 130);
     REQUIRE(compounding_box.size.y == 130);
   }
+
+  SECTION("10 boxes are added sequentially to the compounding box") {
+    compounding_box.position = {0, 0};
+    compounding_box.size = {0, 0};
+    for (int i = 0; i < 10; ++i) {
+      sf::FloatRect next_box{
+          {static_cast<float>(i * 10), static_cast<float>(i * 10)},
+          {10.f, 10.f}};
+      calculate_composite_box(compounding_box, next_box);
+    }
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 100);
+  }
 }
 TEST_CASE("calculate_outer_box tests") {
 

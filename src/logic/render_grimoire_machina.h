@@ -37,7 +37,8 @@ namespace steamrot::logic::render::grimoire_machina {
 ///                         rendering decision.
 /////////////////////////////////////////////////
 void render_machina_form(sf::RenderTexture &texture,
-                         GrimoireMachina &grimoire_machina);
+                         GrimoireMachina &grimoire_machina,
+                         const sf::Font &font);
 
 /////////////////////////////////////////////////
 /// @brief Draw a small indicator box at the world origin (0, 0) to show that

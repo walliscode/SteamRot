@@ -137,47 +137,19 @@ void position_machina_form_scaffold(PartGraph &parts) {
 }
 
 /////////////////////////////////////////////////
-void calculate_composite_box(sf::FloatRect &compounding_box,
+void calculate_composite_box(sf::FloatRect &composite_box,
                              const sf::FloatRect &next_box) {
 
-  // all 4 sides of the next box need to be accounted for
-  // right edge
-  if ((compounding_box.position.x + compounding_box.size.x) <
-      (next_box.position.x + next_box.size.x)) {
-    // position does NOT change
-    // size increases to match the right edge
-    compounding_box.size.x = next_box.position.x + next_box.size.x;
-  }
+  auto left = std::min(composite_box.position.x, next_box.position.x);
+  auto top = std::min(composite_box.position.y, next_box.position.y);
 
-  // bottom edge
-  if ((compounding_box.position.y + compounding_box.size.y) <
-      (next_box.position.y + next_box.size.y)) {
-    // position does NOT change
-    // size increases to match the bottom edge
-    compounding_box.size.y = next_box.position.y + next_box.size.y;
-  }
+  auto right = std::max(composite_box.position.x + composite_box.size.x,
+                        next_box.position.x + next_box.size.x);
 
-  // left edge
-  if (compounding_box.position.x > next_box.position.x) {
+  auto bottom = std::max(composite_box.position.y + composite_box.size.y,
+                         next_box.position.y + next_box.size.y);
 
-    // add the extra size to the compounding_box, this needs to come first
-    // before position is updated
-    compounding_box.size.x += compounding_box.position.x - next_box.position.x;
-
-    // match x position of compounding_box to next_box
-    compounding_box.position.x = next_box.position.x;
-  }
-
-  // top edge
-  if (compounding_box.position.y > next_box.position.y) {
-
-    // add the extra size to the compounding_box, this needs to come before
-    // position is updated
-    compounding_box.size.y += compounding_box.position.y - next_box.position.y;
-
-    // match y position of compounding_box to next_box
-    compounding_box.position.y = next_box.position.y;
-  }
+  composite_box = {{left, top}, {right - left, bottom - top}};
 }
 
 /////////////////////////////////////////////////
@@ -208,15 +180,15 @@ get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
 /////////////////////////////////////////////////
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
                                   const SubGraph &sub_graph) {
-  // return value
-  sf::FloatRect outer_box;
-
-  // need a flag to show if the outer box has been initialized yet
-  bool outer_box_initialized{false};
+  // initiliase box with a minimum size to prevent tiny boxes from being
+  // returned
+  sf::FloatRect outer_box{{-100.f, -100.f}, {200.f, 200.f}};
 
   // if PartGraph is empty, return early
-  if (part_graph.empty())
+  if (part_graph.empty()) {
+
     return outer_box;
+  }
 
   // helper lambda for adding parts
   auto add_part_to_outer_box = [&outer_box](const PartInstanceVariant &part) {
@@ -228,33 +200,19 @@ sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
   if (sub_graph.empty()) {
     for (const auto &[id, part] : part_graph) {
 
-      // if outer box has not been initialized yet, initialize it with the first
-      // part's bounding box
-      if (!outer_box_initialized) {
-        outer_box = get_transformed_bounding_box(part);
-        outer_box_initialized = true;
-      } else {
-        add_part_to_outer_box(part);
-      }
+      add_part_to_outer_box(part);
     }
+
   } else {
     // calculate outer box for only the parts in the subgraph
     for (const auto &id : sub_graph) {
       auto it = part_graph.find(id);
       if (it != part_graph.end()) {
 
-        // if outer box has not been initialized yet, initialize it with the
-        // first part's bounding box
-        if (!outer_box_initialized) {
-          outer_box = get_transformed_bounding_box(it->second);
-          outer_box_initialized = true;
-        } else {
-          add_part_to_outer_box(it->second);
-        }
+        add_part_to_outer_box(it->second);
       }
     }
   }
-
   return outer_box;
 }
 } // namespace steamrot::logic::positioning::grimoire_machina

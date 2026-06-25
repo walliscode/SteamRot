@@ -63,7 +63,7 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 /////////////////////////////////////////////////
 void position_machina_form_scaffold(PartGraph &parts);
 
-void calculate_composite_box(sf::FloatRect &compounding_box,
+void calculate_composite_box(sf::FloatRect &composite_box,
                              const sf::FloatRect &next_box);
 
 sf::FloatRect
