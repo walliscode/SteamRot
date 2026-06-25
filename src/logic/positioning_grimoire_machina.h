@@ -63,12 +63,36 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 /////////////////////////////////////////////////
 void position_machina_form_scaffold(PartGraph &parts);
 
+/////////////////////////////////////////////////
+/// @brief expands teh composite box to include the next box, effectively
+/// calculating the bounding box of all boxes added so far.
+///
+/// @param composite_box sf::FloatRect that will be expanded to include the next
+/// box
+/// @param next_box sf::FloatRect that will be used to expand the composite box
+/////////////////////////////////////////////////
 void calculate_composite_box(sf::FloatRect &composite_box,
                              const sf::FloatRect &next_box);
 
+/////////////////////////////////////////////////
+/// @brief Helper function to get the transformed bounding box of a
+/// PartInstanceVariant.
+///
+/// @param part_variant PartInstanceVariant to get the transformed bounding box
+/// of
+/////////////////////////////////////////////////
 sf::FloatRect
 get_transformed_bounding_box(const PartInstanceVariant &part_variant);
 
+/////////////////////////////////////////////////
+/// @brief Given a PartGraph and an optional SubGraph, calculates the outer
+/// bounding box of the parts
+///
+/// @param part_graph PartGraph containing the parts to calculate the outer
+/// bounding box for
+/// @param sub_graph SubGraph containing a subset of the parts to calculate the
+/// outer bounding box for (optional)
+/////////////////////////////////////////////////
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
                                   const SubGraph &sub_graph = {});
 
