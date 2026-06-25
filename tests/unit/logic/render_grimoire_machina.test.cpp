@@ -417,10 +417,14 @@ TEST_CASE("render_machina_form draws without throwing when no scaffold is "
   sf::RenderTexture texture{{100, 100}};
   steamrot::GrimoireMachina grimoire_machina;
   // m_scaffold_form is null by default
-
+  auto font_result = ProvideDefaultFont();
+  if (!font_result) {
+    FAIL("Failed to load default font: " + font_result.error().message);
+  }
+  sf::Font &font = font_result.value();
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::render_machina_form(
-          texture, grimoire_machina));
+          texture, grimoire_machina, font));
 }
 
 TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
@@ -428,6 +432,11 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
 
+  auto font_result = ProvideDefaultFont();
+  if (!font_result) {
+    FAIL("Failed to load default font: " + font_result.error().message);
+  }
+  sf::Font &font = font_result.value();
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_all_fragments["frag"] =
       steamrot::tests::MakeFragmentWithOriginTriangle();
@@ -442,7 +451,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::render_machina_form(
-          texture, grimoire_machina));
+          texture, grimoire_machina, font));
 }
 
 TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
@@ -450,6 +459,11 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
 
+  auto font_result = ProvideDefaultFont();
+  if (!font_result) {
+    FAIL("Failed to load default font: " + font_result.error().message);
+  }
+  sf::Font &font = font_result.value();
   steamrot::GrimoireMachina grimoire_machina;
   grimoire_machina.m_all_joints["joint"] =
       steamrot::tests::MakeJointWithOriginTriangle();
@@ -464,7 +478,7 @@ TEST_CASE("render_machina_form draws without throwing when scaffold has placed "
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::grimoire_machina::render_machina_form(
-          texture, grimoire_machina));
+          texture, grimoire_machina, font));
 }
 
 TEST_CASE("draw_status_box tests", "[unit][render_grimoire_machina]") {

@@ -7,10 +7,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include "Fragment.h"
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
+#include "ViewDirection.h"
 #include "grimoire_machina_test_helpers.h"
+#include <SFML/Graphics/PrimitiveType.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
@@ -370,4 +375,166 @@ TEST_CASE("initialize_joint_socket_positions tests",
     REQUIRE(instance.sockets.empty());
   }
 }
+
+TEST_CASE("calculate_composite_box tests") {
+
+  sf::FloatRect compounding_box{};
+  REQUIRE(compounding_box.position.x == 0);
+  REQUIRE(compounding_box.position.y == 0);
+  REQUIRE(compounding_box.size.x == 0);
+  REQUIRE(compounding_box.size.y == 0);
+
+  SECTION(" next box is added to compounding_box at origin and no size") {
+    sf::FloatRect next_box{{50, 50}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    // this box is to the right of the compounding_box at both x and y so
+    // position of compounding_box should not change
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 100);
+  }
+
+  SECTION("the next box has left edge further left ") {
+    compounding_box.position = {0, 0};
+    compounding_box.size = {100, 100};
+    sf::FloatRect next_box{{-25, 10}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == -25);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 125);
+    REQUIRE(compounding_box.size.y == 100);
+  }
+
+  SECTION("the next box has a top edge further up") {
+
+    compounding_box.position = {0, 0};
+    compounding_box.size = {100, 100};
+    sf::FloatRect next_box{{10, -30}, {50, 50}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == -30);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 130);
+  }
+
+  SECTION("the next box is bigger in all dimensions") {
+
+    compounding_box.position = {0, 0};
+    compounding_box.size = {60, 60};
+    sf::FloatRect next_box{{-25, -30}, {130, 130}};
+    calculate_composite_box(compounding_box, next_box);
+
+    REQUIRE(compounding_box.position.x == -25);
+    REQUIRE(compounding_box.position.y == -30);
+    REQUIRE(compounding_box.size.x == 130);
+    REQUIRE(compounding_box.size.y == 130);
+  }
+
+  SECTION("10 boxes are added sequentially to the compounding box") {
+    compounding_box.position = {0, 0};
+    compounding_box.size = {0, 0};
+    for (int i = 0; i < 10; ++i) {
+      sf::FloatRect next_box{
+          {static_cast<float>(i * 10), static_cast<float>(i * 10)},
+          {10.f, 10.f}};
+      calculate_composite_box(compounding_box, next_box);
+    }
+    REQUIRE(compounding_box.position.x == 0);
+    REQUIRE(compounding_box.position.y == 0);
+    REQUIRE(compounding_box.size.x == 100);
+    REQUIRE(compounding_box.size.y == 100);
+  }
+}
+TEST_CASE("calculate_outer_box tests") {
+
+  // set up a fragment wiht a single triangle in the front view
+  Fragment fragment;
+  sf::VertexArray &front_array =
+      fragment.positioning_views[ViewDirection::Front];
+  front_array.setPrimitiveType(sf::PrimitiveType::Triangles);
+  front_array.append(sf::Vertex(sf::Vector2f(0.f, 0.f)));
+  front_array.append(sf::Vertex(sf::Vector2f(30.f, 0.f)));
+  front_array.append(sf::Vertex(sf::Vector2f(15.f, 30.f)));
+
+  Fragment fragment2;
+  sf::VertexArray &front_array2 =
+      fragment2.positioning_views[ViewDirection::Front];
+  front_array2.setPrimitiveType(sf::PrimitiveType::Triangles);
+  front_array2.append(sf::Vertex(sf::Vector2f(10.f, 10.f)));
+  front_array2.append(sf::Vertex(sf::Vector2f(40.f, 10.f)));
+  front_array2.append(sf::Vertex(sf::Vector2f(25.f, 40.f)));
+
+  SECTION("PartGraph has only one part and no subgraph provided") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment};
+    fragment_instance.id = 0;
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 0.f);
+    REQUIRE(outer_box.position.y == 0.f);
+  }
+
+  SECTION("PartGraph has only one part, no subgraph provided, and local "
+          "transform applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment};
+    fragment_instance.id = 0;
+    // apply a local transform to the fragment instance
+    fragment_instance.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 10.f);
+    REQUIRE(outer_box.position.y == 10.f);
+  }
+
+  SECTION("PartGraph has multiple parts, no subgraph provided and transforms "
+          "applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance1{&fragment};
+    fragment_instance1.id = 0;
+    fragment_instance1.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.id, fragment_instance1);
+    FragmentInstance fragment_instance2{&fragment2};
+    fragment_instance2.id = 1;
+    fragment_instance2.transform.translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    REQUIRE(outer_box.size.x == 35.f);
+    REQUIRE(outer_box.size.y == 35.f);
+    REQUIRE(outer_box.position.x == 5.f);
+    REQUIRE(outer_box.position.y == 5.f);
+  }
+
+  SECTION("PartGraph has multiple parts, subgraph provided and transforms "
+          "applied") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance1{&fragment};
+    fragment_instance1.id = 0;
+    fragment_instance1.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.id, fragment_instance1);
+    FragmentInstance fragment_instance2{&fragment2};
+    fragment_instance2.id = 1;
+    fragment_instance2.transform.translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    SubGraph sub_graph{0}; // only include the first part
+    sf::FloatRect outer_box = calculate_outer_box(part_graph, sub_graph);
+    REQUIRE(outer_box.size.x == 30.f);
+    REQUIRE(outer_box.size.y == 30.f);
+    REQUIRE(outer_box.position.x == 10.f);
+    REQUIRE(outer_box.position.y == 10.f);
+  }
+}
+
 } // namespace steamrot::tests

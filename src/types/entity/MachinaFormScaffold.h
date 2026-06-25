@@ -288,8 +288,9 @@ struct FragmentInstance : public PartInstance {
 };
 
 /// using helpers ///
-using PartGraph =
-    std::map<uint32_t, std::variant<JointInstance, FragmentInstance>>;
+using PartInstanceVariant = std::variant<JointInstance, FragmentInstance>;
+
+using PartGraph = std::map<uint32_t, PartInstanceVariant>;
 
 using StructuralAnalysisResults =
     std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;
@@ -340,7 +341,8 @@ struct MachinaFormScaffold {
   /////////////////////////////////////////////////
   /// @brief Holds the current state of the structural analysis.
   /////////////////////////////////////////////////
-  StructuralAnalysisState analysis_state{StructuralAnalysisState::NotRun};
+  StructuralAnalysisState structural_analysis_state{
+      StructuralAnalysisState::NotRun};
 
   /////////////////////////////////////////////////
   /// @brief Holds the results of an analysis run, keyed by archetype name. Each

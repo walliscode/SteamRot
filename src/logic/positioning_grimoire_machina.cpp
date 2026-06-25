@@ -7,9 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
+#include <cstdlib>
 
 namespace steamrot::logic::positioning::grimoire_machina {
 
@@ -132,5 +134,85 @@ void position_machina_form_scaffold(PartGraph &parts) {
 
   // position the first part of the scaffold at 0,0
   position_first_part_of_machina_form_scaffold(parts);
+}
+
+/////////////////////////////////////////////////
+void calculate_composite_box(sf::FloatRect &composite_box,
+                             const sf::FloatRect &next_box) {
+
+  auto left = std::min(composite_box.position.x, next_box.position.x);
+  auto top = std::min(composite_box.position.y, next_box.position.y);
+
+  auto right = std::max(composite_box.position.x + composite_box.size.x,
+                        next_box.position.x + next_box.size.x);
+
+  auto bottom = std::max(composite_box.position.y + composite_box.size.y,
+                         next_box.position.y + next_box.size.y);
+
+  composite_box = {{left, top}, {right - left, bottom - top}};
+}
+
+/////////////////////////////////////////////////
+sf::FloatRect
+get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
+  if (const FragmentInstance *fragment_instance =
+          std::get_if<FragmentInstance>(&part_variant)) {
+    // get the bounding box of the FRONT view of the fragment
+    sf::FloatRect box =
+        fragment_instance->fragment->positioning_views[ViewDirection::Front]
+            .getBounds();
+    // apply the local transform of the fragment instance to the bounding box
+    return fragment_instance->transform.transformRect(box);
+
+  } else if (const JointInstance *joint_instance =
+                 std::get_if<JointInstance>(&part_variant)) {
+    // get the bounding box of the FRONT view of the joint
+    sf::FloatRect box =
+        joint_instance->joint->positioning_views[ViewDirection::Front]
+            .getBounds();
+    // apply the local transform of the joint instance to the bounding box
+    return joint_instance->transform.transformRect(box);
+  }
+  // if part_variant is neither a FragmentInstance nor a JointInstance, return
+  // an empty bounding box
+  return sf::FloatRect{};
+}
+/////////////////////////////////////////////////
+sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
+                                  const SubGraph &sub_graph) {
+  // initiliase box with a minimum size to prevent tiny boxes from being
+  // returned
+  sf::FloatRect outer_box{{-100.f, -100.f}, {200.f, 200.f}};
+
+  // if PartGraph is empty, return early
+  if (part_graph.empty()) {
+
+    return outer_box;
+  }
+
+  // helper lambda for adding parts
+  auto add_part_to_outer_box = [&outer_box](const PartInstanceVariant &part) {
+    sf::FloatRect part_box = get_transformed_bounding_box(part);
+    calculate_composite_box(outer_box, part_box);
+  };
+
+  // if subgraph is empty, calculate outer box for all parts in the part graph
+  if (sub_graph.empty()) {
+    for (const auto &[id, part] : part_graph) {
+
+      add_part_to_outer_box(part);
+    }
+
+  } else {
+    // calculate outer box for only the parts in the subgraph
+    for (const auto &id : sub_graph) {
+      auto it = part_graph.find(id);
+      if (it != part_graph.end()) {
+
+        add_part_to_outer_box(it->second);
+      }
+    }
+  }
+  return outer_box;
 }
 } // namespace steamrot::logic::positioning::grimoire_machina

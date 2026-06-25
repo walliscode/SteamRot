@@ -10,22 +10,17 @@
 #include "render_grimoire_machina.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
+#include "positioning_grimoire_machina.h"
 #include "render_text.h"
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/ConvexShape.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
 
 /////////////////////////////////////////////////
 void render_machina_form(sf::RenderTexture &texture,
-                         GrimoireMachina &grimoire_machina) {
+                         GrimoireMachina &grimoire_machina,
+                         const sf::Font &font) {
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
 
   if (!scaffold) {
@@ -35,12 +30,25 @@ void render_machina_form(sf::RenderTexture &texture,
 
   const bool draw_sockets = scaffold->are_sockets_visible;
 
+  // draw the PartGraph
   for (auto &[id, part] : scaffold->parts) {
+
     if (auto *joint = std::get_if<JointInstance>(&part))
       draw_joint_instance(texture, *joint, draw_sockets);
-    else if (auto *fragment = std::get_if<FragmentInstance>(&part))
+
+    else if (auto *fragment = std::get_if<FragmentInstance>(&part)) {
       draw_fragment_instance(texture, *fragment, draw_sockets);
+    }
   }
+
+  /// Strucutural Analysis status box drawing ///
+  // generate a sf::FloatRect to be drawn
+  const sf::FloatRect status_box =
+      positioning::grimoire_machina::calculate_outer_box(scaffold->parts);
+
+  // pass the status box to the pick_and_draw_status_box function
+  pick_and_draw_status_box(scaffold->structural_analysis_state, status_box,
+                           font, texture);
 }
 
 /////////////////////////////////////////////////
@@ -200,6 +208,7 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
 
   // create text to draw and populate variables
   sf::Text text_to_draw{font, text};
+
   text_to_draw.setFillColor(sf::Color::White);
   text_to_draw.setPosition(
       {box.position.x + unit_width, box.position.y - (unit_height * 0.8f)});
@@ -222,8 +231,7 @@ void pick_and_draw_status_box(const StructuralAnalysisState state,
   case StructuralAnalysisState::NotRun:
     // draw a grey box with "Analysis Not Run" text
 
-    draw_status_box(box, {255, 255, 255, 50}, "Analysis Not Run", font,
-                    texture);
+    draw_status_box(box, {255, 255, 255, 50}, "No Analy.", font, texture);
     break;
 
   case StructuralAnalysisState::NothingFound:

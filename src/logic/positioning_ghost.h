@@ -12,7 +12,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CameraState.h"
-#include "EventPayload.h"
 #include "MrGhost.h"
 #include "Subscriber.h"
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -27,11 +26,12 @@ namespace steamrot::logic::positioning::ghost {
 /// mouse cursor, and cache the result in world_mouse_position.
 ///
 /// Converts the screen-space mouse position to world-space coordinates using
-/// positioning::camera::MapToWorldCoords (the single authoritative conversion), writes
-/// the result into both @p world_mouse_position and @p mr_ghost.m_position,
-/// and should be called once per tick before any world-space system consumes
-/// either value. The stored @p mr_ghost.m_rotation_degrees is applied to
-/// the instance transform so the ghost is rendered at the correct rotation.
+/// positioning::camera::MapToWorldCoords (the single authoritative conversion),
+/// writes the result into both @p world_mouse_position and @p
+/// mr_ghost.m_position, and should be called once per tick before any
+/// world-space system consumes either value. The stored @p
+/// mr_ghost.m_rotation_degrees is applied to the instance transform so the
+/// ghost is rendered at the correct rotation.
 ///
 /// @param mr_ghost            MrGhost instance whose position will be updated.
 /// @param world_mouse_position Out-parameter receiving the computed world-space

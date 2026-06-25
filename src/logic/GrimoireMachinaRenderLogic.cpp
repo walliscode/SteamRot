@@ -31,8 +31,14 @@ void GrimoireMachinaRenderLogic::ProcessLogic() {
   }
   GrimoireMachina &grimoire_machina = *grimoire_result.value();
 
+  // pull out the default font for use
+  auto font_result = m_scene_context.asset_manager.GetFont("Roboto-Regular");
+  if (!font_result.has_value()) {
+    return;
+  }
+  const sf::Font &font = *font_result.value();
   render::grimoire_machina::render_machina_form(m_scene_context.scene_texture,
-                                                grimoire_machina);
+                                                grimoire_machina, font);
 }
 
 } // namespace steamrot::logic

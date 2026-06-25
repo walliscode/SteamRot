@@ -23,6 +23,12 @@ void fit_text_to_box(sf::Text &text, const sf::Vector2f &box_size,
     while (text.getLocalBounds().size.x > (box_size.x - (padding * 2.f)) ||
            text.getLocalBounds().size.y > (box_size.y - (padding * 2.f))) {
 
+      // guard statement to prevent the character size from going below 2, which
+      // is the minimum size for readability
+      if (text.getCharacterSize() <= 2) {
+        text.setCharacterSize(2);
+        break;
+      }
       text.setCharacterSize(text.getCharacterSize() - 1);
     }
 
