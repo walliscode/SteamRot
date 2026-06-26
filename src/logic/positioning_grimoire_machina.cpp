@@ -204,6 +204,10 @@ sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
     }
 
   } else {
+    // if a SubGraph is provided, the minimum bounding box will be based on the
+    // first part
+    outer_box = get_transformed_bounding_box(part_graph.at(*sub_graph.begin()));
+
     // calculate outer box for only the parts in the subgraph
     for (const auto &id : sub_graph) {
       auto it = part_graph.find(id);
