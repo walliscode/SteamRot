@@ -78,6 +78,13 @@ private:
   ConfigureTestLogics(LogicCollection &logic_collection);
 
   /////////////////////////////////////////////////
+  /// @brief Configure the LogicCollection for the Spatial Analysis Scene.
+  ///
+  /// @param logic_collection A logic collection to configure.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  ConfigureSpatialAnalysisLogics(LogicCollection &logic_collection);
+  /////////////////////////////////////////////////
   /// @brief Create a configured a Logic object based on the LogicType.
   ///
   /// @param logic_type Logic object type to create.

@@ -136,6 +136,10 @@ ConfigureScenePayload(ScenePayload &scene_payload,
     case SceneTypeFbs_CRAFTING:
       scene_payload.optional_scene_type = SceneType::CRAFTING;
       break;
+    case SceneTypeFbs_SPATIAL_ANALYSIS:
+      scene_payload.optional_scene_type = SceneType::SPATIAL_ANALYSIS;
+      break;
+
     case SceneTypeFbs_UNKNOWN:
       return std::unexpected(
           FailInfo{FailMode::MissingData,

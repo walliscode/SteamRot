@@ -178,12 +178,31 @@ std::expected<uuids::uuid, FailInfo> SceneManager::LoadUIExplorerScene() {
 
   auto adding_result = m_scenes.emplace(id, std::move(scene_result.value()));
   if (!adding_result.second) {
-    return std::unexpected(
-        FailInfo{FailMode::NotAddedToMap,
-                 "UIExplorerScene was not added correctly"});
+    return std::unexpected(FailInfo{FailMode::NotAddedToMap,
+                                    "UIExplorerScene was not added correctly"});
   }
 
   return id;
+}
+
+/////////////////////////////////////////////////
+std::expected<uuids::uuid, FailInfo> SceneManager::LoadSpatialAnalysisScene() {
+  // clear existing scenes
+  m_scenes.clear();
+
+  // create spatial analysis scene
+  auto spatial_result = AddSceneFromDefault(SceneType::SPATIAL_ANALYSIS);
+  if (!spatial_result.has_value())
+    return std::unexpected(spatial_result.error());
+
+  // check that there is only one scene in the map and the uuids match
+  if (m_scenes.size() != 1) {
+    FailInfo fail_info(FailMode::NotAddedToMap,
+                       "Spatial Analysis scene was not added correctly");
+    return std::unexpected(fail_info);
+  }
+  // return the ID of the spatial analysis scene
+  return m_scenes.begin()->first;
 }
 
 /////////////////////////////////////////////////
@@ -296,6 +315,14 @@ std::expected<std::monostate, FailInfo> SceneManager::ProcessSubscriptions() {
 
             case SceneType::CRAFTING: {
               auto load_scene_result = LoadCraftingScene();
+              if (!load_scene_result.has_value()) {
+                return std::unexpected(load_scene_result.error());
+              }
+              break;
+            }
+
+            case SceneType::SPATIAL_ANALYSIS: {
+              auto load_scene_result = LoadSpatialAnalysisScene();
               if (!load_scene_result.has_value()) {
                 return std::unexpected(load_scene_result.error());
               }

@@ -23,33 +23,36 @@ enum SceneTypeFbs : int8_t {
   SceneTypeFbs_TEST = 1,
   SceneTypeFbs_TITLE = 2,
   SceneTypeFbs_CRAFTING = 3,
+  SceneTypeFbs_SPATIAL_ANALYSIS = 4,
   SceneTypeFbs_MIN = SceneTypeFbs_UNKNOWN,
-  SceneTypeFbs_MAX = SceneTypeFbs_CRAFTING
+  SceneTypeFbs_MAX = SceneTypeFbs_SPATIAL_ANALYSIS
 };
 
-inline const SceneTypeFbs (&EnumValuesSceneTypeFbs())[4] {
+inline const SceneTypeFbs (&EnumValuesSceneTypeFbs())[5] {
   static const SceneTypeFbs values[] = {
     SceneTypeFbs_UNKNOWN,
     SceneTypeFbs_TEST,
     SceneTypeFbs_TITLE,
-    SceneTypeFbs_CRAFTING
+    SceneTypeFbs_CRAFTING,
+    SceneTypeFbs_SPATIAL_ANALYSIS
   };
   return values;
 }
 
 inline const char * const *EnumNamesSceneTypeFbs() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "UNKNOWN",
     "TEST",
     "TITLE",
     "CRAFTING",
+    "SPATIAL_ANALYSIS",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameSceneTypeFbs(SceneTypeFbs e) {
-  if (::flatbuffers::IsOutRange(e, SceneTypeFbs_UNKNOWN, SceneTypeFbs_CRAFTING)) return "";
+  if (::flatbuffers::IsOutRange(e, SceneTypeFbs_UNKNOWN, SceneTypeFbs_SPATIAL_ANALYSIS)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesSceneTypeFbs()[index];
 }

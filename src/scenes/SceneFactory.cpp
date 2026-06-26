@@ -12,6 +12,7 @@
 #include "IEntityConfigurator.h"
 #include "LogicFactory.h"
 #include "Scene.h"
+#include "SpatialAnalysisScene.h"
 #include "TitleScene.h"
 #include "UIExplorerScene.h"
 #include "entity_memory.h"
@@ -54,6 +55,12 @@ SceneFactory::CreateEmptyScene(const SceneType scene_type) {
   case SceneType::UI_EXPLORER: {
     auto explorer_ptr = new UIExplorerScene(m_game_context);
     scene_ptr = std::unique_ptr<UIExplorerScene>(explorer_ptr);
+    return scene_ptr;
+  }
+
+  case SceneType::SPATIAL_ANALYSIS: {
+    auto spatial_ptr = new SpatialAnalysisScene(m_game_context);
+    scene_ptr = std::unique_ptr<SpatialAnalysisScene>(spatial_ptr);
     return scene_ptr;
   }
   default: {
@@ -302,8 +309,7 @@ SceneFactory::CreateUIExplorerScene() {
 /////////////////////////////////////////////////
 std::expected<std::monostate, FailInfo>
 SceneFactory::ValidateUIStyles(Scene &scene) const {
-  const EntityMemoryPool &emp =
-      scene.GetEntityManager().GetEntityMemoryPool();
+  const EntityMemoryPool &emp = scene.GetEntityManager().GetEntityMemoryPool();
   const std::unordered_map<std::string, UIStyle> &styles =
       m_game_context.asset_manager.GetAllUIStyles();
   const size_t pool_size = entity::memory::GetMemoryPoolSize(emp);

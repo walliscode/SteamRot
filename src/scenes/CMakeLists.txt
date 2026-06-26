@@ -6,6 +6,7 @@ add_library(scenes
     CraftingScene.cpp
     TitleScene.cpp
     UIExplorerScene.cpp
+    SpatialAnalysisScene.cpp
 )
 
 target_compile_definitions(scenes PRIVATE

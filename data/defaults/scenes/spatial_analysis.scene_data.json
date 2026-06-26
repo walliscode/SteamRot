@@ -1,6 +1,6 @@
 {
   "scene_info": {
-    "scene_type": "TITLE"
+    "scene_type": "SPATIAL_ANALYSIS"
   },
   "scene_resources_config": {
     "texture_width": 800,
@@ -11,23 +11,25 @@
     "entities": [
       {
         "c_user_interface": {
-          "ui_name": "title_screen_menu",
+          "ui_name": "machina_archetype_selection_menu",
           "is_visible": true,
           "root_ui_element": {
             "base_data": {
               "position": {
-                "x": 325,
-                "y": 150
+                "x": 0,
+                "y": 0
               },
               "size": {
-                "x": 250,
-                "y": 300
+                "x": 100,
+                "y": 600
               },
               "children_active": true,
               "children": [
                 {
                   "element_type": "ButtonDataFbs",
+
                   "element": {
+                    "label": "Grab",
                     "base_data": {
                       "position": {
                         "x": 0,
@@ -38,23 +40,7 @@
                         "y": 0
                       },
                       "children_active": false,
-                      "children": []
-                    },
-                    "label": "Start Game"
-                  }
-                },
-                {
-                  "element_type": "ButtonDataFbs",
-                  "element": {
-                    "base_data": {
-                      "position": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "size": {
-                        "x": 0,
-                        "y": 0
-                      },
+                      "children": [],
                       "subscriber_data": {
                         "event_type": "USER_INPUT",
                         "filter_payload_type": "InputPayloadFbs",
@@ -67,100 +53,150 @@
                           "context": {
                             "lifetime": 1
                           },
-                          "type": "SCENE",
-                          "payload_type": "ScenePayloadFbs",
+                          "type": "UI",
+                          "payload_type": "UIPayloadFbs",
                           "payload": {
-                            "scene_type": "CRAFTING",
-                            "action": "CHANGE"
+                            "c_ui_state_name": "grab_options_menu_on",
+                            "action": "TOGGLE"
                           }
                         }
-                      ],
-                      "children_active": false,
-                      "children": []
-                    },
-                    "label": "Crafting Table"
-                  }
-                },
-                {
-                  "element_type": "ButtonDataFbs",
-                  "element": {
-                    "base_data": {
-                      "position": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "size": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "subscriber_data": {
-                        "event_type": "USER_INPUT",
-                        "filter_payload_type": "InputPayloadFbs",
-                        "filter_payload": {
-                          "action": "SELECT"
-                        }
-                      },
-                      "response_event_data": [
-                        {
-                          "context": {
-                            "lifetime": 1
-                          },
-                          "type": "SCENE",
-                          "payload_type": "ScenePayloadFbs",
-                          "payload": {
-                            "scene_type": "SPATIAL_ANALYSIS",
-                            "action": "CHANGE"
-                          }
-                        }
-                      ],
-                      "children_active": false,
-                      "children": []
-                    },
-                    "label": "Spatial Analysis"
-                  }
-                },
-                {
-                  "element_type": "ButtonDataFbs",
-                  "element": {
-                    "base_data": {
-                      "position": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "size": {
-                        "x": 0,
-                        "y": 0
-                      },
-                      "subscriber_data": {
-                        "event_type": "USER_INPUT",
-                        "filter_payload_type": "InputPayloadFbs",
-                        "filter_payload": {
-                          "action": "SELECT"
-                        }
-                      },
-                      "response_event_data": [
-                        {
-                          "context": {
-                            "lifetime": 1
-                          },
-                          "type": "SYSTEM",
-                          "payload_type": "SystemPayloadFbs",
-                          "payload": {
-                            "action": "QUIT"
-                          }
-                        }
-                      ],
-                      "children_active": false,
-                      "children": []
-                    },
-                    "label": "Quit Game"
+                      ]
+                    }
                   }
                 }
               ]
             },
-            "spacing_strategy": "Even",
-            "layout": "Vertical"
+            "layout": "Vertical",
+            "spacing_strategy": "None"
           }
+        }
+      },
+      {
+        "c_user_interface": {
+          "ui_name": "grab_options_menu",
+          "is_visible": false,
+          "root_ui_element": {
+            "base_data": {
+              "position": {
+                "x": 700,
+                "y": 0
+              },
+              "size": {
+                "x": 100,
+                "y": 600
+              },
+              "children_active": true,
+              "children": [
+                {
+                  "element_type": "ButtonDataFbs",
+
+                  "element": {
+                    "label": "Open",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "subscriber_data": {
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
+                        }
+                      },
+                      "response_event_data": []
+                    }
+                  }
+                },
+                {
+                  "element_type": "ButtonDataFbs",
+
+                  "element": {
+                    "label": "Close",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "subscriber_data": {
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
+                        }
+                      },
+                      "response_event_data": []
+                    }
+                  }
+                },
+                {
+                  "element_type": "ButtonDataFbs",
+
+                  "element": {
+                    "label": "Reset",
+                    "base_data": {
+                      "position": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "size": {
+                        "x": 0,
+                        "y": 0
+                      },
+                      "children_active": false,
+                      "children": [],
+                      "subscriber_data": {
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
+                        }
+                      },
+                      "response_event_data": []
+                    }
+                  }
+                }
+              ]
+            },
+            "layout": "Vertical",
+            "spacing_strategy": "None"
+          }
+        }
+      },
+
+      {
+        "c_ui_state": {
+          "ui_states": [
+            {
+              "state_key": "grab_options_menu_on",
+              "ui_state_changes": {
+                "ui_names_on": ["grab_options_menu"],
+                "ui_names_off": []
+              },
+              "subscribers": [
+                {
+                  "event_type": "UI",
+                  "filter_payload_type": "UIPayloadFbs",
+                  "filter_payload": {
+                    "c_ui_state_name": "grab_options_menu_on",
+                    "action": "TOGGLE"
+                  }
+                }
+              ]
+            }
+          ]
         }
       }
     ]
