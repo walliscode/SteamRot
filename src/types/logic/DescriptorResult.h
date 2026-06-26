@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -115,16 +116,47 @@ struct ChainDescriptorResult : DescriptorResult {
 };
 
 struct TestArchetypeResult {
+  /////////////////////////////////////////////////
+  /// @brief A single node in the Test archetype that serves as the anchor for
+  /// the two chains
+  /////////////////////////////////////////////////
   uint32_t test_node;
+
+  /////////////////////////////////////////////////
+  /// @brief A SubGraph containing all nodes in the first chain of the Test
+  /// archetype
+  /////////////////////////////////////////////////
   SubGraph chain1;
+
+  /////////////////////////////////////////////////
+  /// @brief A SubGraph containing all nodes in the second chain of the Test
+  /// archetype
+  /////////////////////////////////////////////////
   SubGraph chain2;
+
+  /////////////////////////////////////////////////
+  /// @brief A collection of SubGraphs containing all nodes in the chains of the
+  /// Test archetype
+  /////////////////////////////////////////////////
   std::vector<SubGraph> chains;
+
+  SubGraph get_unique_nodes() const {
+    std::unordered_set<uint32_t> unique_nodes;
+    unique_nodes.insert(test_node);
+    unique_nodes.insert(chain1.begin(), chain1.end());
+    unique_nodes.insert(chain2.begin(), chain2.end());
+    for (const auto &chain : chains) {
+      unique_nodes.insert(chain.begin(), chain.end());
+    }
+    return SubGraph(unique_nodes.begin(), unique_nodes.end());
+  }
 };
 /////////////////////////////////////////////////
 /// @class GrabResult
 /// @brief Store the anchor and arms of a successful Grab MachinaArchetype
 /////////////////////////////////////////////////
 struct GrabResult {
+
   /////////////////////////////////////////////////
   /// @brief Anchor node from which the arms extend
   /////////////////////////////////////////////////
@@ -134,6 +166,20 @@ struct GrabResult {
   /// @brief Collection of grabbing arms
   /////////////////////////////////////////////////
   std::vector<SubGraph> arms;
+
+  /////////////////////////////////////////////////
+  /// @brief Get a SubGraph containing all unique nodes in the GrabResult
+  ///
+  /// @return SubGraph containing all unique nodes in the GrabResult
+  /////////////////////////////////////////////////
+  SubGraph get_unique_nodes() const {
+    std::unordered_set<uint32_t> unique_nodes;
+    unique_nodes.insert(anchor);
+    for (const auto &arm : arms) {
+      unique_nodes.insert(arm.begin(), arm.end());
+    }
+    return SubGraph(unique_nodes.begin(), unique_nodes.end());
+  }
 };
 
 using ArchetypeVariant = std::variant<TestArchetypeResult, GrabResult>;

@@ -41,14 +41,8 @@ void render_machina_form(sf::RenderTexture &texture,
     }
   }
 
-  /// Strucutural Analysis status box drawing ///
-  // generate a sf::FloatRect to be drawn
-  const sf::FloatRect status_box =
-      positioning::grimoire_machina::calculate_outer_box(scaffold->parts);
-
   // pass the status box to the pick_and_draw_status_box function
-  pick_and_draw_status_box(scaffold->structural_analysis_state, status_box,
-                           font, texture);
+  pick_and_draw_status_box(*scaffold, font, texture);
 }
 
 /////////////////////////////////////////////////
@@ -222,28 +216,52 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
 }
 
 /////////////////////////////////////////////////
-void pick_and_draw_status_box(const StructuralAnalysisState state,
-                              const sf::FloatRect box, const sf::Font &font,
+void pick_and_draw_status_box(const MachinaFormScaffold &scaffold,
+                              const sf::Font &font,
                               sf::RenderTexture &texture) {
   // switch on the state and draw the appropriate box
-  switch (state) {
+  switch (scaffold.structural_analysis_state) {
 
-  case StructuralAnalysisState::NotRun:
+    // for NotRun and NotFound we can draw a generic box
+  case StructuralAnalysisState::NotRun: {
     // draw a grey box with "Analysis Not Run" text
-
+    auto box =
+        positioning::grimoire_machina::calculate_outer_box(scaffold.parts);
     draw_status_box(box, {255, 255, 255, 50}, "No Analy.", font, texture);
     break;
+  }
 
-  case StructuralAnalysisState::NothingFound:
+  case StructuralAnalysisState::NothingFound: {
+    auto box =
+        positioning::grimoire_machina::calculate_outer_box(scaffold.parts);
     // draw a red box with "No Archetypes Found" text
     draw_status_box(box, {168, 50, 50, 255}, "No Archetypes Found", font,
                     texture);
     break;
+  }
 
+    // now we are going to pass Subgraphs to the draw_status_box from every
+    // successful analysis
   case StructuralAnalysisState::Found:
-    // draw a green box with "Archetypes Found" text
-    draw_status_box(box, {50, 168, 50, 255}, "Archetypes Found", font, texture);
+
+    // for each archetype result, we will draw a box around the subgraph
+    for (const auto &[archetype_name, results] :
+         scaffold.structural_analysis_results) {
+
+      // we can use std::visit as each variant should have a get_unique_nodes()
+      // function to get the unique nodes in the subgraph
+      std::visit(
+          [&](const auto &result) {
+            SubGraph unique_nodes = result.get_unique_nodes();
+            auto box = positioning::grimoire_machina::calculate_outer_box(
+                scaffold.parts, unique_nodes);
+            draw_status_box(box, {50, 168, 50, 255}, archetype_name, font,
+                            texture);
+          },
+          results.front().result_sub_graphs);
+    }
     break;
   }
 }
+
 } // namespace steamrot::logic::render::grimoire_machina
