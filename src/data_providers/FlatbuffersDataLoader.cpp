@@ -43,6 +43,10 @@ FlatbuffersDataLoader::ProvideDefaultSceneData(
     scene_file_prefix = "crafting";
     break;
   }
+  case SceneType::SPATIAL_ANALYSIS: {
+    scene_file_prefix = "spatial_analysis";
+    break;
+  }
   default:
     return std::unexpected(
         FailInfo(FailMode::SceneTypeNotFound, "Invalid SceneType provided"));
@@ -92,8 +96,9 @@ FlatbuffersDataLoader::ProvideUIStylesData() const {
         ui_styles.push_back(style_data);
       } else {
         // unexpected error if style data is null
-        std::string error_message = std::format(
-            "UIStyleDataFbs pointer is null for file: {}", entry.path().string());
+        std::string error_message =
+            std::format("UIStyleDataFbs pointer is null for file: {}",
+                        entry.path().string());
         return std::unexpected(
             FailInfo(FailMode::FlatbuffersDataNotFound, error_message));
       }

@@ -95,6 +95,14 @@ LogicFactory::ProvideLogicCollection(SceneType scene_type) {
     break;
   }
 
+  case SceneType::SPATIAL_ANALYSIS: {
+    auto result = ConfigureSpatialAnalysisLogics(logic_collection);
+    if (!result) {
+      return std::unexpected(result.error());
+    }
+    break;
+  }
+
   // other SceneTypes can be added here
   default:
     return std::unexpected(
@@ -394,6 +402,53 @@ LogicFactory::ConfigureTestLogics(LogicCollection &logic_collection) {
     return std::unexpected(positioning_result.error());
   }
 
+  return std::monostate();
+}
+
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+LogicFactory::ConfigureSpatialAnalysisLogics(
+    LogicCollection &logic_collection) {
+  ////// THE ORDER OF THE LOGIC CLASSES IS VERY IMPORTANT //////
+  ////// DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING //////
+  // Define the Logic types for each grouping in the order they should execute
+  // These are compile-time constants that define the scene's Logic
+  // configuration
+  static constexpr std::array collision_logic_types = {LogicType::UICollision};
+  static constexpr std::array action_logic_types = {LogicType::UIAction,
+                                                    LogicType::UIState};
+  static constexpr std::array render_logic_types = {LogicType::UIRender};
+  static constexpr std::array positioning_logic_types = {
+      LogicType::UIPositioning};
+  // Add Logics to collection using the helper function
+  auto collision_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Collision,
+      std::vector<LogicType>(collision_logic_types.begin(),
+                             collision_logic_types.end()));
+  if (!collision_result) {
+    return std::unexpected(collision_result.error());
+  }
+  auto action_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Action,
+                            std::vector<LogicType>(action_logic_types.begin(),
+                                                   action_logic_types.end()));
+  if (!action_result) {
+    return std::unexpected(action_result.error());
+  }
+  auto render_result =
+      AddLogicsToCollection(logic_collection, LogicGrouping::Render,
+                            std::vector<LogicType>(render_logic_types.begin(),
+                                                   render_logic_types.end()));
+  if (!render_result) {
+    return std::unexpected(render_result.error());
+  }
+  auto positioning_result = AddLogicsToCollection(
+      logic_collection, LogicGrouping::Positioning,
+      std::vector<LogicType>(positioning_logic_types.begin(),
+                             positioning_logic_types.end()));
+  if (!positioning_result) {
+    return std::unexpected(positioning_result.error());
+  }
   return std::monostate();
 }
 } // namespace steamrot::logic

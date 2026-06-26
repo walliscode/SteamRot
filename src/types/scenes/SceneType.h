@@ -25,7 +25,14 @@ namespace steamrot {
 /// identification. The FlatBuffers SceneTypeFbs enum should only be
 /// used when loading/saving data and converted to this enum.
 /////////////////////////////////////////////////
-enum class SceneType { UNKNOWN = 0, TEST = 1, TITLE = 2, CRAFTING = 3, UI_EXPLORER = 4 };
+enum class SceneType {
+  UNKNOWN = 0,
+  TEST = 1,
+  TITLE = 2,
+  CRAFTING = 3,
+  UI_EXPLORER = 4,
+  SPATIAL_ANALYSIS = 5
+};
 
 /////////////////////////////////////////////////
 /// @brief Converts a SceneType enum value to its string representation.
@@ -44,6 +51,8 @@ inline std::string EnumNameSceneType(SceneType scene_type) {
     return "CRAFTING";
   case SceneType::UI_EXPLORER:
     return "UI_EXPLORER";
+  case SceneType::SPATIAL_ANALYSIS:
+    return "SpatialAnalysis";
   default:
     return "INVALID_SCENE_TYPE";
   }

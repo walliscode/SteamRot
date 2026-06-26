@@ -115,6 +115,11 @@ public:
   std::expected<uuids::uuid, FailInfo> LoadUIExplorerScene();
 
   /////////////////////////////////////////////////
+  /// @brief A convenience function to load the spatial analysis scene.
+  /////////////////////////////////////////////////
+  std::expected<uuids::uuid, FailInfo> LoadSpatialAnalysisScene();
+
+  /////////////////////////////////////////////////
   /// @brief Cause the cascade of events that will add a scene from default
   /// data.
   ///
@@ -162,7 +167,8 @@ public:
   GetScenes() const;
 
   /////////////////////////////////////////////////
-  /// @brief Execute scene manager level logic including subscription processing.
+  /// @brief Execute scene manager level logic including subscription
+  /// processing.
   ///
   /// @return Success or failure information
   /////////////////////////////////////////////////

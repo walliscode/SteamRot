@@ -39,6 +39,8 @@ ConvertSceneTypeFbsToSceneType(SceneTypeFbs fbs_type) {
     return SceneType::TITLE;
   case SceneTypeFbs_CRAFTING:
     return SceneType::CRAFTING;
+  case SceneTypeFbs_SPATIAL_ANALYSIS:
+    return SceneType::SPATIAL_ANALYSIS;
   default:
     return std::unexpected(
         FailInfo{FailMode::EnumValueNotHandled,

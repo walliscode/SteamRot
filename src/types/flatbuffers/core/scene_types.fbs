@@ -6,7 +6,8 @@ enum SceneTypeFbs: byte {
   UNKNOWN = 0,
   TEST = 1,
   TITLE = 2,
-  CRAFTING = 3
+  CRAFTING = 3,
+  SPATIAL_ANALYSIS
 }
 
 table SceneChangePacketDataFbs {
