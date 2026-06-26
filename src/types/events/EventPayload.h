@@ -277,7 +277,8 @@ struct CameraPayload {
     SCROLL,
     RESET_ZOOM,
     PAN_PRESS,
-    PAN_RELEASE
+    PAN_RELEASE,
+    ALIGN_TO_MACHINA_FORM_SCAFFOLD
   } action{CameraAction::NONE};
 
   /////////////////////////////////////////////////

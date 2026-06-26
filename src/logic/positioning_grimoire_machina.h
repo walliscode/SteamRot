@@ -94,6 +94,7 @@ get_transformed_bounding_box(const PartInstanceVariant &part_variant);
 /// outer bounding box for (optional)
 /////////////////////////////////////////////////
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
-                                  const SubGraph &sub_graph = {});
+                                  const SubGraph &sub_graph = {},
+                                  const bool use_minimal_bounding_box = true);
 
 } // namespace steamrot::logic::positioning::grimoire_machina

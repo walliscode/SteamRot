@@ -179,7 +179,8 @@ get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
 }
 /////////////////////////////////////////////////
 sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
-                                  const SubGraph &sub_graph) {
+                                  const SubGraph &sub_graph,
+                                  const bool use_minimum_bounding_box) {
   // initiliase box with a minimum size to prevent tiny boxes from being
   // returned
   sf::FloatRect outer_box{{-100.f, -100.f}, {200.f, 200.f}};
@@ -198,14 +199,19 @@ sf::FloatRect calculate_outer_box(const PartGraph &part_graph,
 
   // if subgraph is empty, calculate outer box for all parts in the part graph
   if (sub_graph.empty()) {
+
+    // if use_minimum_bounding_box is false, set the outer box to the bounding
+    // box of the first part
+    if (!use_minimum_bounding_box)
+      outer_box = get_transformed_bounding_box(part_graph.begin()->second);
+
     for (const auto &[id, part] : part_graph) {
 
       add_part_to_outer_box(part);
     }
-
   } else {
-    // if a SubGraph is provided, the minimum bounding box will be based on the
-    // first part
+    // if a SubGraph is provided, the minimum bounding box will be based on
+    // the first part
     outer_box = get_transformed_bounding_box(part_graph.at(*sub_graph.begin()));
 
     // calculate outer box for only the parts in the subgraph
