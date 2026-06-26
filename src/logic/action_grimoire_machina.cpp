@@ -13,7 +13,6 @@
 #include "MachinaFormScaffold.h"
 #include "descriptors_runner.h"
 #include <expected>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -92,7 +91,7 @@ void process_logic_events(Subscriber &subscriber,
   case LogicPayload::LogicToggle::PERFORM_STRUCTURAL_ANALYSIS: {
     // if no active scaffold, break
     MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
-    std::cout << "Performing structural analysis on scaffold..." << std::endl;
+
     if (!scaffold)
       break;
 
