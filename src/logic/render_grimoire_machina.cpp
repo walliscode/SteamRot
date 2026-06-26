@@ -189,7 +189,7 @@ void draw_status_box(sf::FloatRect box, sf::Color color,
   texture.draw(border_box);
 
   // pull out some unit of width from the box to use as increments
-  const float unit_width = box.size.x * 0.05f;
+  const float unit_width = box.size.x * 0.1f;
   const float unit_height = box.size.y * 0.08f;
 
   // create a 6 point convex shape to draw the trapezium shape above the box
@@ -238,6 +238,11 @@ void pick_and_draw_status_box(const StructuralAnalysisState state,
     // draw a red box with "No Archetypes Found" text
     draw_status_box(box, {168, 50, 50, 255}, "No Archetypes Found", font,
                     texture);
+    break;
+
+  case StructuralAnalysisState::Found:
+    // draw a green box with "Archetypes Found" text
+    draw_status_box(box, {50, 168, 50, 255}, "Archetypes Found", font, texture);
     break;
   }
 }

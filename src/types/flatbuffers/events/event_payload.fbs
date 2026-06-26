@@ -31,7 +31,8 @@ enum UIActionFbs: byte {
 ////////////////////////////////////////////////////////////
 enum LogicToggleFbs: byte {
   INITIATE_MACHINA_FORM_SCAFFOLD,
-  CLEAR_MACHINA_FORM_SCAFFOLD
+  CLEAR_MACHINA_FORM_SCAFFOLD,
+  PERFORM_STRUCTURAL_ANALYSIS,
 }
 
 ////////////////////////////////////////////////////////////
