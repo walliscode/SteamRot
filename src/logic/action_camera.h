@@ -13,6 +13,7 @@
 /////////////////////////////////////////////////
 #include "CameraState.h"
 #include "EventPayload.h"
+#include "MachinaFormScaffold.h"
 #include "Subscriber.h"
 #include <memory>
 #include <vector>
@@ -56,6 +57,9 @@ void apply_pan_start(CameraState &camera_state,
 void apply_pan_stop(CameraState &camera_state,
                     CameraPayload::PanDirection direction);
 
+void align_camera_to_machina_form_scaffold(const MachinaFormScaffold &scaffold,
+                                           CameraState &camera_state);
+
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers and apply their camera scroll deltas.
 ///
@@ -68,6 +72,6 @@ void apply_pan_stop(CameraState &camera_state,
 /////////////////////////////////////////////////
 void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
-    CameraState &camera_state);
+    CameraState &camera_state, MachinaFormScaffold *scaffold = nullptr);
 
 } // namespace steamrot::logic::action::camera

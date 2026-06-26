@@ -245,35 +245,38 @@ enum CameraActionFbs : int8_t {
   CameraActionFbs_RESET_ZOOM = 2,
   CameraActionFbs_PAN_PRESS = 3,
   CameraActionFbs_PAN_RELEASE = 4,
+  CameraActionFbs_ALIGN_TO_MACHINA_FORM_SCAFFOLD = 5,
   CameraActionFbs_MIN = CameraActionFbs_NONE,
-  CameraActionFbs_MAX = CameraActionFbs_PAN_RELEASE
+  CameraActionFbs_MAX = CameraActionFbs_ALIGN_TO_MACHINA_FORM_SCAFFOLD
 };
 
-inline const CameraActionFbs (&EnumValuesCameraActionFbs())[5] {
+inline const CameraActionFbs (&EnumValuesCameraActionFbs())[6] {
   static const CameraActionFbs values[] = {
     CameraActionFbs_NONE,
     CameraActionFbs_SCROLL,
     CameraActionFbs_RESET_ZOOM,
     CameraActionFbs_PAN_PRESS,
-    CameraActionFbs_PAN_RELEASE
+    CameraActionFbs_PAN_RELEASE,
+    CameraActionFbs_ALIGN_TO_MACHINA_FORM_SCAFFOLD
   };
   return values;
 }
 
 inline const char * const *EnumNamesCameraActionFbs() {
-  static const char * const names[6] = {
+  static const char * const names[7] = {
     "NONE",
     "SCROLL",
     "RESET_ZOOM",
     "PAN_PRESS",
     "PAN_RELEASE",
+    "ALIGN_TO_MACHINA_FORM_SCAFFOLD",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCameraActionFbs(CameraActionFbs e) {
-  if (::flatbuffers::IsOutRange(e, CameraActionFbs_NONE, CameraActionFbs_PAN_RELEASE)) return "";
+  if (::flatbuffers::IsOutRange(e, CameraActionFbs_NONE, CameraActionFbs_ALIGN_TO_MACHINA_FORM_SCAFFOLD)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCameraActionFbs()[index];
 }

@@ -257,10 +257,10 @@ ConfigureCameraPayload(CameraPayload &camera_payload,
   case CameraActionFbs_PAN_RELEASE:
     camera_payload.action = CameraPayload::CameraAction::PAN_RELEASE;
     break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown CameraActionFbs value in flatbuffers data"});
+  case CameraActionFbs_ALIGN_TO_MACHINA_FORM_SCAFFOLD:
+    camera_payload.action =
+        CameraPayload::CameraAction::ALIGN_TO_MACHINA_FORM_SCAFFOLD;
+    break;
   }
   return std::monostate{};
 }

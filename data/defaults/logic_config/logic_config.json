@@ -85,6 +85,11 @@
         "event_type": "CAMERA",
         "filter_payload_type": "CameraPayloadFbs",
         "filter_payload": { "action": "PAN_RELEASE" }
+      },
+      {
+        "event_type": "CAMERA",
+        "filter_payload_type": "CameraPayloadFbs",
+        "filter_payload": { "action": "ALIGN_TO_MACHINA_FORM_SCAFFOLD" }
       }
     ]
   }

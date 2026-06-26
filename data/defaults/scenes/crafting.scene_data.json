@@ -393,6 +393,25 @@
                         "x": 0,
                         "y": 0
                       },
+                      "subscriber_data": {
+                        "event_type": "USER_INPUT",
+                        "filter_payload_type": "InputPayloadFbs",
+                        "filter_payload": {
+                          "action": "SELECT"
+                        }
+                      },
+                      "response_event_data": [
+                        {
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "type": "CAMERA",
+                          "payload_type": "CameraPayloadFbs",
+                          "payload": {
+                            "action": "ALIGN_TO_MACHINA_FORM_SCAFFOLD"
+                          }
+                        }
+                      ],
                       "children_active": false,
                       "children": []
                     }
