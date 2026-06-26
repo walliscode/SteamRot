@@ -22,6 +22,11 @@
         "filter_payload": { "toggle_name": "CLEAR_MACHINA_FORM_SCAFFOLD" }
       },
       {
+        "event_type": "LOGIC",
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": { "toggle_name": "PERFORM_STRUCTURAL_ANALYSIS" }
+      },
+      {
         "event_type": "USER_INPUT",
         "filter_payload_type": "InputPayloadFbs",
         "filter_payload": { "action": "SELECT" }

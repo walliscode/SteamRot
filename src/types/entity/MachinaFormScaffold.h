@@ -298,6 +298,7 @@ using StructuralAnalysisResults =
 enum class StructuralAnalysisState {
   NotRun,       ///< No analysis has been run yet.
   NothingFound, ///< Analysis was run but no archetypes were found.
+  Found         ///< Analysis was run and archetypes were found.
 };
 /////////////////////////////////////////////////
 /// 3struct MachinaFormScaffold
@@ -348,7 +349,7 @@ struct MachinaFormScaffold {
   /// @brief Holds the results of an analysis run, keyed by archetype name. Each
   /// archetype may produce multiple results
   /////////////////////////////////////////////////
-  StructuralAnalysisResults archetype_results{};
+  StructuralAnalysisResults structural_analysis_results{};
 };
 
 } // namespace steamrot

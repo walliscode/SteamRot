@@ -11,7 +11,9 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
+#include "descriptors_runner.h"
 #include <expected>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -87,6 +89,25 @@ void process_logic_events(Subscriber &subscriber,
     clear_active_machina_form_scaffold(grimoire_machina);
     break;
   }
+  case LogicPayload::LogicToggle::PERFORM_STRUCTURAL_ANALYSIS: {
+    // if no active scaffold, break
+    MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
+    std::cout << "Performing structural analysis on scaffold..." << std::endl;
+    if (!scaffold)
+      break;
+
+    descriptors::run_structural_analysis(scaffold->parts,
+                                         scaffold->structural_analysis_results);
+
+    // update the StucturalAnalysisState
+    if (scaffold->structural_analysis_results.empty()) {
+      scaffold->structural_analysis_state =
+          StructuralAnalysisState::NothingFound;
+    } else {
+      scaffold->structural_analysis_state = StructuralAnalysisState::Found;
+    }
+    break;
+  }
 
   default:
     break;
@@ -146,7 +167,8 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
   if (!ghost_socket_index.has_value())
     return;
 
-  auto partgraph_result = check_PartGraph_for_connection_readiness(scaffold.parts);
+  auto partgraph_result =
+      check_PartGraph_for_connection_readiness(scaffold.parts);
   if (!partgraph_result.has_value())
     return;
 
@@ -173,8 +195,9 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     JointInstance &existing_ji =
         std::get<JointInstance>(scaffold.parts.at(partgraph_part_id));
 
-    auto connection_result = create_connection(
-        placed_fi, ghost_socket_index.value(), existing_ji, partgraph_socket_id);
+    auto connection_result =
+        create_connection(placed_fi, ghost_socket_index.value(), existing_ji,
+                          partgraph_socket_id);
     static_cast<void>(connection_result);
 
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
@@ -197,8 +220,9 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     FragmentInstance &existing_fi =
         std::get<FragmentInstance>(scaffold.parts.at(partgraph_part_id));
 
-    auto connection_result = create_connection(
-        existing_fi, partgraph_socket_id, placed_ji, ghost_socket_index.value());
+    auto connection_result =
+        create_connection(existing_fi, partgraph_socket_id, placed_ji,
+                          ghost_socket_index.value());
     static_cast<void>(connection_result);
   }
 }

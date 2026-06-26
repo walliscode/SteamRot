@@ -109,7 +109,8 @@ struct LogicPayload {
 
     // GrimoireMachina toggles
     INITIATE_MACHINA_FORM_SCAFFOLD,
-    CLEAR_MACHINA_FORM_SCAFFOLD
+    CLEAR_MACHINA_FORM_SCAFFOLD,
+    PERFORM_STRUCTURAL_ANALYSIS,
 
     // add other categories as needed
 
