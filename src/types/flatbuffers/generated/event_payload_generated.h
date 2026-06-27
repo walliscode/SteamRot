@@ -111,31 +111,34 @@ enum LogicToggleFbs : int8_t {
   LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD = 0,
   LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD = 1,
   LogicToggleFbs_PERFORM_STRUCTURAL_ANALYSIS = 2,
+  LogicToggleFbs_POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD = 3,
   LogicToggleFbs_MIN = LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD,
-  LogicToggleFbs_MAX = LogicToggleFbs_PERFORM_STRUCTURAL_ANALYSIS
+  LogicToggleFbs_MAX = LogicToggleFbs_POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD
 };
 
-inline const LogicToggleFbs (&EnumValuesLogicToggleFbs())[3] {
+inline const LogicToggleFbs (&EnumValuesLogicToggleFbs())[4] {
   static const LogicToggleFbs values[] = {
     LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD,
     LogicToggleFbs_CLEAR_MACHINA_FORM_SCAFFOLD,
-    LogicToggleFbs_PERFORM_STRUCTURAL_ANALYSIS
+    LogicToggleFbs_PERFORM_STRUCTURAL_ANALYSIS,
+    LogicToggleFbs_POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD
   };
   return values;
 }
 
 inline const char * const *EnumNamesLogicToggleFbs() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "INITIATE_MACHINA_FORM_SCAFFOLD",
     "CLEAR_MACHINA_FORM_SCAFFOLD",
     "PERFORM_STRUCTURAL_ANALYSIS",
+    "POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLogicToggleFbs(LogicToggleFbs e) {
-  if (::flatbuffers::IsOutRange(e, LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD, LogicToggleFbs_PERFORM_STRUCTURAL_ANALYSIS)) return "";
+  if (::flatbuffers::IsOutRange(e, LogicToggleFbs_INITIATE_MACHINA_FORM_SCAFFOLD, LogicToggleFbs_POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLogicToggleFbs()[index];
 }

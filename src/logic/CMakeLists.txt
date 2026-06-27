@@ -74,5 +74,6 @@ target_link_libraries(logic
   context
   resources
   conmat::conmat
+  machina_form_scaffolds
 
 )

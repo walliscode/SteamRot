@@ -414,12 +414,21 @@ LogicFactory::ConfigureSpatialAnalysisLogics(
   // Define the Logic types for each grouping in the order they should execute
   // These are compile-time constants that define the scene's Logic
   // configuration
-  static constexpr std::array collision_logic_types = {LogicType::UICollision};
-  static constexpr std::array action_logic_types = {LogicType::UIAction,
-                                                    LogicType::UIState};
-  static constexpr std::array render_logic_types = {LogicType::UIRender};
+
+  static constexpr std::array collision_logic_types = {
+      LogicType::UICollision, LogicType::GrimoireMachinaCollision};
+
+  static constexpr std::array action_logic_types = {
+      LogicType::CameraAction, LogicType::UIAction, LogicType::UIState,
+      LogicType::GrimoireMachinaAction};
+
+  static constexpr std::array render_logic_types = {
+      LogicType::GrimoireMachinaRender, LogicType::UIRender};
+
   static constexpr std::array positioning_logic_types = {
-      LogicType::UIPositioning};
+      LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning,
+      LogicType::CameraPositioning};
+
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(
       logic_collection, LogicGrouping::Collision,
