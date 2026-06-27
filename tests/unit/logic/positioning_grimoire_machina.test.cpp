@@ -468,7 +468,17 @@ TEST_CASE("calculate_outer_box tests") {
   front_array2.append(sf::Vertex(sf::Vector2f(40.f, 10.f)));
   front_array2.append(sf::Vertex(sf::Vector2f(25.f, 40.f)));
 
-  SECTION("PartGraph has only one part and no subgraph provided") {
+  // large fragment
+  Fragment fragment_large;
+  sf::VertexArray &front_array_large =
+      fragment_large.positioning_views[ViewDirection::Front];
+  front_array_large.setPrimitiveType(sf::PrimitiveType::Triangles);
+  front_array_large.append(sf::Vertex(sf::Vector2f(-100.f, -100.f)));
+  front_array_large.append(sf::Vertex(sf::Vector2f(150.f, -100.f)));
+  front_array_large.append(sf::Vertex(sf::Vector2f(25.f, 150.f)));
+
+  SECTION("PartGraph has only one part and no subgraph provided, does not "
+          "exceed minimum box size") {
     PartGraph part_graph;
     FragmentInstance fragment_instance{&fragment};
     fragment_instance.id = 0;
@@ -476,14 +486,30 @@ TEST_CASE("calculate_outer_box tests") {
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
 
-    REQUIRE(outer_box.size.x == 30.f);
-    REQUIRE(outer_box.size.y == 30.f);
-    REQUIRE(outer_box.position.x == 0.f);
-    REQUIRE(outer_box.position.y == 0.f);
+    REQUIRE(outer_box.size.x == 200.f);
+    REQUIRE(outer_box.size.y == 200.f);
+    REQUIRE(outer_box.position.x == -100.f);
+    REQUIRE(outer_box.position.y == -100.f);
+  }
+
+  SECTION("PartGraph has only one part and no subgraph provided, exceeds "
+          "minimum size") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment_large};
+    fragment_instance.id = 0;
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    // The outer box should be the same as the fragment's bounding box since it
+    // exceeds the minimum size
+    REQUIRE(outer_box.size.x == 250.f);
+    REQUIRE(outer_box.size.y == 250.f);
+    REQUIRE(outer_box.position.x == -100.f);
+    REQUIRE(outer_box.position.y == -100.f);
   }
 
   SECTION("PartGraph has only one part, no subgraph provided, and local "
-          "transform applied") {
+          "transform applied, does not exceed minimum box size") {
     PartGraph part_graph;
     FragmentInstance fragment_instance{&fragment};
     fragment_instance.id = 0;
@@ -492,14 +518,33 @@ TEST_CASE("calculate_outer_box tests") {
     part_graph.emplace(fragment_instance.id, fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
-    REQUIRE(outer_box.size.x == 30.f);
-    REQUIRE(outer_box.size.y == 30.f);
-    REQUIRE(outer_box.position.x == 10.f);
-    REQUIRE(outer_box.position.y == 10.f);
+
+    REQUIRE(outer_box.size.x == 200.f);
+    REQUIRE(outer_box.size.y == 200.f);
+    REQUIRE(outer_box.position.x == -100.f);
+    REQUIRE(outer_box.position.y == -100.f);
+  }
+
+  SECTION("PartGraph has only one part, no subgraph provided, and local "
+          "transform applied, exceeds minimum box size") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{&fragment_large};
+    fragment_instance.id = 0;
+    // apply a local transform to the fragment instance
+    fragment_instance.transform.translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance.id, fragment_instance);
+    sf::FloatRect outer_box =
+        calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
+    // The outer box should be the same as the fragment's bounding box since it
+    // exceeds the minimum size
+    REQUIRE(outer_box.size.x == 260.f);
+    REQUIRE(outer_box.size.y == 260.f);
+    REQUIRE(outer_box.position.x == -100.f);
+    REQUIRE(outer_box.position.y == -100.f);
   }
 
   SECTION("PartGraph has multiple parts, no subgraph provided and transforms "
-          "applied") {
+          "applied, does not exceed minimum box size") {
     PartGraph part_graph;
     FragmentInstance fragment_instance1{&fragment};
     fragment_instance1.id = 0;
@@ -511,10 +556,11 @@ TEST_CASE("calculate_outer_box tests") {
     part_graph.emplace(fragment_instance2.id, fragment_instance2);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
-    REQUIRE(outer_box.size.x == 35.f);
-    REQUIRE(outer_box.size.y == 35.f);
-    REQUIRE(outer_box.position.x == 5.f);
-    REQUIRE(outer_box.position.y == 5.f);
+
+    REQUIRE(outer_box.size.x == 200.f);
+    REQUIRE(outer_box.size.y == 200.f);
+    REQUIRE(outer_box.position.x == -100.f);
+    REQUIRE(outer_box.position.y == -100.f);
   }
 
   SECTION("PartGraph has multiple parts, subgraph provided and transforms "
@@ -530,6 +576,9 @@ TEST_CASE("calculate_outer_box tests") {
     part_graph.emplace(fragment_instance2.id, fragment_instance2);
     SubGraph sub_graph{0}; // only include the first part
     sf::FloatRect outer_box = calculate_outer_box(part_graph, sub_graph);
+
+    // because a subgraph has been provided, the minimum box size in the
+    // function is not applied
     REQUIRE(outer_box.size.x == 30.f);
     REQUIRE(outer_box.size.y == 30.f);
     REQUIRE(outer_box.position.x == 10.f);
