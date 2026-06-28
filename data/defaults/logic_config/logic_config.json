@@ -27,6 +27,13 @@
         "filter_payload": { "toggle_name": "PERFORM_STRUCTURAL_ANALYSIS" }
       },
       {
+        "event_type": "LOGIC",
+        "filter_payload_type": "LogicPayloadFbs",
+        "filter_payload": {
+          "toggle_name": "POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD"
+        }
+      },
+      {
         "event_type": "USER_INPUT",
         "filter_payload_type": "InputPayloadFbs",
         "filter_payload": { "action": "SELECT" }

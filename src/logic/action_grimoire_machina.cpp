@@ -12,6 +12,7 @@
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
 #include "descriptors_runner.h"
+#include "machina_form_scaffolds/machina_form_scaffold_library.h"
 #include <expected>
 #include <string>
 #include <vector>
@@ -79,6 +80,9 @@ void process_logic_events(Subscriber &subscriber,
 
   switch (logic_payload->toggle_name) {
 
+  case LogicPayload::LogicToggle::NONE:
+    break;
+
   case LogicPayload::LogicToggle::INITIATE_MACHINA_FORM_SCAFFOLD: {
     initialise_active_machina_form_scaffold(grimoire_machina);
     break;
@@ -107,9 +111,10 @@ void process_logic_events(Subscriber &subscriber,
     }
     break;
   }
-
-  default:
-    break;
+  case LogicPayload::LogicToggle::
+      POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD: {
+    create_grab_scaffold_one(grimoire_machina);
+  }
   }
 }
 /////////////////////////////////////////////////

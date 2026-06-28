@@ -59,6 +59,16 @@
                             "c_ui_state_name": "grab_options_menu_on",
                             "action": "TOGGLE"
                           }
+                        },
+                        {
+                          "context": {
+                            "lifetime": 1
+                          },
+                          "type": "LOGIC",
+                          "payload_type": "LogicPayloadFbs",
+                          "payload": {
+                            "toggle_name": "POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD"
+                          }
                         }
                       ]
                     }

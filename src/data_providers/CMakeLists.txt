@@ -1,3 +1,4 @@
+add_subdirectory(machina_form_scaffolds)
 
 configure_file(
 paths.cpp.in

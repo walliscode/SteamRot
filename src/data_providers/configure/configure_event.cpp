@@ -104,6 +104,10 @@ ConfigureLogicPayload(LogicPayload &logic_payload,
     logic_payload.toggle_name =
         LogicPayload::LogicToggle::PERFORM_STRUCTURAL_ANALYSIS;
     break;
+  case LogicToggleFbs_POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD:
+    logic_payload.toggle_name =
+        LogicPayload::LogicToggle::POPULATE_GRIMOIRE_MACHINA_WITH_GRAB_SCAFFOLD;
+    break;
   default:
     return std::unexpected(
         FailInfo{FailMode::NonExistentEnumValue,
