@@ -12,7 +12,7 @@ target_link_libraries(test_spatial_analysis
   PRIVATE
   Catch2::Catch2WithMain
   spatial_analysis
-  part_graphs
+  part_library
   matchers
 )
 

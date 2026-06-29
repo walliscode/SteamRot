@@ -226,4 +226,21 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
     REQUIRE(right_arm_sockets.at(1) == 2);
   }
 }
+
+TEST_CASE("assign_open_state_transforms tests") {
+  // arrange
+  steamrot::tests::PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  MachinaArchetypeResult ma_result =
+      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
+                              valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
+  REQUIRE(std::holds_alternative<steamrot::GrabResult>(
+      ma_result.result_sub_graphs));
+  steamrot::GrabResult grab_result =
+      std::get<steamrot::GrabResult>(ma_result.result_sub_graphs);
+  steamrot::PartGraph &graph = valid_grab_pkg.part_graph;
+
+  SECTION("assign_open_state_transforms is empty") {
+    REQUIRE(grab_result.static_transforms.empty());
+  }
+}
 } // namespace steamrot::tests

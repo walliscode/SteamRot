@@ -71,4 +71,15 @@ void align_grab_structure(const GrabResult &grab_result, PartGraph &part_graph,
 /////////////////////////////////////////////////
 uint32_t get_end_of_arm(const SubGraph &arm);
 
+/////////////////////////////////////////////////
+/// @brief Using the grab result and part graph, assign the open state
+/// transforms for each part in the grab structure.
+///
+/// @param grab_result The GrabResult containing the anchor point ID and arm
+/// subgraphs for the grab structure
+/// @param part_graph The PartGraph containing the parts for the grab structure
+/////////////////////////////////////////////////
+void assign_open_state_transforms(GrabResult &grab_result,
+                                  PartGraph &part_graph);
+
 } // namespace steamrot::logic::spatial_analysis

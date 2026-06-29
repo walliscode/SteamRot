@@ -49,10 +49,8 @@ target_link_libraries(test_logic
   matchers
   context_test_helpers
   harness
-  part_graphs
+  part_library
   assets_for_tests
-
-
 )
 
 catch_discover_tests(test_logic)

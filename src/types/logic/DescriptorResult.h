@@ -12,9 +12,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AnalysisEvent.h"
+#include <SFML/Graphics/Transform.hpp>
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -180,6 +182,18 @@ struct GrabResult {
     }
     return SubGraph(unique_nodes.begin(), unique_nodes.end());
   }
+
+  /////////////////////////////////////////////////
+  /// @brief Enum representing the state of the grab
+  /////////////////////////////////////////////////
+  enum class GrabState { OPEN, CLOSED };
+
+  /////////////////////////////////////////////////
+  /// @brief captures the local transforms for each static state of each part of
+  /// the grab structure
+  /////////////////////////////////////////////////
+  std::unordered_map<GrabState, std::unordered_map<uint32_t, sf::Transform>>
+      static_transforms;
 };
 
 using ArchetypeVariant = std::variant<TestArchetypeResult, GrabResult>;

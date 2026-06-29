@@ -11,5 +11,6 @@ add_subdirectory(data_providers)
 add_subdirectory(logic)
 add_subdirectory(types)
 add_subdirectory(context)
+add_subdirectory(part_library)
 
 

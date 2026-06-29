@@ -92,4 +92,7 @@ uint32_t get_end_of_arm(const SubGraph &arm) {
   return arm.empty() ? 0 : arm.back();
 }
 
+/////////////////////////////////////////////////
+void assign_open_state_transforms(GrabResult &grab_result,
+                                  PartGraph &part_graph) {}
 } // namespace steamrot::logic::spatial_analysis

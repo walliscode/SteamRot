@@ -54,6 +54,13 @@ struct Socket {
 /// Stores explicit local socket positions in the part's own coordinate space.
 /////////////////////////////////////////////////
 struct Fragment : Part {
+
+  /////////////////////////////////////////////////
+  /// @brief Default constructor. Initializes an empty Fragment with default
+  /// Part data and no sockets.
+  /////////////////////////////////////////////////
+  Fragment() = default;
+
   /////////////////////////////////////////////////
   /// @brief Local positions of the fragment's sockets, in the part's own
   /// coordinate space.
