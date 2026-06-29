@@ -1,5 +1,6 @@
 add_library(part_library
   FragmentBuilder.cpp
+  JointBuilder.cpp
   PartGraphBuilder.cpp
   part_graph_library.cpp
   machina_archetype_packages.cpp

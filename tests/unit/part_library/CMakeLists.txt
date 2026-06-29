@@ -1,5 +1,7 @@
 add_executable(test_part_library
   FragmentBuilder.test.cpp
+  JointBuilder.test.cpp
+  fragment_library.test.cpp
   PartGraphBuilder.test.cpp
   part_graph_library.test.cpp
 )

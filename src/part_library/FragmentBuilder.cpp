@@ -29,7 +29,7 @@ FragmentBuilder &FragmentBuilder::AddSocket(const sf::Vector2f &local_pos,
   return *this;
 }
 /////////////////////////////////////////////////
-Fragment FragmentBuilder::build(const std::string &name) {
+Fragment FragmentBuilder::Build(const std::string &name) {
 
   m_fragment.name = name;
   Fragment fragment_copy = m_fragment;

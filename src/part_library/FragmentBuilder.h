@@ -65,6 +65,6 @@ public:
   ///
   /// @return Fragment The constructed Fragment object.
   /////////////////////////////////////////////////
-  Fragment build(const std::string &name);
+  Fragment Build(const std::string &name);
 };
 } // namespace steamrot::parts

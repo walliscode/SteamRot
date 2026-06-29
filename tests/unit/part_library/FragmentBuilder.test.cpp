@@ -21,14 +21,14 @@ TEST_CASE("FragmentBuilder tests", "[unit][part_library][FragmentBuilder]") {
 
   SECTION("build() returns a Fragment with the specified name") {
     const std::string fragment_name = "TestFragment";
-    Fragment fragment = builder.build(fragment_name);
+    Fragment fragment = builder.Build(fragment_name);
     REQUIRE(fragment.name == fragment_name);
   }
 
   SECTION("AddViews() sets the positioning_views of the Fragment") {
     const std::string fragment_name = "TestFragmentWithViews";
     Fragment fragment =
-        builder.AddViews(PremadeViews::WhiteOblong).build(fragment_name);
+        builder.AddViews(PremadeViews::WhiteOblong).Build(fragment_name);
     REQUIRE(!fragment.positioning_views.empty());
     REQUIRE(fragment.positioning_views.size() == 1);
   }
@@ -37,7 +37,7 @@ TEST_CASE("FragmentBuilder tests", "[unit][part_library][FragmentBuilder]") {
     sf::Vector2f local_pos(10.f, 20.f);
     sf::Vector2f align_vec(1.f, 0.f);
     Fragment fragment =
-        builder.AddSocket(local_pos, align_vec).build(fragment_name);
+        builder.AddSocket(local_pos, align_vec).Build(fragment_name);
     REQUIRE(fragment.sockets.size() == 1);
     REQUIRE(fragment.sockets[0].local_position == local_pos);
     REQUIRE(fragment.sockets[0].alignment_vector == align_vec.normalized());
@@ -50,7 +50,7 @@ TEST_CASE("FragmentBuilder tests", "[unit][part_library][FragmentBuilder]") {
     sf::Vector2f align_vec2(0.f, 1.f);
     Fragment fragment = builder.AddSocket(local_pos1, align_vec1)
                             .AddSocket(local_pos2, align_vec2)
-                            .build(fragment_name);
+                            .Build(fragment_name);
     REQUIRE(fragment.sockets.size() == 2);
     REQUIRE(fragment.sockets[0].local_position == local_pos1);
     REQUIRE(fragment.sockets[0].alignment_vector == align_vec1.normalized());
@@ -63,15 +63,15 @@ TEST_CASE("FragmentBuilder tests", "[unit][part_library][FragmentBuilder]") {
     sf::Vector2f align_vec(1.f, 0.f);
     Fragment fragment = builder.AddViews(PremadeViews::WhiteOblong)
                             .AddSocket(local_pos, align_vec)
-                            .build(fragment_name);
+                            .Build(fragment_name);
     REQUIRE(!fragment.positioning_views.empty());
     REQUIRE(fragment.sockets.size() == 1);
   }
   SECTION("Builder can be reused after build()") {
     const std::string fragment_name1 = "FirstFragment";
     const std::string fragment_name2 = "SecondFragment";
-    Fragment fragment1 = builder.build(fragment_name1);
-    Fragment fragment2 = builder.build(fragment_name2);
+    Fragment fragment1 = builder.Build(fragment_name1);
+    Fragment fragment2 = builder.Build(fragment_name2);
     REQUIRE(fragment1.name == fragment_name1);
     REQUIRE(fragment2.name == fragment_name2);
   }
