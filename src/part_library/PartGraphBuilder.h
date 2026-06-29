@@ -76,9 +76,16 @@ public:
   /////////////////////////////////////////////////
   JointInstance MakeJointInstance(const JointNames name);
 
-  PartGraphBuilder &AddFragment(const FragmentNames name, const std::string id);
+  PartGraphBuilder &AddFragmentInstance(const FragmentNames name,
+                                        const std::string id);
 
-  PartGraphBuilder &AddJoint(const JointNames name, const std::string id);
+  PartGraphBuilder &AddFragmentInstance(const Fragment &fragment,
+                                        const std::string id);
+
+  PartGraphBuilder &AddJointInstance(const JointNames name,
+                                     const std::string id);
+
+  PartGraphBuilder &AddJointInstance(const Joint &joint, const std::string id);
 
   PartGraphBuilder &Connect(const std::string &from_id,
                             const uint32_t from_socket_id,

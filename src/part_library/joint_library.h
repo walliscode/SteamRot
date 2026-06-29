@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Free functions for creating Fragment objects with specific
+/// @brief Free functions for creating Joint objects with specific
 /// configurations and properties.
 /////////////////////////////////////////////////
 
@@ -13,15 +13,17 @@
 /// Headers
 /////////////////////////////////////////////////
 
-#include "Fragment.h"
-#include "FragmentBuilder.h"
+#include "Joint.h"
+#include "JointBuilder.h"
 namespace steamrot::parts {
 
-inline const Fragment FragmentRectangleWith2Sockets = [] {
-  return FragmentBuilder()
-      .AddViews(PremadeViews::WhiteOblong)
-      .AddSocket({0, 5}, {1, 0})
-      .AddSocket({50, 5}, {-1, 0})
-      .Build("FragmentRectangleWith2Sockets");
+/////////////////////////////////////////////////
+inline const Joint JointSquareWith2Sockets = [] -> Joint {
+  return JointBuilder()
+      .AddViews(PremadeViews::WhiteSquare)
+      .SetOrigin({10, 10})
+      .SetSocketConfig(2, 13, 0, 0, false, 0, 90)
+      .Build("JointSquareWith2Sockets");
 }();
+
 } // namespace steamrot::parts

@@ -79,6 +79,7 @@ struct SocketConnection {
 /// status and hover flag that are updated each tick by Logic.
 /////////////////////////////////////////////////
 struct SocketData {
+
   /////////////////////////////////////////////////
   /// @brief Construct a SocketData with the given local-space position.
   ///

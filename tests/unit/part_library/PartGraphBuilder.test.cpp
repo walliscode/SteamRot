@@ -8,121 +8,128 @@
 /////////////////////////////////////////////////
 #include "PartGraphBuilder.h"
 #include "MachinaFormScaffold.h"
+#include "fragment_library.h"
+#include "joint_library.h"
 #include <catch2/catch_test_macros.hpp>
 
-namespace tests = steamrot::tests;
+namespace steamrot::tests {
 
-/////////////////////////////////////////////////
-/// AddFragment / AddJoint — basic insertion
-/////////////////////////////////////////////////
+TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
+  PartGraphBuilder builder;
 
-TEST_CASE("AddFragment inserts a FragmentInstance into the part graph",
+  SECTION("AddFragmentInstance inserts a FragmentInstance into the part graph",
           "[unit][part_graphs][PartGraphBuilder]") {
-  tests::PartGraphBuilder builder;
-  const tests::PartGraphPackage pkg =
-      builder.AddFragment(tests::FragmentNames::TwoSockets, "f0").Build();
 
-  REQUIRE(pkg.part_graph.size() == 1);
-  REQUIRE(
-      std::holds_alternative<steamrot::FragmentInstance>(pkg.part_graph.at(0)));
-}
+    const PartGraphPackage pkg =
+        builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+            .Build();
 
-TEST_CASE("AddJoint inserts a JointInstance into the part graph",
+    REQUIRE(pkg.part_graph.size() == 1);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+        pkg.part_graph.at(0)));
+  }
+
+  SECTION("AddJointInstance inserts a JointInstance into the part graph",
           "[unit][part_graphs][PartGraphBuilder]") {
-  tests::PartGraphBuilder builder;
-  const tests::PartGraphPackage pkg =
-      builder.AddJoint(tests::JointNames::TwoSockets, "j0").Build();
 
-  REQUIRE(pkg.part_graph.size() == 1);
-  REQUIRE(
-      std::holds_alternative<steamrot::JointInstance>(pkg.part_graph.at(0)));
-}
+    const PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWith2Sockets, "j0").Build();
 
-TEST_CASE("AddFragment assigns the correct stable ID to the instance",
+    REQUIRE(pkg.part_graph.size() == 1);
+    REQUIRE(
+        std::holds_alternative<steamrot::JointInstance>(pkg.part_graph.at(0)));
+  }
+
+  SECTION("AddFragmentInstance assigns the correct stable ID to the instance",
           "[unit][part_graphs][PartGraphBuilder]") {
-  tests::PartGraphBuilder builder;
-  builder.AddFragment(tests::FragmentNames::OneSocket, "f0")
-      .AddFragment(tests::FragmentNames::OneSocket, "f1");
-  const tests::PartGraphPackage pkg = builder.Build();
 
-  const auto &f0 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
-  const auto &f1 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
+    builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+        .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f1");
+    const tests::PartGraphPackage pkg = builder.Build();
 
-  REQUIRE(f0.id == 0);
-  REQUIRE(f1.id == 1);
-}
+    const auto &f0 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
+    const auto &f1 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
 
-TEST_CASE("AddJoint assigns the correct stable ID to the instance",
+    REQUIRE(f0.id == 0);
+    REQUIRE(f1.id == 1);
+  }
+
+  SECTION("AddJointInstance assigns the correct stable ID to the instance",
           "[unit][part_graphs][PartGraphBuilder]") {
-  tests::PartGraphBuilder builder;
-  builder.AddJoint(tests::JointNames::OneSocket, "j0")
-      .AddJoint(tests::JointNames::OneSocket, "j1");
-  const tests::PartGraphPackage pkg = builder.Build();
 
-  const auto &j0 = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
-  const auto &j1 = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
+    builder.AddJointInstance(parts::JointSquareWith2Sockets, "j0")
+        .AddJointInstance(parts::JointSquareWith2Sockets, "j1");
+    const tests::PartGraphPackage pkg = builder.Build();
 
-  REQUIRE(j0.id == 0);
-  REQUIRE(j1.id == 1);
-}
+    const auto &j0 = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
+    const auto &j1 = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
-TEST_CASE("AddFragment and AddJoint assign IDs from a shared counter",
+    REQUIRE(j0.id == 0);
+    REQUIRE(j1.id == 1);
+  }
+
+  SECTION("AddFragmentInstance and AddJointInstance assign IDs from a shared "
+          "counter",
           "[unit][part_graphs][PartGraphBuilder]") {
-  tests::PartGraphBuilder builder;
-  builder.AddFragment(tests::FragmentNames::TwoSockets, "f0")
-      .AddJoint(tests::JointNames::TwoSockets, "j0")
-      .AddFragment(tests::FragmentNames::TwoSockets, "f1");
-  const tests::PartGraphPackage pkg = builder.Build();
 
-  REQUIRE(pkg.part_graph.size() == 3);
-  REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0)).id == 0);
-  REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(1)).id == 1);
-  REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(2)).id == 2);
+    builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+        .AddJointInstance(parts::JointSquareWith2Sockets, "j0")
+        .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f1");
+    const tests::PartGraphPackage pkg = builder.Build();
+
+    REQUIRE(pkg.part_graph.size() == 3);
+    REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0)).id == 0);
+    REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(1)).id == 1);
+    REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(2)).id == 2);
+  }
 }
 
 TEST_CASE("id_to_part_graph_id maps string alias to stable uint32_t ID",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
-  builder.AddFragment(tests::FragmentNames::TwoSockets, "my_fragment")
-      .AddJoint(tests::JointNames::TwoSockets, "my_joint");
+  builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "my_fragment")
+      .AddJointInstance(tests::JointNames::TwoSockets, "my_joint");
   const tests::PartGraphPackage pkg = builder.Build();
 
   REQUIRE(pkg.id_to_part_graph_id.at("my_fragment") == 0);
   REQUIRE(pkg.id_to_part_graph_id.at("my_joint") == 1);
 }
 
-TEST_CASE(
-    "AddFragment creates a FragmentInstance with the correct socket count",
-    "[unit][part_graphs][PartGraphBuilder]") {
+TEST_CASE("AddFragmentInstance creates a FragmentInstance with the correct "
+          "socket count",
+          "[unit][part_graphs][PartGraphBuilder]") {
   SECTION("TwoSockets fragment has two sockets") {
     tests::PartGraphBuilder builder;
     const tests::PartGraphPackage pkg =
-        builder.AddFragment(tests::FragmentNames::TwoSockets, "f0").Build();
+        builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "f0")
+            .Build();
     const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
     REQUIRE(fi.sockets.size() == 2);
   }
   SECTION("NoSocket fragment has zero sockets") {
     tests::PartGraphBuilder builder;
     const tests::PartGraphPackage pkg =
-        builder.AddFragment(tests::FragmentNames::NoSocket, "f0").Build();
+        builder.AddFragmentInstance(tests::FragmentNames::NoSocket, "f0")
+            .Build();
     const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
     REQUIRE(fi.sockets.empty());
   }
 }
 
-TEST_CASE("AddJoint creates a JointInstance with the correct socket count",
-          "[unit][part_graphs][PartGraphBuilder]") {
+TEST_CASE(
+    "AddJointInstance creates a JointInstance with the correct socket count",
+    "[unit][part_graphs][PartGraphBuilder]") {
   SECTION("ThreeSockets joint has three sockets") {
     tests::PartGraphBuilder builder;
     const tests::PartGraphPackage pkg =
-        builder.AddJoint(tests::JointNames::ThreeSockets, "j0").Build();
+        builder.AddJointInstance(tests::JointNames::ThreeSockets, "j0").Build();
     const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
     REQUIRE(ji.sockets.size() == 3);
   }
   SECTION("NoSocket joint has zero sockets") {
     tests::PartGraphBuilder builder;
     const tests::PartGraphPackage pkg =
-        builder.AddJoint(tests::JointNames::NoSocket, "j0").Build();
+        builder.AddJointInstance(tests::JointNames::NoSocket, "j0").Build();
     const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
     REQUIRE(ji.sockets.empty());
   }
@@ -136,8 +143,8 @@ TEST_CASE("Connect(fragment, joint) wires socket state on both ends",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
   const tests::PartGraphPackage pkg =
-      builder.AddFragment(tests::FragmentNames::TwoSockets, "frag")
-          .AddJoint(tests::JointNames::TwoSockets, "joint")
+      builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "frag")
+          .AddJointInstance(tests::JointNames::TwoSockets, "joint")
           .Connect("frag", 0, "joint", 0)
           .Build();
 
@@ -153,8 +160,8 @@ TEST_CASE("Connect(joint, fragment) wires socket state on both ends",
   // Joint listed first, fragment second — order should not matter
   tests::PartGraphBuilder builder;
   const tests::PartGraphPackage pkg =
-      builder.AddJoint(tests::JointNames::TwoSockets, "joint")
-          .AddFragment(tests::FragmentNames::TwoSockets, "frag")
+      builder.AddJointInstance(tests::JointNames::TwoSockets, "joint")
+          .AddFragmentInstance(tests::FragmentNames::TwoSockets, "frag")
           .Connect("joint", 1, "frag", 0)
           .Build();
 
@@ -169,8 +176,8 @@ TEST_CASE("Connect sets connected_to peer IDs correctly",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
   const tests::PartGraphPackage pkg =
-      builder.AddFragment(tests::FragmentNames::TwoSockets, "frag")
-          .AddJoint(tests::JointNames::TwoSockets, "joint")
+      builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "frag")
+          .AddJointInstance(tests::JointNames::TwoSockets, "joint")
           .Connect("frag", 1, "joint", 0)
           .Build();
 
@@ -192,8 +199,8 @@ TEST_CASE("Connect increments connection_count on both ends",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
   const tests::PartGraphPackage pkg =
-      builder.AddFragment(tests::FragmentNames::TwoSockets, "frag")
-          .AddJoint(tests::JointNames::TwoSockets, "joint")
+      builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "frag")
+          .AddJointInstance(tests::JointNames::TwoSockets, "joint")
           .Connect("frag", 0, "joint", 0)
           .Build();
 
@@ -209,9 +216,9 @@ TEST_CASE("Connect can chain multiple connections",
   // f0 ─── j0 ─── f1   (linear chain)
   tests::PartGraphBuilder builder;
   const tests::PartGraphPackage pkg =
-      builder.AddFragment(tests::FragmentNames::TwoSockets, "f0")
-          .AddFragment(tests::FragmentNames::TwoSockets, "f1")
-          .AddJoint(tests::JointNames::TwoSockets, "j0")
+      builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "f0")
+          .AddFragmentInstance(tests::FragmentNames::TwoSockets, "f1")
+          .AddJointInstance(tests::JointNames::TwoSockets, "j0")
           .Connect("f0", 0, "j0", 0)
           .Connect("j0", 1, "f1", 0)
           .Build();
@@ -296,12 +303,12 @@ TEST_CASE("Connect can chain multiple connections",
 TEST_CASE("Build returns a copy and resets the builder for reuse",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
-  builder.AddFragment(tests::FragmentNames::TwoSockets, "f0");
+  builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "f0");
 
   const tests::PartGraphPackage first = builder.Build();
 
   // The builder has been reset; a second Build should return an empty package
-  builder.AddJoint(tests::JointNames::TwoSockets, "j0");
+  builder.AddJointInstance(tests::JointNames::TwoSockets, "j0");
   const tests::PartGraphPackage second = builder.Build();
 
   REQUIRE(first.part_graph.size() == 1);
@@ -315,13 +322,14 @@ TEST_CASE("Build returns a copy and resets the builder for reuse",
 TEST_CASE("Build resets the ID counter so the next build starts from 0",
           "[unit][part_graphs][PartGraphBuilder]") {
   tests::PartGraphBuilder builder;
-  builder.AddFragment(tests::FragmentNames::TwoSockets, "f0");
+  builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "f0");
   builder.Build(); // consumes and resets
 
-  builder.AddJoint(tests::JointNames::TwoSockets, "j0");
+  builder.AddJointInstance(tests::JointNames::TwoSockets, "j0");
   const tests::PartGraphPackage pkg = builder.Build();
 
   // First ID in the fresh build must be 0
   REQUIRE(pkg.part_graph.count(0) == 1);
   REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(0)).id == 0);
 }
+} // namespace steamrot::tests

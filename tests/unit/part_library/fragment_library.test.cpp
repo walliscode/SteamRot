@@ -15,11 +15,11 @@ using namespace parts;
 
 TEST_CASE("CreateRectangleFragmentWith2Sockets creates the correct fragment",
           "[fragment_library]") {
-  std::string fragment_name = "TestFragment";
-  Fragment fragment = CreateRectangleFragmentWith2Sockets(fragment_name);
+
+  const Fragment &fragment = FragmentRectangleWith2Sockets;
 
   // test name
-  REQUIRE(fragment.name == fragment_name);
+  REQUIRE(fragment.name == "FragmentRectangleWith2Sockets");
   // test views
   REQUIRE(fragment.positioning_views.size() == 1);
   REQUIRE(fragment.positioning_views[ViewDirection::Front].getVertexCount() ==

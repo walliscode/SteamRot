@@ -8,6 +8,7 @@
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
 #include "Fragment.h"
+#include "Joint.h"
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
@@ -102,6 +103,147 @@ TEST_CASE("position_first_part_of_machina_form tests",
   }
 }
 
+TEST_CASE("maximise_joint_socket_spread tests",
+          "[positioning_grimoire_machina]") {
+  // Arrange
+  Joint joint;
+  joint.origin = {0.f, 0.f};
+  SocketConfig &config = joint.socket_config;
+
+  SECTION("Does not throw with zero sockets") {
+
+    // Arrange
+    config.socket_count = 0;
+    JointInstance joint_instance{&joint};
+    // Act & Assert
+    REQUIRE_NOTHROW(maximise_joint_socket_spread(joint_instance));
+  }
+
+  SECTION("Joint with 2 sockets") {
+    config.socket_count = 2;
+    JointInstance joint_instance{&joint};
+    REQUIRE(joint_instance.sockets.size() == 2); // sanity check
+
+    SECTION("90° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 90.f; // arc from 0° to 90°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0° and 90°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{0.f, 10.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+    }
+
+    SECTION("180° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 180.f; // arc from 0° to 180°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0° and 180°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{-10.f, 0.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+    }
+
+    SECTION("270° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 270.f; // arc from 0° to 270°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0° and 270°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{0.f, -10.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+    }
+  }
+
+  SECTION("Joint with 3 sockets") {
+    config.socket_count = 3;
+    JointInstance joint_instance{&joint};
+    REQUIRE(joint_instance.sockets.size() == 3); // sanity check
+    //
+    SECTION("90° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 90.f; // arc from 0° to 90°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0°, 45°,
+      // and 90°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{7.071f, 7.071f}; // (10 * cos(45°), 10 *
+                                                        // sin(45°))
+      sf::Vector2f expected_position_2{0.f, 10.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(2).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
+    }
+
+    SECTION("180° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 180.f; // arc from 0° to 180°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0°, 90°,
+      // and 180°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{0.f, 10.f};
+      sf::Vector2f expected_position_2{-10.f, 0.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(2).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
+    }
+
+    SECTION("270° arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 270.f; // arc from 0° to 270°
+      config.radius = 10.f;
+      maximise_joint_socket_spread(joint_instance);
+      // Assert: sockets should be at radius distance from origin at 0°, 135°,
+      // and 270°
+      sf::Vector2f expected_position_0{10.f, 0.f};
+      sf::Vector2f expected_position_1{-7.071f, 7.071f}; // (10 * cos(135°), 10
+                                                         // * sin(135°))
+      sf::Vector2f expected_position_2{0.f, -10.f};
+      REQUIRE_THAT(
+          joint_instance.sockets.at(0).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_0, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(1).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_1, 0.001f));
+      REQUIRE_THAT(
+          joint_instance.sockets.at(2).local_position,
+          steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
+    }
+  }
+}
 TEST_CASE("compute_socket_local_positions_even_spread tests",
           "[positioning_grimoire_machina]") {
   // Arrange
@@ -220,8 +362,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 10.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0° and
-        // 90°
+        // Assert: sockets should be at radius distance from origin at 0°
+        // and 90°
         sf::Vector2f expected_position_0{10.f,
                                          0.f}; // (10 * cos(0°), 10 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -235,8 +377,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 20.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0° and
-        // 90°
+        // Assert: sockets should be at radius distance from origin at 0°
+        // and 90°
         sf::Vector2f expected_position_0{20.f,
                                          0.f}; // (20 * cos(0°), 20 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -254,8 +396,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 10.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0° and
-        // 180°
+        // Assert: sockets should be at radius distance from origin at 0°
+        // and 180°
         sf::Vector2f expected_position_0{10.f,
                                          0.f}; // (10 * cos(0°), 10 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -269,8 +411,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 20.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0° and
-        // 180°
+        // Assert: sockets should be at radius distance from origin at 0°
+        // and 180°
         sf::Vector2f expected_position_0{20.f,
                                          0.f}; // (20 * cos(0°), 20 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -292,8 +434,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 10.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0°, 45°,
-        // and 90°
+        // Assert: sockets should be at radius distance from origin at 0°,
+        // 45°, and 90°
         sf::Vector2f expected_position_0{10.f,
                                          0.f}; // (10 * cos(0°), 10 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -315,8 +457,8 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
         config.radius = 10.f;
         compute_socket_local_positions_even_spread(config, origin,
                                                    local_positions);
-        // Assert: sockets should be at radius distance from origin at 0°, 90°,
-        // and 180°
+        // Assert: sockets should be at radius distance from origin at 0°,
+        // 90°, and 180°
         sf::Vector2f expected_position_0{10.f,
                                          0.f}; // (10 * cos(0°), 10 * sin(0°))
         sf::Vector2f expected_position_1{
@@ -355,8 +497,8 @@ TEST_CASE("initialize_joint_socket_positions tests",
     steamrot::logic::positioning::grimoire_machina::
         initialize_joint_socket_positions(instance);
 
-    // Assert: sockets should be at radius distance from origin at 0°, 135°, and
-    // 270°
+    // Assert: sockets should be at radius distance from origin at 0°, 135°,
+    // and 270°
     REQUIRE_THAT(instance.sockets.at(0).local_position,
                  EqualsVector2f({10.f, 0.f}, 0.001f));
     REQUIRE_THAT(instance.sockets.at(1).local_position,
@@ -500,8 +642,8 @@ TEST_CASE("calculate_outer_box tests") {
     part_graph.emplace(fragment_instance.id, fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
-    // The outer box should be the same as the fragment's bounding box since it
-    // exceeds the minimum size
+    // The outer box should be the same as the fragment's bounding box since
+    // it exceeds the minimum size
     REQUIRE(outer_box.size.x == 250.f);
     REQUIRE(outer_box.size.y == 250.f);
     REQUIRE(outer_box.position.x == -100.f);
@@ -535,8 +677,8 @@ TEST_CASE("calculate_outer_box tests") {
     part_graph.emplace(fragment_instance.id, fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
-    // The outer box should be the same as the fragment's bounding box since it
-    // exceeds the minimum size
+    // The outer box should be the same as the fragment's bounding box since
+    // it exceeds the minimum size
     REQUIRE(outer_box.size.x == 260.f);
     REQUIRE(outer_box.size.y == 260.f);
     REQUIRE(outer_box.position.x == -100.f);

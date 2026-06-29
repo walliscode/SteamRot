@@ -6,9 +6,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "PartGraphBuilder.h"
 #include "collision_grimoire_machina.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraphBuilder.h"
 #include "Vector2fEqualsMatcher.h"
 #include "catch2/matchers/catch_matchers_floating_point.hpp"
 #include <catch2/catch_test_macros.hpp>
@@ -19,7 +19,8 @@
 namespace {
 
 /// @brief Manually reset proximity state on a SocketData.
-///        Simulates what reset_socket_proximity_state() does at PartGraph level.
+///        Simulates what reset_socket_proximity_state() does at PartGraph
+///        level.
 void reset_socket(steamrot::SocketData &s) {
   s.is_another_socket_near = false;
   s.is_ready_to_connect = false;
@@ -529,8 +530,8 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
   // arrange
   steamrot::tests::PartGraphBuilder builder;
 
-  steamrot::FragmentInstance fragment_instance =
-      builder.MakeFragmentInstance(steamrot::tests::FragmentNames::ThreeSockets);
+  steamrot::FragmentInstance fragment_instance = builder.MakeFragmentInstance(
+      steamrot::tests::FragmentNames::ThreeSockets);
   REQUIRE(fragment_instance.sockets.size() == 3);
 
   steamrot::JointInstance joint_instance =
@@ -607,8 +608,9 @@ TEST_CASE("reset_socket_proximity_state(PartGraph) tests",
   SECTION("clears proximity state on all sockets in the PartGraph") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j0")
             .Build()
             .part_graph;
 
@@ -672,7 +674,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
   SECTION("no collision when joint socket is far away") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j0")
             .Build()
             .part_graph;
     steamrot::JointInstance &ji =
@@ -693,7 +695,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
           "proximity") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j0")
             .Build()
             .part_graph;
     steamrot::JointInstance &ji =
@@ -715,7 +717,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
           "threshold") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j0")
             .Build()
             .part_graph;
     steamrot::JointInstance &ji =
@@ -780,7 +782,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
           "call") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j0")
             .Build()
             .part_graph;
     steamrot::JointInstance &ji =
@@ -825,8 +827,8 @@ TEST_CASE(
     //
     // Each fragment socket pairs exclusively with its nearest joint — two
     // valid ready-to-connect pairs.
-    steamrot::FragmentInstance fi =
-        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::TwoSockets);
+    steamrot::FragmentInstance fi = builder.MakeFragmentInstance(
+        steamrot::tests::FragmentNames::TwoSockets);
     REQUIRE(fi.sockets.size() == 2);
     fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.sockets.at(1).local_position = {20.f, 0.f};
@@ -862,8 +864,8 @@ TEST_CASE(
     // Fragment sockets at world (0,0) and (20,0) — far apart.
     // Both joints clustered near x=0: J_far at x=8 (near), J_near at x=1
     // (ready). F[0] should prefer J_near; F[1] has no candidate in range.
-    steamrot::FragmentInstance fi =
-        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::TwoSockets);
+    steamrot::FragmentInstance fi = builder.MakeFragmentInstance(
+        steamrot::tests::FragmentNames::TwoSockets);
     REQUIRE(fi.sockets.size() == 2);
     fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.sockets.at(1).local_position = {20.f, 0.f};
@@ -925,8 +927,8 @@ TEST_CASE(
     //   F[2](20,0) ↔ J[0](1,0)   = 19  → far
     //   F[2](20,0) ↔ J[1](15,0)  = 5   → near
     //   F[2](20,0) ↔ J[2](25,0)  = 5   → near
-    steamrot::FragmentInstance fi =
-        builder.MakeFragmentInstance(steamrot::tests::FragmentNames::ThreeSockets);
+    steamrot::FragmentInstance fi = builder.MakeFragmentInstance(
+        steamrot::tests::FragmentNames::ThreeSockets);
     REQUIRE(fi.sockets.size() == 3);
     fi.sockets.at(0).local_position = {0.f, 0.f};
     fi.sockets.at(1).local_position = {10.f, 0.f};
@@ -1016,7 +1018,8 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
   SECTION("no collision when fragment socket is far away") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
             .Build()
             .part_graph;
     steamrot::FragmentInstance &fi =
@@ -1037,7 +1040,8 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
           "proximity") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
             .Build()
             .part_graph;
     steamrot::FragmentInstance &fi =
@@ -1059,7 +1063,8 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
           "connection threshold") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
             .Build()
             .part_graph;
     steamrot::FragmentInstance &fi =
@@ -1123,7 +1128,8 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
           "call") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
             .Build()
             .part_graph;
     steamrot::FragmentInstance &fi =
@@ -1151,14 +1157,16 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
   }
 }
 
-TEST_CASE("check_socket_collisions(JointInstance, PartGraph) multi-socket tests",
-          "[unit][collision_grimoire_machina]") {
+TEST_CASE(
+    "check_socket_collisions(JointInstance, PartGraph) multi-socket tests",
+    "[unit][collision_grimoire_machina]") {
   steamrot::tests::PartGraphBuilder builder;
 
   SECTION("two joint sockets: each finds its own nearest fragment candidate") {
     // Joint sockets at world (0,0) and (20,0).
     // Two fragments in PartGraph with sockets at world (1,0) and (19,0).
-    steamrot::JointInstance ji = builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
+    steamrot::JointInstance ji =
+        builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
     REQUIRE(ji.sockets.size() == 2);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.sockets.at(1).local_position = {20.f, 0.f};
@@ -1194,7 +1202,8 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) multi-socket tests"
     // Joint sockets at world (0,0) and (20,0) — far apart.
     // Both fragments clustered near x=0: frag_far at x=8, frag_near at x=1.
     // J[0] should prefer frag_near; J[1] has no candidate in range.
-    steamrot::JointInstance ji = builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
+    steamrot::JointInstance ji =
+        builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
     REQUIRE(ji.sockets.size() == 2);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.sockets.at(1).local_position = {20.f, 0.f};

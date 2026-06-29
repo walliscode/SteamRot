@@ -46,6 +46,33 @@ public:
   JointBuilder &AddViews(const PremadeViews view);
 
   /////////////////////////////////////////////////
+  /// @brief Sets the local origin of the Joint being built.
+  ///
+  /// @param origin The local origin of the Joint in its own coordinate space.
+  /// @return Reference to the current JointBuilder instance for method
+  /// chaining.
+  /////////////////////////////////////////////////
+  JointBuilder &SetOrigin(const sf::Vector2f &origin);
+
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param socket_count [TODO:parameter]
+  /// @param radius [TODO:parameter]
+  /// @param min_gap [TODO:parameter]
+  /// @param fixed_socket_angle [TODO:parameter]
+  /// @param has_fixed_socket [TODO:parameter]
+  /// @param rotation_arc_min [TODO:parameter]
+  /// @param rotation_arc_max [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
+  JointBuilder &SetSocketConfig(const uint8_t socket_count, const float radius,
+                                const float min_gap,
+                                const float fixed_socket_angle,
+                                const bool has_fixed_socket,
+                                const float rotation_arc_min,
+                                const float rotation_arc_max);
+  /////////////////////////////////////////////////
   /// @brief Finalizes the construction of the Joint and returns the constructed
   /// Joint object.
   /////////////////////////////////////////////////

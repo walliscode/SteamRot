@@ -1472,8 +1472,8 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
 
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
-            .AddJoint(steamrot::tests::JointNames::NoSocket, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .AddJointInstance(steamrot::tests::JointNames::NoSocket, "j0")
             .Build()
             .part_graph;
 
@@ -1488,8 +1488,9 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
           "available sockets") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0")
-            .AddJoint(steamrot::tests::JointNames::NoSocket, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f0")
+            .AddJointInstance(steamrot::tests::JointNames::NoSocket, "j0")
             .Build()
             .part_graph;
 
@@ -1516,8 +1517,8 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
           "available sockets") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
             .Build()
             .part_graph;
     // get the Joint at id 1
@@ -1542,9 +1543,11 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
       "available sockets when multiple parts have available sockets") {
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0")
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1")
-            .AddJoint(steamrot::tests::JointNames::NoSocket, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f1")
+            .AddJointInstance(steamrot::tests::JointNames::NoSocket, "j0")
             .Build()
             .part_graph;
     // set the first Fragment's socket 1 to available and ready
