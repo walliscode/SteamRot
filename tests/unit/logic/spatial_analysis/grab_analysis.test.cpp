@@ -17,6 +17,7 @@
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <variant>
 
 namespace steamrot::tests {
@@ -230,7 +231,10 @@ TEST_CASE("assign_open_state_transforms tests") {
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
   REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
+
+  // grab result contains the anchor joint and the arms of the grab structure
   GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
+  const uint32_t &anchor_id = grab_result.anchor;
   PartGraph &graph = valid_grab_pkg.part_graph;
 
   SECTION("assign_open_state_transforms is empty if not run through function") {
@@ -239,9 +243,41 @@ TEST_CASE("assign_open_state_transforms tests") {
 
   SECTION(
       "assign_open_state_transforms assigns transforms for the anchor joint") {
+    // arrange
+    REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
+    JointInstance &anchor_joint =
+        spatial_analysis::get_anchor_joint(grab_result, graph);
+    const SocketConfig &config = anchor_joint.joint->socket_config;
+    REQUIRE(config.socket_count == 2);
+    anchor_joint.sockets.at(0).local_position = {0.f, 0.f};
+    anchor_joint.sockets.at(1).local_position = {0.f, 0.f};
+
     // act
     spatial_analysis::assign_open_state_transforms(grab_result, graph);
+
     // assert
+    // the anchor joint should have its sockets at its maximum angles, manually
+    // calculate the expected positions and then add to the origin
+    sf::Vector2f expected_position_0 =
+        anchor_joint.joint->origin +
+        sf::Vector2f{
+            config.radius *
+                std::cos(sf::degrees(config.rotation_arc_min).asRadians()),
+            config.radius *
+                std::sin(sf::degrees(config.rotation_arc_min).asRadians())};
+
+    sf::Vector2f expected_position_1 =
+        anchor_joint.joint->origin +
+        sf::Vector2f{
+            config.radius *
+                std::cos(sf::degrees(config.rotation_arc_max).asRadians()),
+            config.radius *
+                std::sin(sf::degrees(config.rotation_arc_max).asRadians())};
+
+    REQUIRE_THAT(anchor_joint.sockets.at(0).local_position,
+                 EqualsVector2f(expected_position_0, 0.001f));
+    REQUIRE_THAT(anchor_joint.sockets.at(1).local_position,
+                 EqualsVector2f(expected_position_1, 0.001f));
   }
 }
 } // namespace steamrot::tests
