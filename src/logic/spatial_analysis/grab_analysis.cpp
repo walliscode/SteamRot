@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
+#include "positioning_grimoire_machina.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::spatial_analysis {
@@ -92,4 +93,14 @@ uint32_t get_end_of_arm(const SubGraph &arm) {
   return arm.empty() ? 0 : arm.back();
 }
 
+/////////////////////////////////////////////////
+void assign_open_state_transforms(GrabResult &grab_result,
+                                  PartGraph &part_graph) {
+
+  // get the anchor joint
+  JointInstance &anchor_joint = get_anchor_joint(grab_result, part_graph);
+
+  // maximise the socket spread of the anchor joint
+  positioning::grimoire_machina::maximise_joint_socket_spread(anchor_joint);
+}
 } // namespace steamrot::logic::spatial_analysis

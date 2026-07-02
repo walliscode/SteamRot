@@ -30,6 +30,46 @@ void initialize_joint_socket_positions(JointInstance &instance) {
 }
 
 /////////////////////////////////////////////////
+void maximise_joint_socket_spread(JointInstance &instance) {
+  if (!instance.joint)
+    return;
+
+  // pull out the socket config from the joint instance
+  const SocketConfig &config = instance.joint->socket_config;
+  const float arc_min = config.rotation_arc_min;
+  const float arc_max = config.rotation_arc_max;
+  const float arc_range = arc_max - arc_min;
+
+  // if socket count is 0, return early
+  if (config.socket_count == 0) {
+    return;
+  }
+
+  // if socket count is 1, place it at the midpoint of the arc
+  if (config.socket_count == 1) {
+    const float angle_deg = arc_min + arc_range / 2.f;
+    const float angle_rad = sf::degrees(angle_deg).asRadians();
+    instance.sockets.at(0).local_position =
+        instance.joint->origin +
+        sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
+
+    // for greater that one socket, place them on the arc min/max range and then
+    // evenly spread them out across the arc
+
+  } else {
+    const float angle_between_sockets = arc_range / (config.socket_count - 1);
+    for (size_t i = 0; i < config.socket_count; ++i) {
+      const float angle_deg = arc_min + (i * angle_between_sockets);
+      const float angle_rad = sf::degrees(angle_deg).asRadians();
+      instance.sockets.at(i).local_position =
+          instance.joint->origin +
+          sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
+              config.radius;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
     const SocketConfig &config, const sf::Vector2f &origin,
     std::vector<sf::Vector2f> &local_positions) {

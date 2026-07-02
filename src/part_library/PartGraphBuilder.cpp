@@ -59,8 +59,9 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
 }
 
 /////////////////////////////////////////////////
-PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
-                                                const std::string id) {
+PartGraphBuilder &
+PartGraphBuilder::AddFragmentInstance(const FragmentNames name,
+                                      const std::string id) {
   // create a new FragmentInstance (assigns stable ID), then insert
   FragmentInstance instance = MakeFragmentInstance(name);
   instance.alias = id;
@@ -74,8 +75,23 @@ PartGraphBuilder &PartGraphBuilder::AddFragment(const FragmentNames name,
 }
 
 /////////////////////////////////////////////////
-PartGraphBuilder &PartGraphBuilder::AddJoint(const JointNames name,
-                                             const std::string id) {
+PartGraphBuilder &
+PartGraphBuilder::AddFragmentInstance(const Fragment &fragment,
+                                      const std::string id) {
+  FragmentInstance instance{&fragment};
+  instance.id = m_package.next_id++;
+  instance.alias = id;
+  const uint32_t instance_id = instance.id;
+  m_package.part_graph.emplace(instance_id, std::move(instance));
+
+  // map the user-friendly string ID to the stable uint32_t ID in the part graph
+  m_package.id_to_part_graph_id.emplace(id, instance_id);
+
+  return *this;
+}
+/////////////////////////////////////////////////
+PartGraphBuilder &PartGraphBuilder::AddJointInstance(const JointNames name,
+                                                     const std::string id) {
   // create a new JointInstance (assigns stable ID), then insert
   JointInstance instance = MakeJointInstance(name);
   instance.alias = id;
@@ -84,6 +100,21 @@ PartGraphBuilder &PartGraphBuilder::AddJoint(const JointNames name,
 
   // map the user-friendly string ID to the stable uint32_t ID in the part graph
   m_package.id_to_part_graph_id.emplace(id, instance_id);
+  return *this;
+}
+
+/////////////////////////////////////////////////
+PartGraphBuilder &PartGraphBuilder::AddJointInstance(const Joint &joint,
+                                                     const std::string id) {
+  JointInstance instance{&joint};
+  instance.id = m_package.next_id++;
+  instance.alias = id;
+  const uint32_t instance_id = instance.id;
+  m_package.part_graph.emplace(instance_id, std::move(instance));
+
+  // map the user-friendly string ID to the stable uint32_t ID in the part graph
+  m_package.id_to_part_graph_id.emplace(id, instance_id);
+
   return *this;
 }
 

@@ -32,6 +32,15 @@ namespace steamrot::logic::positioning::grimoire_machina {
 void initialize_joint_socket_positions(JointInstance &instance);
 
 /////////////////////////////////////////////////
+/// @brief Give a JointInstance, calculates the maximum possible even spread of
+/// its sockets based on its SocketConfig and applies the resulting positions to
+/// the instance's sockets.
+///
+/// @param instance JointInstance whose sockets should be maximally spread.
+/////////////////////////////////////////////////
+void maximise_joint_socket_spread(JointInstance &instance);
+
+/////////////////////////////////////////////////
 /// @brief Calculates an even spread of socket local positions for a Joint based
 /// on its SocketConfig.
 ///

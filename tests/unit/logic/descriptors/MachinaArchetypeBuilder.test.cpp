@@ -171,7 +171,7 @@ TEST_CASE(
 
   const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
-          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
           .Build();
 
   const AnalysisTrace expected_trace =
@@ -205,7 +205,7 @@ TEST_CASE("MachinaArchetypeBuilder records AtLeastNOf step result events",
 
   const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
-          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
           .Build();
 
   const AnalysisTrace expected_trace =

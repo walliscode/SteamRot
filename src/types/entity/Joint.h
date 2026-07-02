@@ -38,6 +38,14 @@ struct SocketConfig {
   /////////////////////////////////////////////////
   SocketConfig() = default;
 
+  SocketConfig(uint8_t count, float radius, float min_gap,
+               float fixed_socket_angle, bool has_fixed_socket,
+               float rotation_arc_min, float rotation_arc_max)
+      : socket_count(count), radius(radius), min_gap(min_gap),
+        fixed_socket_angle(fixed_socket_angle),
+        has_fixed_socket(has_fixed_socket), rotation_arc_min(rotation_arc_min),
+        rotation_arc_max(rotation_arc_max) {}
+
   /////////////////////////////////////////////////
   /// @brief Total number of sockets including the fixed anchor (if present).
   /////////////////////////////////////////////////

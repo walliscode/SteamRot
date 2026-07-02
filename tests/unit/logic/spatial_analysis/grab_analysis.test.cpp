@@ -17,13 +17,14 @@
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <variant>
 
 namespace steamrot::tests {
 using namespace steamrot::logic;
 
 TEST_CASE("valid_grab_pkg passes grab structural tests") {
-  steamrot::tests::PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
   MachinaArchetypeResult result =
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
@@ -34,24 +35,21 @@ TEST_CASE("valid_grab_pkg passes grab structural tests") {
 TEST_CASE("align_grab_structure tests") {
   // arrange
   // set up valid grab package and result
-  steamrot::tests::PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
-  steamrot::MachinaArchetypeResult ma_result =
+  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  MachinaArchetypeResult ma_result =
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
 
   // pull ou the GrabResult from the MachinaArchetypeResult variant
-  REQUIRE(std::holds_alternative<steamrot::GrabResult>(
-      ma_result.result_sub_graphs));
-  steamrot::GrabResult grab_result =
-      std::get<steamrot::GrabResult>(ma_result.result_sub_graphs);
-  steamrot::PartGraph &graph = valid_grab_pkg.part_graph;
+  REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
+  GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
+  PartGraph &graph = valid_grab_pkg.part_graph;
 
   // get the instance of the anchor joint
   const uint32_t anchor_id = grab_result.anchor;
   REQUIRE(valid_grab_pkg.id_to_part_graph_id.at("j3") == anchor_id);
-  REQUIRE(std::holds_alternative<steamrot::JointInstance>(graph.at(anchor_id)));
-  steamrot::JointInstance &anchor_instance =
-      std::get<steamrot::JointInstance>(graph.at(anchor_id));
+  REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
+  JointInstance &anchor_instance = std::get<JointInstance>(graph.at(anchor_id));
 
   SECTION("align_grab_structure sets the anchor's transform to the provided "
           "vector") {
@@ -70,8 +68,8 @@ TEST_CASE("align_grab_structure tests") {
         {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
 
     for (const sf::Vector2f &target_position : target_positions) {
-      steamrot::logic::spatial_analysis::align_grab_structure(
-          grab_result, graph, target_position);
+      spatial_analysis::align_grab_structure(grab_result, graph,
+                                             target_position);
       // assert
       // the transform of the anchor joint should be able to move a 0,0 point to
       // the target position
@@ -97,8 +95,7 @@ TEST_CASE("align_grab_structure tests") {
     const float arc_mid = (arc_min + arc_max) / 2.f;
 
     // act
-    steamrot::logic::spatial_analysis::align_grab_structure(grab_result, graph,
-                                                            {0.f, 0.f});
+    spatial_analysis::align_grab_structure(grab_result, graph, {0.f, 0.f});
 
     // assert
     // construct a transform that rotates by the arc_mid value and check that it
@@ -126,8 +123,8 @@ TEST_CASE("align_grab_structure tests") {
     std::vector<sf::Vector2f> target_positions{
         {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
     for (const sf::Vector2f &target_position : target_positions) {
-      steamrot::logic::spatial_analysis::align_grab_structure(
-          grab_result, graph, target_position);
+      spatial_analysis::align_grab_structure(grab_result, graph,
+                                             target_position);
       // assert
       // construct a transform that translates to the target position and then
       // rotates by the arc_mid value and check that it is equal to the anchor
@@ -147,9 +144,9 @@ TEST_CASE("get_end_of_arm tests") {
   SubGraph arm3{};
 
   // act and assert
-  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm1) == 4);
-  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm2) == 5);
-  REQUIRE(steamrot::logic::spatial_analysis::get_end_of_arm(arm3) == 0);
+  REQUIRE(spatial_analysis::get_end_of_arm(arm1) == 4);
+  REQUIRE(spatial_analysis::get_end_of_arm(arm2) == 5);
+  REQUIRE(spatial_analysis::get_end_of_arm(arm3) == 0);
 }
 
 TEST_CASE("assign_left_and_right_arm_sockets tests") {
@@ -167,7 +164,7 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
     std::vector<uint32_t> left_arm_sockets;
     std::vector<uint32_t> right_arm_sockets;
     // act
-    steamrot::logic::spatial_analysis::assign_left_and_right_arm_sockets(
+    spatial_analysis::assign_left_and_right_arm_sockets(
         anchor_joint, left_arm_sockets, right_arm_sockets);
     // assert
     REQUIRE(left_arm_sockets.empty());
@@ -192,7 +189,7 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
     std::vector<uint32_t> right_arm_sockets;
 
     // act
-    steamrot::logic::spatial_analysis::assign_left_and_right_arm_sockets(
+    spatial_analysis::assign_left_and_right_arm_sockets(
         anchor_joint, left_arm_sockets, right_arm_sockets);
 
     // assert
@@ -216,7 +213,7 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
     std::vector<uint32_t> left_arm_sockets;
     std::vector<uint32_t> right_arm_sockets;
     // act
-    steamrot::logic::spatial_analysis::assign_left_and_right_arm_sockets(
+    spatial_analysis::assign_left_and_right_arm_sockets(
         anchor_joint, left_arm_sockets, right_arm_sockets);
     // assert
     REQUIRE(left_arm_sockets.size() == 1);
@@ -224,6 +221,63 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
     REQUIRE(right_arm_sockets.size() == 2);
     REQUIRE(right_arm_sockets.at(0) == 1);
     REQUIRE(right_arm_sockets.at(1) == 2);
+  }
+}
+
+TEST_CASE("assign_open_state_transforms tests") {
+  // arrange
+  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  MachinaArchetypeResult ma_result =
+      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
+                              valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
+  REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
+
+  // grab result contains the anchor joint and the arms of the grab structure
+  GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
+  const uint32_t &anchor_id = grab_result.anchor;
+  PartGraph &graph = valid_grab_pkg.part_graph;
+
+  SECTION("assign_open_state_transforms is empty if not run through function") {
+    REQUIRE(grab_result.static_transforms.empty());
+  }
+
+  SECTION(
+      "assign_open_state_transforms assigns transforms for the anchor joint") {
+    // arrange
+    REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
+    JointInstance &anchor_joint =
+        spatial_analysis::get_anchor_joint(grab_result, graph);
+    const SocketConfig &config = anchor_joint.joint->socket_config;
+    REQUIRE(config.socket_count == 2);
+    anchor_joint.sockets.at(0).local_position = {0.f, 0.f};
+    anchor_joint.sockets.at(1).local_position = {0.f, 0.f};
+
+    // act
+    spatial_analysis::assign_open_state_transforms(grab_result, graph);
+
+    // assert
+    // the anchor joint should have its sockets at its maximum angles, manually
+    // calculate the expected positions and then add to the origin
+    sf::Vector2f expected_position_0 =
+        anchor_joint.joint->origin +
+        sf::Vector2f{
+            config.radius *
+                std::cos(sf::degrees(config.rotation_arc_min).asRadians()),
+            config.radius *
+                std::sin(sf::degrees(config.rotation_arc_min).asRadians())};
+
+    sf::Vector2f expected_position_1 =
+        anchor_joint.joint->origin +
+        sf::Vector2f{
+            config.radius *
+                std::cos(sf::degrees(config.rotation_arc_max).asRadians()),
+            config.radius *
+                std::sin(sf::degrees(config.rotation_arc_max).asRadians())};
+
+    REQUIRE_THAT(anchor_joint.sockets.at(0).local_position,
+                 EqualsVector2f(expected_position_0, 0.001f));
+    REQUIRE_THAT(anchor_joint.sockets.at(1).local_position,
+                 EqualsVector2f(expected_position_1, 0.001f));
   }
 }
 } // namespace steamrot::tests

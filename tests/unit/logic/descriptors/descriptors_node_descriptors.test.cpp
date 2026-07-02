@@ -220,10 +220,10 @@ TEST_CASE("is_branched", "[unit][logic][descriptors]") {
   // IDs: j0=0, f0=1, f1=2, f2=3
   const tests::PartGraphPackage pkg =
       tests::PartGraphBuilder{}
-          .AddJoint(tests::JointNames::ThreeSockets, "j0")
-          .AddFragment(tests::FragmentNames::OneSocket, "f0")
-          .AddFragment(tests::FragmentNames::OneSocket, "f1")
-          .AddFragment(tests::FragmentNames::OneSocket, "f2")
+          .AddJointInstance(tests::JointNames::ThreeSockets, "j0")
+          .AddFragmentInstance(tests::FragmentNames::OneSocket, "f0")
+          .AddFragmentInstance(tests::FragmentNames::OneSocket, "f1")
+          .AddFragmentInstance(tests::FragmentNames::OneSocket, "f2")
           .Connect("f0", 0, "j0", 0)
           .Connect("f1", 0, "j0", 1)
           .Connect("f2", 0, "j0", 2)

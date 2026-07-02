@@ -48,7 +48,7 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // build part graph with a single joint node
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
             .Build();
 
     // build expected trace
@@ -82,8 +82,9 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // build part graph with a serial chain of length 2
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
             .Connect("j0", 0, "f0", 0) // j0.socket[0] ↔ f0.socket[0]
             .Build();
     // test predicate
@@ -124,9 +125,11 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // middle node
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0")
-            .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                                 "f1")
             .Connect("j0", 0, "f0", 0) // j0.socket[0] ↔ f0.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
             .Build();
@@ -173,11 +176,13 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // middle node
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0")
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j1")
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1")
-            .AddJoint(steamrot::tests::JointNames::OneSocket, "j2")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f0")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j1")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f1")
+            .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j2")
             .Connect("j0", 0, "f0", 0) // j0.socket[0] ↔ f0.socket[0]
             .Connect("f0", 1, "j1", 0) // f0.socket[1] ↔ j1.socket[0]
             .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
@@ -234,13 +239,17 @@ TEST_CASE("MachinaArchetype Grab tests") {
     // middle node
     steamrot::tests::PartGraphPackage pkg =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0")
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f2")
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j3")
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f4")
-            .AddJoint(steamrot::tests::JointNames::TwoSockets, "j5")
-            .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f6")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f0")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j1")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f2")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j3")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f4")
+            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j5")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                                 "f6")
             .Connect("f0", 0, "j1", 0)
             .Connect("j1", 1, "f2", 0)
             .Connect("f2", 1, "j3", 0)

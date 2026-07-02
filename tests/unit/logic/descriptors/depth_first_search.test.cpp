@@ -158,7 +158,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
     // the valid subgraph must be recorded when the Sequence step is consumed.
     const steamrot::PartGraph parts =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
             .Build()
             .part_graph;
     const ChainDescriptorResult result =
@@ -172,7 +172,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
   SECTION("isolated node not matching a Sequence step → one invalid subgraph") {
     const steamrot::PartGraph parts =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
             .Build()
             .part_graph;
     const ChainDescriptorResult result =
@@ -186,7 +186,7 @@ TEST_CASE("depth_first_search: single-node scenarios",
       "start node missing from graph → invalid subgraph recorded, no crash") {
     const steamrot::PartGraph parts =
         steamrot::tests::PartGraphBuilder{}
-            .AddFragment(steamrot::tests::FragmentNames::NoSocket, "f0")
+            .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
             .Build()
             .part_graph;
     const ChainDescriptorResult result = run_dfs(
@@ -210,9 +210,12 @@ TEST_CASE(
   //   joint0.socket[1] ↔ frag1.socket[0]
   const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
-          .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f0") // id=0
-          .AddFragment(steamrot::tests::FragmentNames::TwoSockets, "f1") // id=1
-          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")       // id=2
+          .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                               "f0") // id=0
+          .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets,
+                               "f1") // id=1
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets,
+                            "j0")    // id=2
           .Connect("f0", 1, "j0", 0) // f0.socket[1] ↔ j0.socket[0]
           .Connect("j0", 1, "f1", 0) // j0.socket[1] ↔ f1.socket[0]
           .Build();
@@ -290,10 +293,14 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
   //   joint1.socket[1] ↔ frag1.socket[0]
   const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
-          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f0") // id=0
-          .AddFragment(steamrot::tests::FragmentNames::OneSocket, "f1") // id=1
-          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j0")      // id=2
-          .AddJoint(steamrot::tests::JointNames::TwoSockets, "j1")      // id=3
+          .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                               "f0") // id=0
+          .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
+                               "f1") // id=1
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets,
+                            "j0") // id=2
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets,
+                            "j1")             // id=3
           .Connect("f0", 0, "j0", 0)          // f0.socket[0] ↔ j0.socket[0]
           .ConnectUnchecked("j0", 1, "j1", 0) // j0.socket[1] ↔ j1.socket[0]
           .Connect("j1", 1, "f1", 0)          // j1.socket[1] ↔ f1.socket[0]
