@@ -18,13 +18,13 @@ namespace steamrot::tests {
 PartGraphPackage create_valid_grab_pkg() {
   PartGraphPackage pkg =
       PartGraphBuilder{}
-          .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+          .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f0")
           .AddJointInstance(parts::JointSquareWith2Sockets, "j1")
-          .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f2")
+          .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f2")
           .AddJointInstance(parts::JointSquareWith2Sockets, "j3")
-          .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f4")
+          .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f4")
           .AddJointInstance(parts::JointSquareWith2Sockets, "j5")
-          .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f6")
+          .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f6")
           .Connect("f0", 0, "j1", 0)
           .Connect("j1", 1, "f2", 0)
           .Connect("f2", 1, "j3", 0)

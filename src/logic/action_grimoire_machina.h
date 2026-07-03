@@ -116,8 +116,8 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 /// @ref create_connection (setting @c SocketData::connected_to on each end).
 ///
 /// By convention connections are only between a FragmentInstance and a
-/// JointInstance. Does nothing if the ghost and the PartGraph part have the same
-/// type (both Fragment or both Joint).
+/// JointInstance. Does nothing if the ghost and the PartGraph part have the
+/// same type (both Fragment or both Joint).
 ///
 /// Does nothing if:
 ///   - @p scaffold.parts is empty (use @ref place_first_piece instead),
@@ -191,7 +191,7 @@ create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
 /// @return Boolean indicating whether the socket is ready to be connected
 /// (true) or not (false).
 /////////////////////////////////////////////////
-bool check_socket_for_connection_readiness(const SocketData &socket);
+bool check_socket_for_connection_readiness(const SocketState &socket);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether any of the selections on MrGhost are ready to be

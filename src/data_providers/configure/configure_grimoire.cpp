@@ -43,10 +43,10 @@ ConfigureFragment(Fragment &fragment, const FragmentFbs *fragment_fbs) {
 
       if (socket_fbs) {
         fragment.sockets.emplace_back(
-            Socket{sf::Vector2f(socket_fbs->local_position()->x(),
-                                socket_fbs->local_position()->y()),
-                   sf::Vector2f(socket_fbs->alignment_vector()->x(),
-                                socket_fbs->alignment_vector()->y())});
+            SocketData{sf::Vector2f(socket_fbs->local_position()->x(),
+                                    socket_fbs->local_position()->y()),
+                       sf::Vector2f(socket_fbs->alignment_vector()->x(),
+                                    socket_fbs->alignment_vector()->y())});
 
       } else {
         return std::unexpected(

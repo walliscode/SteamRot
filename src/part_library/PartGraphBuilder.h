@@ -68,6 +68,15 @@ public:
   FragmentInstance MakeFragmentInstance(const FragmentNames name);
 
   /////////////////////////////////////////////////
+  /// @brief Creates a FragmentInstance from a Fragment definition, assigning a
+  /// stable ID.
+  ///
+  /// @param fragment Fragment definition to wrap in a FragmentInstance.
+  /// @return A FragmentInstance with a builder-assigned stable ID.
+  /////////////////////////////////////////////////
+  FragmentInstance MakeFragmentInstance(const Fragment &fragment);
+
+  /////////////////////////////////////////////////
   /// @brief Creates a JointInstance based on the provided JointNames enum
   /// value.
   ///
@@ -75,6 +84,15 @@ public:
   /// @return A JointInstance corresponding to the specified JointNames.
   /////////////////////////////////////////////////
   JointInstance MakeJointInstance(const JointNames name);
+
+  /////////////////////////////////////////////////
+  /// @brief Creates a JointInstance from a Joint definition, assigning a
+  /// stable ID.
+  ///
+  /// @param joint Joint definition to wrap in a JointInstance.
+  /// @return A JointInstance with a builder-assigned stable ID.
+  /////////////////////////////////////////////////
+  JointInstance MakeJointInstance(const Joint &joint);
 
   PartGraphBuilder &AddFragmentInstance(const FragmentNames name,
                                         const std::string id);

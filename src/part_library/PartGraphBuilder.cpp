@@ -59,6 +59,21 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
 }
 
 /////////////////////////////////////////////////
+FragmentInstance
+PartGraphBuilder::MakeFragmentInstance(const Fragment &fragment) {
+  FragmentInstance instance{&fragment};
+  instance.id = m_package.next_id++;
+  return instance;
+}
+
+/////////////////////////////////////////////////
+JointInstance PartGraphBuilder::MakeJointInstance(const Joint &joint) {
+  JointInstance instance{&joint};
+  instance.id = m_package.next_id++;
+  return instance;
+}
+
+/////////////////////////////////////////////////
 PartGraphBuilder &
 PartGraphBuilder::AddFragmentInstance(const FragmentNames name,
                                       const std::string id) {
@@ -188,7 +203,8 @@ PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
           if (!instance.sockets.count(socket_id))
             FAIL("ConnectUnchecked: socket_id ("
                  << socket_id << ") not found for part " << part_id);
-          instance.sockets.at(socket_id).state = SocketState::Connected;
+          instance.sockets.at(socket_id).connection_state =
+              SocketConnectionState::Connected;
           instance.sockets.at(socket_id).connected_to =
               SocketConnection{peer_part_id, peer_socket_id};
           ++instance.connection_count;

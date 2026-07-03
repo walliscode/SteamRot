@@ -11,12 +11,16 @@
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
+#include "SocketState.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "joint_library.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
 namespace steamrot::tests {
+
+using namespace logic::action::grimoire_machina;
 namespace {
 
 /////////////////////////////////////////////////
@@ -116,14 +120,15 @@ TEST_CASE("GetAllJointNames returns the string names of all joints in "
 
 TEST_CASE("SocketState has Available state by default",
           "[unit][SocketState][MachinaFormScaffold]") {
-  steamrot::SocketData socket_data{{0.f, 0.f}};
-  REQUIRE(socket_data.state == steamrot::SocketState::Available);
+  steamrot::SocketState socket_data;
+  REQUIRE(socket_data.connection_state ==
+          steamrot::SocketConnectionState::Available);
 }
 
 TEST_CASE("SocketState has is_mouse_over false by default",
           "[unit][SocketState][MachinaFormScaffold]") {
 
-  steamrot::SocketData socket_data{{0.f, 0.f}};
+  steamrot::SocketState socket_data;
   REQUIRE(socket_data.is_mouse_over == false);
 }
 
@@ -134,9 +139,9 @@ TEST_CASE("SocketState has is_mouse_over false by default",
 TEST_CASE("FragmentInstance constructor creates one socket per Fragment socket",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
-  Socket socket1{{10.f, 20.f}, {1.f, 0.f}};
-  Socket socket2{{30.f, 40.f}, {0.f, 1.f}};
-  Socket socket3{{50.f, 60.f}, {-1.f, 0.f}};
+  SocketData socket1{{10.f, 20.f}, {1.f, 0.f}};
+  SocketData socket2{{30.f, 40.f}, {0.f, 1.f}};
+  SocketData socket3{{50.f, 60.f}, {-1.f, 0.f}};
 
   fragment.sockets.push_back(socket1);
   fragment.sockets.push_back(socket2);
@@ -151,7 +156,7 @@ TEST_CASE("FragmentInstance constructor stores the Fragment reference",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
   fragment.name = "test_fragment";
-  Socket socket{{0.f, 0.f}, {1.f, 0.f}};
+  SocketData socket{{0.f, 0.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
 
   steamrot::FragmentInstance instance{&fragment};
@@ -162,7 +167,7 @@ TEST_CASE("FragmentInstance constructor stores the Fragment reference",
 TEST_CASE("FragmentInstance constructor stores the initial transform",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
-  Socket socket{{0.f, 0.f}, {1.f, 0.f}};
+  SocketData socket{{0.f, 0.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
 
   sf::Transform transform;
@@ -186,21 +191,23 @@ TEST_CASE("FragmentInstance constructor with no sockets creates empty "
 TEST_CASE("FragmentInstance constructor initialises socket states to Available",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
-  Socket socket1{{10.f, 20.f}, {1.f, 0.f}};
-  Socket socket2{{30.f, 40.f}, {0.f, 1.f}};
+  SocketData socket1{{10.f, 20.f}, {1.f, 0.f}};
+  SocketData socket2{{30.f, 40.f}, {0.f, 1.f}};
   fragment.sockets.push_back(socket1);
   fragment.sockets.push_back(socket2);
 
   steamrot::FragmentInstance instance{&fragment};
 
-  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Available);
+  REQUIRE(instance.sockets.at(1).connection_state ==
+          steamrot::SocketConnectionState::Available);
 }
 
 TEST_CASE("FragmentInstance id defaults to zero",
           "[unit][FragmentInstance][MachinaFormScaffold]") {
   steamrot::Fragment fragment;
-  Socket socket{{0.f, 0.f}, {1.f, 0.f}};
+  SocketData socket{{0.f, 0.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
 
   steamrot::FragmentInstance instance{&fragment};
@@ -264,8 +271,10 @@ TEST_CASE("JointInstance constructor initialises socket states to Available",
 
   steamrot::JointInstance instance{&joint};
 
-  REQUIRE(instance.sockets.at(0).state == steamrot::SocketState::Available);
-  REQUIRE(instance.sockets.at(1).state == steamrot::SocketState::Available);
+  REQUIRE(instance.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Available);
+  REQUIRE(instance.sockets.at(1).connection_state ==
+          steamrot::SocketConnectionState::Available);
 }
 
 TEST_CASE("JointInstance id defaults to zero",
@@ -1287,18 +1296,18 @@ TEST_CASE("create_connection tests",
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     steamrot::JointInstance joint_instance =
         builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-    REQUIRE(frag_instance.sockets.at(0).state ==
-            steamrot::SocketState::Available);
-    REQUIRE(joint_instance.sockets.at(1).state ==
-            steamrot::SocketState::Available);
+    REQUIRE(frag_instance.sockets.at(0).connection_state ==
+            steamrot::SocketConnectionState::Available);
+    REQUIRE(joint_instance.sockets.at(1).connection_state ==
+            steamrot::SocketConnectionState::Available);
     auto connection_result =
         steamrot::logic::action::grimoire_machina::create_connection(
             frag_instance, 0, joint_instance, 1);
     REQUIRE(connection_result.has_value());
-    REQUIRE(frag_instance.sockets.at(0).state ==
-            steamrot::SocketState::Connected);
-    REQUIRE(joint_instance.sockets.at(1).state ==
-            steamrot::SocketState::Connected);
+    REQUIRE(frag_instance.sockets.at(0).connection_state ==
+            steamrot::SocketConnectionState::Connected);
+    REQUIRE(joint_instance.sockets.at(1).connection_state ==
+            steamrot::SocketConnectionState::Connected);
   }
 }
 
@@ -1313,7 +1322,8 @@ TEST_CASE("check_socket_for_connection_readiness tests",
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // manually set the only socket to occupied
-    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    frag_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Connected;
     frag_instance.sockets.at(0).is_ready_to_connect = false;
 
     auto result = steamrot::logic::action::grimoire_machina::
@@ -1326,7 +1336,8 @@ TEST_CASE("check_socket_for_connection_readiness tests",
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // manually set the only socket to occupied but ready
-    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    frag_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Connected;
     frag_instance.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
         check_socket_for_connection_readiness(frag_instance.sockets.at(0));
@@ -1338,7 +1349,8 @@ TEST_CASE("check_socket_for_connection_readiness tests",
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // ensure the only socket is available but not ready
-    frag_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance.sockets.at(0).is_ready_to_connect = false;
     auto result = steamrot::logic::action::grimoire_machina::
         check_socket_for_connection_readiness(frag_instance.sockets.at(0));
@@ -1350,7 +1362,8 @@ TEST_CASE("check_socket_for_connection_readiness tests",
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // ensure the only socket is available and ready
-    frag_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
         check_socket_for_connection_readiness(frag_instance.sockets.at(0));
@@ -1399,7 +1412,8 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
     steamrot::FragmentInstance frag_instance =
         builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
     // manually set the only socket to occupied
-    frag_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    frag_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Connected;
 
     steamrot::MrGhost mr_ghost;
     mr_ghost.m_instance = frag_instance;
@@ -1413,7 +1427,8 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
     steamrot::JointInstance joint_instance =
         builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
     // manually set the only socket to occupied
-    joint_instance.sockets.at(0).state = steamrot::SocketState::Connected;
+    joint_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Connected;
     steamrot::MrGhost mr_ghost;
     mr_ghost.m_instance = joint_instance;
     auto result = steamrot::logic::action::grimoire_machina::
@@ -1425,7 +1440,8 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
       "available sockets") {
     steamrot::FragmentInstance frag_instance = builder.MakeFragmentInstance(
         steamrot::tests::FragmentNames::TwoSockets);
-    frag_instance.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(1).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance.sockets.at(1).is_ready_to_connect = true;
     steamrot::MrGhost mr_ghost;
     mr_ghost.m_instance = frag_instance;
@@ -1440,7 +1456,8 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
           "available sockets") {
     steamrot::JointInstance joint_instance =
         builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-    joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    joint_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Available;
     joint_instance.sockets.at(0).is_ready_to_connect = true;
     steamrot::MrGhost mr_ghost;
     mr_ghost.m_instance = joint_instance;
@@ -1499,7 +1516,8 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part));
     auto &frag_instance = std::get<steamrot::FragmentInstance>(part);
     // set its only socket to available and ready
-    frag_instance.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance.sockets.at(1).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance.sockets.at(1).is_ready_to_connect = true;
 
     auto result = steamrot::logic::action::grimoire_machina::
@@ -1518,18 +1536,21 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
             .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
-            .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j0")
+            .AddJointInstance(parts::JointSquareWith2Sockets, "j1")
             .Build()
             .part_graph;
+
     // get the Joint at id 1
     auto &part = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::JointInstance>(part));
     auto &joint_instance = std::get<steamrot::JointInstance>(part);
+    REQUIRE(joint_instance.sockets.size() == 2);
+
     // set its first socket to available and ready
-    joint_instance.sockets.at(0).state = steamrot::SocketState::Available;
+    joint_instance.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Available;
     joint_instance.sockets.at(0).is_ready_to_connect = true;
-    auto result = steamrot::logic::action::grimoire_machina::
-        check_PartGraph_for_connection_readiness(part_graph);
+    auto result = check_PartGraph_for_connection_readiness(part_graph);
     REQUIRE(result);
     REQUIRE(result.value().first ==
             1); // the id of the part with available sockets
@@ -1554,13 +1575,15 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
     auto &part0 = part_graph.at(0);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part0));
     auto &frag_instance0 = std::get<steamrot::FragmentInstance>(part0);
-    frag_instance0.sockets.at(1).state = steamrot::SocketState::Available;
+    frag_instance0.sockets.at(1).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance0.sockets.at(1).is_ready_to_connect = true;
     // set the second Fragment's socket 0 to available and ready
     auto &part1 = part_graph.at(1);
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(part1));
     auto &frag_instance1 = std::get<steamrot::FragmentInstance>(part1);
-    frag_instance1.sockets.at(0).state = steamrot::SocketState::Available;
+    frag_instance1.sockets.at(0).connection_state =
+        steamrot::SocketConnectionState::Available;
     frag_instance1.sockets.at(0).is_ready_to_connect = true;
     auto result = steamrot::logic::action::grimoire_machina::
         check_PartGraph_for_connection_readiness(part_graph);
@@ -1601,7 +1624,8 @@ TEST_CASE("place_next_piece does nothing when ghost instance is monostate",
   steamrot::MachinaFormScaffold scaffold;
   auto joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
-  joint.sockets.at(0).state = steamrot::SocketState::Available;
+  joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, joint);
 
@@ -1621,15 +1645,13 @@ TEST_CASE("place_next_piece does nothing when ghost fragment pointer is null",
   steamrot::MachinaFormScaffold scaffold;
   auto joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
-  joint.sockets.at(0).state = steamrot::SocketState::Available;
+  joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, joint);
 
   steamrot::MrGhost mr_ghost;
   steamrot::FragmentInstance null_fi{nullptr};
-  null_fi.sockets.insert({0, steamrot::SocketData{sf::Vector2f{0.f, 0.f}}});
-  null_fi.sockets.at(0).state = steamrot::SocketState::Available;
-  null_fi.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = null_fi;
 
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
@@ -1646,15 +1668,13 @@ TEST_CASE("place_next_piece does nothing when ghost joint pointer is null",
   steamrot::MachinaFormScaffold scaffold;
   auto frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  frag.sockets.at(0).state = steamrot::SocketState::Available;
+  frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   frag.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, frag);
 
   steamrot::MrGhost mr_ghost;
   steamrot::JointInstance null_ji{nullptr};
-  null_ji.sockets.insert({0, steamrot::SocketData{sf::Vector2f{0.f, 0.f}}});
-  null_ji.sockets.at(0).state = steamrot::SocketState::Available;
-  null_ji.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = null_ji;
 
   steamrot::logic::action::grimoire_machina::place_next_piece(scaffold,
@@ -1671,7 +1691,8 @@ TEST_CASE("place_next_piece does nothing when ghost has no ready sockets",
   steamrot::MachinaFormScaffold scaffold;
   auto joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
-  joint.sockets.at(0).state = steamrot::SocketState::Available;
+  joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, joint);
 
@@ -1703,7 +1724,8 @@ TEST_CASE("place_next_piece does nothing when PartGraph has no ready sockets",
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1723,14 +1745,16 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::TwoSockets);
-  existing_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_frag.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_frag);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1750,14 +1774,16 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  existing_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_joint);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
-  ghost_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_joint.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_joint;
 
@@ -1781,7 +1807,8 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  existing_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_joint);
   REQUIRE(scaffold.parts.size() == 1);
@@ -1789,7 +1816,8 @@ TEST_CASE(
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1810,7 +1838,8 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::TwoSockets);
-  existing_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_frag.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_frag);
   REQUIRE(scaffold.parts.size() == 1);
@@ -1818,7 +1847,8 @@ TEST_CASE(
   steamrot::MrGhost mr_ghost;
   auto ghost_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
-  ghost_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_joint.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_joint;
 
@@ -1839,14 +1869,16 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  existing_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_joint);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1866,14 +1898,16 @@ TEST_CASE(
   steamrot::MachinaFormScaffold scaffold;
   auto existing_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  existing_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_joint);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1905,14 +1939,16 @@ TEST_CASE("place_next_piece: connection endpoints are correct when Joint ghost "
   steamrot::MachinaFormScaffold scaffold;
   auto existing_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::TwoSockets);
-  existing_frag.sockets.at(1).state = steamrot::SocketState::Available;
+  existing_frag.sockets.at(1).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_frag.sockets.at(1).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_frag);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  ghost_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_joint.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_joint;
 
@@ -1943,14 +1979,16 @@ TEST_CASE("place_next_piece marks connected sockets as SocketState::Connected",
   steamrot::MachinaFormScaffold scaffold;
   auto existing_joint =
       builder.MakeJointInstance(steamrot::tests::JointNames::TwoSockets);
-  existing_joint.sockets.at(0).state = steamrot::SocketState::Available;
+  existing_joint.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   existing_joint.sockets.at(0).is_ready_to_connect = true;
   scaffold.parts.emplace(scaffold.next_id++, existing_joint);
 
   steamrot::MrGhost mr_ghost;
   auto ghost_frag =
       builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
-  ghost_frag.sockets.at(0).state = steamrot::SocketState::Available;
+  ghost_frag.sockets.at(0).connection_state =
+      steamrot::SocketConnectionState::Available;
   ghost_frag.sockets.at(0).is_ready_to_connect = true;
   mr_ghost.m_instance = ghost_frag;
 
@@ -1962,7 +2000,9 @@ TEST_CASE("place_next_piece marks connected sockets as SocketState::Connected",
   const steamrot::JointInstance &existing_ji =
       std::get<steamrot::JointInstance>(scaffold.parts.at(0));
 
-  REQUIRE(placed_fi.sockets.at(0).state == steamrot::SocketState::Connected);
-  REQUIRE(existing_ji.sockets.at(0).state == steamrot::SocketState::Connected);
+  REQUIRE(placed_fi.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Connected);
+  REQUIRE(existing_ji.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Connected);
 }
 } // namespace steamrot::tests

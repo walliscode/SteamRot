@@ -153,13 +153,13 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
 
   SECTION("assign_left_and_right_arm_sockets with no connected sockets") {
     JointInstance anchor_joint{nullptr};
-    anchor_joint.sockets.emplace(0, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(1, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(2, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(3, SocketData{{0.f, 0.f}});
+    anchor_joint.sockets.emplace(0, SocketState{});
+    anchor_joint.sockets.emplace(1, SocketState{});
+    anchor_joint.sockets.emplace(2, SocketState{});
+    anchor_joint.sockets.emplace(3, SocketState{});
     // set all sockets to available
     for (auto &[socket_id, socket_data] : anchor_joint.sockets) {
-      socket_data.state = SocketState::Available;
+      socket_data.connection_state = SocketConnectionState::Available;
     }
     std::vector<uint32_t> left_arm_sockets;
     std::vector<uint32_t> right_arm_sockets;
@@ -174,16 +174,20 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
   SECTION("assign_left_and_right_arm_sockets with even number of connected "
           "sockets") {
     JointInstance anchor_joint{nullptr};
-    anchor_joint.sockets.emplace(0, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(1, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(2, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(3, SocketData{{0.f, 0.f}});
+    anchor_joint.sockets.emplace(0, SocketState{});
+    anchor_joint.sockets.emplace(1, SocketState{});
+    anchor_joint.sockets.emplace(2, SocketState{});
+    anchor_joint.sockets.emplace(3, SocketState{});
 
     // set sockets 0 and 2 to connected and sockets 1 and 3 to available
-    anchor_joint.sockets.at(0).state = SocketState::Connected;
-    anchor_joint.sockets.at(1).state = SocketState::Available;
-    anchor_joint.sockets.at(2).state = SocketState::Connected;
-    anchor_joint.sockets.at(3).state = SocketState::Available;
+    anchor_joint.sockets.at(0).connection_state =
+        SocketConnectionState::Connected;
+    anchor_joint.sockets.at(1).connection_state =
+        SocketConnectionState::Available;
+    anchor_joint.sockets.at(2).connection_state =
+        SocketConnectionState::Connected;
+    anchor_joint.sockets.at(3).connection_state =
+        SocketConnectionState::Available;
 
     std::vector<uint32_t> left_arm_sockets;
     std::vector<uint32_t> right_arm_sockets;
@@ -202,13 +206,16 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
   SECTION("assign_left_and_right_arm_sockets with odd number of connected "
           "sockets") {
     JointInstance anchor_joint{nullptr};
-    anchor_joint.sockets.emplace(0, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(1, SocketData{{0.f, 0.f}});
-    anchor_joint.sockets.emplace(2, SocketData{{0.f, 0.f}});
+    anchor_joint.sockets.emplace(0, SocketState{});
+    anchor_joint.sockets.emplace(1, SocketState{});
+    anchor_joint.sockets.emplace(2, SocketState{});
     // set sockets 0 and 1 to connected and socket 2 to available
-    anchor_joint.sockets.at(0).state = SocketState::Connected;
-    anchor_joint.sockets.at(1).state = SocketState::Connected;
-    anchor_joint.sockets.at(2).state = SocketState::Connected;
+    anchor_joint.sockets.at(0).connection_state =
+        SocketConnectionState::Connected;
+    anchor_joint.sockets.at(1).connection_state =
+        SocketConnectionState::Connected;
+    anchor_joint.sockets.at(2).connection_state =
+        SocketConnectionState::Connected;
 
     std::vector<uint32_t> left_arm_sockets;
     std::vector<uint32_t> right_arm_sockets;

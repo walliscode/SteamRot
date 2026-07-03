@@ -135,8 +135,7 @@ TEST_CASE("draw_view with RenderStates draws Joint positioning_views at "
 TEST_CASE("draw_socket draws a non-hovered socket without throwing",
           "[unit][render_grimoire_machina]") {
   sf::RenderTexture texture{{100, 100}};
-  steamrot::SocketData socket_data{
-      {0.0f, 0.0f}}; // default: Available, not hovered
+  steamrot::SocketState socket_data;
 
   REQUIRE_NOTHROW(steamrot::logic::render::grimoire_machina::draw_socket(
       texture, {50.f, 50.f}, socket_data));
@@ -147,7 +146,7 @@ TEST_CASE("draw_socket produces white pixels at world_pos when not hovered",
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  steamrot::SocketState socket_data;
   socket_data.is_mouse_over = false;
   steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
                                                          socket_data);
@@ -163,7 +162,7 @@ TEST_CASE("draw_socket produces yellow pixels at world_pos when hovered",
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  steamrot::SocketState socket_data;
   socket_data.is_mouse_over = true;
   steamrot::logic::render::grimoire_machina::draw_socket(texture, {50.f, 50.f},
                                                          socket_data);
@@ -179,7 +178,7 @@ TEST_CASE("draw_socket produces white outer and green inner when "
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  steamrot::SocketState socket_data;
   socket_data.is_another_socket_near = true;
   socket_data.is_ready_to_connect = true;
   socket_data.proximity_scale = uint8_t{255};
@@ -198,7 +197,7 @@ TEST_CASE("draw_socket produces white outer and blue inner when "
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
-  steamrot::SocketData socket_data{{0.0f, 0.0f}};
+  steamrot::SocketState socket_data;
   socket_data.is_another_socket_near = true;
   socket_data.is_ready_to_connect = false;
   socket_data.proximity_scale = uint8_t{200};

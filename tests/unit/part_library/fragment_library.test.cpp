@@ -16,10 +16,10 @@ using namespace parts;
 TEST_CASE("CreateRectangleFragmentWith2Sockets creates the correct fragment",
           "[fragment_library]") {
 
-  const Fragment &fragment = FragmentRectangleWith2Sockets;
+  const Fragment &fragment = FragmentRectangleWithTwoSockets;
 
   // test name
-  REQUIRE(fragment.name == "FragmentRectangleWith2Sockets");
+  REQUIRE(fragment.name == "FragmentRectangleWithTwoSockets");
   // test views
   REQUIRE(fragment.positioning_views.size() == 1);
   REQUIRE(fragment.positioning_views[ViewDirection::Front].getVertexCount() ==

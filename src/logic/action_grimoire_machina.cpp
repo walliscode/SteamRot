@@ -315,11 +315,13 @@ create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
         "Connection creation failed: one or both socket IDs are not found.");
 
   // Mark both sockets as Connected and store the reciprocal peer reference.
-  fragment_instance.sockets.at(socket_id_a).state = SocketState::Connected;
+  fragment_instance.sockets.at(socket_id_a).connection_state =
+      SocketConnectionState::Connected;
   fragment_instance.sockets.at(socket_id_a).connected_to =
       SocketConnection{joint_instance.id, socket_id_b};
 
-  joint_instance.sockets.at(socket_id_b).state = SocketState::Connected;
+  joint_instance.sockets.at(socket_id_b).connection_state =
+      SocketConnectionState::Connected;
   joint_instance.sockets.at(socket_id_b).connected_to =
       SocketConnection{fragment_instance.id, socket_id_a};
 
@@ -330,9 +332,10 @@ create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
 }
 
 /////////////////////////////////////////////////
-bool check_socket_for_connection_readiness(const SocketData &socket) {
+bool check_socket_for_connection_readiness(const SocketState &socket) {
 
-  if (socket.state != SocketState::Available || !socket.is_ready_to_connect) {
+  if (socket.connection_state != SocketConnectionState::Available ||
+      !socket.is_ready_to_connect) {
     return false;
   } else {
     return true;
@@ -393,6 +396,7 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost) {
   return std::nullopt;
 }
 
+/////////////////////////////////////////////////
 std::optional<std::pair<uint32_t, uint32_t>>
 check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
 
@@ -402,21 +406,34 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
 
   // cycle through all parts in the PartGraph and check their sockets
   for (const auto &[id, part] : part_graph) {
-    const SocketMap &sockets = std::visit(
-        [](const auto &inst) -> const SocketMap & { return inst.sockets; },
-        part);
 
-    auto it =
-        std::find_if(sockets.begin(), sockets.end(), [](const auto &entry) {
-          return check_socket_for_connection_readiness(entry.second);
-        });
+    // deal with FragmentInstance
+    if (std::holds_alternative<FragmentInstance>(part)) {
+      const FragmentInstance &fi = std::get<FragmentInstance>(part);
+      auto it = std::find_if(
+          fi.sockets.begin(), fi.sockets.end(), [](const auto &entry) {
+            return check_socket_for_connection_readiness(entry.second);
+          });
 
-    // if successful, return the part id and stable socket ID of the first
-    // ready socket
-    if (it != sockets.end())
-      return std::make_pair(id, it->first);
+      // if successful, return the part id and stable socket ID of the first
+      // ready socket
+      if (it != fi.sockets.end())
+        return std::make_pair(id, it->first);
+    }
+    //
+    if (std::holds_alternative<JointInstance>(part)) {
+      const JointInstance &ji = std::get<JointInstance>(part);
+      auto it = std::find_if(
+          ji.sockets.begin(), ji.sockets.end(), [](const auto &entry) {
+            return check_socket_for_connection_readiness(entry.second);
+          });
+
+      // if successful, return the part id and stable socket ID of the first
+      // ready socket
+      if (it != ji.sockets.end())
+        return std::make_pair(id, it->first);
+    }
   }
-
   return std::nullopt;
 }
 

@@ -195,39 +195,42 @@ private:
 
     // iterate over all connected neighbours and apply the descriptor to each
     // one;
-    for (const auto &[socket_id, socket_data] : sockets) {
-      (void)socket_id;
 
-      // if the socket isn't connected, skip it
-      if (!socket_data.connected_to.has_value()) {
-        continue;
-      }
+    std::visit(
+        [&](const auto &sockets) {
+          for (const auto &[socket_id, socket_state] : sockets) {
+            (void)socket_id;
 
-      // extract neighbour ID and apply descriptor
-      const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
+            // if the socket isn't connected, skip it
+            if (!socket_state.connected_to.has_value()) {
+              continue;
+            }
+            // extract neighbour ID and apply descriptor
+            const uint32_t neighbour_id =
+                socket_state.connected_to->peer_part_id;
+            // check if node has already been visited to prevent cycles; if so,
+            // skip it
+            if (context.visited_nodes.contains(neighbour_id)) {
+              // could add some kind of detection event in the future
+              continue;
+            }
 
-      // check if node has already been visited to prevent cycles; if so, skip
-      // it
-      if (context.visited_nodes.contains(neighbour_id)) {
-        // could add some kind of detection event in the future
-        continue;
-      }
-      ChainDescriptorResult step_result = step.descriptor(
-          parts, neighbour_id, context.visited_nodes, depth + 1);
-
-      // mark neighbour as visited
-      context.visited_nodes.insert(neighbour_id);
-
-      // merge trace to parent context
-      Merge(context.trace, std::move(step_result.m_trace));
-
-      // if the descriptor matched and the result includes a valid subgraph, add
-      // it to the result vector and increment the match count
-      if (step_result && step_result.valid_subgraph.has_value()) {
-        result_vector.push_back(*step_result.valid_subgraph);
-        matches_found++;
-      }
-    }
+            ChainDescriptorResult step_result = step.descriptor(
+                parts, neighbour_id, context.visited_nodes, depth + 1);
+            // mark neighbour as visited
+            context.visited_nodes.insert(neighbour_id);
+            // merge trace to parent context
+            Merge(context.trace, std::move(step_result.m_trace));
+            // if the descriptor matched and the result includes a valid
+            // subgraph, add it to the result vector and increment the match
+            // count
+            if (step_result && step_result.valid_subgraph.has_value()) {
+              result_vector.push_back(*step_result.valid_subgraph);
+              matches_found++;
+            }
+          }
+        },
+        sockets);
 
     // step succeeds if the number of matches found meets the minimum
     // repetitions
@@ -269,8 +272,8 @@ private:
       return result;
     }
 
-    const SocketMap &start_sockets = std::visit(
-        [](const auto &instance) -> const SocketMap & {
+    const SocketMap start_sockets = std::visit(
+        [](const auto &instance) -> SocketMap {
           return instance.sockets;
         },
         start_node_it->second);

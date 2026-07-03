@@ -50,9 +50,11 @@ void reset_socket_proximity_state(PartGraph &part_graph);
 /// @param other_socket_transform  World-space transform of the second socket's
 ///                                owning PartInstance.
 /////////////////////////////////////////////////
-void check_socket_collisions(SocketData &socket_data,
+void check_socket_collisions(SocketState &socket_data,
+                             const sf::Vector2f &socket_local_position,
                              const sf::Transform &socket_transform,
-                             SocketData &other_socket_data,
+                             SocketState &other_socket_data,
+                             const sf::Vector2f &other_socket_local_position,
                              const sf::Transform &other_socket_transform);
 
 /////////////////////////////////////////////////
@@ -71,12 +73,13 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 ///        candidate per socket.
 ///
 /// Resets all proximity state on both the @p fragment_instance sockets and all
-/// PartGraph sockets before iterating, so that each call produces a clean result
-/// independent of any prior state. Only Fragment–Joint pairs are evaluated;
-/// Fragment–Fragment collisions are not checked here.
+/// PartGraph sockets before iterating, so that each call produces a clean
+/// result independent of any prior state. Only Fragment–Joint pairs are
+/// evaluated; Fragment–Fragment collisions are not checked here.
 ///
 /// @param fragment_instance FragmentInstance whose sockets are tested.
-/// @param part_graph          PartGraph containing the candidate JointInstances.
+/// @param part_graph          PartGraph containing the candidate
+/// JointInstances.
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
                              PartGraph &part_graph);
@@ -87,14 +90,16 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 ///        candidate per socket.
 ///
 /// Resets all proximity state on both the @p joint_instance sockets and all
-/// PartGraph sockets before iterating, so that each call produces a clean result
-/// independent of any prior state. Only Joint–Fragment pairs are evaluated;
-/// Joint–Joint collisions are not checked here.
+/// PartGraph sockets before iterating, so that each call produces a clean
+/// result independent of any prior state. Only Joint–Fragment pairs are
+/// evaluated; Joint–Joint collisions are not checked here.
 ///
 /// @param joint_instance JointInstance whose sockets are tested.
-/// @param part_graph       PartGraph containing the candidate FragmentInstances.
+/// @param part_graph       PartGraph containing the candidate
+/// FragmentInstances.
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance, PartGraph &part_graph);
+void check_socket_collisions(JointInstance &joint_instance,
+                             PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief wrapper function to check for collisions between the active ghost
