@@ -59,6 +59,21 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
 }
 
 /////////////////////////////////////////////////
+FragmentInstance
+PartGraphBuilder::MakeFragmentInstance(const Fragment &fragment) {
+  FragmentInstance instance{&fragment};
+  instance.id = m_package.next_id++;
+  return instance;
+}
+
+/////////////////////////////////////////////////
+JointInstance PartGraphBuilder::MakeJointInstance(const Joint &joint) {
+  JointInstance instance{&joint};
+  instance.id = m_package.next_id++;
+  return instance;
+}
+
+/////////////////////////////////////////////////
 PartGraphBuilder &
 PartGraphBuilder::AddFragmentInstance(const FragmentNames name,
                                       const std::string id) {
