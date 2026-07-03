@@ -37,7 +37,7 @@ namespace steamrot::logic::spatial_analysis {
 JointInstance &get_anchor_joint(const GrabResult &grab_result,
                                 PartGraph &part_graph);
 
-std::set<uint32_t> get_connected_sockets(const PartInstance &anchor_joint);
+std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint);
 /////////////////////////////////////////////////
 /// @brief Get the number of connected sockets on the anchor joint and assign
 /// the socket IDs to the left and right arm sockets

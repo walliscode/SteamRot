@@ -16,7 +16,7 @@ using namespace parts;
 TEST_CASE("CreateRectangleFragmentWith2Sockets creates the correct fragment",
           "[fragment_library]") {
 
-  const Fragment &fragment = FragmentRectangleWith2Sockets;
+  const Fragment &fragment = FragmentRectangleWithTwoSockets;
 
   // test name
   REQUIRE(fragment.name == "FragmentRectangleWith2Sockets");

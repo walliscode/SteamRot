@@ -254,7 +254,7 @@ TEST_CASE("draw_ghost_item draws socket circle for a FragmentInstance",
 
   // Fragment with a 20x20 white square and one socket at local (25, 10)
   steamrot::Fragment fragment = MakePopulatedFragment("leaf");
-  steamrot::Socket socket{{25.f, 10.f}, {1.f, 0.f}};
+  steamrot::SocketData socket{{25.f, 10.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
 
   steamrot::FragmentInstance instance{&fragment};

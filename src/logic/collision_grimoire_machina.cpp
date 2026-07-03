@@ -8,6 +8,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "collision_grimoire_machina.h"
+#include <SFML/System/Vector2.hpp>
 #include <algorithm>
 #include <cmath>
 #include <variant>
@@ -22,7 +23,7 @@ static constexpr float k_connection_distance_threshold = 2.5f;
 /////////////////////////////////////////////////
 /// @brief Reset proximity state on a single SocketData.
 /////////////////////////////////////////////////
-void reset_socket(SocketData &socket) {
+void reset_socket(SocketState &socket) {
   socket.is_another_socket_near = false;
   socket.is_ready_to_connect = false;
   socket.distance_to_nearest_socket = std::nullopt;
@@ -59,7 +60,7 @@ uint8_t compute_proximity_scale(float distance) {
 /// @param distance World-space distance to the candidate partner socket.
 /// @param ready    Whether this distance qualifies as "ready to connect".
 /////////////////////////////////////////////////
-void apply_if_better(SocketData &socket, float distance, bool ready) {
+void apply_if_better(SocketState &socket, float distance, bool ready) {
   if (socket.distance_to_nearest_socket.has_value() &&
       distance >= socket.distance_to_nearest_socket.value()) {
     return; // a closer candidate was already recorded
@@ -86,21 +87,23 @@ void reset_socket_proximity_state(PartGraph &part_graph) {
 }
 
 /////////////////////////////////////////////////
-void check_socket_collisions(SocketData &socket_data,
+void check_socket_collisions(SocketState &socket_data,
+                             const sf::Vector2f &socket_local_position,
                              const sf::Transform &socket_transform,
-                             SocketData &other_socket_data,
+                             SocketState &other_socket_data,
+                             const sf::Vector2f &other_socket_local_position,
                              const sf::Transform &other_socket_transform) {
 
   // return early if either socket is not available
-  if (socket_data.state != SocketState::Available ||
-      other_socket_data.state != SocketState::Available) {
+  if (socket_data.connection_state != SocketConnectionState::Available ||
+      other_socket_data.connection_state != SocketConnectionState::Available) {
     return;
   }
 
   const sf::Vector2f socket_world_pos =
-      socket_transform.transformPoint(socket_data.local_position);
+      socket_transform.transformPoint(socket_local_position);
   const sf::Vector2f other_socket_world_pos =
-      other_socket_transform.transformPoint(other_socket_data.local_position);
+      other_socket_transform.transformPoint(other_socket_local_position);
 
   const float distance =
       std::hypot(socket_world_pos.x - other_socket_world_pos.x,
@@ -117,11 +120,13 @@ void check_socket_collisions(SocketData &socket_data,
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
                              JointInstance &joint_instance) {
-  for (auto &[fragment_socket_id, fragment_socket] :
+  for (auto &[fragment_socket_id, fragment_socket_state] :
        fragment_instance.sockets) {
-    for (auto &[joint_socket_id, joint_socket] : joint_instance.sockets) {
-      check_socket_collisions(fragment_socket, fragment_instance.transform,
-                              joint_socket, joint_instance.transform);
+    for (auto &[joint_socket_id, joint_socket_state] : joint_instance.sockets) {
+      check_socket_collisions(
+          fragment_socket_state, fragment_socket_state.local_position,
+          fragment_instance.transform, joint_socket_state,
+          joint_socket_state.local_position, joint_instance.transform);
     }
   }
 }
@@ -143,7 +148,8 @@ void check_socket_collisions(FragmentInstance &fragment_instance,
 }
 
 /////////////////////////////////////////////////
-void check_socket_collisions(JointInstance &joint_instance, PartGraph &part_graph) {
+void check_socket_collisions(JointInstance &joint_instance,
+                             PartGraph &part_graph) {
   // Reset state on both sides before each pass so that stale state from the
   // previous tick does not bleed through.
   for (auto &[socket_id, socket_data] : joint_instance.sockets)

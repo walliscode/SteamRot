@@ -188,7 +188,8 @@ PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
           if (!instance.sockets.count(socket_id))
             FAIL("ConnectUnchecked: socket_id ("
                  << socket_id << ") not found for part " << part_id);
-          instance.sockets.at(socket_id).state = SocketState::Connected;
+          instance.sockets.at(socket_id).connection_state =
+              SocketConnectionState::Connected;
           instance.sockets.at(socket_id).connected_to =
               SocketConnection{peer_part_id, peer_socket_id};
           ++instance.connection_count;

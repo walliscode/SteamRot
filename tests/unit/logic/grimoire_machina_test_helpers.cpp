@@ -76,13 +76,13 @@ steamrot::Fragment MakeFragmentWithOriginTriangle(sf::Color colour) {
   steamrot::Fragment fragment;
   fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
                                               std::move(va));
-  Socket socket{{5.f, 5.f}, {1.f, 0.f}};
+  SocketData socket{{5.f, 5.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
   return fragment;
 }
 
 /////////////////////////////////////////////////
-steamrot::Fragment MakeFragmentWithSockets(std::vector<Socket> sockets) {
+steamrot::Fragment MakeFragmentWithSockets(std::vector<SocketData> sockets) {
   steamrot::Fragment fragment;
   fragment.sockets = std::move(sockets);
   return fragment;
@@ -198,7 +198,7 @@ MakeGrimoireWithFragmentAndSocket(const std::string &name,
   fragment.positioning_views.insert_or_assign(
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
-  Socket socket{{socket_local_pos.x, socket_local_pos.y}, {1.f, 0.f}};
+  SocketData socket{{socket_local_pos.x, socket_local_pos.y}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
   grimoire.m_all_fragments.insert({name, std::move(fragment)});
   return grimoire;
@@ -215,7 +215,7 @@ MakeGrimoireWithFragmentAndSockets(const std::string &name,
       steamrot::ViewDirection::Front,
       MakeFilledSquare(0.f, 0.f, sf::Color::White));
   for (const auto &pos : socket_positions) {
-    Socket socket{{pos.x, pos.y}, {1.f, 0.f}};
+    SocketData socket{{pos.x, pos.y}, {1.f, 0.f}};
     fragment.sockets.push_back(socket);
   }
 

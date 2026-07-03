@@ -21,11 +21,11 @@ JointInstance &get_anchor_joint(const GrabResult &grab_result,
 }
 
 /////////////////////////////////////////////////
-std::set<uint32_t> get_connected_sockets(const PartInstance &anchor_joint) {
+std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint) {
 
   std::set<uint32_t> connected_sockets;
   for (const auto &[socket_id, socket_data] : anchor_joint.sockets) {
-    if (socket_data.state == SocketState::Connected) {
+    if (socket_data.connection_state == SocketConnectionState::Connected) {
       connected_sockets.insert(socket_id);
     }
   }

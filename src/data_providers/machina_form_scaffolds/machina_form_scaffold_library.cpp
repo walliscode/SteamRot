@@ -67,64 +67,64 @@ void create_grab_scaffold_one(GrimoireMachina &grimoire) {
   JointInstance ji_0{&grimoire.m_all_joints.at("joint_one")};
   ji_0.id = 0;
   // connect to FragmentInstance 1, socket 0
-  ji_0.sockets.at(0).state = SocketState::Connected;
+  ji_0.sockets.at(0).connection_state = SocketConnectionState::Connected;
   ji_0.sockets.at(0).connected_to =
       SocketConnection{1, 0}; // connected to FragmentInstance 1, socket 0
   // connect to FragmentInstance 4, socket 0
-  ji_0.sockets.at(1).state = SocketState::Connected;
+  ji_0.sockets.at(1).connection_state = SocketConnectionState::Connected;
   ji_0.sockets.at(1).connected_to = SocketConnection{4, 0};
 
   // arm
   FragmentInstance fi_1{&grimoire.m_all_fragments.at("fragment_one")};
   fi_1.id = 1;
   // connect to JointInstance 0, socket 0
-  fi_1.sockets.at(0).state = SocketState::Connected;
+  fi_1.sockets.at(0).connection_state = SocketConnectionState::Connected;
   fi_1.sockets.at(0).connected_to = SocketConnection{0, 0};
   // connect to JointInstance 2, socket 0
-  fi_1.sockets.at(1).state = SocketState::Connected;
+  fi_1.sockets.at(1).connection_state = SocketConnectionState::Connected;
   fi_1.sockets.at(1).connected_to = SocketConnection{2, 0};
 
   JointInstance ji_2{&grimoire.m_all_joints.at("joint_one")};
   ji_2.id = 2;
   // connect to FragmentInstance 1, socket 1
-  ji_2.sockets.at(0).state = SocketState::Connected;
+  ji_2.sockets.at(0).connection_state = SocketConnectionState::Connected;
   ji_2.sockets.at(0).connected_to = SocketConnection{1, 1};
   // connect to FragmentInstance 3, socket 0
-  ji_2.sockets.at(1).state = SocketState::Connected;
+  ji_2.sockets.at(1).connection_state = SocketConnectionState::Connected;
   ji_2.sockets.at(1).connected_to = SocketConnection{3, 0};
   FragmentInstance fi_3{&grimoire.m_all_fragments.at("fragment_one")};
   fi_3.id = 3;
   // connect to JointInstance 2, socket 0
-  fi_3.sockets.at(0).state = SocketState::Connected;
+  fi_3.sockets.at(0).connection_state = SocketConnectionState::Connected;
   fi_3.sockets.at(0).connected_to = SocketConnection{2, 0};
   // end socket 1 is available for connection
-  fi_3.sockets.at(1).state = SocketState::Available;
+  fi_3.sockets.at(1).connection_state = SocketConnectionState::Available;
 
   // arm
   FragmentInstance fi_4{&grimoire.m_all_fragments.at("fragment_one")};
   fi_4.id = 4;
   // connect to JointInstance 0, socket 1
-  fi_4.sockets.at(0).state = SocketState::Connected;
+  fi_4.sockets.at(0).connection_state = SocketConnectionState::Connected;
   fi_4.sockets.at(0).connected_to = SocketConnection{0, 1};
   // connect to JointInstance 5, socket 0
-  fi_4.sockets.at(1).state = SocketState::Connected;
+  fi_4.sockets.at(1).connection_state = SocketConnectionState::Connected;
   fi_4.sockets.at(1).connected_to = SocketConnection{5, 0};
   JointInstance ji_5{&grimoire.m_all_joints.at("joint_one")};
   ji_5.id = 5;
   // connect to FragmentInstance 4, socket 1
-  ji_5.sockets.at(0).state = SocketState::Connected;
+  ji_5.sockets.at(0).connection_state = SocketConnectionState::Connected;
   ji_5.sockets.at(0).connected_to = SocketConnection{4, 1};
   // connect to FragmentInstance 6, socket 0
-  ji_5.sockets.at(1).state = SocketState::Connected;
+  ji_5.sockets.at(1).connection_state = SocketConnectionState::Connected;
   ji_5.sockets.at(1).connected_to = SocketConnection{6, 0};
 
   FragmentInstance fi_6{&grimoire.m_all_fragments.at("fragment_one")};
   fi_6.id = 6;
   // connect to JointInstance 5, socket 1
-  fi_6.sockets.at(0).state = SocketState::Connected;
+  fi_6.sockets.at(0).connection_state = SocketConnectionState::Connected;
   fi_6.sockets.at(0).connected_to = SocketConnection{5, 1};
   // end socket 1 is available for connection
-  fi_6.sockets.at(1).state = SocketState::Available;
+  fi_6.sockets.at(1).connection_state = SocketConnectionState::Available;
 
   // assign to part graph with stable IDs
   part_graph.emplace(ji_0.id, ji_0);

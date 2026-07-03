@@ -167,41 +167,40 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /// and are forwarded to each child cursor so every neighbour continues from
   /// the correct step.
   /////////////////////////////////////////////////
-  const SocketMap &sockets = std::visit(
-      [](const auto &instance) -> const SocketMap & {
-        return instance.sockets;
+  std::visit(
+      [&](const auto &instance) {
+        for (const auto &[socket_id, socket_data] : instance.sockets) {
+          if (!socket_data.connected_to)
+            continue;
+
+          const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
+          if (context.visited.count(neighbour_id))
+            continue;
+
+          append_event(context,
+                       make_moving_to_neighbour_event(
+                           cursor.depth, cursor.current_id, socket_id,
+                           neighbour_id,
+                           socket_data.connected_to->peer_socket_id, parts));
+
+          Cursor child{};
+          child.current_id = neighbour_id;
+          child.steps_it = cursor.steps_it;
+          child.progress = cursor.progress;
+          child.depth = cursor.depth + 1;
+
+          depth_first_search(child, context, parts, result);
+
+          append_event(context, make_backtracking_event(
+                                    cursor.depth, neighbour_id,
+                                    socket_data.connected_to->peer_socket_id,
+                                    cursor.current_id, socket_id, parts));
+
+          if (result.valid_subgraph.has_value())
+            break;
+        }
       },
       current_node->second);
-
-  for (const auto &[socket_id, socket_data] : sockets) {
-    if (!socket_data.connected_to)
-      continue;
-
-    const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
-    if (context.visited.count(neighbour_id))
-      continue;
-
-    append_event(context,
-                 make_moving_to_neighbour_event(
-                     cursor.depth, cursor.current_id, socket_id, neighbour_id,
-                     socket_data.connected_to->peer_socket_id, parts));
-
-    Cursor child{};
-    child.current_id = neighbour_id;
-    child.steps_it = cursor.steps_it;
-    child.progress = cursor.progress;
-    child.depth = cursor.depth + 1;
-
-    depth_first_search(child, context, parts, result);
-
-    append_event(context, make_backtracking_event(
-                              cursor.depth, neighbour_id,
-                              socket_data.connected_to->peer_socket_id,
-                              cursor.current_id, socket_id, parts));
-
-    if (result.valid_subgraph.has_value())
-      break;
-  }
 
   /////////////////////////////////////////////////
   /// SECTION: Backtrack — unmark the current node before returning

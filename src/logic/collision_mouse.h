@@ -13,8 +13,8 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "MachinaFormScaffold.h"
-#include "UIPriorityTier.h"
 #include "UIElement.h"
+#include "UIPriorityTier.h"
 #include "containers.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -80,7 +80,7 @@ bool AnyMouseOver(const UIElement &element);
 /// @param socket_data  SocketState to update with the result of the check.
 /////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketData &socket_data);
+                    SocketState &socket_data);
 
 /////////////////////////////////////////////////
 /// @brief Checks whether the mouse is over any socket on a FragmentInstance

@@ -77,7 +77,7 @@ MakeFragmentWithOriginTriangle(sf::Color colour = sf::Color::Green);
 /// @param sockets Local socket positions to assign.
 /// @return Fragment whose sockets vector matches the argument.
 /////////////////////////////////////////////////
-steamrot::Fragment MakeFragmentWithSockets(std::vector<Socket> sockets);
+steamrot::Fragment MakeFragmentWithSockets(std::vector<SocketData> sockets);
 
 /////////////////////////////////////////////////
 /// @brief Build a vector of N default-constructed empty Fragments.

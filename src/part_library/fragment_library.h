@@ -17,11 +17,31 @@
 #include "FragmentBuilder.h"
 namespace steamrot::parts {
 
-inline const Fragment FragmentRectangleWith2Sockets = [] {
+/////////////////////////////////////////////////
+inline const Fragment FragmentRectangleWithOneSocket = [] {
+  return FragmentBuilder()
+      .AddViews(PremadeViews::WhiteOblong)
+      .AddSocket({0, 5}, {1, 0})
+      .Build("FragmentRectangleWithOneSocket");
+}();
+
+/////////////////////////////////////////////////
+inline const Fragment FragmentRectangleWithTwoSockets = [] {
   return FragmentBuilder()
       .AddViews(PremadeViews::WhiteOblong)
       .AddSocket({0, 5}, {1, 0})
       .AddSocket({50, 5}, {-1, 0})
-      .Build("FragmentRectangleWith2Sockets");
+      .Build("FragmentRectangleWithTwoSockets");
 }();
+
+/////////////////////////////////////////////////
+inline const Fragment FragmentRectangleWithThreeSockets = [] {
+  return FragmentBuilder()
+      .AddViews(PremadeViews::WhiteOblong)
+      .AddSocket({0, 5}, {1, 0})
+      .AddSocket({50, 5}, {-1, 0})
+      .AddSocket({25, 0}, {0, -1})
+      .Build("FragmentRectangleWithThreeSockets");
+}();
+
 } // namespace steamrot::parts

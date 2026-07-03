@@ -21,7 +21,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
           "[unit][part_graphs][PartGraphBuilder]") {
 
     const PartGraphPackage pkg =
-        builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+        builder
+            .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f0")
             .Build();
 
     REQUIRE(pkg.part_graph.size() == 1);
@@ -43,8 +44,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
   SECTION("AddFragmentInstance assigns the correct stable ID to the instance",
           "[unit][part_graphs][PartGraphBuilder]") {
 
-    builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
-        .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f1");
+    builder.AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f0")
+        .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1");
     const tests::PartGraphPackage pkg = builder.Build();
 
     const auto &f0 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
@@ -72,9 +73,9 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
           "counter",
           "[unit][part_graphs][PartGraphBuilder]") {
 
-    builder.AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f0")
+    builder.AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f0")
         .AddJointInstance(parts::JointSquareWith2Sockets, "j0")
-        .AddFragmentInstance(parts::FragmentRectangleWith2Sockets, "f1");
+        .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1");
     const tests::PartGraphPackage pkg = builder.Build();
 
     REQUIRE(pkg.part_graph.size() == 3);
@@ -151,8 +152,10 @@ TEST_CASE("Connect(fragment, joint) wires socket state on both ends",
   const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
-  REQUIRE(fi.sockets.at(0).state == steamrot::SocketState::Connected);
-  REQUIRE(ji.sockets.at(0).state == steamrot::SocketState::Connected);
+  REQUIRE(fi.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Connected);
+  REQUIRE(ji.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Connected);
 }
 
 TEST_CASE("Connect(joint, fragment) wires socket state on both ends",
@@ -168,8 +171,10 @@ TEST_CASE("Connect(joint, fragment) wires socket state on both ends",
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
   const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
 
-  REQUIRE(ji.sockets.at(1).state == steamrot::SocketState::Connected);
-  REQUIRE(fi.sockets.at(0).state == steamrot::SocketState::Connected);
+  REQUIRE(ji.sockets.at(1).connection_state ==
+          steamrot::SocketConnectionState::Connected);
+  REQUIRE(fi.sockets.at(0).connection_state ==
+          steamrot::SocketConnectionState::Connected);
 }
 
 TEST_CASE("Connect sets connected_to peer IDs correctly",

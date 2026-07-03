@@ -102,7 +102,7 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
 
 /////////////////////////////////////////////////
 void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketData &socket_data) {
+                    SocketState &socket_data) {
 
   // give the socket a circular hitbox with a fixed radius;
   static constexpr float k_radius = 5.f;

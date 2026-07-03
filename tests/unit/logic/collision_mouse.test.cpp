@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "collision_mouse.h"
 #include "CUserInterface.h"
-#include "MachinaFormScaffold.h"
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
 #include "entity_memory.h"
@@ -21,7 +20,8 @@
 
 TEST_CASE("CheckMouseOver SocketState sets is_mouse_over correctly",
           "[unit][collision][mouse]") {
-  steamrot::SocketData socket_data{{100.f, 100.f}};
+  steamrot::JointSocketState socket_data;
+  socket_data.local_position = {100.f, 100.f};
   SECTION("Mouse is over socket") {
 
     sf::Vector2f world_pos{100.f, 100.f};
@@ -46,7 +46,7 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is over a socket on the fragment") {
     steamrot::Fragment fragment;
-    steamrot::Socket socket{{100.f, 100.f}, {1.f, 1.f}};
+    steamrot::SocketData socket{{100.f, 100.f}, {1.f, 1.f}};
     fragment.sockets.push_back(socket);
     steamrot::FragmentInstance fragment_instance{&fragment};
     sf::Vector2f world_mouse{103.f, 103.f};
@@ -57,7 +57,7 @@ TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
 
   SECTION("Mouse is not over any socket on the fragment") {
     steamrot::Fragment fragment;
-    steamrot::Socket socket{{100.f, 100.f}, {1.f, 1.f}};
+    steamrot::SocketData socket{{100.f, 100.f}, {1.f, 1.f}};
     fragment.sockets.push_back(socket);
     steamrot::FragmentInstance fragment_instance{&fragment};
     sf::Vector2f world_mouse{200.f, 200.f};
