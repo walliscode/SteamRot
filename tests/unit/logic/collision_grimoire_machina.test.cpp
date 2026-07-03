@@ -73,6 +73,8 @@ TEST_CASE("check_socket_collisions(SocketData, SocketData) tests",
   SECTION("is_another_socket_near is true when sockets are within proximity "
           "threshold") {
     // arrange
+    // Socket one at world (0,0), socket two at world (5,5).
+    // Distance = sqrt(5^2 + 5^2) = sqrt(50) ≈ 7.07, within proximity (10).
     sf::Transform socket_one_transform = sf::Transform::Identity;
     socket_one_transform.translate({0.f, 0.f});
     sf::Transform socket_two_transform = sf::Transform::Identity;
@@ -474,8 +476,8 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
     // Distances:
     //   F[0](0,5) ↔ J[0](0,4)  = 1     → ready to connect
     //   F[0](0,5) ↔ J[1](0,13) = 8     → near only
-    //   F[1](50,5) ↔ J[0](0,4) ≈ 50.0  → far (no update)
-    //   F[1](50,5) ↔ J[1](0,13) ≈ 50.7 → far (no update)
+    //   F[1](50,5) ↔ J[0](0,4) ≈ 50.01 → far (no update)
+    //   F[1](50,5) ↔ J[1](0,13) ≈ 50.63 → far (no update)
     //
     // Expected: F[0] records J[0] (distance 1, ready) ignoring the farther
     // J[1]; J[0] is ready; J[1] is near (distance 8, from F[0]); F[1] has
@@ -847,10 +849,10 @@ TEST_CASE(
     //   J[1]: translate(45, 5) → socket world (45, 5)
     //   J[2]: translate(20, 0) → socket world (20, 0)
     //
-    // Key distances:
-    //   F[0](0,5) ↔ J[0](0,5)  = 0   → ready
-    //   F[1](50,5) ↔ J[1](45,5) = 5  → near
-    //   F[2](25,0) ↔ J[2](20,0) = 5  → near
+    // Key distances (connection threshold = 2.5, proximity threshold = 10):
+    //   F[0](0,5) ↔ J[0](0,5)  = 0  → ready to connect (≤ 2.5)
+    //   F[1](50,5) ↔ J[1](45,5) = 5 → near only (≤ 10, > 2.5)
+    //   F[2](25,0) ↔ J[2](20,0) = 5 → near only (≤ 10, > 2.5)
     FragmentInstance fi{&parts::FragmentRectangleWithThreeSockets};
     REQUIRE(fi.sockets.size() == 3);
 
@@ -1076,7 +1078,7 @@ TEST_CASE(
   PartGraphBuilder builder;
 
   SECTION("two joint sockets: each finds its own nearest fragment candidate") {
-    // Joint sockets at world (0,0) and (20,0).
+    // Joint uses identity transform; sockets at local/world (0,0) and (20,0).
     // Fragment socket local (0,5):
     //   frag_a translate (0,-4) → world (0,1). J[0] distance = 1 → ready.
     //   frag_b translate (20,-4) → world (20,1). J[1] distance = 1 → ready.
