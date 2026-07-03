@@ -272,8 +272,8 @@ private:
       return result;
     }
 
-    const SocketMap &start_sockets = std::visit(
-        [](const auto &instance) -> const SocketMap & {
+    const SocketMap start_sockets = std::visit(
+        [](const auto &instance) -> SocketMap {
           return instance.sockets;
         },
         start_node_it->second);
