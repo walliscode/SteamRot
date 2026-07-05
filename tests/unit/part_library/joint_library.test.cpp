@@ -15,7 +15,7 @@ using namespace parts;
 TEST_CASE(
     "CreateWhiteRectangleJointWith2Sockets creates a joint with 2 sockets",
     "[joint_library]") {
-  const Joint &joint = JointSquareWith2Sockets;
+  const Joint &joint = JointSquareWithTwoSockets;
 
   REQUIRE(joint.name == "JointSquareWith2Sockets");
   REQUIRE(joint.origin == sf::Vector2f(10, 10));

@@ -47,7 +47,8 @@ struct FragmentInstance : public PartInstance {
       for (uint32_t i = 0;
            i < static_cast<uint32_t>(fragment_ptr->sockets.size()); ++i)
         sockets.emplace(
-            i, FragmentSocketState{fragment_ptr->sockets[i].local_position});
+            i, FragmentSocketState{fragment_ptr->sockets[i].local_position,
+                                   fragment_ptr->sockets[i].alignment_vector});
     }
   }
 

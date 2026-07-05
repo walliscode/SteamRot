@@ -1536,7 +1536,7 @@ TEST_CASE("check_PartGraph_for_connection_readiness tests",
     steamrot::PartGraph part_graph =
         steamrot::tests::PartGraphBuilder{}
             .AddFragmentInstance(steamrot::tests::FragmentNames::NoSocket, "f0")
-            .AddJointInstance(parts::JointSquareWith2Sockets, "j1")
+            .AddJointInstance(parts::JointSquareWithTwoSockets, "j1")
             .Build()
             .part_graph;
 

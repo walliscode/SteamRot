@@ -19,6 +19,7 @@
 /////////////////////////////////////////////////
 #include "DescriptorResult.h"
 #include "MachinaFormScaffold.h"
+#include "SocketState.h"
 #include <SFML/System/Vector2.hpp>
 #include <set>
 
@@ -37,7 +38,18 @@ namespace steamrot::logic::spatial_analysis {
 JointInstance &get_anchor_joint(const GrabResult &grab_result,
                                 PartGraph &part_graph);
 
+/////////////////////////////////////////////////
+/// @brief Get the set of connected socket IDs on the anchor joint.
+///
+/// @param anchor_joint The JointInstance corresponding to the anchor point of
+/// the grab structure
+/////////////////////////////////////////////////
 std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint);
+
+FragmentInstance &get_beginning_of_arm(const SocketConnection &connection,
+                                       const SubGraph &arm,
+                                       PartGraph &part_graph);
+
 /////////////////////////////////////////////////
 /// @brief Get the number of connected sockets on the anchor joint and assign
 /// the socket IDs to the left and right arm sockets

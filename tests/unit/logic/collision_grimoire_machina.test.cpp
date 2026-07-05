@@ -313,10 +313,8 @@ TEST_CASE("check_socket_collisions tests",
 
     // Set one socket to Unavailable and the other to Hovered to test both
     // non-Available states.
-    fragment_socket_state.connection_state =
-        SocketConnectionState::Available;
-    joint_socket_state.connection_state =
-        SocketConnectionState::Connected;
+    fragment_socket_state.connection_state = SocketConnectionState::Available;
+    joint_socket_state.connection_state = SocketConnectionState::Connected;
 
     // act
     check_socket_collisions(fragment_instance, joint_instance);
@@ -331,8 +329,8 @@ TEST_CASE("check_socket_collisions tests",
   SECTION("is_another_socket_near is true when sockets are within proximity "
           "threshold") {
     // arrange
-    // Fragment socket world pos: (0, 5). Joint socket at (5, 5) after translate.
-    // Distance = sqrt((5-0)^2 + (5-5)^2) = 5, within proximity (10).
+    // Fragment socket world pos: (0, 5). Joint socket at (5, 5) after
+    // translate. Distance = sqrt((5-0)^2 + (5-5)^2) = 5, within proximity (10).
     fragment_instance.transform.translate({0.f, 0.f});
     joint_instance.transform.translate({5.f, 5.f});
     // act
@@ -438,7 +436,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
       fragment_instance.sockets.at(1);
 
   // JointSquareWith2Sockets: two sockets; positions start at (0, 0).
-  JointInstance joint_instance{&parts::JointSquareWith2Sockets};
+  JointInstance joint_instance{&parts::JointSquareWithTwoSockets};
   JointSocketState &joint_socket_data_one = joint_instance.sockets.at(0);
   JointSocketState &joint_socket_data_two = joint_instance.sockets.at(1);
   joint_socket_data_one.local_position = {0.f, 0.f};  // set for easy testing
@@ -452,15 +450,13 @@ TEST_CASE("check_socket_collisions(FragmentInstance, JointInstance) tests with "
     check_socket_collisions(fragment_instance, joint_instance);
     // assert
     for (const auto &[socket_id, socket_data] : fragment_instance.sockets) {
-      REQUIRE(socket_data.connection_state ==
-              SocketConnectionState::Available);
+      REQUIRE(socket_data.connection_state == SocketConnectionState::Available);
       REQUIRE(socket_data.is_mouse_over == false);
       REQUIRE(socket_data.is_another_socket_near == false);
       REQUIRE(socket_data.is_ready_to_connect == false);
     }
     for (const auto &[socket_id, socket_data] : joint_instance.sockets) {
-      REQUIRE(socket_data.connection_state ==
-              SocketConnectionState::Available);
+      REQUIRE(socket_data.connection_state == SocketConnectionState::Available);
       REQUIRE(socket_data.is_mouse_over == false);
       REQUIRE(socket_data.is_another_socket_near == false);
       REQUIRE(socket_data.is_ready_to_connect == false);
@@ -596,8 +592,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
 
   SECTION("does not throw on empty PartGraph") {
     PartGraph empty_map;
-    REQUIRE_NOTHROW(
-        check_socket_collisions(fragment_instance, empty_map));
+    REQUIRE_NOTHROW(check_socket_collisions(fragment_instance, empty_map));
     REQUIRE(fragment_instance.sockets.at(0).is_another_socket_near == false);
     REQUIRE(fragment_instance.sockets.at(0).is_ready_to_connect == false);
   }
@@ -608,8 +603,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
             .AddJointInstance(parts::JointSquareWithOneSocket, "j0")
             .Build()
             .part_graph;
-    JointInstance &ji =
-        std::get<JointInstance>(part_graph.begin()->second);
+    JointInstance &ji = std::get<JointInstance>(part_graph.begin()->second);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.transform.translate({100.f, 0.f}); // joint socket world (100,0)
     // Fragment socket world (0,5) — distance ≈ 100
@@ -629,8 +623,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
             .AddJointInstance(parts::JointSquareWithOneSocket, "j0")
             .Build()
             .part_graph;
-    JointInstance &ji =
-        std::get<JointInstance>(part_graph.begin()->second);
+    JointInstance &ji = std::get<JointInstance>(part_graph.begin()->second);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     // Joint socket world (5, 5). Fragment socket world (0, 5).
     // Distance = sqrt((5-0)^2 + (5-5)^2) = 5, within proximity (10).
@@ -651,8 +644,7 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
             .AddJointInstance(parts::JointSquareWithOneSocket, "j0")
             .Build()
             .part_graph;
-    JointInstance &ji =
-        std::get<JointInstance>(part_graph.begin()->second);
+    JointInstance &ji = std::get<JointInstance>(part_graph.begin()->second);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     // Joint socket world (1, 4). Fragment socket world (0, 5).
     // Distance = sqrt((1-0)^2 + (4-5)^2) = sqrt(2) ≈ 1.41, within
@@ -673,11 +665,13 @@ TEST_CASE("check_socket_collisions(FragmentInstance, PartGraph) tests",
     // Fragment socket world: (0, 5).
     // joint_far socket world: (8, 0). Distance ≈ 9.43 — proximity only.
     // joint_near socket world: (0, 4). Distance = 1 — ready to connect.
-    JointInstance joint_far = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_far =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_far.sockets.at(0).local_position = {0.f, 0.f};
     joint_far.transform.translate({8.f, 0.f});
 
-    JointInstance joint_near = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_near =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_near.sockets.at(0).local_position = {0.f, 0.f};
     joint_near.transform.translate({0.f, 4.f});
 
@@ -765,14 +759,17 @@ TEST_CASE(
     //
     // Each fragment socket pairs exclusively with its nearest joint — two
     // valid ready-to-connect pairs.
-    FragmentInstance fi = builder.MakeFragmentInstance(parts::FragmentRectangleWithTwoSockets);
+    FragmentInstance fi =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithTwoSockets);
     REQUIRE(fi.sockets.size() == 2);
 
-    JointInstance joint_a = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_a =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_a.sockets.at(0).local_position = {0.f, 0.f};
     joint_a.transform.translate({0.f, 4.f});
 
-    JointInstance joint_b = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_b =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_b.sockets.at(0).local_position = {0.f, 0.f};
     joint_b.transform.translate({50.f, 4.f});
 
@@ -801,14 +798,17 @@ TEST_CASE(
     //   J_near(0,4) = 1    → ready
     //
     // F[1](50,5) has no candidate in range.
-    FragmentInstance fi = builder.MakeFragmentInstance(parts::FragmentRectangleWithTwoSockets);
+    FragmentInstance fi =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithTwoSockets);
     REQUIRE(fi.sockets.size() == 2);
 
-    JointInstance joint_far = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_far =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_far.sockets.at(0).local_position = {0.f, 0.f};
     joint_far.transform.translate({8.f, 0.f});
 
-    JointInstance joint_near = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_near =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_near.sockets.at(0).local_position = {0.f, 0.f};
     joint_near.transform.translate({0.f, 4.f});
 
@@ -856,15 +856,18 @@ TEST_CASE(
     FragmentInstance fi{&parts::FragmentRectangleWithThreeSockets};
     REQUIRE(fi.sockets.size() == 3);
 
-    JointInstance joint_0 = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_0 =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_0.sockets.at(0).local_position = {0.f, 0.f};
     joint_0.transform.translate({0.f, 5.f});
 
-    JointInstance joint_1 = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_1 =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_1.sockets.at(0).local_position = {0.f, 0.f};
     joint_1.transform.translate({45.f, 5.f});
 
-    JointInstance joint_2 = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+    JointInstance joint_2 =
+        builder.MakeJointInstance(parts::JointSquareWithOneSocket);
     joint_2.sockets.at(0).local_position = {0.f, 0.f};
     joint_2.transform.translate({20.f, 0.f});
 
@@ -920,14 +923,14 @@ TEST_CASE("check_socket_collisions(JointInstance, PartGraph) tests",
 
   // JointSquareWithOneSocket: one socket; local position set to (0, 0).
   // Identity transform → joint socket world (0, 0).
-  JointInstance joint_instance = builder.MakeJointInstance(parts::JointSquareWithOneSocket);
+  JointInstance joint_instance =
+      builder.MakeJointInstance(parts::JointSquareWithOneSocket);
   REQUIRE(joint_instance.sockets.size() == 1);
   joint_instance.sockets.at(0).local_position = {0.f, 0.f};
 
   SECTION("does not throw on empty PartGraph") {
     PartGraph empty_map;
-    REQUIRE_NOTHROW(
-        check_socket_collisions(joint_instance, empty_map));
+    REQUIRE_NOTHROW(check_socket_collisions(joint_instance, empty_map));
     REQUIRE(joint_instance.sockets.at(0).is_another_socket_near == false);
     REQUIRE(joint_instance.sockets.at(0).is_ready_to_connect == false);
   }
@@ -1082,15 +1085,18 @@ TEST_CASE(
     // Fragment socket local (0,5):
     //   frag_a translate (0,-4) → world (0,1). J[0] distance = 1 → ready.
     //   frag_b translate (20,-4) → world (20,1). J[1] distance = 1 → ready.
-    JointInstance ji = builder.MakeJointInstance(parts::JointSquareWith2Sockets);
+    JointInstance ji =
+        builder.MakeJointInstance(parts::JointSquareWithTwoSockets);
     REQUIRE(ji.sockets.size() == 2);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.sockets.at(1).local_position = {20.f, 0.f};
 
-    FragmentInstance frag_a = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_a =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_a.transform.translate({0.f, -4.f});
 
-    FragmentInstance frag_b = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_b =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_b.transform.translate({20.f, -4.f});
 
     const uint32_t a_id = frag_a.id;
@@ -1117,15 +1123,18 @@ TEST_CASE(
     //   frag_near: translate (0,-4) → socket world (0, 1). Distance = 1
     //              from J[0] — ready to connect.
     // J[1](20,0) has no candidate in range.
-    JointInstance ji = builder.MakeJointInstance(parts::JointSquareWith2Sockets);
+    JointInstance ji =
+        builder.MakeJointInstance(parts::JointSquareWithTwoSockets);
     REQUIRE(ji.sockets.size() == 2);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.sockets.at(1).local_position = {20.f, 0.f};
 
-    FragmentInstance frag_far = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_far =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_far.transform.translate({8.f, 0.f});
 
-    FragmentInstance frag_near = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_near =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_near.transform.translate({0.f, -4.f});
 
     const uint32_t far_id = frag_far.id;
@@ -1152,19 +1161,23 @@ TEST_CASE(
     //   frag_0: translate (0,-4) → world (0, 1). J[0] distance = 1 → ready.
     //   frag_1: translate (15, 0) → world (15, 5). J[1] distance ≈ 7.07 → near.
     //   frag_2: translate (25, 0) → world (25, 5). J[2] distance ≈ 7.07 → near.
-    JointInstance ji = builder.MakeJointInstance(parts::JointSquareWithThreeSockets);
+    JointInstance ji =
+        builder.MakeJointInstance(parts::JointSquareWithThreeSockets);
     REQUIRE(ji.sockets.size() == 3);
     ji.sockets.at(0).local_position = {0.f, 0.f};
     ji.sockets.at(1).local_position = {10.f, 0.f};
     ji.sockets.at(2).local_position = {20.f, 0.f};
 
-    FragmentInstance frag_0 = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_0 =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_0.transform.translate({0.f, -4.f});
 
-    FragmentInstance frag_1 = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_1 =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_1.transform.translate({15.f, 0.f});
 
-    FragmentInstance frag_2 = builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
+    FragmentInstance frag_2 =
+        builder.MakeFragmentInstance(parts::FragmentRectangleWithOneSocket);
     frag_2.transform.translate({25.f, 0.f});
 
     const uint32_t id_0 = frag_0.id;

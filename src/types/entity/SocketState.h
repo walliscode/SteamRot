@@ -120,8 +120,9 @@ struct FragmentSocketState : public SocketState {
   /// @param local_pos Reference to the local position of the socket in the
   /// Fragment's coordinate space.
   /////////////////////////////////////////////////
-  explicit FragmentSocketState(const sf::Vector2f &local_pos)
-      : local_position{local_pos} {};
+  explicit FragmentSocketState(const sf::Vector2f &local_pos,
+                               const sf::Vector2f &alignment_vec)
+      : local_position{local_pos}, alignment_vector(alignment_vec) {};
 
   /////////////////////////////////////////////////
   /// @brief References a socket on the Fragment
@@ -131,6 +132,11 @@ struct FragmentSocketState : public SocketState {
   /// FragmentInstance's transform.
   /////////////////////////////////////////////////
   const sf::Vector2f &local_position;
+
+  /////////////////////////////////////////////////
+  /// @brief References the alignment vector of the socket on the Fragment
+  /////////////////////////////////////////////////
+  const sf::Vector2f &alignment_vector;
 };
 
 struct JointSocketState : public SocketState {

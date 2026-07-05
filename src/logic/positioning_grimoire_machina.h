@@ -11,9 +11,9 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Joint.h"
 #include "MachinaFormScaffold.h"
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::positioning::grimoire_machina {
@@ -39,6 +39,32 @@ void initialize_joint_socket_positions(JointInstance &instance);
 /// @param instance JointInstance whose sockets should be maximally spread.
 /////////////////////////////////////////////////
 void maximise_joint_socket_spread(JointInstance &instance);
+
+/////////////////////////////////////////////////
+/// @brief Calculates the rotation angle required to rotate a source vector to
+/// align with a target vector.
+///
+/// @param source_vector the source vector to be rotated
+/// @param target_vector the target vector to align with
+/////////////////////////////////////////////////
+sf::Angle
+rotation_of_vector_to_target_vector(const sf::Vector2f &source_vector,
+                                    const sf::Vector2f &target_vector);
+
+/////////////////////////////////////////////////
+/// @brief Aligns a FragmentInstance onto a JointInstance socket by way of the
+/// FragmentInstance socket
+///
+/// @param fragment_instance FragmentInstance to be aligned onto the
+/// JointInstance socket
+/// @param frament_socket_id fragment socket id to be used for alignment
+/// @param joint_instance JointInstance to be aligned onto
+/// @param joint_socket_id joint socket id to be used for alignment
+/////////////////////////////////////////////////
+void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
+                                      const uint32_t frament_socket_id,
+                                      const JointInstance &joint_instance,
+                                      const uint32_t joint_socket_id);
 
 /////////////////////////////////////////////////
 /// @brief Calculates an even spread of socket local positions for a Joint based
