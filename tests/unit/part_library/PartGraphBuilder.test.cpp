@@ -34,7 +34,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
           "[unit][part_graphs][PartGraphBuilder]") {
 
     const PartGraphPackage pkg =
-        builder.AddJointInstance(parts::JointSquareWith2Sockets, "j0").Build();
+        builder.AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
+            .Build();
 
     REQUIRE(pkg.part_graph.size() == 1);
     REQUIRE(
@@ -58,8 +59,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
   SECTION("AddJointInstance assigns the correct stable ID to the instance",
           "[unit][part_graphs][PartGraphBuilder]") {
 
-    builder.AddJointInstance(parts::JointSquareWith2Sockets, "j0")
-        .AddJointInstance(parts::JointSquareWith2Sockets, "j1");
+    builder.AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
+        .AddJointInstance(parts::JointSquareWithTwoSockets, "j1");
     const tests::PartGraphPackage pkg = builder.Build();
 
     const auto &j0 = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
@@ -74,7 +75,7 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
           "[unit][part_graphs][PartGraphBuilder]") {
 
     builder.AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f0")
-        .AddJointInstance(parts::JointSquareWith2Sockets, "j0")
+        .AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
         .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1");
     const tests::PartGraphPackage pkg = builder.Build();
 

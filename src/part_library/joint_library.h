@@ -27,7 +27,7 @@ inline const Joint JointSquareWithOneSocket = [] -> Joint {
 }();
 
 /////////////////////////////////////////////////
-inline const Joint JointSquareWith2Sockets = [] -> Joint {
+inline const Joint JointSquareWithTwoSockets = [] -> Joint {
   return JointBuilder()
       .AddViews(PremadeViews::WhiteSquare)
       .SetOrigin({10, 10})

@@ -102,5 +102,10 @@ void assign_open_state_transforms(GrabResult &grab_result,
 
   // maximise the socket spread of the anchor joint
   positioning::grimoire_machina::maximise_joint_socket_spread(anchor_joint);
+
+  // cycle through the connected sockets
+  for (const auto &socket_id : get_connected_sockets(anchor_joint)) {
+    // get the connection for this socket
+  }
 }
 } // namespace steamrot::logic::spatial_analysis

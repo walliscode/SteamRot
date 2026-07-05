@@ -10,6 +10,7 @@
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
+#include "SocketState.h"
 #include "Vector2fEqualsMatcher.h"
 #include "descriptors_machina_archetypes.h"
 #include "machina_archetype_packages.h"
@@ -285,6 +286,61 @@ TEST_CASE("assign_open_state_transforms tests") {
                  EqualsVector2f(expected_position_0, 0.001f));
     REQUIRE_THAT(anchor_joint.sockets.at(1).local_position,
                  EqualsVector2f(expected_position_1, 0.001f));
+  }
+
+  SECTION("fragments connected to the anchor joint are transformed correctly") {
+    // ARRANGE //
+    // get the anchor joint instance
+    JointInstance &anchor_joint =
+        spatial_analysis::get_anchor_joint(grab_result, graph);
+
+    // get the anchor joints sockets
+    const JointSocketState &anchor_socket_0 = anchor_joint.sockets.at(0);
+    const JointSocketState &anchor_socket_1 = anchor_joint.sockets.at(1);
+
+    // get the connections for the anchor joint's sockets
+    REQUIRE(anchor_joint.sockets.at(0).connected_to.has_value());
+    const SocketConnection &connection_0 =
+        anchor_joint.sockets.at(0).connected_to.value();
+    REQUIRE(anchor_joint.sockets.at(1).connected_to.has_value());
+    const SocketConnection &connection_1 =
+        anchor_joint.sockets.at(1).connected_to.value();
+
+    // get the connected part instances
+    REQUIRE(std::holds_alternative<FragmentInstance>(
+        graph.at(connection_0.peer_part_id)));
+    FragmentInstance &fragment_0 =
+        std::get<FragmentInstance>(graph.at(connection_0.peer_part_id));
+    REQUIRE(std::holds_alternative<FragmentInstance>(
+        graph.at(connection_1.peer_part_id)));
+    FragmentInstance &fragment_1 =
+        std::get<FragmentInstance>(graph.at(connection_1.peer_part_id));
+
+    // get the connected socket on the fragment of the first arm
+    const FragmentSocketState &fragment_socket_0 =
+        fragment_0.sockets.at(connection_0.peer_socket_id);
+    // get the connected socket on the fragment of the second arm
+    const FragmentSocketState &fragment_socket_1 =
+        fragment_1.sockets.at(connection_1.peer_socket_id);
+
+    // ACT //
+    spatial_analysis::assign_open_state_transforms(grab_result, graph);
+
+    // check that the world position of the fragment sockets is equal to the
+    // world position of the anchor joint's sockets
+    const sf::Vector2f anchor_socket_0_world_position =
+        anchor_joint.transform.transformPoint(anchor_socket_0.local_position);
+    const sf::Vector2f anchor_socket_1_world_position =
+        anchor_joint.transform.transformPoint(anchor_socket_1.local_position);
+    const sf::Vector2f fragment_socket_0_world_position =
+        fragment_0.transform.transformPoint(fragment_socket_0.local_position);
+    const sf::Vector2f fragment_socket_1_world_position =
+        fragment_1.transform.transformPoint(fragment_socket_1.local_position);
+
+    REQUIRE_THAT(fragment_socket_0_world_position,
+                 EqualsVector2f(anchor_socket_0_world_position, 0.001f));
+    REQUIRE_THAT(fragment_socket_1_world_position,
+                 EqualsVector2f(anchor_socket_1_world_position, 0.001f));
   }
 }
 } // namespace steamrot::tests

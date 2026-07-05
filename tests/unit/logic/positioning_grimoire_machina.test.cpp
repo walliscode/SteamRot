@@ -12,7 +12,9 @@
 #include "MachinaFormScaffold.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
+#include "fragment_library.h"
 #include "grimoire_machina_test_helpers.h"
+#include "joint_library.h"
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
@@ -242,6 +244,150 @@ TEST_CASE("maximise_joint_socket_spread tests",
           joint_instance.sockets.at(2).local_position,
           steamrot::tests::EqualsVector2f(expected_position_2, 0.001f));
     }
+  }
+}
+
+TEST_CASE("rotate_vector_to_target_vector tests") {
+
+  SECTION("Does not throw with zero vectors") {
+    sf::Vector2f source_vector{0.f, 0.f};
+    sf::Vector2f target_vector{0.f, 0.f};
+
+    REQUIRE_NOTHROW(
+        rotation_of_vector_to_target_vector(source_vector, target_vector));
+  }
+  SECTION("Rotates vector to target vector") {
+
+    // this is SFML space so y axis is inverted, so up is negative y and down is
+    // positive y
+    std::vector<sf::Vector2f> source_vectors{
+        {1.f, 0.f},  // pointing right
+        {0.f, -1.f}, // pointing up
+        {-1.f, 0.f}, // pointing left
+        {0.f, 1.f},  // pointing down
+        {1.f, 1.f},  // pointing down-right
+        {-1.f, -1.f} // pointing up-left
+    };
+    sf::Vector2f target_vector{0.f, 1.f}; // pointing down
+
+    for (const auto &source_vector : source_vectors) {
+
+      // create a transform that rotates the source vector to the target vector
+      sf::Transform transform = sf::Transform::Identity;
+      transform.rotate(
+          rotation_of_vector_to_target_vector(source_vector, target_vector));
+
+      // The transform should now rotate the source vector to the target vector,
+      // normalise to avoid new magnitude issues
+      sf::Vector2f transformed_source =
+          transform.transformPoint(source_vector).normalized();
+      ;
+
+      REQUIRE_THAT(transformed_source, steamrot::tests::EqualsVector2f(
+                                           target_vector.normalized(), 0.001f));
+    }
+  }
+}
+
+TEST_CASE("align_fragment_onto_joint_socket tests") {
+
+  FragmentInstance fragment_instance{&parts::FragmentRectangleWithTwoSockets};
+  fragment_instance.transform = sf::Transform::Identity; // reset transform
+  JointInstance joint_instance{&parts::JointSquareWithTwoSockets};
+  joint_instance.transform = sf::Transform::Identity; // reset transform
+
+  // maximise the joint socket spread so we know where the sockets are
+  maximise_joint_socket_spread(joint_instance);
+  // check the positions of the sockets
+  REQUIRE_THAT(joint_instance.sockets.at(0).local_position,
+               steamrot::tests::EqualsVector2f({23.f, 10.f}, 0.001f));
+  REQUIRE_THAT(joint_instance.sockets.at(1).local_position,
+               steamrot::tests::EqualsVector2f({10.f, 23.f}, 0.001f));
+
+  SECTION("Does not throw if fragmnet socket id is invalid") {
+    REQUIRE_NOTHROW(align_fragment_onto_joint_socket(fragment_instance, 99,
+                                                     joint_instance, 0));
+  }
+  SECTION("Does not throw if joint socket id is invalid") {
+    REQUIRE_NOTHROW(align_fragment_onto_joint_socket(fragment_instance, 0,
+                                                     joint_instance, 99));
+  }
+
+  SECTION("Does not align if no connection between fragment and joint") {
+    // Act
+    align_fragment_onto_joint_socket(fragment_instance, 0, joint_instance, 0);
+    // Assert: fragment should not be aligned to joint socket
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(0).local_position),
+                 !steamrot::tests::EqualsVector2f(
+                     joint_instance.transform.transformPoint(
+                         joint_instance.sockets.at(0).local_position),
+                     0.001f));
+  }
+
+  SECTION("FragmentInstance sockets are correctly translated and rotated"
+          " to align with JointInstance sockets") {
+
+    // add a connection between the fragment socket and the joint socket
+    fragment_instance.sockets.at(0).connected_to = SocketConnection{
+        joint_instance.id, 0}; // fragment socket 0 connected to joint socket 0
+    fragment_instance.sockets.at(0).connection_state =
+        SocketConnectionState::Connected;
+    // add a connection between the joint socket and the fragment socket
+    joint_instance.sockets.at(0).connected_to =
+        SocketConnection{fragment_instance.id,
+                         0}; // joint socket 0 connected to fragment socket 0
+    joint_instance.sockets.at(0).connection_state =
+        SocketConnectionState::Connected;
+
+    // Act
+    align_fragment_onto_joint_socket(fragment_instance, 0, joint_instance, 0);
+
+    // Assert: fragment socket should be at the same position as joint socket
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(0).local_position),
+                 EqualsVector2f({23, 10}, 0.001f));
+
+    // so the joint socket is at {23,10} with an origin of {10,10}, so the
+    // normalised vector from the origin to the socket is {13,0} normalized =
+    // {1,0}. The fragment socket alignment vector is also {1,0} so no rotataion
+    // applied
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(1).local_position),
+                 EqualsVector2f({73.f, 10.f}, 0.001f));
+  }
+
+  SECTION("FragmentInstance is correctly translated and rotated to align with "
+          "JointInstance") {
+
+    // add a connection between the fragment socket and the joint socket
+    fragment_instance.sockets.at(0).connected_to = SocketConnection{
+        joint_instance.id, 1}; // fragment socket 0 connected to joint socket 1
+    fragment_instance.sockets.at(0).connection_state =
+        SocketConnectionState::Connected;
+
+    // add a connection between the joint socket and the fragment socket
+    joint_instance.sockets.at(1).connected_to =
+        SocketConnection{fragment_instance.id,
+                         0}; // joint socket 1 connected to fragment socket 0
+    joint_instance.sockets.at(1).connection_state =
+        SocketConnectionState::Connected;
+
+    // Act
+    align_fragment_onto_joint_socket(fragment_instance, 0, joint_instance, 1);
+
+    // Assert: fragment should be aligned to joint socket
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(0).local_position),
+                 EqualsVector2f({10.f, 23.f}, 0.001f));
+
+    // so the joint socket is at {10,23} with an origin of {10,10}, so the
+    // alignment vector from the origin to the socket is {0,13} normalized =
+    // {0,1}. The fragment socket alignment vector is {1,0} so a rotation of 90°
+    // should be applied
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(1).local_position),
+                 EqualsVector2f({10.f, 73.f}, 0.001f));
   }
 }
 TEST_CASE("compute_socket_local_positions_even_spread tests",
