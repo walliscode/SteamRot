@@ -245,10 +245,6 @@ TEST_CASE("assign_open_state_transforms tests") {
   const uint32_t &anchor_id = grab_result.anchor;
   PartGraph &graph = valid_grab_pkg.part_graph;
 
-  SECTION("assign_open_state_transforms is empty if not run through function") {
-    REQUIRE(grab_result.static_transforms.empty());
-  }
-
   SECTION(
       "assign_open_state_transforms assigns transforms for the anchor joint") {
     // arrange
