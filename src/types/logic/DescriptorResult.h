@@ -12,11 +12,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "AnalysisEvent.h"
+#include "PartGraphTransitions.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cstdint>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -189,11 +189,15 @@ struct GrabResult {
   enum class GrabState { OPEN, CLOSED };
 
   /////////////////////////////////////////////////
-  /// @brief captures the local transforms for each static state of each part of
-  /// the grab structure
+  /// @brief Stores all possible transtional and static Transforms of the
+  /// GrabResult
   /////////////////////////////////////////////////
-  std::unordered_map<GrabState, std::unordered_map<uint32_t, sf::Transform>>
-      static_transforms;
+  PartGraphTransforms<GrabState> transforms;
+
+  /////////////////////////////////////////////////
+  /// @brief Stores the current state of the grab, whether it is open or closed
+  /////////////////////////////////////////////////
+  TransitionState<GrabState> transition_state{GrabState::OPEN};
 };
 
 using ArchetypeVariant = std::variant<TestArchetypeResult, GrabResult>;
