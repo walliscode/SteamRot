@@ -34,8 +34,9 @@ bool Vector2fEqualsMatcher::match(const sf::Vector2f &actual) const {
       oss << conmat::Indent(2)
           << "actual: " << conmat::Colorize(actual.x, conmat::Color::Red)
           << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(m_expected.x, conmat::Color::Blue) << "\n";
+      oss << conmat::Indent(2)
+          << "expected: " << conmat::Colorize(m_expected.x, conmat::Color::Blue)
+          << "\n";
       oss << conmat::Indent(2) << "difference: "
           << conmat::Colorize(std::abs(actual.x - m_expected.x),
                               conmat::Color::Yellow)
@@ -48,8 +49,9 @@ bool Vector2fEqualsMatcher::match(const sf::Vector2f &actual) const {
       oss << conmat::Indent(2)
           << "actual: " << conmat::Colorize(actual.y, conmat::Color::Red)
           << "\n";
-      oss << conmat::Indent(2) << "expected: "
-          << conmat::Colorize(m_expected.y, conmat::Color::Blue) << "\n";
+      oss << conmat::Indent(2)
+          << "expected: " << conmat::Colorize(m_expected.y, conmat::Color::Blue)
+          << "\n";
       oss << conmat::Indent(2) << "difference: "
           << conmat::Colorize(std::abs(actual.y - m_expected.y),
                               conmat::Color::Yellow)

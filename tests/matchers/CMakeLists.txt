@@ -19,6 +19,7 @@ add_library(matchers
   Vector2fEqualsMatcher.cpp
   AnalysisTraceBuilder.cpp
   TraceEqualsMatcher.cpp
+  TransformEqualsMatcher.cpp
   ColorEqualsMatcher.cpp
 )
 

@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
-#include "positioning_grimoire_machina.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot::logic::spatial_analysis {
@@ -58,8 +57,9 @@ void assign_left_and_right_arm_sockets(
 }
 
 /////////////////////////////////////////////////
-void align_grab_structure(const GrabResult &grab_result, PartGraph &part_graph,
-                          const sf::Vector2f &anchor_point) {
+void align_anchor_joint_to_anchor_point(const GrabResult &grab_result,
+                                        PartGraph &part_graph,
+                                        const sf::Vector2f &anchor_point) {
 
   // pull out the variables
   const uint32_t anchor_id = grab_result.anchor;
@@ -94,18 +94,8 @@ uint32_t get_end_of_arm(const SubGraph &arm) {
 }
 
 /////////////////////////////////////////////////
-void assign_open_state_transforms(GrabResult &grab_result,
-                                  PartGraph &part_graph) {
+void align_grab_result_to_open_state(GrabResult &grab_result,
+                                     PartGraph &part_graph,
+                                     const sf::Vector2f &anchor_point) {}
 
-  // get the anchor joint
-  JointInstance &anchor_joint = get_anchor_joint(grab_result, part_graph);
-
-  // maximise the socket spread of the anchor joint
-  positioning::grimoire_machina::maximise_joint_socket_spread(anchor_joint);
-
-  // cycle through the connected sockets
-  for (const auto &socket_id : get_connected_sockets(anchor_joint)) {
-    // get the connection for this socket
-  }
-}
 } // namespace steamrot::logic::spatial_analysis

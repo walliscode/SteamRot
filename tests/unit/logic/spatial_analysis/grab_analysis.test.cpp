@@ -11,6 +11,7 @@
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
 #include "SocketState.h"
+#include "TransformEqualsMatcher.h"
 #include "Vector2fEqualsMatcher.h"
 #include "descriptors_machina_archetypes.h"
 #include "machina_archetype_packages.h"
@@ -18,7 +19,6 @@
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <cmath>
 #include <variant>
 
 namespace steamrot::tests {
@@ -33,7 +33,7 @@ TEST_CASE("valid_grab_pkg passes grab structural tests") {
   REQUIRE(result);
 }
 
-TEST_CASE("align_grab_structure tests") {
+TEST_CASE("align_anchor_joint_to_anchor_point tests") {
   // arrange
   // set up valid grab package and result
   PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
@@ -52,90 +52,17 @@ TEST_CASE("align_grab_structure tests") {
   REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
   JointInstance &anchor_instance = std::get<JointInstance>(graph.at(anchor_id));
 
-  SECTION("align_grab_structure sets the anchor's transform to the provided "
-          "vector") {
-    // arrange
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-    // add an arbitrary transform to the anchor joint instance to make sure the
-    // function is actually changing it
-    anchor_transform.translate({100.f, 50.f});
-    REQUIRE(anchor_transform.transformPoint({0.f, 0.f}) ==
-            sf::Vector2f{100.f, 50.f});
+  // act
+  spatial_analysis::align_anchor_joint_to_anchor_point(grab_result, graph,
+                                                       {0.f, 0.f});
+  // assert
+  sf::Transform expected_transform{sf::Transform::Identity};
+  // origin of the anchor joint is at (10, 10) in local space, so to align it to
+  // (0, 0) in world space, we need to translate by (-10, -10)
+  expected_transform.translate({-10.f, -10.f});
 
-    // act
-    std::vector<sf::Vector2f> target_positions{
-        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
-
-    for (const sf::Vector2f &target_position : target_positions) {
-      spatial_analysis::align_grab_structure(grab_result, graph,
-                                             target_position);
-      // assert
-      // the transform of the anchor joint should be able to move a 0,0 point to
-      // the target position
-      REQUIRE_THAT(anchor_transform.transformPoint({0.f, 0.f}),
-                   EqualsVector2f(target_position));
-    }
-  }
-
-  SECTION("align_grab_structure rotates the anchor joint correctly") {
-    // The anchor joint should be rotated such that the middle of its available
-    // arc aligns with the y axis this particular Joint has arc_min = 0  and
-    // arc_max = 270
-
-    // arrange
-
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-
-    // get rotation values from the anchor Joint pointer
-    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
-    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
-    const float arc_mid = (arc_min + arc_max) / 2.f;
-
-    // act
-    spatial_analysis::align_grab_structure(grab_result, graph, {0.f, 0.f});
-
-    // assert
-    // construct a transform that rotates by the arc_mid value and check that it
-    // is equal to the anchor joint's transform
-    sf::Transform expected_transform;
-    expected_transform.rotate(sf::degrees(90 - arc_mid));
-
-    REQUIRE(anchor_transform == expected_transform);
-  }
-
-  SECTION("align_grab_structure translates and rotates the anchor joint "
-          "correctly") {
-    // The anchor joint should be translated to the provided position and
-    // rotated such that the middle of its available arc aligns with the y axis
-    // this particular Joint has arc_min = 0  and arc_max = 270
-    // arrange
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-    // get rotation values from the anchor Joint pointer
-    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
-    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
-    const float arc_mid = (arc_min + arc_max) / 2.f;
-    // act
-    std::vector<sf::Vector2f> target_positions{
-        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
-    for (const sf::Vector2f &target_position : target_positions) {
-      spatial_analysis::align_grab_structure(grab_result, graph,
-                                             target_position);
-      // assert
-      // construct a transform that translates to the target position and then
-      // rotates by the arc_mid value and check that it is equal to the anchor
-      // joint's transform
-      sf::Transform expected_transform;
-      expected_transform.translate(target_position);
-      expected_transform.rotate(sf::degrees(90 - arc_mid));
-      REQUIRE(anchor_transform == expected_transform);
-    }
-  }
+  REQUIRE_THAT(anchor_instance.transform,
+               TransformEqualsMatcher(expected_transform));
 }
 
 TEST_CASE("get_end_of_arm tests") {
@@ -232,111 +159,26 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
   }
 }
 
-TEST_CASE("assign_open_state_transforms tests") {
+TEST_CASE("align_grab_result_to_open_state tests") {
   // arrange
   PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
   MachinaArchetypeResult ma_result =
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
   REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
-
-  // grab result contains the anchor joint and the arms of the grab structure
   GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
-  const uint32_t &anchor_id = grab_result.anchor;
   PartGraph &graph = valid_grab_pkg.part_graph;
 
-  SECTION(
-      "assign_open_state_transforms assigns transforms for the anchor joint") {
-    // arrange
-    REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
-    JointInstance &anchor_joint =
-        spatial_analysis::get_anchor_joint(grab_result, graph);
-    const SocketConfig &config = anchor_joint.joint->socket_config;
-    REQUIRE(config.socket_count == 2);
-    anchor_joint.sockets.at(0).local_position = {0.f, 0.f};
-    anchor_joint.sockets.at(1).local_position = {0.f, 0.f};
+  // assert
+  JointInstance &anchor_joint =
+      std::get<JointInstance>(graph.at(grab_result.anchor));
 
+  SECTION("align_grab_result_to_open_state sets the anchor joint to the open "
+          "state") {
     // act
-    spatial_analysis::assign_open_state_transforms(grab_result, graph);
-
+    spatial_analysis::align_grab_result_to_open_state(grab_result, graph,
+                                                      {0.f, 0.f});
     // assert
-    // the anchor joint should have its sockets at its maximum angles, manually
-    // calculate the expected positions and then add to the origin
-    sf::Vector2f expected_position_0 =
-        anchor_joint.joint->origin +
-        sf::Vector2f{
-            config.radius *
-                std::cos(sf::degrees(config.rotation_arc_min).asRadians()),
-            config.radius *
-                std::sin(sf::degrees(config.rotation_arc_min).asRadians())};
-
-    sf::Vector2f expected_position_1 =
-        anchor_joint.joint->origin +
-        sf::Vector2f{
-            config.radius *
-                std::cos(sf::degrees(config.rotation_arc_max).asRadians()),
-            config.radius *
-                std::sin(sf::degrees(config.rotation_arc_max).asRadians())};
-
-    REQUIRE_THAT(anchor_joint.sockets.at(0).local_position,
-                 EqualsVector2f(expected_position_0, 0.001f));
-    REQUIRE_THAT(anchor_joint.sockets.at(1).local_position,
-                 EqualsVector2f(expected_position_1, 0.001f));
-  }
-
-  SECTION("fragments connected to the anchor joint are transformed correctly") {
-    // ARRANGE //
-    // get the anchor joint instance
-    JointInstance &anchor_joint =
-        spatial_analysis::get_anchor_joint(grab_result, graph);
-
-    // get the anchor joints sockets
-    const JointSocketState &anchor_socket_0 = anchor_joint.sockets.at(0);
-    const JointSocketState &anchor_socket_1 = anchor_joint.sockets.at(1);
-
-    // get the connections for the anchor joint's sockets
-    REQUIRE(anchor_joint.sockets.at(0).connected_to.has_value());
-    const SocketConnection &connection_0 =
-        anchor_joint.sockets.at(0).connected_to.value();
-    REQUIRE(anchor_joint.sockets.at(1).connected_to.has_value());
-    const SocketConnection &connection_1 =
-        anchor_joint.sockets.at(1).connected_to.value();
-
-    // get the connected part instances
-    REQUIRE(std::holds_alternative<FragmentInstance>(
-        graph.at(connection_0.peer_part_id)));
-    FragmentInstance &fragment_0 =
-        std::get<FragmentInstance>(graph.at(connection_0.peer_part_id));
-    REQUIRE(std::holds_alternative<FragmentInstance>(
-        graph.at(connection_1.peer_part_id)));
-    FragmentInstance &fragment_1 =
-        std::get<FragmentInstance>(graph.at(connection_1.peer_part_id));
-
-    // get the connected socket on the fragment of the first arm
-    const FragmentSocketState &fragment_socket_0 =
-        fragment_0.sockets.at(connection_0.peer_socket_id);
-    // get the connected socket on the fragment of the second arm
-    const FragmentSocketState &fragment_socket_1 =
-        fragment_1.sockets.at(connection_1.peer_socket_id);
-
-    // ACT //
-    spatial_analysis::assign_open_state_transforms(grab_result, graph);
-
-    // check that the world position of the fragment sockets is equal to the
-    // world position of the anchor joint's sockets
-    const sf::Vector2f anchor_socket_0_world_position =
-        anchor_joint.transform.transformPoint(anchor_socket_0.local_position);
-    const sf::Vector2f anchor_socket_1_world_position =
-        anchor_joint.transform.transformPoint(anchor_socket_1.local_position);
-    const sf::Vector2f fragment_socket_0_world_position =
-        fragment_0.transform.transformPoint(fragment_socket_0.local_position);
-    const sf::Vector2f fragment_socket_1_world_position =
-        fragment_1.transform.transformPoint(fragment_socket_1.local_position);
-
-    REQUIRE_THAT(fragment_socket_0_world_position,
-                 EqualsVector2f(anchor_socket_0_world_position, 0.001f));
-    REQUIRE_THAT(fragment_socket_1_world_position,
-                 EqualsVector2f(anchor_socket_1_world_position, 0.001f));
   }
 }
 } // namespace steamrot::tests
