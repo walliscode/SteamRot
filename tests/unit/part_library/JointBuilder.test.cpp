@@ -33,7 +33,7 @@ TEST_CASE("JointBuilder tests", "[unit][part_library][JointBuilder]") {
     const std::string joint_name = "TestJointWithOrigin";
     sf::Vector2f origin(10.0f, 20.0f);
     Joint joint = builder.SetOrigin(origin).Build(joint_name);
-    REQUIRE(joint.origin == origin);
+    REQUIRE(joint.socket_pivot == origin);
   }
 
   SECTION("SetSocketConfig() sets the socket configuration of the Joint") {

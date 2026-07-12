@@ -81,7 +81,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
   SECTION("Positions origin of first JointInstance at 0,0") {
     // Arrange
     auto joint = steamrot::tests::MakeJointWithFrontView();
-    joint.origin = {5.f, 5.f}; // set origin to (5,5)
+    joint.socket_pivot = {5.f, 5.f}; // set origin to (5,5)
     steamrot::JointInstance joint_instance{&joint};
     joint_instance.id = 0;
     parts.emplace(joint_instance.id, joint_instance);
@@ -98,7 +98,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
     sf::Vector2f expected_position{0.f, 0.f};
 
     sf::Vector2f actual_position =
-        instance.transform.transformPoint(instance.joint->origin);
+        instance.transform.transformPoint(instance.joint->socket_pivot);
 
     REQUIRE_THAT(actual_position,
                  steamrot::tests::EqualsVector2f(expected_position));
@@ -109,7 +109,7 @@ TEST_CASE("maximise_joint_socket_spread tests",
           "[positioning_grimoire_machina]") {
   // Arrange
   Joint joint;
-  joint.origin = {0.f, 0.f};
+  joint.socket_pivot = {0.f, 0.f};
   SocketConfig &config = joint.socket_config;
 
   SECTION("Does not throw with zero sockets") {

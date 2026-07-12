@@ -19,7 +19,6 @@
 /////////////////////////////////////////////////
 #include "DescriptorResult.h"
 #include "MachinaFormScaffold.h"
-#include "SocketState.h"
 #include <SFML/System/Vector2.hpp>
 #include <set>
 
@@ -46,10 +45,6 @@ JointInstance &get_anchor_joint(const GrabResult &grab_result,
 /////////////////////////////////////////////////
 std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint);
 
-FragmentInstance &get_beginning_of_arm(const SocketConnection &connection,
-                                       const SubGraph &arm,
-                                       PartGraph &part_graph);
-
 /////////////////////////////////////////////////
 /// @brief Get the number of connected sockets on the anchor joint and assign
 /// the socket IDs to the left and right arm sockets
@@ -71,8 +66,7 @@ void assign_left_and_right_arm_sockets(
 /// The anchor point is aligned to an/the origin and rotated until the y azis
 /// bisects its rotation arc.
 /////////////////////////////////////////////////
-void align_anchor_joint_to_anchor_point(const GrabResult &grab_result,
-                                        PartGraph &part_graph,
+void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
                                         const sf::Vector2f &anchor_point);
 
 /////////////////////////////////////////////////

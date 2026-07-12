@@ -56,7 +56,7 @@ bool TransformEqualsMatcher::match(const sf::Transform &actual) const {
 
   // Force consistent numeric format for readability:
   // e.g. 0.000001 instead of sometimes showing 1e-06.
-  oss << std::fixed << std::setprecision(6);
+  // oss << std::fixed << std::setprecision(6);
 
   oss << "\n";
   oss << conmat::Indent(1) << conmat::TestFailed() << "Transform mismatch:\n";
@@ -93,16 +93,16 @@ bool TransformEqualsMatcher::match(const sf::Transform &actual) const {
   }
 
   // Optional detail section: exact per-index diff data in same stream.
-  oss << "\n"
-      << conmat::Indent(2) << "diffs >= epsilon(" << m_epsilon << "):\n";
-  for (size_t i = 0; i < 16; ++i) {
-    if (mismatch_test[i]) {
-      const float diff = std::abs(expected_matrix[i] - actual_matrix[i]);
-      oss << conmat::Indent(3) << "idx " << i
-          << " expected=" << expected_matrix[i]
-          << " actual=" << actual_matrix[i] << " diff=" << diff << "\n";
-    }
-  }
+  // oss << "\n"
+  //     << conmat::Indent(2) << "diffs >= epsilon(" << m_epsilon << "):\n";
+  // for (size_t i = 0; i < 16; ++i) {
+  //   if (mismatch_test[i]) {
+  //     const float diff = std::abs(expected_matrix[i] - actual_matrix[i]);
+  //     oss << conmat::Indent(3) << "idx " << i
+  //         << " expected=" << expected_matrix[i]
+  //         << " actual=" << actual_matrix[i] << " diff=" << diff << "\n";
+  //   }
+  // }
 
   // Store final message for describe()/failure reporting.
   m_mismatch_description = oss.str();

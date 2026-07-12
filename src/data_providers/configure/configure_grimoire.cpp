@@ -175,7 +175,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
   // configure origin
   if (joint_fbs->origin()) {
-    joint.origin =
+    joint.socket_pivot =
         sf::Vector2f(joint_fbs->origin()->x(), joint_fbs->origin()->y());
   } else {
     return std::unexpected(

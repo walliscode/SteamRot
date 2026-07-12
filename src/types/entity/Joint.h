@@ -28,10 +28,10 @@ namespace steamrot {
 struct Joint : Part {
 
   /////////////////////////////////////////////////
-  /// @brief Fixed local origin point for this Joint, used to calculate socket
+  /// @brief Fixed local point for this Joint, used to calculate socket
   /// positions from the SocketConfig.
   /////////////////////////////////////////////////
-  sf::Vector2f origin{0.f, 0.f};
+  sf::Vector2f socket_pivot{0.f, 0.f};
 
   /////////////////////////////////////////////////
   /// @brief Procedural socket layout description for this Joint.

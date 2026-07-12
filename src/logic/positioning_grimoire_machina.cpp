@@ -21,8 +21,8 @@ void initialize_joint_socket_positions(JointInstance &instance) {
     return;
 
   std::vector<sf::Vector2f> positions;
-  compute_socket_local_positions_even_spread(instance.joint->socket_config,
-                                             instance.joint->origin, positions);
+  compute_socket_local_positions_even_spread(
+      instance.joint->socket_config, instance.joint->socket_pivot, positions);
 
   for (auto &[socket_id, socket] : instance.sockets) {
     socket.local_position = positions[socket_id];
@@ -50,7 +50,7 @@ void maximise_joint_socket_spread(JointInstance &instance) {
     const float angle_deg = arc_min + arc_range / 2.f;
     const float angle_rad = sf::degrees(angle_deg).asRadians();
     instance.sockets.at(0).local_position =
-        instance.joint->origin +
+        instance.joint->socket_pivot +
         sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
 
     // for greater that one socket, place them on the arc min/max range and then
@@ -62,7 +62,7 @@ void maximise_joint_socket_spread(JointInstance &instance) {
       const float angle_deg = arc_min + (i * angle_between_sockets);
       const float angle_rad = sf::degrees(angle_deg).asRadians();
       instance.sockets.at(i).local_position =
-          instance.joint->origin +
+          instance.joint->socket_pivot +
           sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
               config.radius;
     }
@@ -137,10 +137,17 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
   // calculate the rotation
   sf::Vector2f fragment_socket_alignment_vector =
       fragment_socket.alignment_vector.normalized();
+
+  // make sure the joint socket alignment vector is calculated in world space to
+  // account for any rotation of the joint instance
   sf::Vector2f joint_socket_alignment_vector =
-      joint_socket.local_position - joint_instance.joint->origin;
+      (joint_socket_world_position - joint_instance.transform.transformPoint(
+                                         joint_instance.joint->socket_pivot))
+          .normalized();
+
   sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
       fragment_socket_alignment_vector, joint_socket_alignment_vector);
+
   sf::Transform rotation_transform;
   rotation_transform.rotate(rotation_angle);
 
@@ -252,7 +259,7 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
     // we work of the origin of the joint for positioning
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
-    joint_instance->transform.translate(-joint_instance->joint->origin);
+    joint_instance->transform.translate(-joint_instance->joint->socket_pivot);
 
     // populate socket positions now that the joint is placed
     initialize_joint_socket_positions(*joint_instance);
