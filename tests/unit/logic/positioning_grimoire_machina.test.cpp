@@ -25,6 +25,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
+#include <iostream>
 
 namespace steamrot::tests {
 
@@ -537,6 +538,8 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
 
   auto normalize_degrees_0_360 = [](float deg) {
     float d = std::fmod(deg, 360.f);
+    std::cout << "normalize_degrees_0_360: deg=" << deg << ", d=" << d
+              << std::endl;
     if (d < 0.f)
       d += 360.f; // map negatives into [0,360)
 
@@ -587,6 +590,28 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
     };
 
     const std::vector<AlignmentCase> cases{
+        {"fragment 0°, connect frag[0] -> joint[0]",
+         0,
+         0,
+         0,
+         0,
+         {0.f, 5.f},
+         {50.f, 5.f},
+         {0.f, 5.f},
+         {-13.f, 18.f},
+         {-13.f, 5.f},
+         0.01f},
+        {"fragment 45°, connect frag[0] -> joint[0]",
+         0,
+         0,
+         45.f,
+         45.f,
+         {-3.535f, 3.535f},
+         {31.82f, 38.89f},
+         {-3.535f, 3.535f},
+         {-21.93f, 3.535f},
+         {-12.73f, -5.66f},
+         0.01f},
         {
             "fragment 90°, connect frag[0] -> joint[0]",
             0,
@@ -598,21 +623,121 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
             {-5.f, 0.f},
             {-18.f, -13.f},
             {-5.f, -13.f},
-            0.001f,
-        },
-        {
-            "fragment 45°, connect frag[1] -> joint[1]",
-            1,
-            1,
-            45.f,
-            45.f,
-            {-3.535f, 3.535f},
-            {31.82f, 38.89f},
-            {31.82f, 57.27f},
-            {31.82f, 38.89f},
-            {41.01f, 48.08f},
             0.01f,
         },
+        {"fragment 135°, connect frag[0] -> joint[0]",
+         0,
+         0,
+         135.f,
+         135.f,
+         {-3.535f, -3.535f},
+         {-38.89f, 31.82f},
+         {-3.535f, -3.535f},
+         {-3.535f, -21.93f},
+         {5.66f, -12.73f},
+         0.01f},
+        {"fragment 180°, connect frag[0] -> joint[0]",
+         0,
+         0,
+         180.f,
+         180.f,
+         {0.f, -5.f},
+         {-50.f, -5.f},
+         {0.f, -5.f},
+         {13.f, -18.f},
+         {13.f, -5.f},
+         0.01f},
+        {
+            "fragment 270°, connect frag[0] -> joint[0]",
+            0,
+            0,
+            270.f,
+            270.f,
+            {5.f, 0.f},
+            {5.f, -50.f},
+            {5.f, 0.f},
+            {18.f, 13.f},
+            {5.f, 13.f},
+            0.01f,
+        },
+        {"fragment 0°, connect frag[0] -> joint[1]",
+         0,
+         1,
+         0.f,
+         -90.f,
+         {0.f, 5.f},
+         {50.f, 5.f},
+         {-13.f, -8.f},
+         {0.f, 5.f},
+         {-13.f, 5.f},
+         0.01f},
+        {"fragment 45°, connect frag[0] -> joint[1]",
+         0,
+         1,
+         45.f,
+         -45.f,
+         {-3.535f, 3.535f},
+         {31.82f, 38.89f},
+         {-3.535f, -14.84f},
+         {-3.535f, 3.535f},
+         {-12.73f, -5.66f},
+         0.01f},
+        {"fragment 90°, connect frag[0] -> joint[1]",
+         0,
+         1,
+         90.f,
+         0.f,
+         {-5.f, 0.f},
+         {-5.f, 50.f},
+         {8.f, -13.f},
+         {-5.f, 0.f},
+         {-5.f, -13.f},
+         0.01f},
+        {"fragment 180°, connect frag[0] -> joint[1]",
+         0,
+         1,
+         180.f,
+         90.f,
+         {0.f, -5.f},
+         {-50.f, -5.f},
+         {13.f, 8.f},
+         {0.f, -5.f},
+         {13.f, -5.f},
+         0.01f},
+        {"fragment 270°, connect frag[0] -> joint[1]",
+         0,
+         1,
+         270.f,
+         180.f,
+         {5.f, 0.f},
+         {5.f, -50.f},
+         {-8.f, 13.f},
+         {5.f, 0.f},
+         {5.f, 13.f},
+         0.01f},
+        {"fragment 0°, connect frag[1] -> joint[0]",
+         1,
+         0,
+         0.f,
+         180.f,
+         {0.f, 5.f},
+         {50.f, 5.f},
+         {50.f, 5.f},
+         {63.f, -8.f},
+         {63.f, 5.f},
+         0.01f},
+        {"fragment 90°, connect frag[1] -> joint[0]",
+         1,
+         0,
+         90.f,
+         -90.f,
+         {-5.f, 0.f},
+         {-5.f, 50.f},
+         {-5.f, 50.f},
+         {8.f, 63.f},
+         {-5.f, 63.f},
+         0.01f}
+
     };
 
     for (const auto &tc : cases) {
@@ -634,8 +759,12 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
           FAIL("Failed to create connection between fragment and joint");
         }
 
+        // apply the fragment rotation for this test case
         fragment_instance.transform.rotate(
             sf::degrees(tc.fragment_rotation_deg));
+        // add to the total rotation as well
+        fragment_instance.total_rotation +=
+            sf::degrees(tc.fragment_rotation_deg);
 
         // sanity-check rotated fragment sockets (same pattern in each case)
         REQUIRE_THAT(fragment_instance.transform.transformPoint(
@@ -659,13 +788,13 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
                                     tc.position_tolerance));
 
         REQUIRE_THAT(joint_instance.transform.transformPoint(
-                         joint_instance.sockets.at(1).local_position),
-                     EqualsVector2f(tc.expected_joint_socket_1_world,
+                         joint_instance.joint->socket_pivot),
+                     EqualsVector2f(tc.expected_joint_socket_pivot_world,
                                     tc.position_tolerance));
 
         REQUIRE_THAT(joint_instance.transform.transformPoint(
-                         joint_instance.joint->socket_pivot),
-                     EqualsVector2f(tc.expected_joint_socket_pivot_world,
+                         joint_instance.sockets.at(1).local_position),
+                     EqualsVector2f(tc.expected_joint_socket_1_world,
                                     tc.position_tolerance));
 
         REQUIRE(normalize_degrees_0_360(

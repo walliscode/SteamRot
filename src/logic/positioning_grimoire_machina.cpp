@@ -14,6 +14,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 namespace steamrot::logic::positioning::grimoire_machina {
 
@@ -144,12 +145,12 @@ sf::Angle rotation_of_vector_to_target_vector(const sf::Vector2f &source,
 
 /////////////////////////////////////////////////
 void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
-                                      const uint32_t frament_socket_id,
+                                      const uint32_t fragment_socket_id,
                                       const JointInstance &joint_instance,
                                       const uint32_t joint_socket_id) {
 
   // check that the fragment socket id is valid
-  auto fragment_socket_it = fragment_instance.sockets.find(frament_socket_id);
+  auto fragment_socket_it = fragment_instance.sockets.find(fragment_socket_id);
   if (fragment_socket_it == fragment_instance.sockets.end())
     return;
   FragmentSocketState &fragment_socket = fragment_socket_it->second;
@@ -179,7 +180,7 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
   // get the fragment socket alignment vector in world space and check it is not
   // 0,0
   sf::Vector2f fragment_socket_alignment_vector =
-      calculate_alignment_vector(fragment_instance, frament_socket_id);
+      calculate_alignment_vector(fragment_instance, fragment_socket_id);
   if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
     return;
   }
@@ -251,25 +252,37 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
   }
 
   // ROTATION //
-  // calculate the vector from the joint socket pivot to the joint socket local
-  // position
-  sf::Vector2f joint_socket_alignment_vector =
-      (joint_socket.local_position - joint_instance.joint->socket_pivot);
 
-  // the built-in alignment vector of the fragment socket is in local space, so
-  // we need to transform it to world space
+  // get the fragment socket alignment vector in world space and check it is not
+  // 0,0
   sf::Vector2f fragment_socket_alignment_vector =
-      fragment_instance.transform.transformPoint(
-          fragment_socket.alignment_vector);
+      calculate_alignment_vector(fragment_instance, fragment_socket_id);
+  if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    return;
+  }
+  std::cout << "Fragment socket alignment vector: "
+            << fragment_socket_alignment_vector.x << ", "
+            << fragment_socket_alignment_vector.y << std::endl;
+
+  // get the joint socket alignment vector in world space and check it is not
+  // 0,0
+  sf::Vector2f joint_socket_alignment_vector =
+      calculate_alignment_vector(joint_instance, joint_socket_id);
+  if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    return;
+  }
+
+  std::cout << "Joint socket alignment vector: "
+            << joint_socket_alignment_vector.x << ", "
+            << joint_socket_alignment_vector.y << std::endl;
 
   // calculate the rotation angle required to align the joint socket alignment
   // vector with the fragment socket alignment vector
   sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
       joint_socket_alignment_vector, fragment_socket_alignment_vector);
 
-  // add to the total rotation of the joint instance
-  joint_instance.total_rotation += rotation_angle;
-
+  std::cout << "Rotation angle: " << rotation_angle.asDegrees() << " degrees"
+            << std::endl;
   // build a rotation transform to apply before translation
   sf::Transform rotation_transform{sf::Transform::Identity};
   rotation_transform.rotate(rotation_angle);
@@ -293,6 +306,9 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
   joint_instance.transform = sf::Transform::Identity;
   joint_instance.transform.translate(translation_vector);
   joint_instance.transform.rotate(rotation_angle);
+
+  // add to the total rotation of the joint instance
+  joint_instance.total_rotation += rotation_angle;
 }
 /////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
