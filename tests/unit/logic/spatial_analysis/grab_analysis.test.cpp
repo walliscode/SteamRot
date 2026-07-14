@@ -352,10 +352,10 @@ TEST_CASE("align_grab_result_to_open_state tests") {
           anchor_joint.sockets.at(1).local_position),
       Vector2fEqualsMatcher(expected_anchor_joint_socket_1_position, 0.01f));
 
-  // LEFT ARM //
+  // RIGHT ARM //
   const SubGraph &arm_one = grab_result.arms[0];
 
-  /// LEFT ARM: PART ONE ///
+  /// RIGHT ARM: PART ONE ///
   // first part of the arm should be a fragment instance and should be connected
   // to the anchor joint. This should be connected by socket 0 of the anchor
   // joint and socket 1 of the fragment instance
@@ -383,7 +383,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                Vector2fEqualsMatcher(
                    expected_arm_one_part_one_socket_0_position, 0.01f));
 
-  // LEFT ARM:: PART TWO ///
+  // RIGHT ARM:: PART TWO ///
   // the second part of the arm should be a joint instance and should be
   // connected to the first part of the arm. This should be connected by socket
   // 0 of the first part of the arm and socket 1 of the second part of the arm
@@ -404,10 +404,23 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                Vector2fEqualsMatcher(
                    expected_arm_one_part_two_socket_1_position, 0.01f));
 
-  // RIGHT ARM //
+  // the socket pivot should be lined up with the fragment socket alignment
+  // vector (so in this case a magnitude of 13 split evenly over x and y)
+  sf::Vector2f expected_arm_one_part_two_socket_pivot_position{31.55f, 31.55f};
+  REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
+                   arm_one_part_two_ji.joint->socket_pivot),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_two_socket_pivot_position, 0.01f));
+
+  sf::Vector2f expected_arm_one_part_two_socket_0_position{9.19f, 9.19f};
+  REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
+                   arm_one_part_two_ji.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_two_socket_0_position, 0.01f));
+  // LEFT ARM //
   const SubGraph &arm_two = grab_result.arms[1];
 
-  /// RIGHT ARM: PART ONE ///
+  /// LEFT ARM: PART ONE ///
   /// first part of the arm should be a fragment instance and should be
   /// connected to the anchor joint. This should be connected by socket 1 of the
   /// anchor joint and socket 0 of the fragment instance
