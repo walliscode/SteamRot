@@ -444,8 +444,8 @@ TEST_CASE("ConfigureJoint configures origin successfully",
   steamrot::Joint joint;
   auto result = steamrot::data::configure::ConfigureJoint(joint, joint_fbs);
   REQUIRE(result.has_value());
-  REQUIRE(joint.origin.x == 5.f);
-  REQUIRE(joint.origin.y == 10.f);
+  REQUIRE(joint.socket_pivot.x == 5.f);
+  REQUIRE(joint.socket_pivot.y == 10.f);
 }
 TEST_CASE("ConfigureJoint configures socket_config successfully",
           "[unit][ConfigureJoint]") {

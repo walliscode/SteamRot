@@ -437,4 +437,49 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
   return std::nullopt;
 }
 
+/////////////////////////////////////////////////
+std::optional<JointFragmentConnection>
+check_for_connected_sockets(const JointInstance &joint_instance,
+                            const FragmentInstance &fragment_instance) {
+
+  // cycle through all sockets on the JointInstance and check if any are
+  // connected
+  const uint32_t joint_id = joint_instance.id;
+  for (const auto &[joint_socket_id, joint_socket_data] :
+       joint_instance.sockets) {
+    if (joint_socket_data.connection_state ==
+        SocketConnectionState::Connected) {
+
+      // check if the connected socket is on the FragmentInstance
+      if (joint_socket_data.connected_to.has_value() &&
+          joint_socket_data.connected_to->peer_part_id ==
+              fragment_instance.id) {
+
+        // find the corresponding socket on the FragmentInstance
+        uint32_t fragment_socket_id =
+            joint_socket_data.connected_to->peer_socket_id;
+        if (fragment_instance.sockets.count(fragment_socket_id) &&
+            fragment_instance.sockets.at(fragment_socket_id).connection_state ==
+                SocketConnectionState::Connected) {
+
+          // a final check to ensure the FragmentInstance socket is connected
+          // back to the JointInstance socket
+          if (fragment_instance.sockets.at(fragment_socket_id)
+                  .connected_to.has_value() &&
+              fragment_instance.sockets.at(fragment_socket_id)
+                      .connected_to->peer_part_id == joint_id &&
+              fragment_instance.sockets.at(fragment_socket_id)
+                      .connected_to->peer_socket_id == joint_socket_id) {
+            // return the connected socket IDs
+            return JointFragmentConnection{joint_id, joint_socket_id,
+                                           fragment_instance.id,
+                                           fragment_socket_id};
+          }
+        }
+      }
+    }
+  }
+  return std::nullopt;
+}
+
 } // namespace steamrot::logic::action::grimoire_machina

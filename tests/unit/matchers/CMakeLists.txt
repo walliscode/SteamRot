@@ -17,6 +17,7 @@ add_executable(test_matchers
   Vector2fEqualsMatcher.test.cpp
   TraceEqualsMatcher.test.cpp
   ColorEqualsMatcher.test.cpp
+  TransformEqualsMatcher.test.cpp
 )
 
 target_link_libraries(test_matchers

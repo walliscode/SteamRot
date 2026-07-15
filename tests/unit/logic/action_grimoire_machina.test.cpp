@@ -14,8 +14,10 @@
 #include "SocketState.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "fragment_library.h"
 #include "joint_library.h"
 #include <catch2/catch_test_macros.hpp>
+#include <cstdint>
 #include <memory>
 
 namespace steamrot::tests {
@@ -2004,5 +2006,40 @@ TEST_CASE("place_next_piece marks connected sockets as SocketState::Connected",
           steamrot::SocketConnectionState::Connected);
   REQUIRE(existing_ji.sockets.at(0).connection_state ==
           steamrot::SocketConnectionState::Connected);
+}
+
+TEST_CASE("check_for_connected_sockets tests") {
+
+  // ARRANGE //
+  JointInstance joint_instance{&parts::JointSquareWithTwoSockets};
+  FragmentInstance fragment_instance{&parts::FragmentRectangleWithTwoSockets};
+  fragment_instance.id = 5;
+
+  SECTION("Returns nullopt if no connection exists") {
+    REQUIRE_FALSE(
+        check_for_connected_sockets(joint_instance, fragment_instance));
+  }
+
+  SECTION("Returns the correct socket IDs if a connection exists") {
+    // Create a connection between joint_instance socket 0 and fragment_instance
+    // socket 1
+    const uint32_t joint_socket_id = 0;
+    const uint32_t fragment_socket_id = 1;
+
+    auto connection_result = create_connection(
+        fragment_instance, fragment_socket_id, joint_instance, joint_socket_id);
+    if (!connection_result.has_value()) {
+      FAIL("Failed to create connection for test setup");
+    }
+
+    auto result =
+        check_for_connected_sockets(joint_instance, fragment_instance);
+    REQUIRE(result.has_value());
+    const JointFragmentConnection &connection = result.value();
+    REQUIRE(connection.joint_socket_id == joint_socket_id);
+    REQUIRE(connection.fragment_socket_id == fragment_socket_id);
+    REQUIRE(connection.joint_id == joint_instance.id);
+    REQUIRE(connection.fragment_id == fragment_instance.id);
+  }
 }
 } // namespace steamrot::tests

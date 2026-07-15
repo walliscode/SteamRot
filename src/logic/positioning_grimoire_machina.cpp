@@ -7,13 +7,63 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include "action_grimoire_machina.h"
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 namespace steamrot::logic::positioning::grimoire_machina {
+
+/////////////////////////////////////////////////
+sf::Vector2f
+calculate_alignment_vector(const FragmentInstance &fragment_instance,
+                           const uint32_t fragment_socket_id) {
+  // check that the fragment socket id is valid
+  auto socket_it = fragment_instance.sockets.find(fragment_socket_id);
+  if (socket_it == fragment_instance.sockets.end())
+    return sf::Vector2f{0.f, 0.f};
+
+  // generate transform from the total rotation of the fragment instance
+  sf::Transform rotation_transform;
+  rotation_transform.rotate(fragment_instance.total_rotation);
+
+  // apply the rotation transform to the fragment socket alignment vector
+  sf::Vector2f alignment_vector =
+      rotation_transform.transformPoint(socket_it->second.alignment_vector);
+
+  // return the normalized alignment vector
+  return alignment_vector.normalized();
+}
+
+/////////////////////////////////////////////////
+sf::Vector2f calculate_alignment_vector(const JointInstance &joint_instance,
+                                        const uint32_t joint_socket_id) {
+  // check that the joint socket id is valid
+  auto socket_it = joint_instance.sockets.find(joint_socket_id);
+  if (socket_it == joint_instance.sockets.end())
+    return sf::Vector2f{0.f, 0.f};
+
+  // generate transform from the total rotation of the joint instance
+  sf::Transform rotation_transform;
+  rotation_transform.rotate(joint_instance.total_rotation);
+
+  // generate a local alignment vector from the joint socket pivot to the joint
+  // socket local position
+  sf::Vector2f local_alignment_vector =
+      socket_it->second.local_position - joint_instance.joint->socket_pivot;
+
+  // apply the rotation transform to the local alignment vector to give the
+  // world alignment vector
+  sf::Vector2f alignment_vector =
+      rotation_transform.transformPoint(local_alignment_vector);
+
+  // return the normalized alignment vector
+  return alignment_vector.normalized();
+}
 
 /////////////////////////////////////////////////
 void initialize_joint_socket_positions(JointInstance &instance) {
@@ -21,8 +71,8 @@ void initialize_joint_socket_positions(JointInstance &instance) {
     return;
 
   std::vector<sf::Vector2f> positions;
-  compute_socket_local_positions_even_spread(instance.joint->socket_config,
-                                             instance.joint->origin, positions);
+  compute_socket_local_positions_even_spread(
+      instance.joint->socket_config, instance.joint->socket_pivot, positions);
 
   for (auto &[socket_id, socket] : instance.sockets) {
     socket.local_position = positions[socket_id];
@@ -50,7 +100,7 @@ void maximise_joint_socket_spread(JointInstance &instance) {
     const float angle_deg = arc_min + arc_range / 2.f;
     const float angle_rad = sf::degrees(angle_deg).asRadians();
     instance.sockets.at(0).local_position =
-        instance.joint->origin +
+        instance.joint->socket_pivot +
         sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} * config.radius;
 
     // for greater that one socket, place them on the arc min/max range and then
@@ -62,7 +112,7 @@ void maximise_joint_socket_spread(JointInstance &instance) {
       const float angle_deg = arc_min + (i * angle_between_sockets);
       const float angle_rad = sf::degrees(angle_deg).asRadians();
       instance.sockets.at(i).local_position =
-          instance.joint->origin +
+          instance.joint->socket_pivot +
           sf::Vector2f{std::cos(angle_rad), std::sin(angle_rad)} *
               config.radius;
     }
@@ -77,54 +127,68 @@ sf::Angle rotation_of_vector_to_target_vector(const sf::Vector2f &source,
   if (source == sf::Vector2f{0.f, 0.f} || target == sf::Vector2f{0.f, 0.f}) {
     return sf::Angle::Zero;
   }
-  // normalize the source and target vectors (they may already be normalized,
-  // but this is a safeguard)
+
+  // normalize the source and target vectors
   sf::Vector2f source_norm = source.normalized();
   sf::Vector2f target_norm = target.normalized();
 
-  // calculate the angle between the source and target vectors using the dot
-  // product and cross product The angle can be calculated using the atan2
-  // function, which takes the cross product and dot product of the two vectors
-  // as arguments. The cross product gives the sine of the angle, while the dot
-  // product gives the cosine of the angle. The atan2 function returns the angle
-  // in radians, which can then be used to rotate the transform.
+  // calculate cross and dot for atan2
+  float cross_val = source_norm.cross(target_norm);
+  float dot_val = source_norm.dot(target_norm);
 
-  float angle =
-      std::atan2(source_norm.cross(target_norm), source_norm.dot(target_norm));
+  // angle in radians from source -> target
+  float angle = std::atan2(cross_val, dot_val);
+  sf::Angle result = sf::radians(angle);
 
-  return sf::radians(angle);
+  return result;
 }
 
 /////////////////////////////////////////////////
 void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
-                                      const uint32_t frament_socket_id,
+                                      const uint32_t fragment_socket_id,
                                       const JointInstance &joint_instance,
                                       const uint32_t joint_socket_id) {
 
+  std::cout << "[align_fragment] begin"
+            << " fragment_id=" << fragment_instance.id
+            << " fragment_socket_id=" << fragment_socket_id
+            << " joint_id=" << joint_instance.id
+            << " joint_socket_id=" << joint_socket_id << "\n";
+
   // check that the fragment socket id is valid
-  auto fragment_socket_it = fragment_instance.sockets.find(frament_socket_id);
-  if (fragment_socket_it == fragment_instance.sockets.end())
+  auto fragment_socket_it = fragment_instance.sockets.find(fragment_socket_id);
+  if (fragment_socket_it == fragment_instance.sockets.end()) {
+    std::cout << "[align_fragment][skip] invalid fragment socket id="
+              << fragment_socket_id << "\n";
     return;
+  }
   FragmentSocketState &fragment_socket = fragment_socket_it->second;
+  std::cout << "[align_fragment] fragment socket local=("
+            << fragment_socket.local_position.x << ", "
+            << fragment_socket.local_position.y << ")\n";
 
   // check that the joint socket id is valid
   auto joint_socket_it = joint_instance.sockets.find(joint_socket_id);
-  if (joint_socket_it == joint_instance.sockets.end())
+  if (joint_socket_it == joint_instance.sockets.end()) {
+    std::cout << "[align_fragment][skip] invalid joint socket id="
+              << joint_socket_id << "\n";
     return;
+  }
   const JointSocketState &joint_socket = joint_socket_it->second;
+  std::cout << "[align_fragment] joint socket local=("
+            << joint_socket.local_position.x << ", "
+            << joint_socket.local_position.y << ")\n";
 
   // check that the fragment socket is connected to the joint socket
-  if (!fragment_socket_it->second.connected_to.has_value() ||
-      !joint_socket_it->second.connected_to.has_value())
-    return;
-  if (fragment_socket_it->second.connected_to->peer_part_id !=
-      joint_instance.id) {
-    return;
-  }
-  if (joint_socket_it->second.connected_to->peer_part_id !=
-      fragment_instance.id) {
+  auto check_connection_result =
+      action::grimoire_machina::check_for_connected_sockets(joint_instance,
+                                                            fragment_instance);
+  if (!check_connection_result.has_value()) {
+    std::cout << "[align_fragment][skip] no socket connection between joint "
+                 "and fragment\n";
     return;
   }
+  std::cout << "[align_fragment] connection check passed\n";
 
   // cache world position of the sockets
   sf::Vector2f fragment_socket_world_position =
@@ -134,35 +198,188 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
   sf::Vector2f joint_socket_world_position =
       joint_instance.transform.transformPoint(joint_socket.local_position);
 
-  // calculate the rotation
+  std::cout << "[align_fragment] fragment socket world(before)=("
+            << fragment_socket_world_position.x << ", "
+            << fragment_socket_world_position.y << ")\n";
+  std::cout << "[align_fragment] joint socket world=("
+            << joint_socket_world_position.x << ", "
+            << joint_socket_world_position.y << ")\n";
+
+  // get the fragment socket alignment vector in world space and check it is not
+  // 0,0
   sf::Vector2f fragment_socket_alignment_vector =
-      fragment_socket.alignment_vector.normalized();
+      calculate_alignment_vector(fragment_instance, fragment_socket_id);
+  std::cout << "[align_fragment] fragment alignment vec=("
+            << fragment_socket_alignment_vector.x << ", "
+            << fragment_socket_alignment_vector.y << ")\n";
+  if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    std::cout << "[align_fragment][skip] fragment alignment vector is zero\n";
+    return;
+  }
+
+  // get the joint socket alignment vector in world space and check it is not
+  // 0,0
   sf::Vector2f joint_socket_alignment_vector =
-      joint_socket.local_position - joint_instance.joint->origin;
+      calculate_alignment_vector(joint_instance, joint_socket_id);
+  std::cout << "[align_fragment] joint alignment vec=("
+            << joint_socket_alignment_vector.x << ", "
+            << joint_socket_alignment_vector.y << ")\n";
+  if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    std::cout << "[align_fragment][skip] joint alignment vector is zero\n";
+    return;
+  }
+
   sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
       fragment_socket_alignment_vector, joint_socket_alignment_vector);
+
+  std::cout << "[align_fragment] rotation angle deg="
+            << rotation_angle.asDegrees() << "\n";
+
   sf::Transform rotation_transform;
   rotation_transform.rotate(rotation_angle);
+
+  const sf::Vector2f rotated_fragment_socket_world =
+      rotation_transform.transformPoint(fragment_socket_world_position);
+
+  std::cout << "[align_fragment] rotated fragment socket world=("
+            << rotated_fragment_socket_world.x << ", "
+            << rotated_fragment_socket_world.y << ")\n";
 
   // calculate the transform
   sf::Vector2f translation_vector =
       joint_socket_world_position -
       // apply the rotation to the fragment socket world position before
       // calculating the translation vector
-      rotation_transform.transformPoint(fragment_socket_world_position);
+      rotated_fragment_socket_world;
+
+  std::cout << "[align_fragment] translation vec=(" << translation_vector.x
+            << ", " << translation_vector.y << ")\n";
 
   // BUILDING THE TRANSFORM //
   // transforms are applied in reverse order, so we build translate then rotate
 
+  std::cout << "[align_fragment] fragment total rotation before="
+            << fragment_instance.total_rotation.asDegrees() << "\n";
+
   // reset the transform of the fragment instance to identity
   fragment_instance.transform = sf::Transform::Identity;
+  std::cout << "[align_fragment] fragment transform reset to identity\n";
 
   // transform the fragment instance to the joint socket position
   fragment_instance.transform.translate(translation_vector);
+  std::cout << "[align_fragment] fragment transform translated\n";
 
   // rotate the fragment instance to align the fragment socket alignment vector
   // with the joint socket alignment vector
   fragment_instance.transform.rotate(rotation_angle);
+  std::cout << "[align_fragment] fragment transform rotated\n";
+
+  // UPDATE FRAGMENT INSTANCE STATE //
+  fragment_instance.total_rotation += rotation_angle;
+
+  const sf::Vector2f fragment_socket_world_after =
+      fragment_instance.transform.transformPoint(
+          fragment_socket.local_position);
+
+  std::cout << "[align_fragment] fragment socket world(after)=("
+            << fragment_socket_world_after.x << ", "
+            << fragment_socket_world_after.y << ")\n";
+  std::cout << "[align_fragment] world delta to joint=("
+            << (fragment_socket_world_after.x - joint_socket_world_position.x)
+            << ", "
+            << (fragment_socket_world_after.y - joint_socket_world_position.y)
+            << ")\n";
+  std::cout << "[align_fragment] fragment total rotation after="
+            << fragment_instance.total_rotation.asDegrees() << "\n";
+  std::cout << "[align_fragment] end\n";
+}
+
+/////////////////////////////////////////////////
+void align_joint_onto_fragment_socket(JointInstance &joint_instance,
+                                      const uint32_t joint_socket_id,
+                                      const FragmentInstance &fragment_instance,
+                                      const uint32_t fragment_socket_id) {
+
+  // check that the joint socket id is valid
+  auto joint_socket_it = joint_instance.sockets.find(joint_socket_id);
+  if (joint_socket_it == joint_instance.sockets.end()) {
+    return;
+  }
+  JointSocketState &joint_socket = joint_socket_it->second;
+
+  // check that the fragment socket id is valid
+  auto fragment_socket_it = fragment_instance.sockets.find(fragment_socket_id);
+  if (fragment_socket_it == fragment_instance.sockets.end()) {
+    return;
+  }
+  const FragmentSocketState &fragment_socket = fragment_socket_it->second;
+
+  // check that the joint socket is connected to the fragment socket
+  auto check_connection_result =
+      action::grimoire_machina::check_for_connected_sockets(joint_instance,
+                                                            fragment_instance);
+  if (!check_connection_result.has_value()) {
+    return;
+  }
+
+  // ROTATION //
+
+  // get the fragment socket alignment vector in world space and check it is not
+  // 0,0
+  sf::Vector2f fragment_socket_alignment_vector =
+      calculate_alignment_vector(fragment_instance, fragment_socket_id);
+  if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    return;
+  }
+  std::cout << "Fragment socket alignment vector: "
+            << fragment_socket_alignment_vector.x << ", "
+            << fragment_socket_alignment_vector.y << std::endl;
+
+  // get the joint socket alignment vector in world space and check it is not
+  // 0,0
+  sf::Vector2f joint_socket_alignment_vector =
+      calculate_alignment_vector(joint_instance, joint_socket_id);
+  if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+    return;
+  }
+
+  std::cout << "Joint socket alignment vector: "
+            << joint_socket_alignment_vector.x << ", "
+            << joint_socket_alignment_vector.y << std::endl;
+
+  // calculate the rotation angle required to align the joint socket alignment
+  // vector with the fragment socket alignment vector
+  sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
+      joint_socket_alignment_vector, fragment_socket_alignment_vector);
+
+  std::cout << "Rotation angle: " << rotation_angle.asDegrees() << " degrees"
+            << std::endl;
+  // build a rotation transform to apply before translation
+  sf::Transform rotation_transform{sf::Transform::Identity};
+  rotation_transform.rotate(rotation_angle);
+
+  // TRANSLATION //
+  // make sure to rotate the joint instance before calculating the translation
+  // vector
+  sf::Vector2f fragment_socket_world =
+      fragment_instance.transform.transformPoint(
+          fragment_socket.local_position);
+
+  sf::Vector2f rotated_joint_socket_world = rotation_transform.transformPoint(
+      joint_instance.transform.transformPoint(joint_socket.local_position));
+
+  sf::Vector2f translation_vector =
+      fragment_socket_world - rotated_joint_socket_world;
+
+  // BUILD THE TRANSFORM //
+  // transforms are applied in reverse order, so we build translate then rotate
+  // to achieve rotation then translation
+  joint_instance.transform = sf::Transform::Identity;
+  joint_instance.transform.translate(translation_vector);
+  joint_instance.transform.rotate(rotation_angle);
+
+  // add to the total rotation of the joint instance
+  joint_instance.total_rotation += rotation_angle;
 }
 /////////////////////////////////////////////////
 void compute_socket_local_positions_even_spread(
@@ -252,7 +469,7 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
     // we work of the origin of the joint for positioning
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
-    joint_instance->transform.translate(-joint_instance->joint->origin);
+    joint_instance->transform.translate(-joint_instance->joint->socket_pivot);
 
     // populate socket positions now that the joint is placed
     initialize_joint_socket_positions(*joint_instance);

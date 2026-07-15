@@ -26,7 +26,7 @@ JointBuilder &JointBuilder::AddViews(const PremadeViews view) {
 }
 /////////////////////////////////////////////////
 JointBuilder &JointBuilder::SetOrigin(const sf::Vector2f &origin) {
-  m_joint.origin = origin;
+  m_joint.socket_pivot = origin;
   return *this;
 }
 /////////////////////////////////////////////////

@@ -19,6 +19,31 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
+/// @brief Calulates the alignment vector of a FragmentInstance socket based on
+/// the local alignment vector and the total rotation of the FragmentInstance.
+///
+/// @param fragment_instance FragmentInstance to calculate the alignment vector
+/// for
+/// @param fragment_socket_id socket id of the FragmentInstance to calculate the
+/// alignment vector for
+/////////////////////////////////////////////////
+sf::Vector2f
+calculate_alignment_vector(const FragmentInstance &fragment_instance,
+                           const uint32_t fragment_socket_id);
+
+/////////////////////////////////////////////////
+/// @brief Calculates the alignment vector of a JointInstance socket based on
+/// the local alignment vector, the socket pivot and the total rotation of the
+/// JointInstance.
+///
+/// @param joint_instance JointInstance to calculate the alignment vector for
+/// @param fragment_socket_id socket id of the JointInstance to calculate the
+/// alignment vector for
+/////////////////////////////////////////////////
+sf::Vector2f calculate_alignment_vector(const JointInstance &joint_instance,
+                                        const uint32_t fragment_socket_id);
+
+/////////////////////////////////////////////////
 /// @brief Populates the socket local positions of a JointInstance using the
 /// even-spread algorithm.
 ///
@@ -65,6 +90,21 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
                                       const uint32_t frament_socket_id,
                                       const JointInstance &joint_instance,
                                       const uint32_t joint_socket_id);
+
+/////////////////////////////////////////////////
+/// @brief Aligns a JointInstance onto a FragmentInstance socket by way of the
+/// JointInstance socket
+///
+/// @param joint_instance JointInstance to be aligned onto the FragmentInstance
+/// socket
+/// @param joint_socket_id Joint socket id to be used for alignment
+/// @param fragment_instance FragmentInstance to be aligned onto
+/// @param fragment_socket_id Fragment socket id to be used for alignment
+/////////////////////////////////////////////////
+void align_joint_onto_fragment_socket(JointInstance &joint_instance,
+                                      const uint32_t joint_socket_id,
+                                      const FragmentInstance &fragment_instance,
+                                      const uint32_t fragment_socket_id);
 
 /////////////////////////////////////////////////
 /// @brief Calculates an even spread of socket local positions for a Joint based

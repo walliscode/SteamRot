@@ -50,6 +50,37 @@ struct SocketConnection {
 };
 
 /////////////////////////////////////////////////
+/// @class JointFragmentConnection
+/// @brief Returns a pair of SocketConnections representing a conencted
+/// JointInstance and FragmentInstance. This is mainly a convenience class for
+/// returning both ends of a connection from a function.
+/////////////////////////////////////////////////
+struct JointFragmentConnection {
+
+  /////////////////////////////////////////////////
+  /// @brief Constructs a ConnectedSockets object with the given joint and
+  /// fragment connections.
+  ///
+  /// @param joint_connection The SocketConnection representing the joint end of
+  /// the connection.
+  /// @param fragment_connection  The SocketConnection representing the fragment
+  /// end of the connection.
+  /////////////////////////////////////////////////
+  explicit JointFragmentConnection(const uint32_t joint_id,
+                                   const uint32_t joint_socket_id,
+                                   const uint32_t fragment_id,
+                                   const uint32_t fragment_socket_id)
+      : joint_id{joint_id}, joint_socket_id{joint_socket_id},
+        fragment_id{fragment_id}, fragment_socket_id{fragment_socket_id} {}
+
+  const uint32_t joint_id;
+  const uint32_t joint_socket_id;
+
+  const uint32_t fragment_id;
+  const uint32_t fragment_socket_id;
+};
+
+/////////////////////////////////////////////////
 /// @struct SocketData
 /// @brief Bundles the local position and mutable runtime state for a single
 /// socket on a placed part instance.

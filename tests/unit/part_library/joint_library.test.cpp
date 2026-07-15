@@ -18,7 +18,7 @@ TEST_CASE(
   const Joint &joint = JointSquareWithTwoSockets;
 
   REQUIRE(joint.name == "JointSquareWith2Sockets");
-  REQUIRE(joint.origin == sf::Vector2f(10, 10));
+  REQUIRE(joint.socket_pivot == sf::Vector2f(10, 10));
   REQUIRE(joint.positioning_views.size() == 1);
   REQUIRE(joint.socket_config.socket_count == 2);
   REQUIRE(joint.socket_config.radius == 13);

@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/System/Angle.hpp>
 #include <cstdint>
 #include <string>
 
@@ -56,6 +57,11 @@ struct PartInstance {
   /// @brief Single transform that positions this instance on the canvas.
   /////////////////////////////////////////////////
   sf::Transform transform{sf::Transform::Identity};
+
+  /////////////////////////////////////////////////
+  /// @brief Store the total rotation applied to this instance in degrees.
+  /////////////////////////////////////////////////
+  sf::Angle total_rotation{sf::degrees(0.f)};
 
   /////////////////////////////////////////////////
   /// @brief Number of established connections on this instance.

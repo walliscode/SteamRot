@@ -12,13 +12,16 @@
 #include "PartGraphBuilder.h"
 #include "SocketState.h"
 #include "Vector2fEqualsMatcher.h"
+#include "action_grimoire_machina.h"
+#include "catch2/catch_approx.hpp"
 #include "descriptors_machina_archetypes.h"
+#include "joint_library.h"
 #include "machina_archetype_packages.h"
+#include "positioning_grimoire_machina.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <cmath>
 #include <variant>
 
 namespace steamrot::tests {
@@ -33,107 +36,189 @@ TEST_CASE("valid_grab_pkg passes grab structural tests") {
   REQUIRE(result);
 }
 
-TEST_CASE("align_grab_structure tests") {
-  // arrange
-  // set up valid grab package and result
-  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
-  MachinaArchetypeResult ma_result =
-      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
-                              valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
+TEST_CASE("align_anchor_joint_to_anchor_point tests") {
 
-  // pull ou the GrabResult from the MachinaArchetypeResult variant
-  REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
-  GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
-  PartGraph &graph = valid_grab_pkg.part_graph;
+  // ARRANGE //
+  JointInstance ji_one = JointInstance{&parts::JointSquareWithOneSocket};
+  positioning::grimoire_machina::maximise_joint_socket_spread(ji_one);
+  const sf::Vector2f &ji_one_socket_0_local_position =
+      ji_one.sockets.at(0).local_position;
+  REQUIRE(ji_one.transform == sf::Transform::Identity);
+  REQUIRE_THAT(ji_one_socket_0_local_position,
+               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
+  REQUIRE_THAT(ji_one.transform.transformPoint(ji_one_socket_0_local_position),
+               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
 
-  // get the instance of the anchor joint
-  const uint32_t anchor_id = grab_result.anchor;
-  REQUIRE(valid_grab_pkg.id_to_part_graph_id.at("j3") == anchor_id);
-  REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
-  JointInstance &anchor_instance = std::get<JointInstance>(graph.at(anchor_id));
+  JointInstance ji_two = JointInstance{&parts::JointSquareWithTwoSockets};
+  positioning::grimoire_machina::maximise_joint_socket_spread(ji_two);
+  const sf::Vector2f &ji_two_socket_0_local_position =
+      ji_two.sockets.at(0).local_position;
+  const sf::Vector2f &ji_two_socket_1_local_position =
+      ji_two.sockets.at(1).local_position;
+  REQUIRE_THAT(ji_two_socket_0_local_position,
+               Vector2fEqualsMatcher({23.0f, 10.0f}));
+  REQUIRE_THAT(ji_two_socket_1_local_position,
+               Vector2fEqualsMatcher({10.0f, 23.0f}));
 
-  SECTION("align_grab_structure sets the anchor's transform to the provided "
-          "vector") {
-    // arrange
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-    // add an arbitrary transform to the anchor joint instance to make sure the
-    // function is actually changing it
-    anchor_transform.translate({100.f, 50.f});
-    REQUIRE(anchor_transform.transformPoint({0.f, 0.f}) ==
-            sf::Vector2f{100.f, 50.f});
+  JointInstance ji_three = JointInstance{&parts::JointSquareWithThreeSockets};
+  positioning::grimoire_machina::maximise_joint_socket_spread(ji_three);
+  const sf::Vector2f &ji_three_socket_0_local_position =
+      ji_three.sockets.at(0).local_position;
+  const sf::Vector2f &ji_three_socket_1_local_position =
+      ji_three.sockets.at(1).local_position;
+  const sf::Vector2f &ji_three_socket_2_local_position =
+      ji_three.sockets.at(2).local_position;
+  REQUIRE_THAT(ji_three_socket_0_local_position,
+               Vector2fEqualsMatcher({23.0f, 10.0f}));
+  REQUIRE_THAT(ji_three_socket_1_local_position,
+               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
+  REQUIRE_THAT(ji_three_socket_2_local_position,
+               Vector2fEqualsMatcher({10.0f, 23.0f}));
 
-    // act
-    std::vector<sf::Vector2f> target_positions{
-        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
+  SECTION("ji_one tests") {
+    SECTION("anchor point at (0,0)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{0.f, 13.f};
 
-    for (const sf::Vector2f &target_position : target_positions) {
-      spatial_analysis::align_grab_structure(grab_result, graph,
-                                             target_position);
-      // assert
-      // the transform of the anchor joint should be able to move a 0,0 point to
-      // the target position
-      REQUIRE_THAT(anchor_transform.transformPoint({0.f, 0.f}),
-                   EqualsVector2f(target_position));
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_one, {0.f, 0.f});
+
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_one.transform.transformPoint(ji_one_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+    }
+
+    SECTION("anchor point at (10,10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{10.f, 23.f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_one,
+                                                           {10.f, 10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_one.transform.transformPoint(ji_one_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+    }
+
+    SECTION("anchor point at (-10,-10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{-10.f, 3.f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_one,
+                                                           {-10.f, -10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_one.transform.transformPoint(ji_one_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
     }
   }
 
-  SECTION("align_grab_structure rotates the anchor joint correctly") {
-    // The anchor joint should be rotated such that the middle of its available
-    // arc aligns with the y axis this particular Joint has arc_min = 0  and
-    // arc_max = 270
+  SECTION("ji_two tests") {
+    SECTION("anchor point at (0,0)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{9.19f, 9.19f};
+      sf::Vector2f expected_socket_1_position{-9.19f, 9.19f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two, {0.f, 0.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+    }
 
-    // arrange
-
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-
-    // get rotation values from the anchor Joint pointer
-    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
-    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
-    const float arc_mid = (arc_min + arc_max) / 2.f;
-
-    // act
-    spatial_analysis::align_grab_structure(grab_result, graph, {0.f, 0.f});
-
-    // assert
-    // construct a transform that rotates by the arc_mid value and check that it
-    // is equal to the anchor joint's transform
-    sf::Transform expected_transform;
-    expected_transform.rotate(sf::degrees(90 - arc_mid));
-
-    REQUIRE(anchor_transform == expected_transform);
+    SECTION("anchor point at (10,10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{19.19f, 19.19f};
+      sf::Vector2f expected_socket_1_position{0.808f, 19.19f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
+                                                           {10.f, 10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+    }
+    SECTION("anchor point at (-10,-10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{-0.81f, -0.81f};
+      sf::Vector2f expected_socket_1_position{-19.19f, -0.81f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
+                                                           {-10.f, -10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_two.transform.transformPoint(ji_two_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+    }
   }
+  SECTION("ji_three tests") {
+    SECTION("anchor point at (0,0)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{9.19f, 9.19f};
+      sf::Vector2f expected_socket_1_position{0.f, 13.f};
+      sf::Vector2f expected_socket_2_position{-9.19f, 9.19f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                           {0.f, 0.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_2_local_position),
+          Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
+    }
 
-  SECTION("align_grab_structure translates and rotates the anchor joint "
-          "correctly") {
-    // The anchor joint should be translated to the provided position and
-    // rotated such that the middle of its available arc aligns with the y axis
-    // this particular Joint has arc_min = 0  and arc_max = 270
-    // arrange
-    // pull out the transform of the anchor joint instance, we can use this to
-    // check if the function is actually changing it
-    sf::Transform &anchor_transform = anchor_instance.transform;
-    // get rotation values from the anchor Joint pointer
-    const float arc_min = anchor_instance.joint->socket_config.rotation_arc_min;
-    const float arc_max = anchor_instance.joint->socket_config.rotation_arc_max;
-    const float arc_mid = (arc_min + arc_max) / 2.f;
-    // act
-    std::vector<sf::Vector2f> target_positions{
-        {{0.f, 0.f}, {0.f, 100.f}, {65.f, 25.f}, {-50.f, -50.f}}};
-    for (const sf::Vector2f &target_position : target_positions) {
-      spatial_analysis::align_grab_structure(grab_result, graph,
-                                             target_position);
-      // assert
-      // construct a transform that translates to the target position and then
-      // rotates by the arc_mid value and check that it is equal to the anchor
-      // joint's transform
-      sf::Transform expected_transform;
-      expected_transform.translate(target_position);
-      expected_transform.rotate(sf::degrees(90 - arc_mid));
-      REQUIRE(anchor_transform == expected_transform);
+    SECTION("anchor point at (10,10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{19.19f, 19.19f};
+      sf::Vector2f expected_socket_1_position{10.f, 23.f};
+      sf::Vector2f expected_socket_2_position{0.81f, 19.19f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                           {10.f, 10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_2_local_position),
+          Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
+    }
+    SECTION("anchor point at (-10,-10)") {
+      // ARRANGE //
+      sf::Vector2f expected_socket_0_position{-0.81f, -0.81f};
+      sf::Vector2f expected_socket_1_position{-10.f, 3.f};
+      sf::Vector2f expected_socket_2_position{-19.19f, -0.81f};
+      // ACT //
+      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                           {-10.f, -10.f});
+      // ASSERT //
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_0_local_position),
+          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_1_local_position),
+          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+      REQUIRE_THAT(
+          ji_three.transform.transformPoint(ji_three_socket_2_local_position),
+          Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
     }
   }
 }
@@ -232,111 +317,215 @@ TEST_CASE("assign_left_and_right_arm_sockets tests") {
   }
 }
 
-TEST_CASE("assign_open_state_transforms tests") {
-  // arrange
+TEST_CASE("align_grab_result_to_open_state tests") {
+  // ARRANGE //
   PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
   MachinaArchetypeResult ma_result =
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
   REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
-
-  // grab result contains the anchor joint and the arms of the grab structure
   GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
-  const uint32_t &anchor_id = grab_result.anchor;
   PartGraph &graph = valid_grab_pkg.part_graph;
 
-  SECTION(
-      "assign_open_state_transforms assigns transforms for the anchor joint") {
-    // arrange
-    REQUIRE(std::holds_alternative<JointInstance>(graph.at(anchor_id)));
-    JointInstance &anchor_joint =
-        spatial_analysis::get_anchor_joint(grab_result, graph);
-    const SocketConfig &config = anchor_joint.joint->socket_config;
-    REQUIRE(config.socket_count == 2);
-    anchor_joint.sockets.at(0).local_position = {0.f, 0.f};
-    anchor_joint.sockets.at(1).local_position = {0.f, 0.f};
+  JointInstance &anchor_joint =
+      std::get<JointInstance>(graph.at(grab_result.anchor));
 
-    // act
-    spatial_analysis::assign_open_state_transforms(grab_result, graph);
+  // ACT //
+  spatial_analysis::align_grab_result_to_open_state(grab_result, graph,
+                                                    {0.f, 0.f});
 
-    // assert
-    // the anchor joint should have its sockets at its maximum angles, manually
-    // calculate the expected positions and then add to the origin
-    sf::Vector2f expected_position_0 =
-        anchor_joint.joint->origin +
-        sf::Vector2f{
-            config.radius *
-                std::cos(sf::degrees(config.rotation_arc_min).asRadians()),
-            config.radius *
-                std::sin(sf::degrees(config.rotation_arc_min).asRadians())};
+  // ASSERT //
 
-    sf::Vector2f expected_position_1 =
-        anchor_joint.joint->origin +
-        sf::Vector2f{
-            config.radius *
-                std::cos(sf::degrees(config.rotation_arc_max).asRadians()),
-            config.radius *
-                std::sin(sf::degrees(config.rotation_arc_max).asRadians())};
+  // ANCHOR JOINT //
+  sf::Vector2f expected_anchor_joint_socket_pivot_position{0.f, 0.f};
+  REQUIRE_THAT(
+      anchor_joint.transform.transformPoint(anchor_joint.joint->socket_pivot),
+      Vector2fEqualsMatcher(expected_anchor_joint_socket_pivot_position,
+                            0.01f));
+  sf::Vector2f expected_anchor_joint_socket_0_position{9.19f, 9.19f};
+  REQUIRE_THAT(
+      anchor_joint.transform.transformPoint(
+          anchor_joint.sockets.at(0).local_position),
+      Vector2fEqualsMatcher(expected_anchor_joint_socket_0_position, 0.01f));
+  sf::Vector2f expected_anchor_joint_socket_1_position{-9.19f, 9.19f};
+  REQUIRE_THAT(
+      anchor_joint.transform.transformPoint(
+          anchor_joint.sockets.at(1).local_position),
+      Vector2fEqualsMatcher(expected_anchor_joint_socket_1_position, 0.01f));
 
-    REQUIRE_THAT(anchor_joint.sockets.at(0).local_position,
-                 EqualsVector2f(expected_position_0, 0.001f));
-    REQUIRE_THAT(anchor_joint.sockets.at(1).local_position,
-                 EqualsVector2f(expected_position_1, 0.001f));
-  }
+  // RIGHT ARM //
+  const SubGraph &arm_one = grab_result.arms[0];
 
-  SECTION("fragments connected to the anchor joint are transformed correctly") {
-    // ARRANGE //
-    // get the anchor joint instance
-    JointInstance &anchor_joint =
-        spatial_analysis::get_anchor_joint(grab_result, graph);
+  /// RIGHT ARM: PART ONE ///
+  // first part of the arm should be a fragment instance and should be connected
+  // to the anchor joint. This should be connected by socket 0 of the anchor
+  // joint and socket 1 of the fragment instance
+  const auto &arm_one_part_one = graph.at(arm_one[0]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_one_part_one));
+  const FragmentInstance &arm_one_part_one_fi =
+      std::get<FragmentInstance>(arm_one_part_one);
+  auto connection_one = action::grimoire_machina::check_for_connected_sockets(
+      anchor_joint, arm_one_part_one_fi);
+  REQUIRE(connection_one.has_value());
+  REQUIRE(connection_one->joint_socket_id == 0);
+  REQUIRE(connection_one->fragment_socket_id == 1);
+  REQUIRE(arm_one_part_one_fi.total_rotation.asDegrees() == -135.f);
+  // arm_one_part_one_fi socket 1 should be at thte same position as
+  // anchor_joint socket 0
+  sf::Vector2f expected_arm_one_part_one_socket_1_position{9.19f, 9.19f};
+  REQUIRE_THAT(arm_one_part_one_fi.transform.transformPoint(
+                   arm_one_part_one_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_one_socket_1_position, 0.01f));
+  // arm_one_part_one_fi socket 0 should be of length 50 from socket 1 but
+  // aligned with the anchor joint socket 0. a
+  sf::Vector2f expected_arm_one_part_one_socket_0_position{44.55f, 44.55f};
+  REQUIRE_THAT(arm_one_part_one_fi.transform.transformPoint(
+                   arm_one_part_one_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_one_socket_0_position, 0.01f));
 
-    // get the anchor joints sockets
-    const JointSocketState &anchor_socket_0 = anchor_joint.sockets.at(0);
-    const JointSocketState &anchor_socket_1 = anchor_joint.sockets.at(1);
+  // RIGHT ARM:: PART TWO ///
+  // the second part of the arm should be a joint instance and should be
+  // connected to the first part of the arm. This should be connected by socket
+  // 0 of the first part of the arm and socket 1 of the second part of the arm
+  const auto &arm_one_part_two = graph.at(arm_one[1]);
+  REQUIRE(std::holds_alternative<JointInstance>(arm_one_part_two));
+  const JointInstance &arm_one_part_two_ji =
+      std::get<JointInstance>(arm_one_part_two);
+  auto connection_two = action::grimoire_machina::check_for_connected_sockets(
+      arm_one_part_two_ji, arm_one_part_one_fi);
+  REQUIRE(connection_two.has_value());
+  REQUIRE(connection_two->joint_socket_id == 1);
+  REQUIRE(connection_two->fragment_socket_id == 0);
+  // arm_one_part_two_ji socket 1 should be at the same position as
+  // arm_one_part_one_fi socket 0
+  sf::Vector2f expected_arm_one_part_two_socket_1_position{44.55f, 44.55f};
+  REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
+                   arm_one_part_two_ji.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_two_socket_1_position, 0.01f));
 
-    // get the connections for the anchor joint's sockets
-    REQUIRE(anchor_joint.sockets.at(0).connected_to.has_value());
-    const SocketConnection &connection_0 =
-        anchor_joint.sockets.at(0).connected_to.value();
-    REQUIRE(anchor_joint.sockets.at(1).connected_to.has_value());
-    const SocketConnection &connection_1 =
-        anchor_joint.sockets.at(1).connected_to.value();
+  // the socket pivot should be lined up with the fragment socket alignment
+  // vector (so in this case a magnitude of 13 split evenly over x and y)
+  sf::Vector2f expected_arm_one_part_two_socket_pivot_position{53.74f, 53.74f};
+  REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
+                   arm_one_part_two_ji.joint->socket_pivot),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_two_socket_pivot_position, 0.01f));
 
-    // get the connected part instances
-    REQUIRE(std::holds_alternative<FragmentInstance>(
-        graph.at(connection_0.peer_part_id)));
-    FragmentInstance &fragment_0 =
-        std::get<FragmentInstance>(graph.at(connection_0.peer_part_id));
-    REQUIRE(std::holds_alternative<FragmentInstance>(
-        graph.at(connection_1.peer_part_id)));
-    FragmentInstance &fragment_1 =
-        std::get<FragmentInstance>(graph.at(connection_1.peer_part_id));
+  sf::Vector2f expected_arm_one_part_two_socket_0_position{44.55f, 62.93f};
+  REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
+                   arm_one_part_two_ji.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_two_socket_0_position, 0.01f));
 
-    // get the connected socket on the fragment of the first arm
-    const FragmentSocketState &fragment_socket_0 =
-        fragment_0.sockets.at(connection_0.peer_socket_id);
-    // get the connected socket on the fragment of the second arm
-    const FragmentSocketState &fragment_socket_1 =
-        fragment_1.sockets.at(connection_1.peer_socket_id);
+  /// RIGHT ARM: PART THREE ///
+  // the third part of the arm should be a fragment instance
+  const auto &arm_one_part_three = graph.at(arm_one[2]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_one_part_three));
+  const FragmentInstance &arm_one_part_three_fi =
+      std::get<FragmentInstance>(arm_one_part_three);
+  auto connection_three = action::grimoire_machina::check_for_connected_sockets(
+      arm_one_part_two_ji, arm_one_part_three_fi);
+  REQUIRE(connection_three.has_value());
+  REQUIRE(connection_three->joint_socket_id == 0);
+  REQUIRE(connection_three->fragment_socket_id == 0);
+  REQUIRE(arm_one_part_three_fi.total_rotation.asDegrees() == 135.f);
 
-    // ACT //
-    spatial_analysis::assign_open_state_transforms(grab_result, graph);
+  sf::Vector2f expected_arm_one_part_three_socket_0_position{44.55f, 62.93f};
+  REQUIRE_THAT(arm_one_part_three_fi.transform.transformPoint(
+                   arm_one_part_three_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_three_socket_0_position, 0.01f));
 
-    // check that the world position of the fragment sockets is equal to the
-    // world position of the anchor joint's sockets
-    const sf::Vector2f anchor_socket_0_world_position =
-        anchor_joint.transform.transformPoint(anchor_socket_0.local_position);
-    const sf::Vector2f anchor_socket_1_world_position =
-        anchor_joint.transform.transformPoint(anchor_socket_1.local_position);
-    const sf::Vector2f fragment_socket_0_world_position =
-        fragment_0.transform.transformPoint(fragment_socket_0.local_position);
-    const sf::Vector2f fragment_socket_1_world_position =
-        fragment_1.transform.transformPoint(fragment_socket_1.local_position);
+  sf::Vector2f expected_arm_one_part_three_socket_1_position{9.19f, 98.28f};
+  REQUIRE_THAT(arm_one_part_three_fi.transform.transformPoint(
+                   arm_one_part_three_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_three_socket_1_position, 0.01f));
+  // LEFT ARM //
+  const SubGraph &arm_two = grab_result.arms[1];
 
-    REQUIRE_THAT(fragment_socket_0_world_position,
-                 EqualsVector2f(anchor_socket_0_world_position, 0.001f));
-    REQUIRE_THAT(fragment_socket_1_world_position,
-                 EqualsVector2f(anchor_socket_1_world_position, 0.001f));
-  }
+  /// LEFT ARM: PART ONE ///
+  /// first part of the arm should be a fragment instance and should be
+  /// connected to the anchor joint. This should be connected by socket 1 of the
+  /// anchor joint and socket 0 of the fragment instance
+  const auto &arm_two_part_one = graph.at(arm_two[0]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_one));
+  const FragmentInstance &arm_two_part_one_fi =
+      std::get<FragmentInstance>(arm_two_part_one);
+  auto arm_two_connection_two =
+      action::grimoire_machina::check_for_connected_sockets(
+          anchor_joint, arm_two_part_one_fi);
+  REQUIRE(arm_two_connection_two.has_value());
+  REQUIRE(arm_two_connection_two->joint_socket_id == 1);
+  REQUIRE(arm_two_connection_two->fragment_socket_id == 0);
+  REQUIRE(arm_two_part_one_fi.total_rotation.asDegrees() == 135.f);
+  // arm_two_part_one_fi socket 0 should be at thte same position as
+  // anchor_joint socket 1
+  sf::Vector2f expected_arm_two_part_one_socket_0_position{-9.19f, 9.19f};
+  REQUIRE_THAT(arm_two_part_one_fi.transform.transformPoint(
+                   arm_two_part_one_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_one_socket_0_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_one_socket_1_position{-44.55f, 44.55f};
+  REQUIRE_THAT(arm_two_part_one_fi.transform.transformPoint(
+                   arm_two_part_one_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_one_socket_1_position, 0.01f));
+
+  const auto &arm_two_part_two = graph.at(arm_two[1]);
+  REQUIRE(std::holds_alternative<JointInstance>(arm_two_part_two));
+  const JointInstance &arm_two_part_two_ji =
+      std::get<JointInstance>(arm_two_part_two);
+  auto arm_two_connection_three =
+      action::grimoire_machina::check_for_connected_sockets(
+          arm_two_part_two_ji, arm_two_part_one_fi);
+  REQUIRE(arm_two_connection_three.has_value());
+  REQUIRE(arm_two_connection_three->joint_socket_id == 0);
+  REQUIRE(arm_two_connection_three->fragment_socket_id == 1);
+  REQUIRE(Catch::Approx(arm_two_part_two_ji.total_rotation.asDegrees()) ==
+          -45.f);
+
+  sf::Vector2f expected_arm_two_part_two_socket_0_position{-44.55f, 44.55f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_0_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_two_socket_pivot_position{-53.74f, 53.74f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.joint->socket_pivot),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_pivot_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_two_socket_1_position{-44.55f, 62.93f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_1_position, 0.01f));
+
+  const auto &arm_two_part_three = graph.at(arm_two[2]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_three));
+  const FragmentInstance &arm_two_part_three_fi =
+      std::get<FragmentInstance>(arm_two_part_three);
+  auto arm_two_connection_four =
+      action::grimoire_machina::check_for_connected_sockets(
+          arm_two_part_two_ji, arm_two_part_three_fi);
+  REQUIRE(arm_two_connection_four.has_value());
+  REQUIRE(arm_two_connection_four->joint_socket_id == 1);
+  REQUIRE(arm_two_connection_four->fragment_socket_id == 0);
+  REQUIRE(Catch::Approx(arm_two_part_three_fi.total_rotation.asDegrees()) ==
+          45.f);
+
+  sf::Vector2f expected_arm_two_part_three_socket_0_position{-44.55f, 62.93f};
+  REQUIRE_THAT(arm_two_part_three_fi.transform.transformPoint(
+                   arm_two_part_three_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_three_socket_0_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_three_socket_1_position{-9.19f, 98.28f};
+  REQUIRE_THAT(arm_two_part_three_fi.transform.transformPoint(
+                   arm_two_part_three_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_three_socket_1_position, 0.01f));
 }
 } // namespace steamrot::tests

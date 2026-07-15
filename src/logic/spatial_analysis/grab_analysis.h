@@ -19,7 +19,6 @@
 /////////////////////////////////////////////////
 #include "DescriptorResult.h"
 #include "MachinaFormScaffold.h"
-#include "SocketState.h"
 #include <SFML/System/Vector2.hpp>
 #include <set>
 
@@ -46,10 +45,6 @@ JointInstance &get_anchor_joint(const GrabResult &grab_result,
 /////////////////////////////////////////////////
 std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint);
 
-FragmentInstance &get_beginning_of_arm(const SocketConnection &connection,
-                                       const SubGraph &arm,
-                                       PartGraph &part_graph);
-
 /////////////////////////////////////////////////
 /// @brief Get the number of connected sockets on the anchor joint and assign
 /// the socket IDs to the left and right arm sockets
@@ -71,8 +66,8 @@ void assign_left_and_right_arm_sockets(
 /// The anchor point is aligned to an/the origin and rotated until the y azis
 /// bisects its rotation arc.
 /////////////////////////////////////////////////
-void align_grab_structure(const GrabResult &grab_result, PartGraph &part_graph,
-                          const sf::Vector2f &anchor_point);
+void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
+                                        const sf::Vector2f &anchor_point);
 
 /////////////////////////////////////////////////
 /// @brief Simple function to get the end of arm for a grab structure.
@@ -83,15 +78,7 @@ void align_grab_structure(const GrabResult &grab_result, PartGraph &part_graph,
 /////////////////////////////////////////////////
 uint32_t get_end_of_arm(const SubGraph &arm);
 
-/////////////////////////////////////////////////
-/// @brief Using the grab result and part graph, assign the open state
-/// transforms for each part in the grab structure.
-///
-/// @param grab_result The GrabResult containing the anchor point ID and arm
-/// subgraphs for the grab structure
-/// @param part_graph The PartGraph containing the parts for the grab structure
-/////////////////////////////////////////////////
-void assign_open_state_transforms(GrabResult &grab_result,
-                                  PartGraph &part_graph);
-
+void align_grab_result_to_open_state(GrabResult &grab_result,
+                                     PartGraph &part_graph,
+                                     const sf::Vector2f &anchor_point);
 } // namespace steamrot::logic::spatial_analysis

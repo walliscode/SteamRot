@@ -16,6 +16,7 @@
 #include "MachinaFormScaffold.h"
 #include "MrGhost.h"
 #include "SceneContext.h"
+#include "SocketState.h"
 #include "Subscriber.h"
 #include <memory>
 #include <vector>
@@ -212,4 +213,16 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 /////////////////////////////////////////////////
 std::optional<std::pair<uint32_t, uint32_t>>
 check_PartGraph_for_connection_readiness(const PartGraph &part_graph);
+
+/////////////////////////////////////////////////
+/// @brief Checks wether the given JointInstance and FragmentInstance have any
+/// sockets that are connected. If so, returns a ConnectedSockets object
+/// containing the socket connections. If not, returns std::nullopt.
+///
+/// @param joint_instance JointInstance to check for connected sockets
+/// @param fragment_instance FragmentInstance to check for connected sockets
+/////////////////////////////////////////////////
+std::optional<JointFragmentConnection>
+check_for_connected_sockets(const JointInstance &joint_instance,
+                            const FragmentInstance &fragment_instance);
 } // namespace steamrot::logic::action::grimoire_machina
