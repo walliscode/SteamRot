@@ -90,6 +90,9 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
   // TRANSFORM //
   anchor_joint.transform.translate(translation_vector);
   anchor_joint.transform.rotate(rotation_angle);
+
+  // update state of the anchor joint
+  anchor_joint.total_rotation += rotation_angle;
 };
 
 /////////////////////////////////////////////////
@@ -141,6 +144,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
     // cycle through the subgraph - this should be in order of connection
     for (size_t i = 0; i < arm.size(); ++i) {
+      std::cout << "[align][arm] aligning first part of the arm"
+                << "\n";
       const uint32_t part_id = arm[i];
       std::cout << "[align][arm] i=" << i << " part_id=" << part_id << "\n";
 

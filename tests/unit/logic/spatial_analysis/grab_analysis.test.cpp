@@ -13,6 +13,7 @@
 #include "SocketState.h"
 #include "Vector2fEqualsMatcher.h"
 #include "action_grimoire_machina.h"
+#include "catch2/catch_approx.hpp"
 #include "descriptors_machina_archetypes.h"
 #include "joint_library.h"
 #include "machina_archetype_packages.h"
@@ -368,6 +369,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_one.has_value());
   REQUIRE(connection_one->joint_socket_id == 0);
   REQUIRE(connection_one->fragment_socket_id == 1);
+  REQUIRE(arm_one_part_one_fi.total_rotation.asDegrees() == -135.f);
   // arm_one_part_one_fi socket 1 should be at thte same position as
   // anchor_joint socket 0
   sf::Vector2f expected_arm_one_part_one_socket_1_position{9.19f, 9.19f};
@@ -406,17 +408,42 @@ TEST_CASE("align_grab_result_to_open_state tests") {
 
   // the socket pivot should be lined up with the fragment socket alignment
   // vector (so in this case a magnitude of 13 split evenly over x and y)
-  sf::Vector2f expected_arm_one_part_two_socket_pivot_position{31.55f, 31.55f};
+  sf::Vector2f expected_arm_one_part_two_socket_pivot_position{53.74f, 53.74f};
   REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
                    arm_one_part_two_ji.joint->socket_pivot),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_two_socket_pivot_position, 0.01f));
 
-  sf::Vector2f expected_arm_one_part_two_socket_0_position{9.19f, 9.19f};
+  sf::Vector2f expected_arm_one_part_two_socket_0_position{44.55f, 62.93f};
   REQUIRE_THAT(arm_one_part_two_ji.transform.transformPoint(
                    arm_one_part_two_ji.sockets.at(0).local_position),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_two_socket_0_position, 0.01f));
+
+  /// RIGHT ARM: PART THREE ///
+  // the third part of the arm should be a fragment instance
+  const auto &arm_one_part_three = graph.at(arm_one[2]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_one_part_three));
+  const FragmentInstance &arm_one_part_three_fi =
+      std::get<FragmentInstance>(arm_one_part_three);
+  auto connection_three = action::grimoire_machina::check_for_connected_sockets(
+      arm_one_part_two_ji, arm_one_part_three_fi);
+  REQUIRE(connection_three.has_value());
+  REQUIRE(connection_three->joint_socket_id == 0);
+  REQUIRE(connection_three->fragment_socket_id == 0);
+  REQUIRE(arm_one_part_three_fi.total_rotation.asDegrees() == 135.f);
+
+  sf::Vector2f expected_arm_one_part_three_socket_0_position{44.55f, 62.93f};
+  REQUIRE_THAT(arm_one_part_three_fi.transform.transformPoint(
+                   arm_one_part_three_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_three_socket_0_position, 0.01f));
+
+  sf::Vector2f expected_arm_one_part_three_socket_1_position{9.19f, 98.28f};
+  REQUIRE_THAT(arm_one_part_three_fi.transform.transformPoint(
+                   arm_one_part_three_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_one_part_three_socket_1_position, 0.01f));
   // LEFT ARM //
   const SubGraph &arm_two = grab_result.arms[1];
 
@@ -434,6 +461,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(arm_two_connection_two.has_value());
   REQUIRE(arm_two_connection_two->joint_socket_id == 1);
   REQUIRE(arm_two_connection_two->fragment_socket_id == 0);
+  REQUIRE(arm_two_part_one_fi.total_rotation.asDegrees() == 135.f);
   // arm_two_part_one_fi socket 0 should be at thte same position as
   // anchor_joint socket 1
   sf::Vector2f expected_arm_two_part_one_socket_0_position{-9.19f, 9.19f};
@@ -446,5 +474,58 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                    arm_two_part_one_fi.sockets.at(1).local_position),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_one_socket_1_position, 0.01f));
+
+  const auto &arm_two_part_two = graph.at(arm_two[1]);
+  REQUIRE(std::holds_alternative<JointInstance>(arm_two_part_two));
+  const JointInstance &arm_two_part_two_ji =
+      std::get<JointInstance>(arm_two_part_two);
+  auto arm_two_connection_three =
+      action::grimoire_machina::check_for_connected_sockets(
+          arm_two_part_two_ji, arm_two_part_one_fi);
+  REQUIRE(arm_two_connection_three.has_value());
+  REQUIRE(arm_two_connection_three->joint_socket_id == 0);
+  REQUIRE(arm_two_connection_three->fragment_socket_id == 1);
+  REQUIRE(Catch::Approx(arm_two_part_two_ji.total_rotation.asDegrees()) ==
+          -45.f);
+
+  sf::Vector2f expected_arm_two_part_two_socket_0_position{-44.55f, 44.55f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_0_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_two_socket_pivot_position{-53.74f, 53.74f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.joint->socket_pivot),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_pivot_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_two_socket_1_position{-44.55f, 62.93f};
+  REQUIRE_THAT(arm_two_part_two_ji.transform.transformPoint(
+                   arm_two_part_two_ji.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_two_socket_1_position, 0.01f));
+
+  const auto &arm_two_part_three = graph.at(arm_two[2]);
+  REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_three));
+  const FragmentInstance &arm_two_part_three_fi =
+      std::get<FragmentInstance>(arm_two_part_three);
+  auto arm_two_connection_four =
+      action::grimoire_machina::check_for_connected_sockets(
+          arm_two_part_two_ji, arm_two_part_three_fi);
+  REQUIRE(arm_two_connection_four.has_value());
+  REQUIRE(arm_two_connection_four->joint_socket_id == 1);
+  REQUIRE(arm_two_connection_four->fragment_socket_id == 0);
+  REQUIRE(Catch::Approx(arm_two_part_three_fi.total_rotation.asDegrees()) ==
+          45.f);
+
+  sf::Vector2f expected_arm_two_part_three_socket_0_position{-44.55f, 62.93f};
+  REQUIRE_THAT(arm_two_part_three_fi.transform.transformPoint(
+                   arm_two_part_three_fi.sockets.at(0).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_three_socket_0_position, 0.01f));
+  sf::Vector2f expected_arm_two_part_three_socket_1_position{-9.19f, 98.28f};
+  REQUIRE_THAT(arm_two_part_three_fi.transform.transformPoint(
+                   arm_two_part_three_fi.sockets.at(1).local_position),
+               Vector2fEqualsMatcher(
+                   expected_arm_two_part_three_socket_1_position, 0.01f));
 }
 } // namespace steamrot::tests
