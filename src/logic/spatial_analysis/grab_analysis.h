@@ -70,15 +70,32 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
                                         const sf::Vector2f &anchor_point);
 
 /////////////////////////////////////////////////
-/// @brief Simple function to get the end of arm for a grab structure.
+/// @brief Given a grab structure, align it to the open state.
 ///
-/// For now this just returns that last id in the Subgraph
-/// @param arm Subgraph representing an arm of a grab structure
-/// @return the part ID of the end of arm for the given arm
+/// This maximises any JointInstance socket positions and then aligns the
+/// fragmnets along those sockets
+///
+/// @param grab_result GrabResult containing the grab structure to be aligned
+/// @param part_graph PartGraph containing the parts for the grab structure
+/// @param anchor_point The anchor point to align the grab structure to (usually
+/// the origin)
 /////////////////////////////////////////////////
-uint32_t get_end_of_arm(const SubGraph &arm);
-
 void align_grab_result_to_open_state(GrabResult &grab_result,
                                      PartGraph &part_graph,
                                      const sf::Vector2f &anchor_point);
+
+/////////////////////////////////////////////////
+/// @brief Given a FragmentsInstance and a PartGraph, determine if the end of
+/// arm is ready to grab.
+///
+/// @param arm Subgraph representing an arm of a grab structure
+/// @param anchor_joint JointInstance corresponding to the anchor point of the
+/// grab structure
+/// @param part_graph PartGraph containing the parts for the grab structure
+/// @return true if the end of arm is ready to grab, false otherwise
+/////////////////////////////////////////////////
+bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
+                              const JointInstance &anchor_joint,
+                              const PartGraph &part_graph);
+
 } // namespace steamrot::logic::spatial_analysis

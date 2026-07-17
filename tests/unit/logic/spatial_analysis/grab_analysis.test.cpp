@@ -223,18 +223,6 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
   }
 }
 
-TEST_CASE("get_end_of_arm tests") {
-  // arrange
-  SubGraph arm1{1, 2, 3, 4};
-  SubGraph arm2{5};
-  SubGraph arm3{};
-
-  // act and assert
-  REQUIRE(spatial_analysis::get_end_of_arm(arm1) == 4);
-  REQUIRE(spatial_analysis::get_end_of_arm(arm2) == 5);
-  REQUIRE(spatial_analysis::get_end_of_arm(arm3) == 0);
-}
-
 TEST_CASE("assign_left_and_right_arm_sockets tests") {
 
   SECTION("assign_left_and_right_arm_sockets with no connected sockets") {
@@ -527,5 +515,179 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                    arm_two_part_three_fi.sockets.at(1).local_position),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_three_socket_1_position, 0.01f));
+}
+
+TEST_CASE("end_of_arm_is_grab_ready tests") {
+
+  // ARRANGE //
+  /// set up the part graph with a grab structure
+  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  MachinaArchetypeResult ma_result =
+      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
+                              valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
+
+  REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
+  GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
+  PartGraph &graph = valid_grab_pkg.part_graph;
+
+  // get the anchor joint from the part graph
+  JointInstance &anchor_joint =
+      std::get<JointInstance>(graph.at(grab_result.anchor));
+
+  // align the anchor joint to the anchor point, this should put the mid point
+  // pointing {0, 1} in world space
+  spatial_analysis::align_anchor_joint_to_anchor_point(anchor_joint,
+                                                       {0.f, 0.f});
+
+  SECTION("if Subgraph is empty, return false") {
+    SubGraph arm{};
+    REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+        arm, false, anchor_joint, valid_grab_pkg.part_graph));
+  }
+
+  SECTION("if PartGraph is empty, return false") {
+    SubGraph arm{1, 2, 3};
+    PartGraph empty_graph{};
+    REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+        arm, false, anchor_joint, empty_graph));
+  }
+
+  SECTION("Left arm tests") {
+
+    // get the left arm from the grab result
+    const SubGraph &left_arm = grab_result.arms[1];
+    // get the end of the left arm
+    auto &left_arm_end_part = graph.at(left_arm.back());
+    // get the fragment instance of the end of the left arm
+    REQUIRE(std::holds_alternative<FragmentInstance>(left_arm_end_part));
+
+    FragmentInstance &left_arm_end_fi =
+        std::get<FragmentInstance>(left_arm_end_part);
+
+    // the left arm alignment vector on the fragment should be 1,0
+    REQUIRE_THAT(left_arm_end_fi.sockets.at(0).alignment_vector.normalized(),
+                 Vector2fEqualsMatcher({1.f, 0.f}, 0.01f));
+
+    SECTION("rotation 0 degrees") {
+      // should point to the right, so grab ready for left arm
+
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(0.f);
+
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+
+    SECTION("rotation 45 degrees") {
+      // should point down and to the right, so grab ready for left arm
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(45.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 90 degrees") {
+      // should point down, so grab ready for left arm
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(90.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+
+    SECTION("rotation 135 degrees") {
+      // should point down and to the left, so not grab ready for left arm
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(135.f);
+      REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 180 degrees") {
+      // should point to the left, so not grab ready for left arm
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(180.f);
+      REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 225 degrees") {
+      // should point up and to the left, so not grab ready for left arm
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(225.f);
+      REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+
+    SECTION("rotation 270 degrees") {
+      // should point up which is colinear and grab ready
+      // set the rotation
+      left_arm_end_fi.total_rotation = sf::degrees(270.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
+    }
+  }
+
+  SECTION("Right arm tests") {
+    // get the right arm from the grab result
+    const SubGraph &right_arm = grab_result.arms[0];
+    // get the end of the right arm
+    auto &right_arm_end_part = graph.at(right_arm.back());
+    // get the fragment instance of the end of the right arm
+    REQUIRE(std::holds_alternative<FragmentInstance>(right_arm_end_part));
+    FragmentInstance &right_arm_end_fi =
+        std::get<FragmentInstance>(right_arm_end_part);
+    // the right arm alignment vector on the fragment should be -1,0
+    REQUIRE_THAT(right_arm_end_fi.sockets.at(0).alignment_vector.normalized(),
+                 Vector2fEqualsMatcher({1.f, 0.f}, 0.01f));
+
+    SECTION("rotation 0 degrees") {
+      // should point to the right, so not grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(0.f);
+      REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+
+    SECTION("rotation 45 degrees") {
+      // should point down and to the right, so not grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(45.f);
+      REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 90 degrees") {
+      // should point down, so grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(90.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+
+    SECTION("rotation 135 degrees") {
+      // should point down and to the left, so grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(135.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 180 degrees") {
+      // should point to the left, so grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(180.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 225 degrees") {
+      // should point up and to the left, so grab ready for right arm
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(225.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+    SECTION("rotation 270 degrees") {
+      // should point up which is colinear and grab ready
+      // set the rotation
+      right_arm_end_fi.total_rotation = sf::degrees(270.f);
+      REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
+          right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
+    }
+  }
 }
 } // namespace steamrot::tests
