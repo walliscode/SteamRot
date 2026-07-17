@@ -690,4 +690,58 @@ TEST_CASE("end_of_arm_is_grab_ready tests") {
     }
   }
 }
+
+TEST_CASE("all_arms_are_grab_ready tests") {
+  // ARRANGE //
+  /// set up the part graph with a grab structure
+  PartGraphPackage valid_grab_pkg = create_valid_grab_pkg();
+  MachinaArchetypeResult ma_result =
+      descriptors::MA::Grab()(valid_grab_pkg.part_graph,
+                              valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
+  REQUIRE(std::holds_alternative<GrabResult>(ma_result.result_sub_graphs));
+  GrabResult grab_result = std::get<GrabResult>(ma_result.result_sub_graphs);
+  PartGraph &graph = valid_grab_pkg.part_graph;
+  // get the anchor joint from the part graph
+  JointInstance &anchor_joint =
+      std::get<JointInstance>(graph.at(grab_result.anchor));
+  // align the anchor joint to the anchor point, this should put the mid point
+  // pointing {0, 1} in world space
+  spatial_analysis::align_anchor_joint_to_anchor_point(anchor_joint,
+                                                       {0.f, 0.f});
+  // get the left arm from the grab result
+  const SubGraph &left_arm = grab_result.arms[1];
+  // get the end of the left arm
+  auto &left_arm_end_part = graph.at(left_arm.back());
+  // get the fragment instance of the end of the left arm
+
+  // get the right arm from the grab result
+  const SubGraph &right_arm = grab_result.arms[0];
+  // get the end of the right arm
+  auto &right_arm_end_part = graph.at(right_arm.back());
+  // get the fragment instance of the end of the right arm
+  REQUIRE(std::holds_alternative<FragmentInstance>(right_arm_end_part));
+  FragmentInstance &right_arm_end_fi =
+      std::get<FragmentInstance>(right_arm_end_part);
+  REQUIRE(std::holds_alternative<FragmentInstance>(left_arm_end_part));
+  FragmentInstance &left_arm_end_fi =
+      std::get<FragmentInstance>(left_arm_end_part);
+  SECTION("both arms are grab ready") {
+    // set the left arm and right arm end fragments to point down, which is grab
+    // ready for both arms get the left arm from the grab result
+    left_arm_end_fi.total_rotation = sf::degrees(90.f);
+    right_arm_end_fi.total_rotation = sf::degrees(90.f);
+    REQUIRE(spatial_analysis::all_arms_are_grab_ready(
+        grab_result, valid_grab_pkg.part_graph));
+  }
+  SECTION("left arm is not grab ready") {
+    left_arm_end_fi.total_rotation = sf::degrees(135.f);
+    REQUIRE_FALSE(spatial_analysis::all_arms_are_grab_ready(
+        grab_result, valid_grab_pkg.part_graph));
+  }
+  SECTION("right arm is not grab ready") {
+    right_arm_end_fi.total_rotation = sf::degrees(45.f);
+    REQUIRE_FALSE(spatial_analysis::all_arms_are_grab_ready(
+        grab_result, valid_grab_pkg.part_graph));
+  }
+}
 } // namespace steamrot::tests

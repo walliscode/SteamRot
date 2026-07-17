@@ -13,7 +13,6 @@
 #include "positioning_grimoire_machina.h"
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <iostream>
 
 namespace steamrot::logic::spatial_analysis {
 
@@ -298,4 +297,35 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
   return true;
 }
 
+/////////////////////////////////////////////////
+bool all_arms_are_grab_ready(const GrabResult &grab_result,
+                             const PartGraph &part_graph) {
+  // if the grab result has no arms, return false
+  if (grab_result.arms.empty()) {
+    return false;
+  }
+
+  // get the anchor joint from the part graph
+  if (!part_graph.contains(grab_result.anchor)) {
+    return false;
+  }
+
+  if (!std::holds_alternative<JointInstance>(
+          part_graph.at(grab_result.anchor))) {
+    return false;
+  }
+  const JointInstance &anchor_joint =
+      std::get<JointInstance>(part_graph.at(grab_result.anchor));
+
+  // check each arm for grab readiness
+  for (size_t i = 0; i < grab_result.arms.size(); ++i) {
+    const SubGraph &arm = grab_result.arms[i];
+    const bool is_left_arm =
+        i % 2 == 1; // odd index is left arm, even index is right arm
+    if (!end_of_arm_is_grab_ready(arm, is_left_arm, anchor_joint, part_graph)) {
+      return false;
+    }
+  }
+  return true;
+}
 } // namespace steamrot::logic::spatial_analysis

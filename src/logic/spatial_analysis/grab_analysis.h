@@ -98,4 +98,6 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
                               const JointInstance &anchor_joint,
                               const PartGraph &part_graph);
 
+bool all_arms_are_grab_ready(const GrabResult &grab_result,
+                             const PartGraph &part_graph);
 } // namespace steamrot::logic::spatial_analysis
