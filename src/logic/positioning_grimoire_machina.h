@@ -139,6 +139,14 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 void position_machina_form_scaffold(PartGraph &parts);
 
 /////////////////////////////////////////////////
+/// @brief Starting from PartInstance 0 of the PartGraph, positions all parts in
+/// the graph based on their connections and socket configurations.
+///
+/// @param part_graph PartGraph to position
+/////////////////////////////////////////////////
+void position_part_graph(PartGraph &part_graph);
+
+/////////////////////////////////////////////////
 /// @brief expands teh composite box to include the next box, effectively
 /// calculating the bounding box of all boxes added so far.
 ///

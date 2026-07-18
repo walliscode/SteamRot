@@ -88,6 +88,11 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 /// @brief Given a FragmentsInstance and a PartGraph, determine if the end of
 /// arm is ready to grab.
 ///
+/// This is determined by checking the alignment vector of the connected socket
+/// and comparing it to the reference direction of the anchor joint. If the
+/// alignment vector is at least colinear with the reference direction or
+/// "pointing" inwards, then the end of arm is ready to grab.
+///
 /// @param arm Subgraph representing an arm of a grab structure
 /// @param anchor_joint JointInstance corresponding to the anchor point of the
 /// grab structure
@@ -98,6 +103,16 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
                               const JointInstance &anchor_joint,
                               const PartGraph &part_graph);
 
+/////////////////////////////////////////////////
+/// @brief Given a GrabResult and a PartGraph, determine if all arms are ready
+/// to grab.
+///
+///
+/// @param grab_result GrabResult containing the grab structure to be analyzed
+/// @param part_graph PartGraph containing the parts for the grab structure
+/// @return true if all arms are ready to grab, false otherwise
+/////////////////////////////////////////////////
 bool all_arms_are_grab_ready(const GrabResult &grab_result,
                              const PartGraph &part_graph);
+
 } // namespace steamrot::logic::spatial_analysis
