@@ -10,6 +10,7 @@
 #include "Fragment.h"
 #include "Joint.h"
 #include "MachinaFormScaffold.h"
+#include "PartGraphBuilder.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
 #include "action_grimoire_machina.h"
@@ -26,6 +27,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 #include <iostream>
+#include <string>
 
 namespace steamrot::tests {
 
@@ -1051,6 +1053,136 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
   }
 }
 
+TEST_CASE("check_if_allowed_joint_socket_configuration tests",
+          "[unit][positioning_grimoire_machina]") {
+
+  SECTION("Returns false when joint pointer is null") {
+    steamrot::JointInstance instance{nullptr};
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
+  } // namespace steamrot::tests
+
+  SECTION("Returns false if any socket is out of bounds by radius") {
+
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 270.f;
+    steamrot::JointInstance instance{&joint};
+    steamrot::logic::positioning::grimoire_machina::
+        initialize_joint_socket_positions(instance);
+
+    // Manually set one socket to be out of bounds
+    instance.sockets.at(1).local_position = {13.f, 0.f};
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
+  }
+
+  SECTION("Returns false if any socket is out of bounds by rotation arc") {
+
+    struct TestCase {
+      std::string name;
+      float rotation_arc_min;
+      float rotation_arc_max;
+      sf::Vector2f out_of_bounds_socket_position;
+    };
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    steamrot::JointInstance instance{&joint};
+    steamrot::logic::positioning::grimoire_machina::
+        initialize_joint_socket_positions(instance);
+
+    // Test cases for out-of-bounds sockets
+    std::vector<TestCase> test_cases = {
+        {"Socket below min arc", 45.f, 270.f, {10.f, 0.f}},
+        {"Socket above max arc", 0.f, 180.f, {0.f, -10.f}},
+    };
+
+    for (const auto &tc : test_cases) {
+      DYNAMIC_SECTION(tc.name) {
+        joint.socket_config.rotation_arc_min = tc.rotation_arc_min;
+        joint.socket_config.rotation_arc_max = tc.rotation_arc_max;
+        // set one socket to be out of bounds
+        instance.sockets.at(1).local_position =
+            tc.out_of_bounds_socket_position;
+        REQUIRE_FALSE(
+            steamrot::logic::positioning::grimoire_machina::
+                check_if_allowed_joint_socket_configuration(instance));
+      }
+    }
+  }
+
+  SECTION("Returns false if minimum_gap is not maintained between sockets") {
+    // Arrange
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 180.f;
+    steamrot::JointInstance instance{&joint};
+
+    // set up a test struct to initialize the joint socket positions
+    struct TestStruct {
+      std::string name;
+      float minimum_gap;
+      sf::Vector2f socket_0_position;
+      sf::Vector2f socket_1_position;
+      sf::Vector2f socket_2_position;
+    };
+
+    std::vector<TestStruct> test_cases = {
+        {"Sockets too close together_one",
+         15.f,
+         {10.f, 0.f},
+         {9.510565f, 3.090170f},
+         {8.660254f, 5.f}},
+        {"Sockets too close together_two",
+         10.f,
+         {10.f, 0.f},
+         {9.238795f, 3.826834f},
+         {8.660254f, 5.f}},
+    };
+
+    for (const auto &tc : test_cases) {
+      DYNAMIC_SECTION(tc.name) {
+        joint.socket_config.minimum_gap = tc.minimum_gap;
+        instance.sockets.at(0).local_position = tc.socket_0_position;
+        instance.sockets.at(1).local_position = tc.socket_1_position;
+        instance.sockets.at(2).local_position = tc.socket_2_position;
+        REQUIRE_FALSE(
+            steamrot::logic::positioning::grimoire_machina::
+                check_if_allowed_joint_socket_configuration(instance));
+      }
+    }
+  }
+
+  SECTION("Returns false if socket order is not maintained (clockwise)") {
+    // Arrange
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 270.f;
+    joint.socket_config.minimum_gap = 5.f;
+    steamrot::JointInstance instance{&joint};
+    // Manually set sockets to be out of order (clockwise)
+    instance.sockets.at(0).local_position = {10.f, 0.f}; // 0°
+    // set socket 1 to be at 270° (out of order)
+    instance.sockets.at(1).local_position = {0.f, -10.f}; // 270°
+    // set socket 2 to be at 135° (in order)
+    instance.sockets.at(2).local_position = {-7.071f, 7.071f}; // 135°
+    // Act & Assert
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
+  }
+}
+
 TEST_CASE("initialize_joint_socket_positions tests",
           "[unit][positioning_grimoire_machina]") {
 
@@ -1090,6 +1222,161 @@ TEST_CASE("initialize_joint_socket_positions tests",
     REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
                         initialize_joint_socket_positions(instance));
     REQUIRE(instance.sockets.empty());
+  }
+}
+
+TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
+
+  SECTION("Does not throw when part graph is empty") {
+    steamrot::PartGraph part_graph;
+    REQUIRE_NOTHROW(
+        steamrot::logic::positioning::grimoire_machina::position_part_graph(
+            part_graph));
+  }
+
+  SECTION("Positions a simple part graph with one fragment and one joint") {
+
+    // ARRANGE //
+    PartGraphBuilder builder;
+    PartGraphPackage part_graph_package =
+        builder.AddJointInstance(parts::JointSquareWithOneSocket, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f1")
+            .Connect("f1", 0, "j0", 0)
+            .Build();
+
+    PartGraph &part_graph = part_graph_package.part_graph;
+    // get references to the fragment and joint instances
+    auto &joint_instance_result =
+        part_graph.at(part_graph_package.id_to_part_graph_id.at("j0"));
+    REQUIRE(std::holds_alternative<JointInstance>(joint_instance_result));
+    JointInstance &joint_instance =
+        std::get<JointInstance>(joint_instance_result); // get joint instance
+    maximise_joint_socket_spread(
+        joint_instance); // ensure joint sockets are spread out
+    //
+    auto &fragment_instance_result =
+        part_graph.at(part_graph_package.id_to_part_graph_id.at("f1"));
+    REQUIRE(std::holds_alternative<FragmentInstance>(fragment_instance_result));
+    FragmentInstance &fragment_instance =
+        std::get<FragmentInstance>(fragment_instance_result); // get fragment
+    REQUIRE(logic::action::grimoire_machina::check_for_connected_sockets(
+        joint_instance, fragment_instance));
+
+    // check positions before //
+    const sf::Vector2f expected_ji_socket_0_world_before{19.19f, 19.19f};
+    REQUIRE_THAT(joint_instance.transform.transformPoint(
+                     joint_instance.sockets.at(0).local_position),
+                 EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
+    const sf::Vector2f expected_ji_socket_pivot_world_before{10.f, 10.f};
+    REQUIRE_THAT(joint_instance.transform.transformPoint(
+                     joint_instance.joint->socket_pivot),
+                 EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
+
+    const sf::Vector2f expected_fi_socket_0_world_before{0.f, 5.f};
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(0).local_position),
+                 EqualsVector2f(expected_fi_socket_0_world_before, 0.01f));
+
+    // ACT //
+    position_part_graph(part_graph);
+
+    // ASSERT //
+    // joint and joint sockets should not have moved but the fragment should
+    // have been positioned onto the joint socket via the connection
+    REQUIRE_THAT(joint_instance.transform.transformPoint(
+                     joint_instance.sockets.at(0).local_position),
+                 EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
+    REQUIRE_THAT(joint_instance.transform.transformPoint(
+                     joint_instance.joint->socket_pivot),
+                 EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
+    const sf::Vector2f expected_fi_socket_0_world_after{19.19f, 19.19f};
+
+    REQUIRE_THAT(fragment_instance.transform.transformPoint(
+                     fragment_instance.sockets.at(0).local_position),
+                 EqualsVector2f(expected_fi_socket_0_world_after, 0.01f));
+    // rotates 45 degrees to align the fragment socket with the joint socket
+    REQUIRE(fragment_instance.total_rotation.asDegrees() == 45.f);
+  }
+  SECTION("Positions a chain graph: j0 - f1 - j2") {
+    PartGraphBuilder builder;
+    PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWithOneSocket, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1")
+            .AddJointInstance(parts::JointSquareWithOneSocket, "j2")
+            .Connect("f1", 0, "j0", 0)
+            .Connect("f1", 1, "j2", 0)
+            .Build();
+
+    PartGraph &g = pkg.part_graph;
+
+    auto &j0v = g.at(pkg.id_to_part_graph_id.at("j0"));
+    auto &f1v = g.at(pkg.id_to_part_graph_id.at("f1"));
+    auto &j2v = g.at(pkg.id_to_part_graph_id.at("j2"));
+
+    auto &j0 = std::get<JointInstance>(j0v);
+    auto &f1 = std::get<FragmentInstance>(f1v);
+    auto &j2 = std::get<JointInstance>(j2v);
+
+    maximise_joint_socket_spread(j0);
+    maximise_joint_socket_spread(j2);
+
+    position_part_graph(g);
+
+    // f1 socket 0 should align to j0 socket 0
+    REQUIRE_THAT(f1.transform.transformPoint(f1.sockets.at(0).local_position),
+                 EqualsVector2f(j0.transform.transformPoint(
+                                    j0.sockets.at(0).local_position),
+                                0.01f));
+  }
+
+  SECTION("Positions a branching graph: j0 connected to f1 and f2") {
+    PartGraphBuilder builder;
+    PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f1")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f2")
+            .Connect("f1", 0, "j0", 0)
+            .Connect("f2", 0, "j0", 1)
+            .Build();
+
+    PartGraph &g = pkg.part_graph;
+
+    auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
+    auto &f1 =
+        std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f1")));
+    auto &f2 =
+        std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f2")));
+
+    maximise_joint_socket_spread(j0);
+
+    position_part_graph(g);
+
+    REQUIRE_THAT(f1.transform.transformPoint(f1.sockets.at(0).local_position),
+                 EqualsVector2f(j0.transform.transformPoint(
+                                    j0.sockets.at(0).local_position),
+                                0.01f));
+
+    REQUIRE_THAT(f2.transform.transformPoint(f2.sockets.at(0).local_position),
+                 EqualsVector2f(j0.transform.transformPoint(
+                                    j0.sockets.at(1).local_position),
+                                0.01f));
+  }
+
+  SECTION("Does not infinite-loop on a cyclic graph") {
+    PartGraphBuilder builder;
+    PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1")
+            .Connect("f1", 0, "j0", 0)
+            .Connect("f1", 1, "j0",
+                     1) // creates cycle-like revisit opportunities
+            .Build();
+
+    PartGraph &g = pkg.part_graph;
+    auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
+    maximise_joint_socket_spread(j0);
+
+    REQUIRE_NOTHROW(position_part_graph(g));
   }
 }
 

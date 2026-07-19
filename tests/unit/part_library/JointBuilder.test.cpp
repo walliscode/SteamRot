@@ -43,7 +43,7 @@ TEST_CASE("JointBuilder tests", "[unit][part_library][JointBuilder]") {
             .Build(joint_name);
     REQUIRE(joint.socket_config.socket_count == 4);
     REQUIRE(joint.socket_config.radius == Catch::Approx(1.0f));
-    REQUIRE(joint.socket_config.min_gap == Catch::Approx(0.1f));
+    REQUIRE(joint.socket_config.minimum_gap == Catch::Approx(0.1f));
     REQUIRE(joint.socket_config.fixed_socket_angle == Catch::Approx(45.0f));
     REQUIRE(joint.socket_config.has_fixed_socket == true);
     REQUIRE(joint.socket_config.rotation_arc_min == Catch::Approx(0.0f));
@@ -59,7 +59,7 @@ TEST_CASE("JointBuilder tests", "[unit][part_library][JointBuilder]") {
     REQUIRE(joint.positioning_views.size() == 1);
     REQUIRE(joint.socket_config.socket_count == 2);
     REQUIRE(joint.socket_config.radius == Catch::Approx(0.5f));
-    REQUIRE(joint.socket_config.min_gap == Catch::Approx(0.05f));
+    REQUIRE(joint.socket_config.minimum_gap == Catch::Approx(0.05f));
     REQUIRE(joint.socket_config.fixed_socket_angle == Catch::Approx(30.0f));
     REQUIRE(joint.socket_config.has_fixed_socket == false);
     REQUIRE(joint.socket_config.rotation_arc_min == Catch::Approx(0.0f));

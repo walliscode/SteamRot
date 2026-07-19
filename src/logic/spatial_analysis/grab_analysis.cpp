@@ -13,7 +13,6 @@
 #include "positioning_grimoire_machina.h"
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <iostream>
 
 namespace steamrot::logic::spatial_analysis {
 
@@ -96,94 +95,62 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
 };
 
 /////////////////////////////////////////////////
-uint32_t get_end_of_arm(const SubGraph &arm) {
-  return arm.empty() ? 0 : arm.back();
-}
-
-/////////////////////////////////////////////////
 void align_grab_result_to_open_state(GrabResult &grab_result,
                                      PartGraph &part_graph,
                                      const sf::Vector2f &anchor_point) {
-  std::cout << "[align] Begin align_grab_result_to_open_state | anchor="
-            << grab_result.anchor << " | arms=" << grab_result.arms.size()
-            << " | anchor_point=(" << anchor_point.x << ", " << anchor_point.y
-            << ")\n";
 
   // put out the anchor joint
   const uint32_t anchor_id = grab_result.anchor;
 
   // check that the anchor point is a valid part in the part graph
   if (!part_graph.contains(anchor_id)) {
-    std::cerr << "[align][error] Anchor id " << anchor_id
-              << " not found in part_graph. Aborting.\n";
     return;
   }
 
   JointInstance &anchor_joint = get_anchor_joint(grab_result, part_graph);
-  std::cout << "[align] Resolved anchor joint id=" << anchor_id << "\n";
 
   // as this is the coordination fuction we can set the initial transform of the
   // anchor joint to identity
   anchor_joint.transform = sf::Transform::Identity;
-  std::cout << "[align] Anchor transform reset to Identity\n";
 
   // LOCAL TRANSFORMS //
   // spread the sockets on the anchor joint to maximum
   positioning::grimoire_machina::maximise_joint_socket_spread(anchor_joint);
-  std::cout << "[align] Anchor joint socket spread maximised\n";
 
   // GLOBAL TRANSFORMS //
   // align the anchor joint to the anchor point
   align_anchor_joint_to_anchor_point(anchor_joint, anchor_point);
-  std::cout << "[align] Anchor joint aligned to anchor point\n";
 
   // create lambda to cycle through an arm an connect each one in turn to the
   // previous one
   auto align_arm = [&](const SubGraph &arm) {
-    std::cout << "[align][arm] Start arm | size=" << arm.size() << "\n";
-
     // cycle through the subgraph - this should be in order of connection
     for (size_t i = 0; i < arm.size(); ++i) {
-      std::cout << "[align][arm] aligning first part of the arm"
-                << "\n";
       const uint32_t part_id = arm[i];
-      std::cout << "[align][arm] i=" << i << " part_id=" << part_id << "\n";
 
       if (!part_graph.contains(part_id)) {
-        std::cout << "[align][arm][skip] part_id=" << part_id
-                  << " not in part_graph\n";
         continue;
       }
 
       // for the first part in the arm we need to check it connects to the
       // anchor joint
       if (i == 0) {
-        std::cout << "[align][arm] First part, checking connection to anchor\n";
 
         // check that the part is connected to the anchor joint
         auto connection = action::grimoire_machina::check_for_connected_sockets(
             anchor_joint, std::get<FragmentInstance>(part_graph.at(part_id)));
 
         if (!connection) {
-          std::cout << "[align][arm][skip] part_id=" << part_id
-                    << " not connected to anchor\n";
           continue;
         }
 
         // get the part and check it is a FragmentInstance
         if (!std::holds_alternative<FragmentInstance>(part_graph.at(part_id))) {
-          std::cout << "[align][arm][skip] part_id=" << part_id
-                    << " is not FragmentInstance\n";
           continue;
         }
 
         FragmentInstance &fi =
             std::get<FragmentInstance>(part_graph.at(part_id));
-
-        std::cout << "[align][arm] Align fragment part_id=" << part_id
-                  << " onto anchor | fragment_socket="
-                  << connection->fragment_socket_id
-                  << " joint_socket=" << connection->joint_socket_id << "\n";
 
         // align the part to the anchor joint
         positioning::grimoire_machina::align_fragment_onto_joint_socket(
@@ -195,12 +162,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
       // previous one
       else {
         const uint32_t prev_part_id = arm[i - 1];
-        std::cout << "[align][arm] Checking against prev_part_id="
-                  << prev_part_id << "\n";
 
         if (!part_graph.contains(prev_part_id)) {
-          std::cout << "[align][arm][skip] prev_part_id=" << prev_part_id
-                    << " not in part_graph\n";
           continue;
         }
 
@@ -213,23 +176,13 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
           JointInstance &ji =
               std::get<JointInstance>(part_graph.at(prev_part_id));
 
-          std::cout << "[align][arm] Case Fragment <- Joint | part_id="
-                    << part_id << " prev_part_id=" << prev_part_id << "\n";
-
           // check that the part is connected to the previous part
           auto connection =
               action::grimoire_machina::check_for_connected_sockets(ji, fi);
           if (!connection) {
-            std::cout << "[align][arm][skip] No connection Fragment(part_id="
-                      << part_id << ") <-> Joint(prev_part_id=" << prev_part_id
-                      << ")\n";
+
             continue;
           }
-
-          std::cout
-              << "[align][arm] Align fragment onto joint | fragment_socket="
-              << connection->fragment_socket_id
-              << " joint_socket=" << connection->joint_socket_id << "\n";
 
           // align the part to the previous part
           positioning::grimoire_machina::align_fragment_onto_joint_socket(
@@ -244,53 +197,135 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
           FragmentInstance &fi =
               std::get<FragmentInstance>(part_graph.at(prev_part_id));
 
-          std::cout << "[align][arm] Case Joint <- Fragment | part_id="
-                    << part_id << " prev_part_id=" << prev_part_id << "\n";
-
           // check that the part is connected to the previous part
           auto connection =
               action::grimoire_machina::check_for_connected_sockets(ji, fi);
           if (!connection) {
-            std::cout << "[align][arm][skip] No connection Joint(part_id="
-                      << part_id
-                      << ") <-> Fragment(prev_part_id=" << prev_part_id
-                      << ")\n";
-            continue;
           }
 
           // maximise the socket spread on the joint before aligning it to the
           // fragment
           positioning::grimoire_machina::maximise_joint_socket_spread(ji);
-          std::cout << "[align][arm] Joint socket spread maximised for part_id="
-                    << part_id << "\n";
-
-          std::cout << "[align][arm] Align joint onto fragment | joint_socket="
-                    << connection->joint_socket_id
-                    << " fragment_socket=" << connection->fragment_socket_id
-                    << "\n";
 
           // align the part to the previous part
           positioning::grimoire_machina::align_joint_onto_fragment_socket(
               ji, connection->joint_socket_id, fi,
               connection->fragment_socket_id);
         } else {
-          std::cout
-              << "[align][arm][skip] Unsupported type pairing for part_id="
-              << part_id << " and prev_part_id=" << prev_part_id << "\n";
         }
       }
     }
-
-    std::cout << "[align][arm] End arm\n";
   };
 
   // cycle through the arms and align them
   for (size_t arm_index = 0; arm_index < grab_result.arms.size(); ++arm_index) {
-    std::cout << "[align] Processing arm " << arm_index << "\n";
+
     align_arm(grab_result.arms[arm_index]);
   }
-
-  std::cout << "[align] End align_grab_result_to_open_state\n";
 }
 
+/////////////////////////////////////////////////
+bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
+                              const JointInstance &anchor_joint,
+                              const PartGraph &part_graph) {
+
+  // if the arm is empty or the part graph is empty, return false
+  if (arm.empty() || part_graph.empty()) {
+    return false;
+  }
+
+  // the midpoint of the anchor joint's rotation arc in world space gives us our
+  // reference direction
+  const float arc_mid_degrees =
+      (anchor_joint.joint->socket_config.rotation_arc_min +
+       anchor_joint.joint->socket_config.rotation_arc_max) /
+      2.f;
+
+  // add the anchor joint's total rotation to the arc mid degrees to get the
+  // world rotation
+  const sf::Angle world_arc_mid_degrees =
+      anchor_joint.total_rotation + sf::degrees(arc_mid_degrees);
+
+  // convert the world arc mid degrees to a sf::Vector2f representing the
+  // direction. Makes use of the normalized vector to get the direction only
+  sf::Vector2f reference_direction =
+      sf::Vector2f(std::cos(world_arc_mid_degrees.asRadians()),
+                   std::sin(world_arc_mid_degrees.asRadians()))
+          .normalized();
+
+  // get the end of arm part ID and check that it is a FragmentInstance
+  const uint32_t end_of_arm_id = arm.back();
+  if (!part_graph.contains(end_of_arm_id) ||
+      !std::holds_alternative<FragmentInstance>(part_graph.at(end_of_arm_id))) {
+    return false;
+  }
+
+  // get the end of arm FragmentInstance
+  const FragmentInstance &end_of_arm_fi =
+      std::get<FragmentInstance>(part_graph.at(end_of_arm_id));
+
+  // find the alignment vector of the connected socket
+  sf::Vector2f alignment_vector;
+  for (const auto &[socket_id, socket_data] : end_of_arm_fi.sockets) {
+    if (socket_data.connection_state == SocketConnectionState::Connected) {
+      alignment_vector =
+          positioning::grimoire_machina::calculate_alignment_vector(
+              end_of_arm_fi, socket_id);
+      break;
+    }
+  }
+
+  // find the cross product to get directionality.
+  const float direction = reference_direction.cross(alignment_vector);
+
+  // if the arm is the left arm, the direction should be equal to or negative
+  // (counter clockwise) to the reference direction. If the arm is the right
+  // arm, the direction should be equal to or positive (clockwise) to the
+  // reference direction.
+  //
+  // add a small epsilon to account for floating point errors
+  constexpr float EPS = 1e-5f;
+
+  // left arm: allow negative or near-zero
+  if (is_left_arm && direction > EPS) {
+    return false;
+  }
+  // right arm: allow positive or near-zero
+  if (!is_left_arm && direction < -EPS) {
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool all_arms_are_grab_ready(const GrabResult &grab_result,
+                             const PartGraph &part_graph) {
+  // if the grab result has no arms, return false
+  if (grab_result.arms.empty()) {
+    return false;
+  }
+
+  // get the anchor joint from the part graph
+  if (!part_graph.contains(grab_result.anchor)) {
+    return false;
+  }
+
+  if (!std::holds_alternative<JointInstance>(
+          part_graph.at(grab_result.anchor))) {
+    return false;
+  }
+  const JointInstance &anchor_joint =
+      std::get<JointInstance>(part_graph.at(grab_result.anchor));
+
+  // check each arm for grab readiness
+  for (size_t i = 0; i < grab_result.arms.size(); ++i) {
+    const SubGraph &arm = grab_result.arms[i];
+    const bool is_left_arm =
+        i % 2 == 1; // odd index is left arm, even index is right arm
+    if (!end_of_arm_is_grab_ready(arm, is_left_arm, anchor_joint, part_graph)) {
+      return false;
+    }
+  }
+  return true;
+}
 } // namespace steamrot::logic::spatial_analysis

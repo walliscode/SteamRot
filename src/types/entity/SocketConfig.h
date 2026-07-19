@@ -49,7 +49,7 @@ struct SocketConfig {
   SocketConfig(uint8_t count, float radius, float min_gap,
                float fixed_socket_angle, bool has_fixed_socket,
                float rotation_arc_min, float rotation_arc_max)
-      : socket_count(count), radius(radius), min_gap(min_gap),
+      : socket_count(count), radius(radius), minimum_gap(min_gap),
         fixed_socket_angle(fixed_socket_angle),
         has_fixed_socket(has_fixed_socket), rotation_arc_min(rotation_arc_min),
         rotation_arc_max(rotation_arc_max) {}
@@ -68,7 +68,7 @@ struct SocketConfig {
   /// @brief Minimum angular separation (degrees) between adjacent rotatable
   /// sockets.
   /////////////////////////////////////////////////
-  float min_gap{0.f};
+  float minimum_gap{0.f};
 
   /////////////////////////////////////////////////
   /// @brief Angle (degrees) of the fixed anchor socket (socket index 0).

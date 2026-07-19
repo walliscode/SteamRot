@@ -125,6 +125,19 @@ void compute_socket_local_positions_even_spread(
     std::vector<sf::Vector2f> &local_positions);
 
 /////////////////////////////////////////////////
+/// @brief Checks if a JointInstance has a valid socket configuration based on
+/// the sockets current positions
+///
+/// The sockets can move dynamically (locally which then transforms to global)
+/// and this function checks if the current positions are valid based on the
+/// JointInstance's SocketConfig.
+/// @param joint_instance JointInstance to check
+/// @return True if the socket configuration is valid, false otherwise
+/////////////////////////////////////////////////
+bool check_if_allowed_joint_socket_configuration(
+    const JointInstance &joint_instance);
+
+/////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at
 /// 0,0 of the canvas
 /////////////////////////////////////////////////
@@ -137,6 +150,14 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 /// @param parts The PartGraph of the MachinaFormScaffold to position
 /////////////////////////////////////////////////
 void position_machina_form_scaffold(PartGraph &parts);
+
+/////////////////////////////////////////////////
+/// @brief Starting from PartInstance 0 of the PartGraph, positions all parts in
+/// the graph based on their connections and socket configurations.
+///
+/// @param part_graph PartGraph to position
+/////////////////////////////////////////////////
+void position_part_graph(PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief expands teh composite box to include the next box, effectively
