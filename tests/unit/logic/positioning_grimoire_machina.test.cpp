@@ -27,6 +27,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstdint>
 #include <iostream>
+#include <string>
 
 namespace steamrot::tests {
 
@@ -1049,6 +1050,136 @@ TEST_CASE("compute_socket_local_positions_even_spread tests",
                                              expected_position_2, 0.001f));
       }
     }
+  }
+}
+
+TEST_CASE("check_if_allowed_joint_socket_configuration tests",
+          "[unit][positioning_grimoire_machina]") {
+
+  SECTION("Returns false when joint pointer is null") {
+    steamrot::JointInstance instance{nullptr};
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
+  } // namespace steamrot::tests
+
+  SECTION("Returns false if any socket is out of bounds by radius") {
+
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 270.f;
+    steamrot::JointInstance instance{&joint};
+    steamrot::logic::positioning::grimoire_machina::
+        initialize_joint_socket_positions(instance);
+
+    // Manually set one socket to be out of bounds
+    instance.sockets.at(1).local_position = {13.f, 0.f};
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
+  }
+
+  SECTION("Returns false if any socket is out of bounds by rotation arc") {
+
+    struct TestCase {
+      std::string name;
+      float rotation_arc_min;
+      float rotation_arc_max;
+      sf::Vector2f out_of_bounds_socket_position;
+    };
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    steamrot::JointInstance instance{&joint};
+    steamrot::logic::positioning::grimoire_machina::
+        initialize_joint_socket_positions(instance);
+
+    // Test cases for out-of-bounds sockets
+    std::vector<TestCase> test_cases = {
+        {"Socket below min arc", 45.f, 270.f, {10.f, 0.f}},
+        {"Socket above max arc", 0.f, 180.f, {0.f, -10.f}},
+    };
+
+    for (const auto &tc : test_cases) {
+      DYNAMIC_SECTION(tc.name) {
+        joint.socket_config.rotation_arc_min = tc.rotation_arc_min;
+        joint.socket_config.rotation_arc_max = tc.rotation_arc_max;
+        // set one socket to be out of bounds
+        instance.sockets.at(1).local_position =
+            tc.out_of_bounds_socket_position;
+        REQUIRE_FALSE(
+            steamrot::logic::positioning::grimoire_machina::
+                check_if_allowed_joint_socket_configuration(instance));
+      }
+    }
+  }
+
+  SECTION("Returns false if minimum_gap is not maintained between sockets") {
+    // Arrange
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 180.f;
+    steamrot::JointInstance instance{&joint};
+
+    // set up a test struct to initialize the joint socket positions
+    struct TestStruct {
+      std::string name;
+      float minimum_gap;
+      sf::Vector2f socket_0_position;
+      sf::Vector2f socket_1_position;
+      sf::Vector2f socket_2_position;
+    };
+
+    std::vector<TestStruct> test_cases = {
+        {"Sockets too close together_one",
+         15.f,
+         {10.f, 0.f},
+         {9.510565f, 3.090170f},
+         {8.660254f, 5.f}},
+        {"Sockets too close together_two",
+         10.f,
+         {10.f, 0.f},
+         {9.238795f, 3.826834f},
+         {8.660254f, 5.f}},
+    };
+
+    for (const auto &tc : test_cases) {
+      DYNAMIC_SECTION(tc.name) {
+        joint.socket_config.minimum_gap = tc.minimum_gap;
+        instance.sockets.at(0).local_position = tc.socket_0_position;
+        instance.sockets.at(1).local_position = tc.socket_1_position;
+        instance.sockets.at(2).local_position = tc.socket_2_position;
+        REQUIRE_FALSE(
+            steamrot::logic::positioning::grimoire_machina::
+                check_if_allowed_joint_socket_configuration(instance));
+      }
+    }
+  }
+
+  SECTION("Returns false if socket order is not maintained (clockwise)") {
+    // Arrange
+    steamrot::Joint joint;
+    joint.socket_pivot = {0.f, 0.f};
+    joint.socket_config.socket_count = 3;
+    joint.socket_config.radius = 10.f;
+    joint.socket_config.rotation_arc_min = 0.f;
+    joint.socket_config.rotation_arc_max = 270.f;
+    joint.socket_config.minimum_gap = 5.f;
+    steamrot::JointInstance instance{&joint};
+    // Manually set sockets to be out of order (clockwise)
+    instance.sockets.at(0).local_position = {10.f, 0.f}; // 0°
+    // set socket 1 to be at 270° (out of order)
+    instance.sockets.at(1).local_position = {0.f, -10.f}; // 270°
+    // set socket 2 to be at 135° (in order)
+    instance.sockets.at(2).local_position = {-7.071f, 7.071f}; // 135°
+    // Act & Assert
+    REQUIRE_FALSE(steamrot::logic::positioning::grimoire_machina::
+                      check_if_allowed_joint_socket_configuration(instance));
   }
 }
 

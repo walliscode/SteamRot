@@ -198,7 +198,7 @@ ConfigureJoint(Joint &joint, const JointFbs *joint_fbs) {
 
   joint.socket_config.socket_count = sc->socket_count();
   joint.socket_config.radius = sc->radius();
-  joint.socket_config.min_gap = sc->min_gap();
+  joint.socket_config.minimum_gap = sc->min_gap();
   joint.socket_config.fixed_socket_angle = sc->fixed_socket_angle();
   joint.socket_config.has_fixed_socket = sc->has_fixed_socket();
   joint.socket_config.rotation_arc_min = sc->rotation_arc_min();

@@ -55,7 +55,7 @@ void create_grab_scaffold_one(GrimoireMachina &grimoire) {
   joint_one.socket_config.radius = 13.f;
   joint_one.socket_config.rotation_arc_min = 0.f;
   joint_one.socket_config.rotation_arc_max = 180.f;
-  joint_one.socket_config.min_gap = 10.f;
+  joint_one.socket_config.minimum_gap = 10.f;
   joint_one.socket_config.has_fixed_socket = false;
   joint_one.socket_config.fixed_socket_angle = 0.f;
 

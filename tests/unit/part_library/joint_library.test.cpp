@@ -22,7 +22,7 @@ TEST_CASE(
   REQUIRE(joint.positioning_views.size() == 1);
   REQUIRE(joint.socket_config.socket_count == 2);
   REQUIRE(joint.socket_config.radius == 13);
-  REQUIRE(joint.socket_config.min_gap == 0);
+  REQUIRE(joint.socket_config.minimum_gap == 0);
   REQUIRE(joint.socket_config.fixed_socket_angle == 0);
   REQUIRE(joint.socket_config.has_fixed_socket == false);
   REQUIRE(joint.socket_config.rotation_arc_min == 0);

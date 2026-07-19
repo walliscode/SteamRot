@@ -115,4 +115,13 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
 bool all_arms_are_grab_ready(const GrabResult &grab_result,
                              const PartGraph &part_graph);
 
+/////////////////////////////////////////////////
+/// @brief This identifies the JointInstances in
+///
+/// @param grab_result [TODO:parameter]
+/// @param part_graph [TODO:parameter]
+/////////////////////////////////////////////////
+void cycle_though_potential_grab_states(GrabResult &grab_result,
+                                        PartGraph &part_graph);
+
 } // namespace steamrot::logic::spatial_analysis

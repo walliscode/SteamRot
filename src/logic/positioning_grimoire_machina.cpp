@@ -358,6 +358,129 @@ void compute_socket_local_positions_even_spread(
 }
 
 /////////////////////////////////////////////////
+bool check_if_allowed_joint_socket_configuration(
+    const JointInstance &joint_instance) {
+
+  // if the joint pointer is null, return false
+  if (!joint_instance.joint) {
+    std::cerr << "[SocketCheck] FAIL: joint_instance.joint is null\n";
+    return false;
+  }
+
+  const SocketConfig &config = joint_instance.joint->socket_config;
+  const sf::Vector2f pivot = joint_instance.joint->socket_pivot;
+
+  constexpr float kPi = 3.14159265358979323846f;
+  constexpr float kRadToDeg = 180.0f / kPi;
+
+  auto normalize_degrees_0_360 = [](float deg) -> float {
+    float normalized = std::fmod(deg, 360.0f);
+    if (normalized < 0.0f)
+      normalized += 360.0f;
+    return normalized;
+  };
+
+  auto angle_degrees_from_position =
+      [&](const sf::Vector2f &position) -> float {
+    sf::Vector2f dir = position - pivot;
+    float angle_rad = std::atan2(dir.y, dir.x);
+    float angle_deg = angle_rad * kRadToDeg;
+    return normalize_degrees_0_360(angle_deg);
+  };
+
+  auto is_angle_within_arc = [&](float angle_deg, float arc_min_deg,
+                                 float arc_max_deg) -> bool {
+    float min_norm = normalize_degrees_0_360(arc_min_deg);
+    float max_norm = normalize_degrees_0_360(arc_max_deg);
+
+    // Non-wrapping arc: [min, max]
+    if (min_norm <= max_norm) {
+      return angle_deg >= min_norm && angle_deg <= max_norm;
+    }
+
+    // Wrapping arc (e.g. 300..30): [min..360) U [0..max]
+    return angle_deg >= min_norm || angle_deg <= max_norm;
+  };
+
+  auto smallest_angular_difference_degrees = [&](float a_deg,
+                                                 float b_deg) -> float {
+    float diff = std::abs(a_deg - b_deg);
+    return std::min(diff, 360.0f - diff);
+  };
+
+  std::cerr << "[SocketCheck] START: sockets=" << joint_instance.sockets.size()
+            << ", radius=" << config.radius
+            << ", arc_min=" << config.rotation_arc_min
+            << ", arc_max=" << config.rotation_arc_max
+            << ", minimum_gap=" << config.minimum_gap << "\n";
+
+  // check whether the local positions fall within the arc defined by the socket
+  // config
+  for (const auto &[socket_id, socket] : joint_instance.sockets) {
+
+    sf::Vector2f direction = socket.local_position - pivot;
+    float distance = direction.length();
+    float radius_error = std::abs(distance - config.radius);
+
+    float angle_deg = angle_degrees_from_position(socket.local_position);
+
+    std::cerr << "[SocketCheck] socket_id=" << socket_id << " pos=("
+              << socket.local_position.x << ", " << socket.local_position.y
+              << ")"
+              << " dir=(" << direction.x << ", " << direction.y << ")"
+              << " dist=" << distance << " radius_error=" << radius_error
+              << " angle_deg=" << angle_deg << "\n";
+
+    // check distance to pivot matches configured radius
+    if (radius_error > 0.01f) {
+      std::cerr << "[SocketCheck] FAIL(socket_id=" << socket_id
+                << "): distance-to-radius mismatch. dist=" << distance
+                << ", expected=" << config.radius << ", error=" << radius_error
+                << ", tolerance=0.01\n";
+      return false;
+    }
+
+    // check whether angle is inside configured arc
+    if (!is_angle_within_arc(angle_deg, config.rotation_arc_min,
+                             config.rotation_arc_max)) {
+      std::cerr << "[SocketCheck] FAIL(socket_id=" << socket_id
+                << "): angle out of arc. angle=" << angle_deg << ", arc=["
+                << config.rotation_arc_min << ", " << config.rotation_arc_max
+                << "]\n";
+      return false;
+    }
+
+    // check minimum angular gap against all other sockets
+    for (const auto &[other_socket_id, other_socket] : joint_instance.sockets) {
+      if (socket_id == other_socket_id)
+        continue;
+
+      float other_angle_deg =
+          angle_degrees_from_position(other_socket.local_position);
+
+      float angle_difference =
+          smallest_angular_difference_degrees(angle_deg, other_angle_deg);
+
+      std::cerr << "[SocketCheck] pair=(" << socket_id << "," << other_socket_id
+                << ")"
+                << " angle_a=" << angle_deg << ", angle_b=" << other_angle_deg
+                << ", diff=" << angle_difference
+                << ", min_gap=" << config.minimum_gap << "\n";
+
+      if (angle_difference < config.minimum_gap) {
+        std::cerr << "[SocketCheck] FAIL(pair=" << socket_id << ","
+                  << other_socket_id
+                  << "): angular gap too small. diff=" << angle_difference
+                  << ", minimum_gap=" << config.minimum_gap << "\n";
+        return false;
+      }
+    }
+  }
+
+  std::cerr << "[SocketCheck] PASS: configuration allowed\n";
+  return true;
+}
+/////////////////////////////////////////////////
 void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
   // check that parts is not empty, if not return early
   if (parts.empty()) {
