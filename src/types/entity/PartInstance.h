@@ -163,6 +163,7 @@ public:
   /////////////////////////////////////////////////
   const sf::Angle &GetTotalRotation() const { return total_rotation; }
 
+  void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
   /////////////////////////////////////////////////
   /// @brief Add an angle to the tracked total rotation.
   ///
@@ -181,6 +182,13 @@ public:
     return (it == sockets.end()) ? nullptr : &it->second;
   }
 
+  const sf::Vector2f GetSocketLocalPosition(uint32_t socket_id) const {
+    const SocketType *socket = TryGetSocket(socket_id);
+    if (!socket) {
+      return sf::Vector2f(0.f, 0.f);
+    }
+    return socket->GetLocalPosition();
+  }
   /////////////////////////////////////////////////
   /// @brief Get a socket world position by transforming its local position.
   ///
@@ -197,6 +205,13 @@ public:
     return transform.transformPoint(socket->GetLocalPosition());
   }
 
+  const sf::Vector2f GetSocketLocalAlignmentVector(uint32_t socket_id) const {
+    const SocketType *socket = TryGetSocket(socket_id);
+    if (!socket) {
+      return sf::Vector2f(0.f, 0.f);
+    }
+    return socket->GetLocalAlignmentVector();
+  }
   /////////////////////////////////////////////////
   /// @brief Get a socket world alignment vector by rotating its local
   /// alignment vector by this instance total rotation.

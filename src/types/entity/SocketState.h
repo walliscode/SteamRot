@@ -399,7 +399,8 @@ struct JointSocketState : public SocketState {
   /// @param alignment New local alignment vector.
   /////////////////////////////////////////////////
   void SetLocalAlignmentVector(const sf::Vector2f &alignment) {
-    m_alignment_vector = alignment;
+    m_alignment_vector =
+        alignment.normalized(); // Ensure alignment vector is normalized
   }
 
 private:
