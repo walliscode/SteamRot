@@ -9,12 +9,16 @@
 /////////////////////////////////////////////////
 #include "machina_form_scaffold_library.h"
 #include "DescriptorResult.h"
+#include "FailInfo.h"
 #include "MachinaFormScaffold.h"
+#include <expected>
+#include <variant>
 
 namespace steamrot {
 
 /////////////////////////////////////////////////
-void create_grab_scaffold_one(GrimoireMachina &grimoire) {
+std::expected<std::monostate, FailInfo>
+create_grab_scaffold_one(GrimoireMachina &grimoire) {
   // clear the GrimoireMachina's existing data
   grimoire.m_all_fragments.clear();
   grimoire.m_all_joints.clear();
@@ -63,77 +67,60 @@ void create_grab_scaffold_one(GrimoireMachina &grimoire) {
 
   // create a PartGraph
   PartGraph part_graph;
-  // anchor node
-  JointInstance ji_0{&grimoire.m_all_joints.at("joint_one")};
-  ji_0.id = 0;
-  // connect to FragmentInstance 1, socket 0
-  ji_0.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  ji_0.sockets.at(0).connected_to =
-      SocketConnection{1, 0}; // connected to FragmentInstance 1, socket 0
-  // connect to FragmentInstance 4, socket 0
-  ji_0.sockets.at(1).connection_state = SocketConnectionState::Connected;
-  ji_0.sockets.at(1).connected_to = SocketConnection{4, 0};
 
-  // arm
-  FragmentInstance fi_1{&grimoire.m_all_fragments.at("fragment_one")};
-  fi_1.id = 1;
-  // connect to JointInstance 0, socket 0
-  fi_1.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  fi_1.sockets.at(0).connected_to = SocketConnection{0, 0};
-  // connect to JointInstance 2, socket 0
-  fi_1.sockets.at(1).connection_state = SocketConnectionState::Connected;
-  fi_1.sockets.at(1).connected_to = SocketConnection{2, 0};
+  // create all instances first
+  JointInstance ji_0{0, grimoire.m_all_joints.at("joint_one")};
+  FragmentInstance fi_1{1, grimoire.m_all_fragments.at("fragment_one")};
+  JointInstance ji_2{2, grimoire.m_all_joints.at("joint_one")};
+  FragmentInstance fi_3{3, grimoire.m_all_fragments.at("fragment_one")};
+  FragmentInstance fi_4{4, grimoire.m_all_fragments.at("fragment_one")};
+  JointInstance ji_5{5, grimoire.m_all_joints.at("joint_one")};
+  FragmentInstance fi_6{6, grimoire.m_all_fragments.at("fragment_one")};
 
-  JointInstance ji_2{&grimoire.m_all_joints.at("joint_one")};
-  ji_2.id = 2;
-  // connect to FragmentInstance 1, socket 1
-  ji_2.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  ji_2.sockets.at(0).connected_to = SocketConnection{1, 1};
-  // connect to FragmentInstance 3, socket 0
-  ji_2.sockets.at(1).connection_state = SocketConnectionState::Connected;
-  ji_2.sockets.at(1).connected_to = SocketConnection{3, 0};
-  FragmentInstance fi_3{&grimoire.m_all_fragments.at("fragment_one")};
-  fi_3.id = 3;
-  // connect to JointInstance 2, socket 0
-  fi_3.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  fi_3.sockets.at(0).connected_to = SocketConnection{2, 0};
-  // end socket 1 is available for connection
-  fi_3.sockets.at(1).connection_state = SocketConnectionState::Available;
+  // anchor -> arm A root
+  auto conn_ji_0_to_fi_1_result =
+      ji_0.CreateConnectionWithOtherInstance(0, fi_1, 0);
+  if (!conn_ji_0_to_fi_1_result)
+    return std::unexpected(conn_ji_0_to_fi_1_result.error());
 
-  // arm
-  FragmentInstance fi_4{&grimoire.m_all_fragments.at("fragment_one")};
-  fi_4.id = 4;
-  // connect to JointInstance 0, socket 1
-  fi_4.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  fi_4.sockets.at(0).connected_to = SocketConnection{0, 1};
-  // connect to JointInstance 5, socket 0
-  fi_4.sockets.at(1).connection_state = SocketConnectionState::Connected;
-  fi_4.sockets.at(1).connected_to = SocketConnection{5, 0};
-  JointInstance ji_5{&grimoire.m_all_joints.at("joint_one")};
-  ji_5.id = 5;
-  // connect to FragmentInstance 4, socket 1
-  ji_5.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  ji_5.sockets.at(0).connected_to = SocketConnection{4, 1};
-  // connect to FragmentInstance 6, socket 0
-  ji_5.sockets.at(1).connection_state = SocketConnectionState::Connected;
-  ji_5.sockets.at(1).connected_to = SocketConnection{6, 0};
+  // anchor -> arm B root
+  auto conn_ji_0_to_fi_4_result =
+      ji_0.CreateConnectionWithOtherInstance(1, fi_4, 0);
+  if (!conn_ji_0_to_fi_4_result)
+    return std::unexpected(conn_ji_0_to_fi_4_result.error());
 
-  FragmentInstance fi_6{&grimoire.m_all_fragments.at("fragment_one")};
-  fi_6.id = 6;
-  // connect to JointInstance 5, socket 1
-  fi_6.sockets.at(0).connection_state = SocketConnectionState::Connected;
-  fi_6.sockets.at(0).connected_to = SocketConnection{5, 1};
-  // end socket 1 is available for connection
-  fi_6.sockets.at(1).connection_state = SocketConnectionState::Available;
+  // arm A middle
+  auto conn_fi_1_to_ji_2_result =
+      fi_1.CreateConnectionWithOtherInstance(1, ji_2, 0);
+  if (!conn_fi_1_to_ji_2_result)
+    return std::unexpected(conn_fi_1_to_ji_2_result.error());
+
+  // arm A end
+  auto conn_ji_2_to_fi_3_result =
+      ji_2.CreateConnectionWithOtherInstance(1, fi_3, 0);
+  if (!conn_ji_2_to_fi_3_result)
+    return std::unexpected(conn_ji_2_to_fi_3_result.error());
+
+  // arm B middle
+  auto conn_fi_4_to_ji_5_result =
+      fi_4.CreateConnectionWithOtherInstance(1, ji_5, 0);
+  if (!conn_fi_4_to_ji_5_result)
+    return std::unexpected(conn_fi_4_to_ji_5_result.error());
+
+  // arm B end
+  auto conn_ji_5_to_fi_6_result =
+      ji_5.CreateConnectionWithOtherInstance(1, fi_6, 0);
+  if (!conn_ji_5_to_fi_6_result)
+    return std::unexpected(conn_ji_5_to_fi_6_result.error());
 
   // assign to part graph with stable IDs
-  part_graph.emplace(ji_0.id, ji_0);
-  part_graph.emplace(fi_1.id, fi_1);
-  part_graph.emplace(ji_2.id, ji_2);
-  part_graph.emplace(fi_3.id, fi_3);
-  part_graph.emplace(fi_4.id, fi_4);
-  part_graph.emplace(ji_5.id, ji_5);
-  part_graph.emplace(fi_6.id, fi_6);
+  part_graph.emplace(ji_0.GetId(), ji_0);
+  part_graph.emplace(fi_1.GetId(), fi_1);
+  part_graph.emplace(ji_2.GetId(), ji_2);
+  part_graph.emplace(fi_3.GetId(), fi_3);
+  part_graph.emplace(fi_4.GetId(), fi_4);
+  part_graph.emplace(ji_5.GetId(), ji_5);
+  part_graph.emplace(fi_6.GetId(), fi_6);
 
   auto scaffold = std::make_unique<MachinaFormScaffold>();
   scaffold->machina_form_name = "grab_scaffold_one";
@@ -155,10 +142,11 @@ void create_grab_scaffold_one(GrimoireMachina &grimoire) {
   // scaffold
   MachinaArchetypeResult archetype_result;
   archetype_result.result_sub_graphs = grab_result;
-
   scaffold->structural_analysis_results["Grab"].push_back(archetype_result);
 
   // Assign the populated scaffold to the GrimoireMachina
   grimoire.m_scaffold_form = std::move(scaffold);
+
+  return std::monostate{};
 }
 } // namespace steamrot

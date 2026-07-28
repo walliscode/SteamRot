@@ -166,35 +166,6 @@ void process_subscribers(
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Creates a connection between specific SocketData on two
-/// PartInstances by setting @c SocketData::connected_to on both ends
-/// symmetrically and marking both sockets as @c SocketState::Connected.
-/// Returns an error string if validation fails.
-///
-/// Connections are, by convention, only between a JointInstance and a
-/// FragmentInstance.
-/// @param fragment FragmentInstance to connect.
-/// @param socket_id_a Stable socket ID of the FragmentInstance to connect.
-/// @param joint JointInstance to connect.
-/// @param socket_id_b Stable socket ID of the JointInstance to connect.
-/// @return @c std::monostate on success, or an error string if either part
-/// has no sockets or a socket ID is not found.
-/////////////////////////////////////////////////
-std::expected<std::monostate, std::string>
-create_connection(FragmentInstance &fragment_instance, uint32_t socket_id_a,
-                  JointInstance &joint_instance, uint32_t socket_id_b);
-
-/////////////////////////////////////////////////
-/// @brief Checks whether the given SocketData is in a state that allows it to
-/// be connected to another socket.
-///
-/// @param socket SocketData to check for connection readiness.
-/// @return Boolean indicating whether the socket is ready to be connected
-/// (true) or not (false).
-/////////////////////////////////////////////////
-bool check_socket_for_connection_readiness(const SocketState &socket);
-
-/////////////////////////////////////////////////
 /// @brief Checks whether any of the selections on MrGhost are ready to be
 /// connected to the active MachinaFormScaffold
 ///

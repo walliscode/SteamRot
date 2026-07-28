@@ -68,42 +68,6 @@ void ClearMouseOver(UIElement &element);
 bool AnyMouseOver(const UIElement &element);
 
 /////////////////////////////////////////////////
-/// @brief Sets is_mouse_over on a SocketState based on whether the mouse is
-/// within the socket's hit radius of the given world position.
-///
-/// The hit radius matches the visual radius used when drawing sockets so that
-/// click/hover detection is pixel-accurate relative to what the user sees.
-///
-/// @param world_mouse World-space mouse position
-/// (SceneContext::world_mouse_position).
-/// @param world_pos   World-space centre of the socket.
-/// @param socket_data  SocketState to update with the result of the check.
-/////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketState &socket_data);
-
-/////////////////////////////////////////////////
-/// @brief Checks whether the mouse is over any socket on a FragmentInstance
-/// and sets each socket's is_mouse_over accordingly.
-///
-/// @param world_mouse World-space mouse position
-/// (SceneContext::world_mouse_position).
-/// @param fragment_instance FragmentInstance whose sockets are checked.
-/////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse,
-                    FragmentInstance &fragment_instance);
-
-/////////////////////////////////////////////////
-/// @brief Checks whether the mouse is over any socket on a JointInstance
-/// and sets each socket's is_mouse_over accordingly.
-///
-/// @param world_mouse World-space mouse position
-/// (SceneContext::world_mouse_position).
-/// @param joint_instance JointInstance whose sockets are checked.
-/////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance);
-
-/////////////////////////////////////////////////
 /// @brief Run the two-pass mouse-collision check for all CUserInterface
 /// components in the scene and thus the UI elements they contain.
 ///

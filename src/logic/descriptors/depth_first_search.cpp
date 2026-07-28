@@ -169,19 +169,24 @@ void depth_first_search(Cursor cursor, DFSContext &context,
   /////////////////////////////////////////////////
   std::visit(
       [&](const auto &instance) {
-        for (const auto &[socket_id, socket_data] : instance.sockets) {
-          if (!socket_data.connected_to)
+        for (const auto &[socket_id, socket_data] : instance.GetSockets()) {
+          // if (!socket_data.connected_to)
+          //   continue;
+
+          if (!socket_data.GetConnection())
             continue;
 
-          const uint32_t neighbour_id = socket_data.connected_to->peer_part_id;
+          const SocketConnection &connection =
+              socket_data.GetConnection().value();
+
+          const uint32_t neighbour_id = connection.peer_part_id;
           if (context.visited.count(neighbour_id))
             continue;
 
           append_event(context,
                        make_moving_to_neighbour_event(
                            cursor.depth, cursor.current_id, socket_id,
-                           neighbour_id,
-                           socket_data.connected_to->peer_socket_id, parts));
+                           neighbour_id, connection.peer_socket_id, parts));
 
           Cursor child{};
           child.current_id = neighbour_id;
@@ -193,7 +198,7 @@ void depth_first_search(Cursor cursor, DFSContext &context,
 
           append_event(context, make_backtracking_event(
                                     cursor.depth, neighbour_id,
-                                    socket_data.connected_to->peer_socket_id,
+                                    connection.peer_socket_id,
                                     cursor.current_id, socket_id, parts));
 
           if (result.valid_subgraph.has_value())

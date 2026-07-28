@@ -31,33 +31,6 @@ namespace steamrot::logic::collision::grimoire_machina {
 void reset_socket_proximity_state(PartGraph &part_graph);
 
 /////////////////////////////////////////////////
-/// @brief Check for a collision between two individual sockets, writing state
-///        only when the measured distance is strictly smaller than the best
-///        candidate already recorded on each socket.
-///
-/// Both sockets are updated symmetrically. If the distance between the two
-/// world-space socket positions is within the connection threshold,
-/// @c is_ready_to_connect is set; if it is within the proximity threshold but
-/// outside the connection threshold, @c is_another_socket_near is set.
-/// In either case the state is written only when this pair is closer than the
-/// current @c distance_to_nearest_socket on the respective socket, ensuring
-/// that the most-proximal candidate always wins across multiple pairs.
-///
-/// @param socket_data             SocketData for the first socket.
-/// @param socket_transform        World-space transform of the first socket's
-///                                owning PartInstance.
-/// @param other_socket_data       SocketData for the second socket.
-/// @param other_socket_transform  World-space transform of the second socket's
-///                                owning PartInstance.
-/////////////////////////////////////////////////
-void check_socket_collisions(SocketState &socket_data,
-                             const sf::Vector2f &socket_local_position,
-                             const sf::Transform &socket_transform,
-                             SocketState &other_socket_data,
-                             const sf::Vector2f &other_socket_local_position,
-                             const sf::Transform &other_socket_transform);
-
-/////////////////////////////////////////////////
 /// @brief Check for collisions between all sockets of a FragmentInstance and
 ///        all sockets of a JointInstance.
 ///

@@ -7,7 +7,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_ghost.h"
-#include "ViewDirection.h"
+#include "overload.h"
 #include "positioning_camera.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cmath>
@@ -32,9 +32,9 @@ namespace {
 /// @param rotation_degrees   Accumulated rotation angle in degrees.
 /// @return The computed sf::Transform.
 /////////////////////////////////////////////////
-sf::Transform ComputeInstanceTransform(const sf::FloatRect &bounds,
-                                       const sf::Vector2f &world_mouse_pos,
-                                       float rotation_degrees) {
+sf::Transform compute_instance_transform(const sf::FloatRect &bounds,
+                                         const sf::Vector2f &world_mouse_pos,
+                                         float rotation_degrees) {
   static constexpr float k_corner_offset = 5.f;
 
   // Local-space centre of the vertex array.  The rotation is applied around
@@ -71,29 +71,28 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
           camera_state, mouse_position, scene_texture);
   mr_ghost.m_position = world_mouse_position;
 
-  std::visit(
-      [&](auto &instance) {
-        using T = std::decay_t<decltype(instance)>;
-        if constexpr (std::is_same_v<T, FragmentInstance>) {
-          if (!instance.fragment)
-            return;
-          const sf::FloatRect bounds =
-              instance.fragment->positioning_views[ViewDirection::Front]
-                  .getBounds();
-          instance.transform = ComputeInstanceTransform(
-              bounds, world_mouse_position, mr_ghost.m_rotation_degrees);
-        } else if constexpr (std::is_same_v<T, JointInstance>) {
-          if (!instance.joint)
-            return;
-          const sf::FloatRect bounds =
-              instance.joint->positioning_views[ViewDirection::Front]
-                  .getBounds();
-          instance.transform = ComputeInstanceTransform(
-              bounds, world_mouse_position, mr_ghost.m_rotation_degrees);
-        }
-        // std::monostate: nothing to update
-      },
-      mr_ghost.m_instance);
+  std::visit(overload{[&](FragmentInstance &instance) {
+                        const sf::FloatRect bounds =
+                            instance.GetPart()
+                                .positioning_views[ViewDirection::Front]
+                                .getBounds();
+                        instance.SetTransform(compute_instance_transform(
+                            bounds, world_mouse_position,
+                            mr_ghost.m_rotation_degrees));
+                      },
+                      [&](JointInstance &instance) {
+                        const sf::FloatRect bounds =
+                            instance.GetPart()
+                                .positioning_views[ViewDirection::Front]
+                                .getBounds();
+                        instance.SetTransform(compute_instance_transform(
+                            bounds, world_mouse_position,
+                            mr_ghost.m_rotation_degrees));
+                      },
+                      [](std::monostate &) {
+                        // std::monostate: nothing to update
+                      }},
+             mr_ghost.m_instance);
 }
 
 /////////////////////////////////////////////////

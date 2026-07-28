@@ -19,53 +19,6 @@
 namespace steamrot::logic::positioning::grimoire_machina {
 
 /////////////////////////////////////////////////
-/// @brief Calulates the alignment vector of a FragmentInstance socket based on
-/// the local alignment vector and the total rotation of the FragmentInstance.
-///
-/// @param fragment_instance FragmentInstance to calculate the alignment vector
-/// for
-/// @param fragment_socket_id socket id of the FragmentInstance to calculate the
-/// alignment vector for
-/////////////////////////////////////////////////
-sf::Vector2f
-calculate_alignment_vector(const FragmentInstance &fragment_instance,
-                           const uint32_t fragment_socket_id);
-
-/////////////////////////////////////////////////
-/// @brief Calculates the alignment vector of a JointInstance socket based on
-/// the local alignment vector, the socket pivot and the total rotation of the
-/// JointInstance.
-///
-/// @param joint_instance JointInstance to calculate the alignment vector for
-/// @param fragment_socket_id socket id of the JointInstance to calculate the
-/// alignment vector for
-/////////////////////////////////////////////////
-sf::Vector2f calculate_alignment_vector(const JointInstance &joint_instance,
-                                        const uint32_t fragment_socket_id);
-
-/////////////////////////////////////////////////
-/// @brief Populates the socket local positions of a JointInstance using the
-/// even-spread algorithm.
-///
-/// Calls @c compute_socket_local_positions_even_spread internally and writes
-/// the resulting positions back into @c instance.sockets[id].local_position.
-/// This must be called after construction to give the sockets their correct
-/// positions.
-///
-/// @param instance JointInstance whose sockets should be positioned.
-/////////////////////////////////////////////////
-void initialize_joint_socket_positions(JointInstance &instance);
-
-/////////////////////////////////////////////////
-/// @brief Give a JointInstance, calculates the maximum possible even spread of
-/// its sockets based on its SocketConfig and applies the resulting positions to
-/// the instance's sockets.
-///
-/// @param instance JointInstance whose sockets should be maximally spread.
-/////////////////////////////////////////////////
-void maximise_joint_socket_spread(JointInstance &instance);
-
-/////////////////////////////////////////////////
 /// @brief Calculates the rotation angle required to rotate a source vector to
 /// align with a target vector.
 ///
@@ -105,37 +58,6 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
                                       const uint32_t joint_socket_id,
                                       const FragmentInstance &fragment_instance,
                                       const uint32_t fragment_socket_id);
-
-/////////////////////////////////////////////////
-/// @brief Calculates an even spread of socket local positions for a Joint based
-/// on its SocketConfig.
-///
-/// This uses the rotation_arc_min and rotation_arc_max to determine the upper
-/// and lower bounds of the arc. This arc distance is divided evenly to
-/// calculate the positions of the sockets.
-///
-/// @param config SocketConfig to calculate from
-/// @param origin Local origin of the Joint, used as the center point for
-/// calculating socket
-/// @param local_positions All the local positions of the sockets will be
-/// written into this vector.
-/////////////////////////////////////////////////
-void compute_socket_local_positions_even_spread(
-    const SocketConfig &config, const sf::Vector2f &origin,
-    std::vector<sf::Vector2f> &local_positions);
-
-/////////////////////////////////////////////////
-/// @brief Checks if a JointInstance has a valid socket configuration based on
-/// the sockets current positions
-///
-/// The sockets can move dynamically (locally which then transforms to global)
-/// and this function checks if the current positions are valid based on the
-/// JointInstance's SocketConfig.
-/// @param joint_instance JointInstance to check
-/// @return True if the socket configuration is valid, false otherwise
-/////////////////////////////////////////////////
-bool check_if_allowed_joint_socket_configuration(
-    const JointInstance &joint_instance);
 
 /////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at

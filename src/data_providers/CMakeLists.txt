@@ -51,4 +51,7 @@ target_link_libraries(data_providers
   events
   entity
   types
+  flatbuffers
+  flatbuffers_headers
+
 )

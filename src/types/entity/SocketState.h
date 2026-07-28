@@ -1,6 +1,6 @@
-/////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 /// @file
-/// @brief Implentation of the SocketState struct and its derivatives
+/// @brief Declaration of SocketState and socket connection types.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -12,59 +12,49 @@
 /// Headers
 /////////////////////////////////////////////////
 #include <SFML/System/Vector2.hpp>
+#include <algorithm>
 #include <cstdint>
-#include <map>
 #include <optional>
-#include <variant>
 
 namespace steamrot {
 
+static constexpr float k_proximity_distance_threshold = 10.f;
+static constexpr float k_connection_distance_threshold = 2.5f;
+/////////////////////////////////////////////////
+/// @enum SocketConnectionState
+/// @brief Runtime connection state of a socket.
+/////////////////////////////////////////////////
 enum class SocketConnectionState {
-  Available, ///< Socket exists and can connect
-  Connected, ///< Socket is currently connected
-  Blocked    ///< Socket exists but can't be used (e.g., edge of canvas)
+  Available, ///< Socket exists and can connect.
+  Connected, ///< Socket is currently connected.
 };
 
 /////////////////////////////////////////////////
 /// @struct SocketConnection
 /// @brief Identifies the peer endpoint of an established socket connection.
-///
-/// When a socket's @c state is @c SocketState::Connected, its
-/// @c SocketData::connected_to field holds a @c SocketConnection that names
-/// the peer part by stable ID and the peer socket by index. Both ends of a
-/// connection store a reciprocal @c SocketConnection so the graph can be
-/// traversed from either direction without a central connection list.
 /////////////////////////////////////////////////
 struct SocketConnection {
-  /////////////////////////////////////////////////
-  /// @brief Stable ID of the peer PartInstance (matches
-  /// JointInstance::id or FragmentInstance::id).
-  /////////////////////////////////////////////////
-  uint32_t peer_part_id{0};
+  uint32_t peer_part_id{0};   ///< Stable ID of peer part instance.
+  uint32_t peer_socket_id{0}; ///< Socket ID on peer instance.
 
-  /////////////////////////////////////////////////
-  /// @brief Stable ID of the connected socket on the peer instance (matches
-  /// the key in the peer instance's @c sockets map).
-  /////////////////////////////////////////////////
-  uint32_t peer_socket_id{0};
+  bool operator==(const SocketConnection &other) const {
+    return peer_part_id == other.peer_part_id &&
+           peer_socket_id == other.peer_socket_id;
+  }
 };
 
 /////////////////////////////////////////////////
-/// @class JointFragmentConnection
-/// @brief Returns a pair of SocketConnections representing a conencted
-/// JointInstance and FragmentInstance. This is mainly a convenience class for
-/// returning both ends of a connection from a function.
+/// @struct JointFragmentConnection
+/// @brief Convenience bundle for both ends of one joint-fragment connection.
 /////////////////////////////////////////////////
 struct JointFragmentConnection {
-
   /////////////////////////////////////////////////
-  /// @brief Constructs a ConnectedSockets object with the given joint and
-  /// fragment connections.
+  /// @brief Construct both ends of a joint-fragment connection pair.
   ///
-  /// @param joint_connection The SocketConnection representing the joint end of
-  /// the connection.
-  /// @param fragment_connection  The SocketConnection representing the fragment
-  /// end of the connection.
+  /// @param joint_id Stable ID of the joint instance.
+  /// @param joint_socket_id Socket ID on the joint instance.
+  /// @param fragment_id Stable ID of the fragment instance.
+  /// @param fragment_socket_id Socket ID on the fragment instance.
   /////////////////////////////////////////////////
   explicit JointFragmentConnection(const uint32_t joint_id,
                                    const uint32_t joint_socket_id,
@@ -75,113 +65,346 @@ struct JointFragmentConnection {
 
   const uint32_t joint_id;
   const uint32_t joint_socket_id;
-
   const uint32_t fragment_id;
   const uint32_t fragment_socket_id;
 };
 
 /////////////////////////////////////////////////
-/// @struct SocketData
-/// @brief Bundles the local position and mutable runtime state for a single
-/// socket on a placed part instance.
-///
-/// @c local_position is initialised at construction from the owning Part
-/// definition and may be updated by positioning Logic (e.g. to rotate the
-/// socket ring of a JointInstance). @c state holds the mutable connection
-/// status and hover flag that are updated each tick by Logic.
+/// @struct SocketState
+/// @brief Mutable runtime state shared by all socket state implementations.
 /////////////////////////////////////////////////
 struct SocketState {
 
+protected:
   /////////////////////////////////////////////////
-  /// @brief Mutable runtime state of this socket (connection status, hover).
+  /// @brief bool flag indicating whether the mouse is currently over this
+  /// socket.
   /////////////////////////////////////////////////
-  SocketConnectionState connection_state{SocketConnectionState::Available};
+  bool m_is_mouse_over{false};
 
   /////////////////////////////////////////////////
-  /// @brief Boolean flag set to true if the mouse is currently hovering over
-  /// this socket.
+  /// @brief Optional float storing distance to nearest socket when proximity is
+  /// active.
   /////////////////////////////////////////////////
-  bool is_mouse_over{false};
+  std::optional<float> m_distance_to_nearest_socket{std::nullopt};
 
   /////////////////////////////////////////////////
-  /// @brief Boolean flag set to true if another socket is within a
-  /// pre_determined radius
+  /// @brief Optional SocketConnection storing the connected peer endpoint if
+  /// connected.
   /////////////////////////////////////////////////
-  bool is_another_socket_near{false};
+  std::optional<SocketConnection> m_connected_to{std::nullopt};
+
+public:
+  /////////////////////////////////////////////////
+  /// @brief Virtual destructor for polymorphic base type.
+  /////////////////////////////////////////////////
+  virtual ~SocketState() = default;
 
   /////////////////////////////////////////////////
-  /// @brief Boolean flag set to true if this socket is within the snap radius
-  /// of another
-  /////////////////////////////////////////////////
-  bool is_ready_to_connect{false};
-
-  /////////////////////////////////////////////////
-  /// @brief if is_another_socket_near is true, this holds the distance to the
-  /// nearest socket
-  /////////////////////////////////////////////////
-  std::optional<float> distance_to_nearest_socket{std::nullopt};
-
-  /////////////////////////////////////////////////
-  /// @brief Proximity brightness scale in the range [0, 255].
+  /// @brief Returns whether the mouse is currently over this socket.
   ///
-  /// Set when @c is_another_socket_near is true. The value maps the distance
-  /// to the nearest socket onto a [0, 255] range: 255 at the connection
-  /// threshold (closest) and 0 at the outer proximity threshold (furthest
-  /// within range). Reset to @c std::nullopt by the collision system whenever
-  /// @c is_another_socket_near is false.
+  /// @return True if mouse is over socket, false otherwise.
   /////////////////////////////////////////////////
-  std::optional<uint8_t> proximity_scale{std::nullopt};
+  bool IsMouseOver() const { return m_is_mouse_over; }
 
   /////////////////////////////////////////////////
-  /// @brief When @c state is @c SocketState::Connected, holds the peer
-  /// endpoint of this connection. @c std::nullopt otherwise.
+  /// @brief Returns whether another socket is currently within proximity range.
   ///
-  /// Both ends of every connection store a reciprocal @c SocketConnection so
-  /// the graph can be traversed from either direction without a central
-  /// connection list.
+  /// @return True if another socket is near, false otherwise.
   /////////////////////////////////////////////////
-  std::optional<SocketConnection> connected_to{std::nullopt};
+  bool IsAnotherSocketNear() const {
+    if (m_distance_to_nearest_socket.has_value()) {
+      return m_distance_to_nearest_socket.value() <=
+             k_proximity_distance_threshold;
+    }
+    return false;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns whether nearest candidate is within direct connection
+  /// threshold.
+  ///
+  /// @return True if within connection threshold, false otherwise.
+  /////////////////////////////////////////////////
+  bool IsWithinConnectionDistance() const {
+    if (!m_distance_to_nearest_socket.has_value())
+      return false;
+    return m_distance_to_nearest_socket.value() <=
+           k_connection_distance_threshold;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns distance to nearest socket when proximity is active.
+  ///
+  /// @return Optional nearest distance in world units.
+  /////////////////////////////////////////////////
+  const std::optional<float> &GetDistanceToNearestSocket() const {
+    return m_distance_to_nearest_socket;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns the connected peer endpoint if connected.
+  ///
+  /// @return Optional peer connection descriptor.
+  /////////////////////////////////////////////////
+  const std::optional<SocketConnection> &GetConnection() const {
+    return m_connected_to;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns true when socket has no active connection endpoint.
+  ///
+  /// @return True if socket is available, false otherwise.
+  /////////////////////////////////////////////////
+  bool IsAvailable() const { return !m_connected_to.has_value(); }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns connection state derived from @c connected_to.
+  ///
+  /// @return Connected when peer endpoint is present, otherwise Available.
+  /////////////////////////////////////////////////
+  SocketConnectionState GetConnectionState() const {
+    return IsAvailable() ? SocketConnectionState::Available
+                         : SocketConnectionState::Connected;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns whether this socket is ready to connect.
+  ///
+  /// @return True if ready to connect, false otherwise.
+  /////////////////////////////////////////////////
+  bool IsReadyToConnect() const { return IsAvailable(); }
+
+  /////////////////////////////////////////////////
+  /// @brief Set hover state of this socket.
+  ///
+  /// @param is_mouse_over New hover state.
+  /////////////////////////////////////////////////
+  void SetMouseOver(const bool is_mouse_over) {
+    m_is_mouse_over = is_mouse_over;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Set optional nearest-socket distance value.
+  ///
+  /// @param distance Optional nearest distance.
+  /////////////////////////////////////////////////
+  void SetDistanceToNearestSocket(const std::optional<float> distance) {
+    m_distance_to_nearest_socket = distance;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Record distance candidate if it improves current proximity state.
+  ///
+  /// Candidate is accepted only when:
+  /// - it is within proximity threshold, and
+  /// - there is no current candidate, or it is strictly closer.
+  ///
+  /// @param distance World-space distance to candidate peer socket.
+  /// @return True when state updated with new candidate, false otherwise.
+  /////////////////////////////////////////////////
+  bool ConsiderCandidateDistance(const float distance) {
+    if (distance > k_proximity_distance_threshold)
+      return false;
+
+    if (m_distance_to_nearest_socket.has_value() &&
+        distance >= m_distance_to_nearest_socket.value()) {
+      return false;
+    }
+
+    m_distance_to_nearest_socket = distance;
+    return true;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Set or clear peer connection endpoint.
+  ///
+  /// @param connection Optional peer connection.
+  /////////////////////////////////////////////////
+  void SetConnection(const SocketConnection &connection) {
+    m_connected_to = connection;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Clear connection endpoint and mark socket as unconnected.
+  /////////////////////////////////////////////////
+  void ClearConnection() { m_connected_to = std::nullopt; }
+
+  /////////////////////////////////////////////////
+  /// @brief Update hover state from world-space mouse and socket position.
+  ///
+  /// @param world_mouse Mouse position in world space.
+  /// @param world_pos Socket position in world space.
+  /// @param radius Hit radius used for overlap test.
+  /////////////////////////////////////////////////
+  void CheckMouseOver(const sf::Vector2f &world_mouse,
+                      const sf::Vector2f &world_pos, const float radius = 5.f) {
+
+    // Check if the mouse is within the hit radius of the socket position.
+    m_is_mouse_over =
+        (world_mouse - world_pos).x * (world_mouse - world_pos).x +
+            (world_mouse - world_pos).y * (world_mouse - world_pos).y <=
+        radius * radius;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Reset interaction-only fields.
+  /////////////////////////////////////////////////
+  void ResetInteractionState() {
+    m_is_mouse_over = false;
+    m_distance_to_nearest_socket = std::nullopt;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Reset all runtime fields, including connection state.
+  /////////////////////////////////////////////////
+  void ResetAllState() {
+    ResetInteractionState();
+    m_connected_to = std::nullopt;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns socket brightness in range [0, 255] from proximity
+  /// distance.
+  ///
+  /// @return Brightness scalar in range [0, 255].
+  /////////////////////////////////////////////////
+  uint32_t GetSocketBrightness() const {
+    static constexpr float range =
+        k_proximity_distance_threshold - k_connection_distance_threshold;
+
+    static_assert(
+        range > 0.f,
+        "proximity threshold must be strictly greater than connection "
+        "threshold");
+    float distance = m_distance_to_nearest_socket.value_or(
+        k_proximity_distance_threshold + 1.f);
+
+    const float t = (k_proximity_distance_threshold - distance) / range;
+    const float clamped = std::clamp(t, 0.f, 1.f);
+    return static_cast<uint8_t>(clamped * 255.f);
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Returns socket-local position in owning part coordinates.
+  ///
+  /// @return Local position vector reference.
+  /////////////////////////////////////////////////
+  virtual const sf::Vector2f &GetLocalPosition() const = 0;
+
+  /////////////////////////////////////////////////
+  /// @brief Returns socket-local alignment vector in owning part coordinates.
+  ///
+  /// @return Local alignment vector reference.
+  /////////////////////////////////////////////////
+  virtual const sf::Vector2f &GetLocalAlignmentVector() const = 0;
 };
 
-struct FragmentSocketState : public SocketState {
+/////////////////////////////////////////////////
+/// @class TestSocketState
+/// @brief Simple socket state for unit tests with fixed local geometry refs.
+/////////////////////////////////////////////////
+struct TestSocketState : public SocketState {
+  explicit TestSocketState(const sf::Vector2f &local_pos,
+                           const sf::Vector2f &alignment_vec)
+      : m_local_position{local_pos}, m_alignment_vector{alignment_vec} {}
 
+  const sf::Vector2f &GetLocalPosition() const override {
+    return m_local_position;
+  }
+
+  const sf::Vector2f &GetLocalAlignmentVector() const override {
+    return m_alignment_vector;
+  }
+
+private:
+  const sf::Vector2f &m_local_position;
+  const sf::Vector2f &m_alignment_vector;
+};
+
+/////////////////////////////////////////////////
+/// @struct FragmentSocketState
+/// @brief Socket state for fragment sockets with fixed local geometry refs.
+/////////////////////////////////////////////////
+struct FragmentSocketState : public SocketState {
   /////////////////////////////////////////////////
-  /// @brief Constructs a FragmentSocketState with the given local position.
+  /// @brief Construct fragment socket state from local geometry references.
   ///
-  /// @param local_pos Reference to the local position of the socket in the
-  /// Fragment's coordinate space.
+  /// @param local_pos Local socket position reference from fragment
+  /// definition.
+  /// @param alignment_vec Local alignment vector reference from definition.
   /////////////////////////////////////////////////
   explicit FragmentSocketState(const sf::Vector2f &local_pos,
                                const sf::Vector2f &alignment_vec)
-      : local_position{local_pos}, alignment_vector(alignment_vec) {};
+      : m_local_position{local_pos}, m_alignment_vector{alignment_vec} {}
 
   /////////////////////////////////////////////////
-  /// @brief References a socket on the Fragment
+  /// @brief Returns fixed local position reference.
   ///
-  /// Sockets on a Fragment are fixed in the Fragment's own coordinate space, so
-  /// this does not need to change. Changes in position can be handled by the
-  /// FragmentInstance's transform.
+  /// @return Local position reference.
   /////////////////////////////////////////////////
-  const sf::Vector2f &local_position;
+  const sf::Vector2f &GetLocalPosition() const override {
+    return m_local_position;
+  }
 
   /////////////////////////////////////////////////
-  /// @brief References the alignment vector of the socket on the Fragment
+  /// @brief Returns fixed local alignment vector reference.
+  ///
+  /// @return Local alignment reference.
   /////////////////////////////////////////////////
-  const sf::Vector2f &alignment_vector;
+  const sf::Vector2f &GetLocalAlignmentVector() const override {
+    return m_alignment_vector;
+  }
+
+private:
+  const sf::Vector2f &m_local_position;
+  const sf::Vector2f &m_alignment_vector;
 };
 
+/////////////////////////////////////////////////
+/// @struct JointSocketState
+/// @brief Socket state for joints with mutable local geometry.
+/////////////////////////////////////////////////
 struct JointSocketState : public SocketState {
-
   /////////////////////////////////////////////////
-  /// @brief Shows the local position of the socket in the Joint's coordinate
-  /// space.
+  /// @brief Returns mutable local position value.
   ///
-  /// This is mutable because the socket ring of a JointInstance can be rotated
+  /// @return Local position reference.
   /////////////////////////////////////////////////
-  sf::Vector2f local_position{0.f, 0.f};
-};
+  const sf::Vector2f &GetLocalPosition() const override {
+    return m_local_position;
+  }
 
-using SocketMap = std::variant<std::map<uint32_t, FragmentSocketState>,
-                               std::map<uint32_t, JointSocketState>>;
+  /////////////////////////////////////////////////
+  /// @brief Returns local alignment vector value.
+  ///
+  /// @return Local alignment reference.
+  /////////////////////////////////////////////////
+  const sf::Vector2f &GetLocalAlignmentVector() const override {
+    return m_alignment_vector;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Set local socket position.
+  ///
+  /// @param position New local position.
+  /////////////////////////////////////////////////
+  void SetLocalPosition(const sf::Vector2f &position) {
+    m_local_position = position;
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Set local alignment vector.
+  ///
+  /// @param alignment New local alignment vector.
+  /////////////////////////////////////////////////
+  void SetLocalAlignmentVector(const sf::Vector2f &alignment) {
+    m_alignment_vector = alignment;
+  }
+
+private:
+  sf::Vector2f m_local_position{0.f, 0.f};
+  sf::Vector2f m_alignment_vector{0.f, 0.f};
+};
 
 } // namespace steamrot

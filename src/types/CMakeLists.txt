@@ -1,9 +1,10 @@
 # This will be an interface library for type definitions
 
-add_library(types INTERFACE)
+add_library(types
+entity/JointInstance.cpp)
 
 target_include_directories(types
-  INTERFACE
+  PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/
   ${CMAKE_CURRENT_SOURCE_DIR}/user_interface/styles/
   ${CMAKE_CURRENT_SOURCE_DIR}/core/
@@ -18,13 +19,14 @@ target_include_directories(types
   ${CMAKE_CURRENT_SOURCE_DIR}/assets/
   ${CMAKE_CURRENT_SOURCE_DIR}/test_structs/
   ${CMAKE_CURRENT_SOURCE_DIR}/flatbuffers/generated/
+  ${CMAKE_CURRENT_SOURCE_DIR}/helpers/
 
 
 
 )
 
 target_link_libraries(types
-  INTERFACE
+  PUBLIC
   SFML::Graphics
   stduuid
   flatbuffers

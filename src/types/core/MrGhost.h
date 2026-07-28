@@ -11,7 +11,8 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "MachinaFormScaffold.h"
+#include "FragmentInstance.h"
+#include "JointInstance.h"
 #include <SFML/System/Vector2.hpp>
 #include <string>
 #include <variant>

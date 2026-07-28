@@ -101,57 +101,6 @@ void CheckMouseOver(const sf::Vector2i &mouse_position, UIElement &element) {
 }
 
 /////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse, sf::Vector2f world_pos,
-                    SocketState &socket_data) {
-
-  // give the socket a circular hitbox with a fixed radius;
-  static constexpr float k_radius = 5.f;
-
-  // calculate vector distance from world-space mouse to world-space socket
-  const sf::Vector2f delta = world_mouse - world_pos;
-
-  // checks squared distance to avoid costly square root; if within radius, mark
-  // socket as is_mouse_over = true, else false
-  socket_data.is_mouse_over =
-      (delta.x * delta.x + delta.y * delta.y) <= (k_radius * k_radius);
-}
-
-/////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse,
-                    FragmentInstance &fragment_instance) {
-
-  // cycle through all sockets in the fragment and check if any are hovered
-  for (auto &[socket_id, socket] : fragment_instance.sockets) {
-
-    // get the world position of the socket by applying the fragment's transform
-    // to the socket's local position
-    const sf::Vector2f world_pos =
-        fragment_instance.transform.transformPoint(socket.local_position);
-
-    // check if the mouse is over this socket and update the socket state
-    // accordingly
-    CheckMouseOver(world_mouse, world_pos, socket);
-  }
-}
-
-/////////////////////////////////////////////////
-void CheckMouseOver(sf::Vector2f world_mouse, JointInstance &joint_instance) {
-
-  // cycle through all sockets in the joint and check if any are hovered
-  for (auto &[socket_id, socket] : joint_instance.sockets) {
-
-    // get the world position of the socket by applying the joint's transform
-    // to the stored local socket position
-    const sf::Vector2f world_pos =
-        joint_instance.transform.transformPoint(socket.local_position);
-
-    // check if the mouse is over this socket and update the socket state
-    // accordingly
-    CheckMouseOver(world_mouse, world_pos, socket);
-  }
-}
-
-/////////////////////////////////////////////////
 void CheckMouseOverAllCUserInterfaceComponents(
     const std::vector<size_t> &entity_indexes, EntityMemoryPool &scene_entities,
     const sf::Vector2i &mouse_position, bool &is_mouse_over_ui_layer) {
@@ -225,8 +174,9 @@ void CheckMouseOverAllCUserInterfaceComponentsInTier(
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
                                sf::Vector2f world_mouse) {
   for (auto &[id, part] : scaffold.parts) {
-    std::visit([&](auto &instance) { CheckMouseOver(world_mouse, instance); },
-               part);
+    std::visit(
+        [&](auto &instance) { instance.CheckMouseOverSockets(world_mouse); },
+        part);
   }
 }
 
