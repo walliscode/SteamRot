@@ -182,6 +182,16 @@ public:
     return (it == sockets.end()) ? nullptr : &it->second;
   }
 
+  uint32_t GetNumberOfConnectedSockets() const {
+    uint32_t count = 0;
+    for (const auto &[socket_id, socket] : sockets) {
+      if (socket.GetConnectionState() == SocketConnectionState::Connected) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   const sf::Vector2f GetSocketLocalPosition(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
     if (!socket) {
@@ -250,7 +260,14 @@ public:
     }
   }
 
-  std::optional<uint32_t> CheckForConnectionReadiness() const {
+  bool CheckIfSocketIsAvailable(uint32_t socket_id) const {
+    const SocketType *socket = TryGetSocket(socket_id);
+    if (!socket) {
+      return false;
+    }
+    return socket->GetConnectionState() == SocketConnectionState::Available;
+  }
+  std::optional<uint32_t> CheckIfAnySocketIsAvailable() const {
     for (const auto &[socket_id, socket] : sockets) {
       if (socket.GetConnectionState() == SocketConnectionState::Available) {
         return socket_id;

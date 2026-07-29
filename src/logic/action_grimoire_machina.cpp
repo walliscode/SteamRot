@@ -290,11 +290,11 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost) {
   } else if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
 
     FragmentInstance ghost_fi = std::get<FragmentInstance>(mr_ghost.m_instance);
-    return ghost_fi.CheckForConnectionReadiness();
+    return ghost_fi.CheckIfAnySocketIsAvailable();
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
 
     JointInstance ghost_ji = std::get<JointInstance>(mr_ghost.m_instance);
-    return ghost_ji.CheckForConnectionReadiness();
+    return ghost_ji.CheckIfAnySocketIsAvailable();
   }
   return std::nullopt;
 }
@@ -314,7 +314,7 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
     if (std::holds_alternative<FragmentInstance>(part)) {
 
       const FragmentInstance &fi = std::get<FragmentInstance>(part);
-      auto readiness_result = fi.CheckForConnectionReadiness();
+      auto readiness_result = fi.CheckIfAnySocketIsAvailable();
       if (readiness_result.has_value())
         return std::make_pair(id, readiness_result.value());
     }
@@ -322,7 +322,7 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
     else if (std::holds_alternative<JointInstance>(part)) {
       const JointInstance &ji = std::get<JointInstance>(part);
 
-      auto readiness_result = ji.CheckForConnectionReadiness();
+      auto readiness_result = ji.CheckIfAnySocketIsAvailable();
       if (readiness_result.has_value())
         return std::make_pair(id, readiness_result.value());
     }

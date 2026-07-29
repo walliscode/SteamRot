@@ -723,12 +723,12 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
 
         // connected socket world positions should coincide
         const auto joint_connected_socket_world =
-            joint_instance.transform.transformPoint(
-                joint_instance.sockets.at(tc.joint_socket_id).local_position);
+            joint_instance.GetTransform().transformPoint(
+                joint_instance.GetSocketLocalPosition(tc.joint_socket_id));
         const auto fragment_connected_socket_world =
-            fragment_instance.transform.transformPoint(
-                fragment_instance.sockets.at(tc.fragment_socket_id)
-                    .local_position);
+            fragment_instance.GetTransform().transformPoint(
+                fragment_instance.GetSocketLocalPosition(
+                    tc.fragment_socket_id));
 
         REQUIRE_THAT(joint_connected_socket_world,
                      EqualsVector2f(fragment_connected_socket_world, 0.001f));
@@ -1127,8 +1127,8 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     REQUIRE(std::holds_alternative<JointInstance>(joint_instance_result));
     JointInstance &joint_instance =
         std::get<JointInstance>(joint_instance_result); // get joint instance
-    maximise_joint_socket_spread(
-        joint_instance); // ensure joint sockets are spread out
+    joint_instance.PositionSockets(
+        JointSocketPositioningStrategy::MaximizeDistance);
     //
     auto &fragment_instance_result =
         part_graph.at(part_graph_package.id_to_part_graph_id.at("f1"));
@@ -1140,17 +1140,14 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
 
     // check positions before //
     const sf::Vector2f expected_ji_socket_0_world_before{19.19f, 19.19f};
-    REQUIRE_THAT(joint_instance.transform.transformPoint(
-                     joint_instance.sockets.at(0).local_position),
+    REQUIRE_THAT(joint_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
     const sf::Vector2f expected_ji_socket_pivot_world_before{10.f, 10.f};
-    REQUIRE_THAT(joint_instance.transform.transformPoint(
-                     joint_instance.joint->socket_pivot),
+    REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
                  EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
 
     const sf::Vector2f expected_fi_socket_0_world_before{0.f, 5.f};
-    REQUIRE_THAT(fragment_instance.transform.transformPoint(
-                     fragment_instance.sockets.at(0).local_position),
+    REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_fi_socket_0_world_before, 0.01f));
 
     // ACT //
@@ -1159,19 +1156,17 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     // ASSERT //
     // joint and joint sockets should not have moved but the fragment should
     // have been positioned onto the joint socket via the connection
-    REQUIRE_THAT(joint_instance.transform.transformPoint(
-                     joint_instance.sockets.at(0).local_position),
+    REQUIRE_THAT(joint_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
-    REQUIRE_THAT(joint_instance.transform.transformPoint(
-                     joint_instance.joint->socket_pivot),
+    REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
                  EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
-    const sf::Vector2f expected_fi_socket_0_world_after{19.19f, 19.19f};
 
-    REQUIRE_THAT(fragment_instance.transform.transformPoint(
-                     fragment_instance.sockets.at(0).local_position),
+    const sf::Vector2f expected_fi_socket_0_world_after{19.19f, 19.19f};
+    REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_fi_socket_0_world_after, 0.01f));
+
     // rotates 45 degrees to align the fragment socket with the joint socket
-    REQUIRE(fragment_instance.total_rotation.asDegrees() == 45.f);
+    REQUIRE(fragment_instance.GetTotalRotation().asDegrees() == 45.f);
   }
   SECTION("Positions a chain graph: j0 - f1 - j2") {
     PartGraphBuilder builder;
@@ -1193,16 +1188,14 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     auto &f1 = std::get<FragmentInstance>(f1v);
     auto &j2 = std::get<JointInstance>(j2v);
 
-    maximise_joint_socket_spread(j0);
-    maximise_joint_socket_spread(j2);
+    j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+    j2.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
     position_part_graph(g);
 
     // f1 socket 0 should align to j0 socket 0
-    REQUIRE_THAT(f1.transform.transformPoint(f1.sockets.at(0).local_position),
-                 EqualsVector2f(j0.transform.transformPoint(
-                                    j0.sockets.at(0).local_position),
-                                0.01f));
+    REQUIRE_THAT(f1.GetSocketWorldPosition(0),
+                 EqualsVector2f(j0.GetSocketWorldPosition(0), 0.01f));
   }
 
   SECTION("Positions a branching graph: j0 connected to f1 and f2") {
@@ -1218,24 +1211,19 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     PartGraph &g = pkg.part_graph;
 
     auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
+    j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
     auto &f1 =
         std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f1")));
     auto &f2 =
         std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f2")));
 
-    maximise_joint_socket_spread(j0);
-
     position_part_graph(g);
 
-    REQUIRE_THAT(f1.transform.transformPoint(f1.sockets.at(0).local_position),
-                 EqualsVector2f(j0.transform.transformPoint(
-                                    j0.sockets.at(0).local_position),
-                                0.01f));
+    REQUIRE_THAT(f1.GetSocketWorldPosition(0),
+                 EqualsVector2f(j0.GetSocketWorldPosition(0), 0.01f));
 
-    REQUIRE_THAT(f2.transform.transformPoint(f2.sockets.at(0).local_position),
-                 EqualsVector2f(j0.transform.transformPoint(
-                                    j0.sockets.at(1).local_position),
-                                0.01f));
+    REQUIRE_THAT(f2.GetSocketWorldPosition(0),
+                 EqualsVector2f(j0.GetSocketWorldPosition(1), 0.01f));
   }
 
   SECTION("Does not infinite-loop on a cyclic graph") {
@@ -1250,7 +1238,7 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
 
     PartGraph &g = pkg.part_graph;
     auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
-    maximise_joint_socket_spread(j0);
+    j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
     REQUIRE_NOTHROW(position_part_graph(g));
   }
@@ -1360,9 +1348,8 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has only one part and no subgraph provided, does not "
           "exceed minimum box size") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance{&fragment};
-    fragment_instance.id = 0;
-    part_graph.emplace(fragment_instance.id, fragment_instance);
+    FragmentInstance fragment_instance{0, fragment};
+    part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
 
@@ -1375,9 +1362,8 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has only one part and no subgraph provided, exceeds "
           "minimum size") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance{&fragment_large};
-    fragment_instance.id = 0;
-    part_graph.emplace(fragment_instance.id, fragment_instance);
+    FragmentInstance fragment_instance{0, fragment_large};
+    part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
     // The outer box should be the same as the fragment's bounding box since
@@ -1391,11 +1377,10 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has only one part, no subgraph provided, and local "
           "transform applied, does not exceed minimum box size") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance{&fragment};
-    fragment_instance.id = 0;
+    FragmentInstance fragment_instance{0, fragment};
     // apply a local transform to the fragment instance
-    fragment_instance.transform.translate({10.f, 10.f});
-    part_graph.emplace(fragment_instance.id, fragment_instance);
+    fragment_instance.GetTransform().translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
 
@@ -1408,11 +1393,10 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has only one part, no subgraph provided, and local "
           "transform applied, exceeds minimum box size") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance{&fragment_large};
-    fragment_instance.id = 0;
+    FragmentInstance fragment_instance{0, fragment_large};
     // apply a local transform to the fragment instance
-    fragment_instance.transform.translate({10.f, 10.f});
-    part_graph.emplace(fragment_instance.id, fragment_instance);
+    fragment_instance.GetTransform().translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
     // The outer box should be the same as the fragment's bounding box since
@@ -1426,14 +1410,12 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has multiple parts, no subgraph provided and transforms "
           "applied, does not exceed minimum box size") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance1{&fragment};
-    fragment_instance1.id = 0;
-    fragment_instance1.transform.translate({10.f, 10.f});
-    part_graph.emplace(fragment_instance1.id, fragment_instance1);
-    FragmentInstance fragment_instance2{&fragment2};
-    fragment_instance2.id = 1;
-    fragment_instance2.transform.translate({-5.f, -5.f});
-    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    FragmentInstance fragment_instance1{0, fragment};
+    fragment_instance1.GetTransform().translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.GetId(), fragment_instance1);
+    FragmentInstance fragment_instance2{1, fragment2};
+    fragment_instance2.GetTransform().translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.GetId(), fragment_instance2);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
 
@@ -1446,14 +1428,13 @@ TEST_CASE("calculate_outer_box tests") {
   SECTION("PartGraph has multiple parts, subgraph provided and transforms "
           "applied") {
     PartGraph part_graph;
-    FragmentInstance fragment_instance1{&fragment};
-    fragment_instance1.id = 0;
-    fragment_instance1.transform.translate({10.f, 10.f});
-    part_graph.emplace(fragment_instance1.id, fragment_instance1);
-    FragmentInstance fragment_instance2{&fragment2};
-    fragment_instance2.id = 1;
-    fragment_instance2.transform.translate({-5.f, -5.f});
-    part_graph.emplace(fragment_instance2.id, fragment_instance2);
+    FragmentInstance fragment_instance1{0, fragment};
+
+    fragment_instance1.GetTransform().translate({10.f, 10.f});
+    part_graph.emplace(fragment_instance1.GetId(), fragment_instance1);
+    FragmentInstance fragment_instance2{1, fragment2};
+    fragment_instance2.GetTransform().translate({-5.f, -5.f});
+    part_graph.emplace(fragment_instance2.GetId(), fragment_instance2);
     SubGraph sub_graph{0}; // only include the first part
     sf::FloatRect outer_box = calculate_outer_box(part_graph, sub_graph);
 

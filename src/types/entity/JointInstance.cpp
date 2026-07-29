@@ -25,4 +25,13 @@ void JointInstance::PositionSockets(
   }
 }
 
+/////////////////////////////////////////////////
+void maximise_joint_socket_spread(JointInstance::Sockets &joint_sockets,
+                                  const sf::Vector2f &pivot,
+                                  const SocketConfig &config) {
+  if (joint_sockets.empty()) {
+    return;
+  }
+}
+
 } // namespace steamrot

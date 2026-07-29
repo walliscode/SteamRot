@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FragmentInstance.h"
-#include "SocketState.h"
 #include "catch2/catch_approx.hpp"
 #include "fragment_library.h"
 #include <SFML/Graphics/Transform.hpp>
@@ -183,27 +182,6 @@ TEST_CASE("FragmentInstance::GetSocketWorldAlignmentVector tests",
   }
 }
 
-TEST_CASE("FragmentInstance::SetConnection tests", "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket,
-                                     "test_fragment");
-
-  SECTION("No-op when socket does not exist") {
-    REQUIRE_NOTHROW(fragment_instance.SetConnection(SocketConnection{}, 12345));
-  }
-
-  SECTION("Sets connection when socket exists") {
-
-    SocketConnection connection{};
-    fragment_instance.SetConnection(connection, 1);
-
-    const auto *stored_socket =
-        static_cast<const FragmentInstance &>(fragment_instance)
-            .TryGetSocket(1);
-    REQUIRE(stored_socket != nullptr);
-    REQUIRE(stored_socket->GetConnection() == connection);
-  }
-}
-
 TEST_CASE("FragmentInstance::CheckMouseOverSockets tests",
           "[FragmentInstance]") {
   FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket,
@@ -226,12 +204,12 @@ TEST_CASE("FragmentInstance::CheckForConnectionReadiness tests",
                                      "test_fragment");
 
   SECTION("Returns nullopt when no sockets are available") {
-    REQUIRE_FALSE(fragment_instance.CheckForConnectionReadiness().has_value());
+    REQUIRE_FALSE(fragment_instance.CheckIfAnySocketIsAvailable().has_value());
   }
 
   SECTION("Returns socket id when an available socket exists") {
 
-    const auto result = fragment_instance.CheckForConnectionReadiness();
+    const auto result = fragment_instance.CheckIfAnySocketIsAvailable();
     REQUIRE(result.has_value());
     REQUIRE(result.value() == 20);
   }

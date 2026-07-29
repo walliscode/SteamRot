@@ -14,6 +14,7 @@
 #include "Joint.h"
 #include "PartInstance.h"
 #include "SocketState.h"
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
@@ -39,6 +40,10 @@ public:
 
   void
   PositionSockets(const JointSocketPositioningStrategy positioning_strategy);
+
+  sf::Vector2f GetSocketPivotWorldPosition() const {
+    return GetTransform().transformPoint(part.socket_pivot);
+  }
 };
 
 /////////////////////////////////////////////////

@@ -369,9 +369,9 @@ TEST_CASE("align_camera_to_machina_form_scaffold tests") {
     // arrange
     camera_state.m_zoom_level = 3.0f;
     // Create a simple part graph with one part at position (50, 50)
-    FragmentInstance fragment_instance{&fragment_one};
-    fragment_instance.transform.translate({50.f, 50.f});
-    scaffold.parts.emplace(fragment_instance.id, fragment_instance);
+    FragmentInstance fragment_instance{0, fragment_one};
+    fragment_instance.GetTransform().translate({50.f, 50.f});
+    scaffold.parts.emplace(fragment_instance.GetId(), fragment_instance);
 
     // act
     align_camera_to_machina_form_scaffold(scaffold, camera_state);

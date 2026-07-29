@@ -15,11 +15,7 @@
 #include "MachinaFormScaffold.h"
 #include <catch2/catch_test_macros.hpp>
 
-namespace tests = steamrot::tests;
-
-/////////////////////////////////////////////////
-/// pair
-/////////////////////////////////////////////////
+namespace steamrot::tests {
 
 TEST_CASE("pair has exactly two parts",
           "[unit][part_graphs][part_graph_library]") {
@@ -44,8 +40,8 @@ TEST_CASE("pair part IDs match their map keys",
       std::get<steamrot::FragmentInstance>(tests::pair.part_graph.at(0));
   const auto &j0 =
       std::get<steamrot::JointInstance>(tests::pair.part_graph.at(1));
-  REQUIRE(f0.id == 0);
-  REQUIRE(j0.id == 1);
+  REQUIRE(f0.GetId() == 0);
+  REQUIRE(j0.GetId() == 1);
 }
 
 TEST_CASE("pair id_to_part_graph_id contains correct aliases",
@@ -58,14 +54,14 @@ TEST_CASE("pair fragment has one socket",
           "[unit][part_graphs][part_graph_library]") {
   const auto &f0 =
       std::get<steamrot::FragmentInstance>(tests::pair.part_graph.at(0));
-  REQUIRE(f0.sockets.size() == 1);
+  REQUIRE(f0.GetSocketCount() == 1);
 }
 
 TEST_CASE("pair joint has one socket",
           "[unit][part_graphs][part_graph_library]") {
   const auto &j0 =
       std::get<steamrot::JointInstance>(tests::pair.part_graph.at(1));
-  REQUIRE(j0.sockets.size() == 1);
+  REQUIRE(j0.GetSocketCount() == 1);
 }
 
 TEST_CASE("pair both parts have connection_count 1",
@@ -74,8 +70,8 @@ TEST_CASE("pair both parts have connection_count 1",
       std::get<steamrot::FragmentInstance>(tests::pair.part_graph.at(0));
   const auto &j0 =
       std::get<steamrot::JointInstance>(tests::pair.part_graph.at(1));
-  REQUIRE(f0.connection_count == 1);
-  REQUIRE(j0.connection_count == 1);
+  REQUIRE(f0.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(j0.GetNumberOfConnectedSockets() == 1);
 }
 
 TEST_CASE("pair sockets are Connected and reference each other",
@@ -85,19 +81,21 @@ TEST_CASE("pair sockets are Connected and reference each other",
   const auto &j0 =
       std::get<steamrot::JointInstance>(tests::pair.part_graph.at(1));
 
-  // fragment socket[0] → joint socket[0]
-  REQUIRE(f0.sockets.at(0).connection_state ==
+  const auto *f0s0 = f0.TryGetSocket(0);
+  REQUIRE(f0s0 != nullptr);
+  REQUIRE(f0s0->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(f0.sockets.at(0).connected_to.has_value());
-  REQUIRE(f0.sockets.at(0).connected_to->peer_part_id == 1);
-  REQUIRE(f0.sockets.at(0).connected_to->peer_socket_id == 0);
+  REQUIRE(f0s0->GetConnection().has_value());
+  REQUIRE(f0s0->GetConnection()->peer_part_id == 1);
+  REQUIRE(f0s0->GetConnection()->peer_socket_id == 0);
 
-  // joint socket[0] → fragment socket[0]
-  REQUIRE(j0.sockets.at(0).connection_state ==
+  const auto *j0s0 = j0.TryGetSocket(0);
+  REQUIRE(j0s0 != nullptr);
+  REQUIRE(j0s0->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(j0.sockets.at(0).connected_to.has_value());
-  REQUIRE(j0.sockets.at(0).connected_to->peer_part_id == 0);
-  REQUIRE(j0.sockets.at(0).connected_to->peer_socket_id == 0);
+  REQUIRE(j0s0->GetConnection().has_value());
+  REQUIRE(j0s0->GetConnection()->peer_part_id == 0);
+  REQUIRE(j0s0->GetConnection()->peer_socket_id == 0);
 }
 
 /////////////////////////////////////////////////
@@ -128,9 +126,9 @@ TEST_CASE("linear_chain_3 part IDs match their map keys",
       std::get<steamrot::JointInstance>(tests::linear_chain_3.part_graph.at(1));
   const auto &f1 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_3.part_graph.at(2));
-  REQUIRE(f0.id == 0);
-  REQUIRE(j0.id == 1);
-  REQUIRE(f1.id == 2);
+  REQUIRE(f0.GetId() == 0);
+  REQUIRE(j0.GetId() == 1);
+  REQUIRE(f1.GetId() == 2);
 }
 
 TEST_CASE("linear_chain_3 id_to_part_graph_id contains correct aliases",
@@ -146,15 +144,15 @@ TEST_CASE("linear_chain_3 terminal fragments have one socket each",
       tests::linear_chain_3.part_graph.at(0));
   const auto &f1 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_3.part_graph.at(2));
-  REQUIRE(f0.sockets.size() == 1);
-  REQUIRE(f1.sockets.size() == 1);
+  REQUIRE(f0.GetSocketCount() == 1);
+  REQUIRE(f1.GetSocketCount() == 1);
 }
 
 TEST_CASE("linear_chain_3 joint has two sockets",
           "[unit][part_graphs][part_graph_library]") {
   const auto &j0 =
       std::get<steamrot::JointInstance>(tests::linear_chain_3.part_graph.at(1));
-  REQUIRE(j0.sockets.size() == 2);
+  REQUIRE(j0.GetSocketCount() == 2);
 }
 
 TEST_CASE("linear_chain_3 connection counts are correct",
@@ -166,9 +164,9 @@ TEST_CASE("linear_chain_3 connection counts are correct",
   const auto &f1 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_3.part_graph.at(2));
 
-  REQUIRE(f0.connection_count == 1); // terminal
-  REQUIRE(j0.connection_count == 2); // middle node
-  REQUIRE(f1.connection_count == 1); // terminal
+  REQUIRE(f0.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(j0.GetNumberOfConnectedSockets() == 2);
+  REQUIRE(f1.GetNumberOfConnectedSockets() == 1);
 }
 
 TEST_CASE("linear_chain_3 socket connections are bidirectionally correct",
@@ -180,29 +178,34 @@ TEST_CASE("linear_chain_3 socket connections are bidirectionally correct",
   const auto &f1 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_3.part_graph.at(2));
 
-  // f0.socket[0] → j0.socket[0]
-  REQUIRE(f0.sockets.at(0).connection_state ==
+  const auto *f0s0 = f0.TryGetSocket(0);
+  REQUIRE(f0s0 != nullptr);
+  REQUIRE(f0s0->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(f0.sockets.at(0).connected_to->peer_part_id == 1);
-  REQUIRE(f0.sockets.at(0).connected_to->peer_socket_id == 0);
+  REQUIRE(f0s0->GetConnection().has_value());
+  REQUIRE(f0s0->GetConnection()->peer_part_id == 1);
 
-  // j0.socket[0] → f0.socket[0]
-  REQUIRE(j0.sockets.at(0).connection_state ==
+  const auto *j0s0 = j0.TryGetSocket(0);
+  REQUIRE(j0s0 != nullptr);
+  REQUIRE(j0s0->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(j0.sockets.at(0).connected_to->peer_part_id == 0);
-  REQUIRE(j0.sockets.at(0).connected_to->peer_socket_id == 0);
+  REQUIRE(j0s0->GetConnection().has_value());
+  REQUIRE(j0s0->GetConnection()->peer_part_id == 0);
 
-  // j0.socket[1] → f1.socket[0]
-  REQUIRE(j0.sockets.at(1).connection_state ==
+  const auto *j0s1 = j0.TryGetSocket(1);
+  REQUIRE(j0s1 != nullptr);
+  REQUIRE(j0s1->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(j0.sockets.at(1).connected_to->peer_part_id == 2);
-  REQUIRE(j0.sockets.at(1).connected_to->peer_socket_id == 0);
+  REQUIRE(j0s1->GetConnection().has_value());
+  REQUIRE(j0s1->GetConnection()->peer_part_id == 2);
 
-  // f1.socket[0] → j0.socket[1]
-  REQUIRE(f1.sockets.at(0).connection_state ==
+  const auto *f1s0 = f1.TryGetSocket(0);
+  REQUIRE(f1s0 != nullptr);
+  REQUIRE(f1s0->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(f1.sockets.at(0).connected_to->peer_part_id == 1);
-  REQUIRE(f1.sockets.at(0).connected_to->peer_socket_id == 1);
+  REQUIRE(f1s0->GetConnection().has_value());
+  REQUIRE(f1s0->GetConnection()->peer_part_id == 1);
+  REQUIRE(f1s0->GetConnection()->peer_socket_id == 1);
 }
 
 /////////////////////////////////////////////////
@@ -235,7 +238,7 @@ TEST_CASE("linear_chain_5 part IDs match their map keys",
   for (uint32_t i = 0; i < 5; ++i) {
     const auto &variant = tests::linear_chain_5.part_graph.at(i);
     const uint32_t id =
-        std::visit([](const auto &inst) { return inst.id; }, variant);
+        std::visit([](const auto &inst) { return inst.GetId(); }, variant);
     REQUIRE(id == i);
   }
 }
@@ -258,9 +261,9 @@ TEST_CASE("linear_chain_5 terminal fragments have one socket, middle fragment "
       tests::linear_chain_5.part_graph.at(2));
   const auto &f2 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_5.part_graph.at(4));
-  REQUIRE(f0.sockets.size() == 1);
-  REQUIRE(f1.sockets.size() == 2);
-  REQUIRE(f2.sockets.size() == 1);
+  REQUIRE(f0.GetSocketCount() == 1);
+  REQUIRE(f1.GetSocketCount() == 2);
+  REQUIRE(f2.GetSocketCount() == 1);
 }
 
 TEST_CASE("linear_chain_5 joints each have two sockets",
@@ -269,8 +272,8 @@ TEST_CASE("linear_chain_5 joints each have two sockets",
       std::get<steamrot::JointInstance>(tests::linear_chain_5.part_graph.at(1));
   const auto &j1 =
       std::get<steamrot::JointInstance>(tests::linear_chain_5.part_graph.at(3));
-  REQUIRE(j0.sockets.size() == 2);
-  REQUIRE(j1.sockets.size() == 2);
+  REQUIRE(j0.GetSocketCount() == 2);
+  REQUIRE(j1.GetSocketCount() == 2);
 }
 
 TEST_CASE("linear_chain_5 connection counts are correct",
@@ -286,11 +289,11 @@ TEST_CASE("linear_chain_5 connection counts are correct",
   const auto &f2 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_5.part_graph.at(4));
 
-  REQUIRE(f0.connection_count == 1); // terminal
-  REQUIRE(j0.connection_count == 2); // middle
-  REQUIRE(f1.connection_count == 2); // middle
-  REQUIRE(j1.connection_count == 2); // middle
-  REQUIRE(f2.connection_count == 1); // terminal
+  REQUIRE(f0.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(j0.GetNumberOfConnectedSockets() == 2);
+  REQUIRE(f1.GetNumberOfConnectedSockets() == 2);
+  REQUIRE(j1.GetNumberOfConnectedSockets() == 2);
+  REQUIRE(f2.GetNumberOfConnectedSockets() == 1);
 }
 
 TEST_CASE("linear_chain_5 socket connections are bidirectionally correct",
@@ -306,27 +309,48 @@ TEST_CASE("linear_chain_5 socket connections are bidirectionally correct",
   const auto &f2 = std::get<steamrot::FragmentInstance>(
       tests::linear_chain_5.part_graph.at(4));
 
-  // f0.socket[0] ↔ j0.socket[0]
-  REQUIRE(f0.sockets.at(0).connected_to->peer_part_id == 1);
-  REQUIRE(f0.sockets.at(0).connected_to->peer_socket_id == 0);
-  REQUIRE(j0.sockets.at(0).connected_to->peer_part_id == 0);
-  REQUIRE(j0.sockets.at(0).connected_to->peer_socket_id == 0);
+  const auto *f0s0 = f0.TryGetSocket(0);
+  const auto *j0s0 = j0.TryGetSocket(0);
+  REQUIRE(f0s0 != nullptr);
+  REQUIRE(j0s0 != nullptr);
+  REQUIRE(f0s0->GetConnection().has_value());
+  REQUIRE(j0s0->GetConnection().has_value());
+  REQUIRE(f0s0->GetConnection()->peer_part_id == 1);
+  REQUIRE(f0s0->GetConnection()->peer_socket_id == 0);
+  REQUIRE(j0s0->GetConnection()->peer_part_id == 0);
+  REQUIRE(j0s0->GetConnection()->peer_socket_id == 0);
 
-  // j0.socket[1] ↔ f1.socket[0]
-  REQUIRE(j0.sockets.at(1).connected_to->peer_part_id == 2);
-  REQUIRE(j0.sockets.at(1).connected_to->peer_socket_id == 0);
-  REQUIRE(f1.sockets.at(0).connected_to->peer_part_id == 1);
-  REQUIRE(f1.sockets.at(0).connected_to->peer_socket_id == 1);
+  const auto *j0s1 = j0.TryGetSocket(1);
+  const auto *f1s0 = f1.TryGetSocket(0);
+  REQUIRE(j0s1 != nullptr);
+  REQUIRE(f1s0 != nullptr);
+  REQUIRE(j0s1->GetConnection().has_value());
+  REQUIRE(f1s0->GetConnection().has_value());
+  REQUIRE(j0s1->GetConnection()->peer_part_id == 2);
+  REQUIRE(j0s1->GetConnection()->peer_socket_id == 0);
+  REQUIRE(f1s0->GetConnection()->peer_part_id == 1);
+  REQUIRE(f1s0->GetConnection()->peer_socket_id == 1);
 
-  // f1.socket[1] ↔ j1.socket[0]
-  REQUIRE(f1.sockets.at(1).connected_to->peer_part_id == 3);
-  REQUIRE(f1.sockets.at(1).connected_to->peer_socket_id == 0);
-  REQUIRE(j1.sockets.at(0).connected_to->peer_part_id == 2);
-  REQUIRE(j1.sockets.at(0).connected_to->peer_socket_id == 1);
+  const auto *f1s1 = f1.TryGetSocket(1);
+  const auto *j1s0 = j1.TryGetSocket(0);
+  REQUIRE(f1s1 != nullptr);
+  REQUIRE(j1s0 != nullptr);
+  REQUIRE(f1s1->GetConnection().has_value());
+  REQUIRE(j1s0->GetConnection().has_value());
+  REQUIRE(f1s1->GetConnection()->peer_part_id == 3);
+  REQUIRE(f1s1->GetConnection()->peer_socket_id == 0);
+  REQUIRE(j1s0->GetConnection()->peer_part_id == 2);
+  REQUIRE(j1s0->GetConnection()->peer_socket_id == 1);
 
-  // j1.socket[1] ↔ f2.socket[0]
-  REQUIRE(j1.sockets.at(1).connected_to->peer_part_id == 4);
-  REQUIRE(j1.sockets.at(1).connected_to->peer_socket_id == 0);
-  REQUIRE(f2.sockets.at(0).connected_to->peer_part_id == 3);
-  REQUIRE(f2.sockets.at(0).connected_to->peer_socket_id == 1);
+  const auto *j1s1 = j1.TryGetSocket(1);
+  const auto *f2s0 = f2.TryGetSocket(0);
+  REQUIRE(j1s1 != nullptr);
+  REQUIRE(f2s0 != nullptr);
+  REQUIRE(j1s1->GetConnection().has_value());
+  REQUIRE(f2s0->GetConnection().has_value());
+  REQUIRE(j1s1->GetConnection()->peer_part_id == 4);
+  REQUIRE(j1s1->GetConnection()->peer_socket_id == 0);
+  REQUIRE(f2s0->GetConnection()->peer_part_id == 3);
+  REQUIRE(f2s0->GetConnection()->peer_socket_id == 1);
 }
+} // namespace steamrot::tests
