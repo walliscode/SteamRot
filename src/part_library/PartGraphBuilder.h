@@ -65,7 +65,8 @@ public:
   /// @param name Enum value specifying the type of FragmentInstance to create.
   /// @return A FragmentInstance corresponding to the specified FragmentNames.
   /////////////////////////////////////////////////
-  FragmentInstance MakeFragmentInstance(const FragmentNames name);
+  FragmentInstance MakeFragmentInstance(const FragmentNames name,
+                                        const std::string &id = "");
 
   /////////////////////////////////////////////////
   /// @brief Creates a FragmentInstance from a Fragment definition, assigning a
@@ -74,7 +75,8 @@ public:
   /// @param fragment Fragment definition to wrap in a FragmentInstance.
   /// @return A FragmentInstance with a builder-assigned stable ID.
   /////////////////////////////////////////////////
-  FragmentInstance MakeFragmentInstance(const Fragment &fragment);
+  FragmentInstance MakeFragmentInstance(const Fragment &fragment,
+                                        const std::string &id = "");
 
   /////////////////////////////////////////////////
   /// @brief Creates a JointInstance based on the provided JointNames enum
@@ -83,7 +85,8 @@ public:
   /// @param name Enum value specifying the type of JointInstance to create.
   /// @return A JointInstance corresponding to the specified JointNames.
   /////////////////////////////////////////////////
-  JointInstance MakeJointInstance(const JointNames name);
+  JointInstance MakeJointInstance(const JointNames name,
+                                  const std::string &id = "");
 
   /////////////////////////////////////////////////
   /// @brief Creates a JointInstance from a Joint definition, assigning a
@@ -92,17 +95,46 @@ public:
   /// @param joint Joint definition to wrap in a JointInstance.
   /// @return A JointInstance with a builder-assigned stable ID.
   /////////////////////////////////////////////////
-  JointInstance MakeJointInstance(const Joint &joint);
+  JointInstance MakeJointInstance(const Joint &joint,
+                                  const std::string &id = "");
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param name [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   PartGraphBuilder &AddFragmentInstance(const FragmentNames name,
                                         const std::string id);
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param fragment [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   PartGraphBuilder &AddFragmentInstance(const Fragment &fragment,
                                         const std::string id);
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param name [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   PartGraphBuilder &AddJointInstance(const JointNames name,
                                      const std::string id);
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param joint [TODO:parameter]
+  /// @param id [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   PartGraphBuilder &AddJointInstance(const Joint &joint, const std::string id);
 
   PartGraphBuilder &Connect(const std::string &from_id,

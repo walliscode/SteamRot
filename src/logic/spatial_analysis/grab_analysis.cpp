@@ -13,6 +13,7 @@
 #include "positioning_grimoire_machina.h"
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cmath>
 
 namespace steamrot::logic::spatial_analysis {
 
@@ -26,8 +27,8 @@ JointInstance &get_anchor_joint(const GrabResult &grab_result,
 std::set<uint32_t> get_connected_sockets(const JointInstance &anchor_joint) {
 
   std::set<uint32_t> connected_sockets;
-  for (const auto &[socket_id, socket_data] : anchor_joint.sockets) {
-    if (socket_data.connection_state == SocketConnectionState::Connected) {
+  for (const auto &[socket_id, socket_data] : anchor_joint.GetSockets()) {
+    if (socket_data.GetConnectionState() == SocketConnectionState::Connected) {
       connected_sockets.insert(socket_id);
     }
   }
@@ -68,8 +69,8 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
 
   // ROTATION //
   // first we find the mid point of the Joint arc in local space
-  const float arc_min = anchor_joint.joint->socket_config.rotation_arc_min;
-  const float arc_max = anchor_joint.joint->socket_config.rotation_arc_max;
+  const float arc_min = anchor_joint.GetPart().socket_config.rotation_arc_min;
+  const float arc_max = anchor_joint.GetPart().socket_config.rotation_arc_max;
   const float arc_mid = (arc_min + arc_max) / 2.f;
 
   // then we convert that to a sf::Angle object
@@ -84,14 +85,14 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
   // been rotated. This sidesteps the need to specify a pivot point
   const sf::Vector2f translation_vector =
       anchor_point -
-      rotation_transform.transformPoint(anchor_joint.joint->socket_pivot);
+      rotation_transform.transformPoint(anchor_joint.GetPart().socket_pivot);
 
   // TRANSFORM //
-  anchor_joint.transform.translate(translation_vector);
-  anchor_joint.transform.rotate(rotation_angle);
+  anchor_joint.GetTransform().translate(translation_vector);
+  anchor_joint.GetTransform().rotate(rotation_angle);
 
   // update state of the anchor joint
-  anchor_joint.total_rotation += rotation_angle;
+  anchor_joint.AddToTotalRotation(rotation_angle);
 };
 
 /////////////////////////////////////////////////
@@ -111,11 +112,12 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
   // as this is the coordination fuction we can set the initial transform of the
   // anchor joint to identity
-  anchor_joint.transform = sf::Transform::Identity;
+  anchor_joint.SetTransform(sf::Transform::Identity);
 
   // LOCAL TRANSFORMS //
   // spread the sockets on the anchor joint to maximum
-  positioning::grimoire_machina::maximise_joint_socket_spread(anchor_joint);
+  anchor_joint.PositionSockets(
+      JointSocketPositioningStrategy::MaximizeDistance);
 
   // GLOBAL TRANSFORMS //
   // align the anchor joint to the anchor point
@@ -205,7 +207,7 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
           // maximise the socket spread on the joint before aligning it to the
           // fragment
-          positioning::grimoire_machina::maximise_joint_socket_spread(ji);
+          ji.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
           // align the part to the previous part
           positioning::grimoire_machina::align_joint_onto_fragment_socket(
@@ -237,14 +239,14 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
   // the midpoint of the anchor joint's rotation arc in world space gives us our
   // reference direction
   const float arc_mid_degrees =
-      (anchor_joint.joint->socket_config.rotation_arc_min +
-       anchor_joint.joint->socket_config.rotation_arc_max) /
+      (anchor_joint.GetPart().socket_config.rotation_arc_min +
+       anchor_joint.GetPart().socket_config.rotation_arc_max) /
       2.f;
 
   // add the anchor joint's total rotation to the arc mid degrees to get the
   // world rotation
   const sf::Angle world_arc_mid_degrees =
-      anchor_joint.total_rotation + sf::degrees(arc_mid_degrees);
+      anchor_joint.GetTotalRotation() + sf::degrees(arc_mid_degrees);
 
   // convert the world arc mid degrees to a sf::Vector2f representing the
   // direction. Makes use of the normalized vector to get the direction only
@@ -266,11 +268,9 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
 
   // find the alignment vector of the connected socket
   sf::Vector2f alignment_vector;
-  for (const auto &[socket_id, socket_data] : end_of_arm_fi.sockets) {
-    if (socket_data.connection_state == SocketConnectionState::Connected) {
-      alignment_vector =
-          positioning::grimoire_machina::calculate_alignment_vector(
-              end_of_arm_fi, socket_id);
+  for (const auto &[socket_id, socket_data] : end_of_arm_fi.GetSockets()) {
+    if (socket_data.GetConnectionState() == SocketConnectionState::Connected) {
+      alignment_vector = end_of_arm_fi.GetSocketWorldAlignmentVector(socket_id);
       break;
     }
   }

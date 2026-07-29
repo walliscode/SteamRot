@@ -25,7 +25,7 @@ namespace detail {
 inline std::string resolve_part_alias(const PartGraph &parts, uint32_t id) {
   if (const auto part_it = parts.find(id); part_it != parts.end()) {
     return std::visit(
-        [](const auto &inst) -> const std::string & { return inst.alias; },
+        [](const auto &inst) -> const std::string & { return inst.GetAlias(); },
         part_it->second);
   }
   return {};
@@ -118,9 +118,8 @@ inline AnalysisEvent make_node_eval_event(uint32_t depth, uint32_t part_id,
                                           const PartGraph &parts,
                                           const bool result,
                                           std::string reason = {}) {
-  AnalysisEvent event = make_node_eval_event(depth, part_id,
-                                             std::move(predicate_name), result,
-                                             std::move(reason));
+  AnalysisEvent event = make_node_eval_event(
+      depth, part_id, std::move(predicate_name), result, std::move(reason));
   event.part_id_alias = detail::resolve_part_alias(parts, part_id);
   return event;
 }

@@ -6,19 +6,18 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
-#include "Fragment.h"
 #include "GhostRenderLogic.h"
+#include "Fragment.h"
 #include "Joint.h"
-#include "MachinaFormScaffold.h"
 #include "MrGhost.h"
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
+namespace steamrot::tests {
 TEST_CASE("GhostRenderLogic can be constructed without errors",
           "[unit][GhostRenderLogic]") {
   steamrot::tests::TestFixture fixture;
-  REQUIRE_NOTHROW(
-      steamrot::logic::GhostRenderLogic{fixture.GetSceneContext()});
+  REQUIRE_NOTHROW(steamrot::logic::GhostRenderLogic{fixture.GetSceneContext()});
 }
 
 TEST_CASE("GhostRenderLogic::GetLogicType returns GhostRender",
@@ -28,8 +27,9 @@ TEST_CASE("GhostRenderLogic::GetLogicType returns GhostRender",
   REQUIRE(logic.GetLogicType() == steamrot::LogicType::GhostRender);
 }
 
-TEST_CASE("GhostRenderLogic::RunLogic does not throw when instance is monostate",
-          "[unit][GhostRenderLogic]") {
+TEST_CASE(
+    "GhostRenderLogic::RunLogic does not throw when instance is monostate",
+    "[unit][GhostRenderLogic]") {
   steamrot::tests::TestFixture fixture;
 
   REQUIRE(std::holds_alternative<std::monostate>(
@@ -45,8 +45,9 @@ TEST_CASE("GhostRenderLogic::RunLogic does not throw when a FragmentInstance "
   steamrot::tests::TestFixture fixture;
 
   steamrot::Fragment fragment;
-  fixture.GetSceneContext().mr_ghost.m_instance =
-      steamrot::FragmentInstance{&fragment};
+  fixture.GetSceneContext().mr_ghost.m_instance.emplace<FragmentInstance>(
+      0, fragment);
+
   fixture.GetSceneContext().mr_ghost.m_position = {50.f, 50.f};
 
   steamrot::logic::GhostRenderLogic logic{fixture.GetSceneContext()};
@@ -59,10 +60,13 @@ TEST_CASE("GhostRenderLogic::RunLogic does not throw when a JointInstance "
   steamrot::tests::TestFixture fixture;
 
   steamrot::Joint joint;
-  fixture.GetSceneContext().mr_ghost.m_instance =
-      steamrot::JointInstance{&joint};
+
+  fixture.GetSceneContext().mr_ghost.m_instance.emplace<JointInstance>(0,
+                                                                       joint);
+
   fixture.GetSceneContext().mr_ghost.m_position = {50.f, 50.f};
 
   steamrot::logic::GhostRenderLogic logic{fixture.GetSceneContext()};
   REQUIRE_NOTHROW(logic.RunLogic());
 }
+} // namespace steamrot::tests

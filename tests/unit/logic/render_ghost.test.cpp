@@ -9,12 +9,12 @@
 #include "render_ghost.h"
 #include "Fragment.h"
 #include "Joint.h"
-#include "MachinaFormScaffold.h"
 #include "MrGhost.h"
 #include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
+namespace steamrot::tests {
 namespace {
 
 /////////////////////////////////////////////////
@@ -102,26 +102,6 @@ TEST_CASE("draw_ghost_item draws nothing when instance is monostate",
 }
 
 /////////////////////////////////////////////////
-/// draw_ghost_item — null fragment pointer
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_ghost_item does not throw when fragment pointer is null",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{100, 100}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{nullptr};
-
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost));
-
-  texture.display();
-  const sf::Image image = texture.getTexture().copyToImage();
-  REQUIRE(image.getPixel({50, 50}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
 /// draw_ghost_item — FragmentInstance: empty view draws nothing
 /////////////////////////////////////////////////
 
@@ -132,7 +112,7 @@ TEST_CASE("draw_ghost_item draws nothing when the fragment view is empty",
 
   steamrot::Fragment fragment = MakeEmptyFragment("stone");
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&fragment};
+  mr_ghost.m_instance.emplace<FragmentInstance>(0, fragment);
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost));
@@ -154,12 +134,12 @@ TEST_CASE("draw_ghost_item draws fragment geometry at the instance transform",
   // Fragment has a 20x20 white square at local origin.
   // Set transform to translate(25, 25) — square lands at [25..45, 25..45].
   steamrot::Fragment fragment = MakePopulatedFragment("arm");
-  steamrot::FragmentInstance instance{&fragment};
-  instance.transform = sf::Transform::Identity;
-  instance.transform.translate({25.f, 25.f});
+  steamrot::FragmentInstance instance{0, fragment};
+  instance.SetTransform(sf::Transform::Identity);
+  instance.GetTransform().translate({25.f, 25.f});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = instance;
+  mr_ghost.m_instance.emplace<FragmentInstance>(instance);
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost);
   texture.display();
@@ -173,26 +153,6 @@ TEST_CASE("draw_ghost_item draws fragment geometry at the instance transform",
 }
 
 /////////////////////////////////////////////////
-/// draw_ghost_item — null joint pointer
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_ghost_item does not throw when joint pointer is null",
-          "[unit][render_ghost]") {
-  sf::RenderTexture texture{{100, 100}};
-  texture.clear(sf::Color::Black);
-
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::JointInstance{nullptr};
-
-  REQUIRE_NOTHROW(
-      steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost));
-
-  texture.display();
-  const sf::Image image = texture.getTexture().copyToImage();
-  REQUIRE(image.getPixel({50, 50}) == sf::Color::Black);
-}
-
-/////////////////////////////////////////////////
 /// draw_ghost_item — JointInstance: empty view draws nothing
 /////////////////////////////////////////////////
 
@@ -203,7 +163,7 @@ TEST_CASE("draw_ghost_item draws nothing when the joint view is empty",
 
   steamrot::Joint joint = MakeEmptyJoint("hinge");
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::JointInstance{&joint};
+  mr_ghost.m_instance.emplace<JointInstance>(0, joint);
 
   REQUIRE_NOTHROW(
       steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost));
@@ -223,13 +183,13 @@ TEST_CASE("draw_ghost_item renders fragment geometry at a far-corner position",
   texture.clear(sf::Color::Black);
 
   steamrot::Fragment fragment = MakePopulatedFragment("rock");
-  steamrot::FragmentInstance instance{&fragment};
-  instance.transform = sf::Transform::Identity;
+  steamrot::FragmentInstance instance{0, fragment};
+  instance.SetTransform(sf::Transform::Identity);
   // translate(175, 175) — square lands at [175..195, 175..195]
-  instance.transform.translate({175.f, 175.f});
+  instance.GetTransform().translate({175.f, 175.f});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = instance;
+  mr_ghost.m_instance.emplace<FragmentInstance>(instance);
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost);
   texture.display();
@@ -257,14 +217,14 @@ TEST_CASE("draw_ghost_item draws socket circle for a FragmentInstance",
   steamrot::SocketData socket{{25.f, 10.f}, {1.f, 0.f}};
   fragment.sockets.push_back(socket);
 
-  steamrot::FragmentInstance instance{&fragment};
-  instance.transform = sf::Transform::Identity;
+  steamrot::FragmentInstance instance{0, fragment};
+  instance.SetTransform(sf::Transform::Identity);
   // translate(75, 75): square at [75..95, 75..95]
   // socket at world = transform.transformPoint(25, 10) = (100, 85)
-  instance.transform.translate({75.f, 75.f});
+  instance.GetTransform().translate({75.f, 75.f});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = instance;
+  mr_ghost.m_instance.emplace<FragmentInstance>(instance);
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost);
   texture.display();
@@ -288,12 +248,12 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment has no sockets",
 
   // Fragment with geometry but NO sockets
   steamrot::Fragment fragment = MakePopulatedFragment("bare");
-  steamrot::FragmentInstance instance{&fragment};
-  instance.transform = sf::Transform::Identity;
-  instance.transform.translate({75.f, 75.f});
+  steamrot::FragmentInstance instance{0, fragment};
+  instance.SetTransform(sf::Transform::Identity);
+  instance.GetTransform().translate({75.f, 75.f});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = instance;
+  mr_ghost.m_instance.emplace<FragmentInstance>(instance);
 
   steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost);
   texture.display();
@@ -304,3 +264,4 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment has no sockets",
   // painted — with no sockets it must remain black.
   REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
 }
+} // namespace steamrot::tests

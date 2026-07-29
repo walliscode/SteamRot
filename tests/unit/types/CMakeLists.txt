@@ -5,6 +5,7 @@ add_executable(test_types
   core/SceneInfo.test.cpp
 
   entity/Fragment.test.cpp
+  entity/FragmentInstance.test.cpp
 
   components/CUIState.test.cpp
   components/CMeta.test.cpp
@@ -35,6 +36,7 @@ target_link_libraries(test_types PRIVATE
   Catch2::Catch2WithMain
   types
   matchers
+  part_library
 )
 
 catch_discover_tests(test_types)

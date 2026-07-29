@@ -9,12 +9,7 @@
 /////////////////////////////////////////////////
 #include "grimoire_machina_test_helpers.h"
 #include "ViewDirection.h"
-#include "positioning_grimoire_machina.h"
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <memory>
 
 namespace {
@@ -245,8 +240,8 @@ PartGraphFragmentFixture MakePartGraphWithSingleFragmentInstance() {
   fixture.fragment =
       std::make_unique<steamrot::Fragment>(MakeFragmentWithOriginTriangle());
 
-  steamrot::FragmentInstance instance{fixture.fragment.get()};
-  instance.id = 0;
+  steamrot::FragmentInstance instance{0, *fixture.fragment.get()};
+
   fixture.parts.emplace(0, std::move(instance));
 
   return fixture;
@@ -258,10 +253,7 @@ PartGraphJointFixture MakePartGraphWithSingleJointInstance() {
   fixture.joint =
       std::make_unique<steamrot::Joint>(MakeJointWithOriginTriangle());
 
-  steamrot::JointInstance instance{fixture.joint.get()};
-  instance.id = 0;
-  steamrot::logic::positioning::grimoire_machina::
-      initialize_joint_socket_positions(instance);
+  steamrot::JointInstance instance{0, *fixture.joint.get()};
   fixture.parts.emplace(0, std::move(instance));
 
   return fixture;

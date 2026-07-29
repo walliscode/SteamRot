@@ -30,9 +30,8 @@ NodeDescriptorResult NodeDescriptor::operator()(const PartGraph &parts,
   } else {
     result = m_fn(parts, id);
   }
-  AnalysisEvent eval_event =
-      make_node_eval_event(depth, id, m_name, parts, static_cast<bool>(result),
-                           result.m_reason);
+  AnalysisEvent eval_event = make_node_eval_event(
+      depth, id, m_name, parts, static_cast<bool>(result), result.m_reason);
 
   result.m_trace.push_back(std::move(eval_event));
 
@@ -67,8 +66,9 @@ const NodeDescriptor &is_joint() {
                                                  std::to_string(id)};
         const bool holds =
             std::holds_alternative<JointInstance>(part_it->second);
-        return NodeDescriptorResult{holds, holds ? "node holds JointInstance"
-                                                 : "node holds FragmentInstance"};
+        return NodeDescriptorResult{holds, holds
+                                               ? "node holds JointInstance"
+                                               : "node holds FragmentInstance"};
       }};
   return instance;
 }
@@ -82,7 +82,7 @@ NodeDescriptor has_exactly_n_edges(size_t n, std::string name) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.connection_count; },
+            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
             part_it->second);
         return NodeDescriptorResult{
             count == n, "connection_count=" + std::to_string(count) +
@@ -106,7 +106,7 @@ NodeDescriptor has_minimum_n_edges(size_t n) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.connection_count; },
+            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
             part_it->second);
         return NodeDescriptorResult{
             count >= n, "connection_count=" + std::to_string(count) +
@@ -130,7 +130,7 @@ NodeDescriptor has_maximum_n_edges(size_t n) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.connection_count; },
+            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
             part_it->second);
         return NodeDescriptorResult{
             count <= n, "connection_count=" + std::to_string(count) +
@@ -140,8 +140,7 @@ NodeDescriptor has_maximum_n_edges(size_t n) {
 
 /////////////////////////////////////////////////
 const NodeDescriptor &is_terminal() {
-  static const NodeDescriptor instance =
-      has_exactly_n_edges(1, "is_terminal");
+  static const NodeDescriptor instance = has_exactly_n_edges(1, "is_terminal");
   return instance;
 }
 } // namespace steamrot::logic::descriptors

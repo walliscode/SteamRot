@@ -7,15 +7,18 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "PartGraphBuilder.h"
-#include "action_grimoire_machina.h"
+#include "JointInstance.h"
 #include "catch2/catch_test_macros.hpp"
+#include "overload.h"
 #include "part_library.h"
 #include <expected>
+#include <variant>
 
 namespace steamrot::tests {
 /////////////////////////////////////////////////
 FragmentInstance
-PartGraphBuilder::MakeFragmentInstance(const FragmentNames name) {
+PartGraphBuilder::MakeFragmentInstance(const FragmentNames name,
+                                       const std::string &id) {
   const Fragment *f;
   switch (name) {
   case FragmentNames::NoSocket:
@@ -31,13 +34,12 @@ PartGraphBuilder::MakeFragmentInstance(const FragmentNames name) {
     f = &fragment_three_sockets;
     break;
   }
-  FragmentInstance instance{f};
-  instance.id = m_package.next_id++;
-  return instance;
+  return MakeFragmentInstance(*f, id);
 }
 
 /////////////////////////////////////////////////
-JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
+JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name,
+                                                  const std::string &id) {
   const Joint *j;
   switch (name) {
   case JointNames::NoSocket:
@@ -53,24 +55,22 @@ JointInstance PartGraphBuilder::MakeJointInstance(const JointNames name) {
     j = &joint_three_sockets;
     break;
   }
-  JointInstance instance{j};
-  instance.id = m_package.next_id++;
-  return instance;
+
+  return MakeJointInstance(*j, id);
 }
 
 /////////////////////////////////////////////////
 FragmentInstance
-PartGraphBuilder::MakeFragmentInstance(const Fragment &fragment) {
-  FragmentInstance instance{&fragment};
-  instance.id = m_package.next_id++;
-  return instance;
+PartGraphBuilder::MakeFragmentInstance(const Fragment &fragment,
+                                       const std::string &id) {
+
+  return FragmentInstance{m_package.next_id++, fragment, id};
 }
 
 /////////////////////////////////////////////////
-JointInstance PartGraphBuilder::MakeJointInstance(const Joint &joint) {
-  JointInstance instance{&joint};
-  instance.id = m_package.next_id++;
-  return instance;
+JointInstance PartGraphBuilder::MakeJointInstance(const Joint &joint,
+                                                  const std::string &id) {
+  return JointInstance{m_package.next_id++, joint, id};
 }
 
 /////////////////////////////////////////////////
@@ -78,13 +78,12 @@ PartGraphBuilder &
 PartGraphBuilder::AddFragmentInstance(const FragmentNames name,
                                       const std::string id) {
   // create a new FragmentInstance (assigns stable ID), then insert
-  FragmentInstance instance = MakeFragmentInstance(name);
-  instance.alias = id;
-  const uint32_t instance_id = instance.id;
-  m_package.part_graph.emplace(instance_id, std::move(instance));
+  FragmentInstance instance = MakeFragmentInstance(name, id);
+  m_package.part_graph.emplace(instance.GetId(), std::move(instance));
 
-  // map the user-friendly string ID to the stable uint32_t ID in the part graph
-  m_package.id_to_part_graph_id.emplace(id, instance_id);
+  // map the user-friendly string ID to the stable uint32_t ID in the part
+  // graph
+  m_package.id_to_part_graph_id.emplace(id, instance.GetId());
 
   return *this;
 }
@@ -93,14 +92,12 @@ PartGraphBuilder::AddFragmentInstance(const FragmentNames name,
 PartGraphBuilder &
 PartGraphBuilder::AddFragmentInstance(const Fragment &fragment,
                                       const std::string id) {
-  FragmentInstance instance{&fragment};
-  instance.id = m_package.next_id++;
-  instance.alias = id;
-  const uint32_t instance_id = instance.id;
-  m_package.part_graph.emplace(instance_id, std::move(instance));
+  FragmentInstance instance{m_package.next_id++, fragment, id};
+  m_package.part_graph.emplace(instance.GetId(), std::move(instance));
 
-  // map the user-friendly string ID to the stable uint32_t ID in the part graph
-  m_package.id_to_part_graph_id.emplace(id, instance_id);
+  // map the user-friendly string ID to the stable uint32_t ID in the part
+  // graph
+  m_package.id_to_part_graph_id.emplace(id, instance.GetId());
 
   return *this;
 }
@@ -108,27 +105,25 @@ PartGraphBuilder::AddFragmentInstance(const Fragment &fragment,
 PartGraphBuilder &PartGraphBuilder::AddJointInstance(const JointNames name,
                                                      const std::string id) {
   // create a new JointInstance (assigns stable ID), then insert
-  JointInstance instance = MakeJointInstance(name);
-  instance.alias = id;
-  const uint32_t instance_id = instance.id;
-  m_package.part_graph.emplace(instance_id, std::move(instance));
+  JointInstance instance = MakeJointInstance(name, id);
+  m_package.part_graph.emplace(instance.GetId(), std::move(instance));
 
-  // map the user-friendly string ID to the stable uint32_t ID in the part graph
-  m_package.id_to_part_graph_id.emplace(id, instance_id);
+  // map the user-friendly string ID to the stable uint32_t ID in the part
+  // graph
+  m_package.id_to_part_graph_id.emplace(id, instance.GetId());
   return *this;
 }
 
 /////////////////////////////////////////////////
 PartGraphBuilder &PartGraphBuilder::AddJointInstance(const Joint &joint,
                                                      const std::string id) {
-  JointInstance instance{&joint};
-  instance.id = m_package.next_id++;
-  instance.alias = id;
-  const uint32_t instance_id = instance.id;
-  m_package.part_graph.emplace(instance_id, std::move(instance));
+  // create a new JointInstance (assigns stable ID), then insert
+  JointInstance instance{m_package.next_id++, joint, id};
+  m_package.part_graph.emplace(instance.GetId(), std::move(instance));
 
-  // map the user-friendly string ID to the stable uint32_t ID in the part graph
-  m_package.id_to_part_graph_id.emplace(id, instance_id);
+  // map the user-friendly string ID to the stable uint32_t ID in the part
+  // graph
+  m_package.id_to_part_graph_id.emplace(id, instance.GetId());
 
   return *this;
 }
@@ -166,13 +161,21 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
   // delegate to create_connection (always takes fragment first, then joint)
   std::expected<std::monostate, std::string> result;
   if (from_is_fragment) {
-    result = steamrot::logic::action::grimoire_machina::create_connection(
-        std::get<FragmentInstance>(from_variant), from_socket_id,
-        std::get<JointInstance>(to_variant), to_socket_id);
+    auto connection_result =
+        std::get<FragmentInstance>(from_variant)
+            .CreateConnectionWithOtherInstance(
+                from_socket_id, std::get<JointInstance>(to_variant),
+                to_socket_id);
+    if (!connection_result.has_value())
+      FAIL(connection_result.error().message);
   } else {
-    result = steamrot::logic::action::grimoire_machina::create_connection(
-        std::get<FragmentInstance>(to_variant), to_socket_id,
-        std::get<JointInstance>(from_variant), from_socket_id);
+    auto connection_result =
+        std::get<FragmentInstance>(to_variant)
+            .CreateConnectionWithOtherInstance(
+                to_socket_id, std::get<JointInstance>(from_variant),
+                from_socket_id);
+    if (!connection_result.has_value())
+      FAIL(connection_result.error().message);
   }
 
   if (!result.has_value())
@@ -195,25 +198,33 @@ PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
   const uint32_t from_part_id = from_it->second;
   const uint32_t to_part_id = to_it->second;
 
-  // directly wire both socket endpoints without type-checking
-  auto set_connected = [this](uint32_t part_id, uint32_t socket_id,
-                              uint32_t peer_part_id, uint32_t peer_socket_id) {
-    std::visit(
-        [part_id, socket_id, peer_part_id, peer_socket_id](auto &instance) {
-          if (!instance.sockets.count(socket_id))
-            FAIL("ConnectUnchecked: socket_id ("
-                 << socket_id << ") not found for part " << part_id);
-          instance.sockets.at(socket_id).connection_state =
-              SocketConnectionState::Connected;
-          instance.sockets.at(socket_id).connected_to =
-              SocketConnection{peer_part_id, peer_socket_id};
-          ++instance.connection_count;
-        },
-        m_package.part_graph.at(part_id));
-  };
+  std::visit(
+      overload{[&](FragmentInstance &from_fragment) {
+                 if (!std::holds_alternative<JointInstance>(
+                         m_package.part_graph.at(to_part_id)))
+                   FAIL("ConnectUnchecked: to_id '"
+                        << to_id << "' is not a JointInstance");
 
-  set_connected(from_part_id, from_socket_id, to_part_id, to_socket_id);
-  set_connected(to_part_id, to_socket_id, from_part_id, from_socket_id);
+                 JointInstance &to_joint = std::get<JointInstance>(
+                     m_package.part_graph.at(to_part_id));
+                 auto result = from_fragment.CreateConnectionWithOtherInstance(
+                     from_socket_id, to_joint, to_socket_id);
+                 if (!result.has_value())
+                   FAIL(result.error().message);
+               },
+               [&](JointInstance &from_joint) {
+                 if (!std::holds_alternative<FragmentInstance>(
+                         m_package.part_graph.at(to_part_id)))
+                   FAIL("ConnectUnchecked: to_id '"
+                        << to_id << "' is not a FragmentInstance");
+                 FragmentInstance &to_fragment = std::get<FragmentInstance>(
+                     m_package.part_graph.at(to_part_id));
+                 auto result = to_fragment.CreateConnectionWithOtherInstance(
+                     to_socket_id, from_joint, from_socket_id);
+                 if (!result.has_value())
+                   FAIL(result.error().message);
+               }},
+      m_package.part_graph.at(from_part_id));
 
   return *this;
 }

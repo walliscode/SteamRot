@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of the JointInstance struct.
+/// @brief Declaration of the JointInstance class.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -14,41 +14,61 @@
 #include "Joint.h"
 #include "PartInstance.h"
 #include "SocketState.h"
-#include <map>
+#include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
 
-/////////////////////////////////////////////////
-/// @struct JointInstance
-/// @brief An instance of a Joint with runtime state
-/////////////////////////////////////////////////
-struct JointInstance : public PartInstance {
-  /////////////////////////////////////////////////
-  /// @brief Construct a JointInstance from a Joint definition.
-  ///
-  /// Allocates one @c SocketData per socket declared in the Joint's
-  /// SocketConfig (positions are zero-initialised). Call
-  /// @c initialize_joint_socket_positions() afterwards to compute the
-  /// even-spread positions from the Joint's SocketConfig.
-  ///
-  /// @param joint_ptr         Pointer to the Joint definition. May be nullptr.
-  /// @param initial_transform Transform placing this instance in world space.
-  /////////////////////////////////////////////////
-  JointInstance(const Joint *joint_ptr,
-                sf::Transform initial_transform = sf::Transform::Identity)
-      : PartInstance{initial_transform}, joint{joint_ptr} {
-    if (!joint_ptr)
-      return;
-    for (uint32_t i = 0;
-         i < static_cast<uint32_t>(joint_ptr->socket_config.socket_count); ++i)
-      sockets.emplace(i, JointSocketState{});
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Pointer to the Joint definition being referenced.
-  /////////////////////////////////////////////////
-  const Joint *joint{nullptr};
-
-  std::map<uint32_t, JointSocketState> sockets{};
+enum class JointSocketPositioningStrategy {
+  EvenSpread,       ///< Evenly spread sockets along the joint's length.
+  MaximizeDistance, ///< Maximize distance between sockets along the joint's
+                    ///< length.
 };
+
+struct JointTraits {
+  using SocketType = JointSocketState;
+
+  using PartType = Joint;
+};
+class JointInstance : public PartInstance<JointTraits> {
+
+public:
+  JointInstance(const uint32_t id, const Joint &joint)
+      : PartInstance<JointTraits>(id, joint) {}
+
+  JointInstance(const uint32_t id, const Joint &joint, const std::string &alias)
+      : PartInstance<JointTraits>(id, alias, joint) {}
+
+  void
+  PositionSockets(const JointSocketPositioningStrategy positioning_strategy);
+
+  sf::Vector2f GetSocketPivotWorldPosition() const {
+    return GetTransform().transformPoint(part.socket_pivot);
+  }
+};
+
+/////////////////////////////////////////////////
+/// @brief Give a JointInstance, calculates the maximum possible even spread of
+/// its sockets based on its SocketConfig and applies the resulting positions to
+/// the instance's sockets.
+///
+/// @param instance JointInstance whose sockets should be maximally spread.
+/////////////////////////////////////////////////
+void maximise_joint_socket_spread(JointInstance::Sockets &joint_sockets,
+                                  const sf::Vector2f &pivot,
+                                  const SocketConfig &config);
+
+/////////////////////////////////////////////////
+/// @brief Checks if a JointInstance has a valid socket configuration based on
+/// the sockets current positions
+///
+/// The sockets can move dynamically (locally which then transforms to global)
+/// and this function checks if the current positions are valid based on the
+/// JointInstance's SocketConfig.
+/// @param joint_instance JointInstance to check
+/// @return True if the socket configuration is valid, false otherwise
+/////////////////////////////////////////////////
+bool check_if_allowed_joint_socket_configuration(
+    const JointInstance::Sockets &joint_sockets, const sf::Vector2f &pivot,
+    const SocketConfig &config);
+
 } // namespace steamrot

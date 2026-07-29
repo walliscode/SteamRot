@@ -20,7 +20,9 @@
 #include "ChainDescriptor.h"
 #include "DescriptorResult.h"
 #include "MachinaArchetype.h"
+#include "MachinaFormScaffold.h"
 #include "descriptors_analysis_event_helpers.h"
+#include "overload.h"
 #include <cstdint>
 #include <string>
 #include <variant>
@@ -178,7 +180,8 @@ private:
 
   static bool EvaluateAtLeastNOfStep(const ArchetypeStep &step,
                                      const PartGraph &parts,
-                                     const SocketMap &sockets, uint32_t depth,
+                                     const PartInstanceVariant &part_instance,
+                                     uint32_t depth,
                                      ArchetypeAnalysisContext &context,
                                      T &typed_result) {
     // This should never happen because AtLeastNOf always stores a vector
@@ -197,40 +200,119 @@ private:
     // one;
 
     std::visit(
-        [&](const auto &sockets) {
-          for (const auto &[socket_id, socket_state] : sockets) {
-            (void)socket_id;
+        overload{
+            [&](const FragmentInstance &instance) {
+              // cycle through the FragmentInstance sockets
+              for (const auto &[socket_id, socket_state] :
+                   instance.GetSockets()) {
 
-            // if the socket isn't connected, skip it
-            if (!socket_state.connected_to.has_value()) {
-              continue;
-            }
-            // extract neighbour ID and apply descriptor
-            const uint32_t neighbour_id =
-                socket_state.connected_to->peer_part_id;
-            // check if node has already been visited to prevent cycles; if so,
-            // skip it
-            if (context.visited_nodes.contains(neighbour_id)) {
-              // could add some kind of detection event in the future
-              continue;
-            }
+                // get the socket connection
+                const auto &connection_result = socket_state.GetConnection();
+                // if the socket isn't connected, skip it
+                if (!connection_result)
+                  continue;
+                const SocketConnection &connection = connection_result.value();
+                // extract neighbour ID and apply descriptor
+                const uint32_t neighbour_id = connection.peer_part_id;
+                // check if node has already been visited to prevent cycles; if
+                // so, skip it
+                if (context.visited_nodes.contains(neighbour_id)) {
+                  // could add some kind of detection event in the future
+                  continue;
+                }
+                ChainDescriptorResult step_result = step.descriptor(
+                    parts, neighbour_id, context.visited_nodes, depth + 1);
+                // mark neighbour as visited
+                context.visited_nodes.insert(neighbour_id);
+                // merge trace to parent context
+                Merge(context.trace, std::move(step_result.m_trace));
+                // if the descriptor matched and the result includes a valid
+                // subgraph, add it to the result vector and increment the match
+                if (step_result && step_result.valid_subgraph.has_value()) {
+                  result_vector.push_back(*step_result.valid_subgraph);
+                  matches_found++;
+                }
+              }
+            },
+            [&](const JointInstance &instance) {
+              // cycle through the JointInstance sockets
+              for (const auto &[socket_id, socket_state] :
+                   instance.GetSockets()) {
 
-            ChainDescriptorResult step_result = step.descriptor(
-                parts, neighbour_id, context.visited_nodes, depth + 1);
-            // mark neighbour as visited
-            context.visited_nodes.insert(neighbour_id);
-            // merge trace to parent context
-            Merge(context.trace, std::move(step_result.m_trace));
-            // if the descriptor matched and the result includes a valid
-            // subgraph, add it to the result vector and increment the match
-            // count
-            if (step_result && step_result.valid_subgraph.has_value()) {
-              result_vector.push_back(*step_result.valid_subgraph);
-              matches_found++;
-            }
-          }
-        },
-        sockets);
+                // get the socket connection
+                const auto &connection_result = socket_state.GetConnection();
+                // if the socket isn't connected, skip it
+                if (!connection_result)
+                  continue;
+                const SocketConnection &connection = connection_result.value();
+                // extract neighbour ID and apply descriptor
+                const uint32_t neighbour_id = connection.peer_part_id;
+                // check if node has already been visited to prevent cycles; if
+                // so, skip it
+                if (context.visited_nodes.contains(neighbour_id)) {
+                  // could add some kind of detection event in the future
+                  continue;
+                }
+                ChainDescriptorResult step_result = step.descriptor(
+                    parts, neighbour_id, context.visited_nodes, depth + 1);
+                // mark neighbour as visited
+                context.visited_nodes.insert(neighbour_id);
+                // merge trace to parent context
+                Merge(context.trace, std::move(step_result.m_trace));
+                // if the descriptor matched and the result includes a valid
+                // subgraph, add it to the result vector and increment the match
+                if (step_result && step_result.valid_subgraph.has_value()) {
+                  result_vector.push_back(*step_result.valid_subgraph);
+                  matches_found++;
+                }
+              }
+            }},
+        part_instance);
+    // std::visit(
+    //     [&](const auto &instance) {
+    //       const auto &sockets = instance.GetSockets();
+    //       for (const auto &[socket_id, socket_state] : sockets) {
+    //         (void)socket_id;
+    //
+    //         // get the socket connection
+    //         const auto &connection_result =
+    //         socket_state.GetConnection();
+    //         // if the socket isn't connected, skip it
+    //         if (!connection_result)
+    //           continue;
+    //
+    //         const SocketConnection &connection =
+    //         connection_result.value();
+    //
+    //         // extract neighbour ID and apply descriptor
+    //         const uint32_t neighbour_id = connection.peer_part_id;
+    //         // check if node has already been visited to prevent
+    //         cycles; if so,
+    //         // skip it
+    //         if (context.visited_nodes.contains(neighbour_id)) {
+    //           // could add some kind of detection event in the future
+    //           continue;
+    //         }
+    //
+    //         ChainDescriptorResult step_result = step.descriptor(
+    //             parts, neighbour_id, context.visited_nodes, depth + 1);
+    //         // mark neighbour as visited
+    //         context.visited_nodes.insert(neighbour_id);
+    //         // merge trace to parent context
+    //         Merge(context.trace, std::move(step_result.m_trace));
+    //         // if the descriptor matched and the result includes a
+    //         valid
+    //         // subgraph, add it to the result vector and increment the
+    //         match
+    //         // count
+    //         if (step_result && step_result.valid_subgraph.has_value())
+    //         {
+    //           result_vector.push_back(*step_result.valid_subgraph);
+    //           matches_found++;
+    //         }
+    //       }
+    //     },
+    //     part_instance);
 
     // step succeeds if the number of matches found meets the minimum
     // repetitions
@@ -272,14 +354,13 @@ private:
       return result;
     }
 
-    const SocketMap start_sockets = std::visit(
-        [](const auto &instance) -> SocketMap {
-          return instance.sockets;
-        },
-        start_node_it->second);
-
+    // initialize result to true; it will be ANDed with each step's result
     result.m_result = true;
+    // get a reference to the typed result struct for convenience
     T &typed_result = GetTypedResult(result);
+
+    // get the part instance at the starting node
+    const PartInstanceVariant &instance = start_node_it->second;
 
     for (const ArchetypeStep &step : steps) {
       bool step_succeeded = false;
@@ -289,8 +370,15 @@ private:
                                               context, typed_result);
         break;
       case ArchetypeStepKind::AtLeastNOf:
-        step_succeeded = EvaluateAtLeastNOfStep(step, parts, start_sockets,
-                                                depth, context, typed_result);
+        step_succeeded = std::visit(
+            [&](const auto &instance) -> bool {
+              return EvaluateAtLeastNOfStep(step, parts, instance, depth,
+                                            context, typed_result);
+            },
+            instance);
+        // step_succeeded = EvaluateAtLeastNOfStep(
+        //     step, parts, instance.GetSockets(), depth, context,
+        //     typed_result);
         break;
       }
 
@@ -348,8 +436,8 @@ public:
   /// min_repetitions times
   ///
   /// @param cd ChainDescriptor to evaluate at this step.
-  /// @param min_repetitions Minimum number of matches required to satisfy this
-  /// step.
+  /// @param min_repetitions Minimum number of matches required to satisfy
+  /// this step.
   /// @return *this for method chaining.
   /////////////////////////////////////////////////
   MachinaArchetypeBuilder &AtLeastNOf(ChainDescriptor cd,
@@ -363,9 +451,10 @@ public:
   /////////////////////////////////////////////////
   /// @brief Consume the builder and produce a named @c MachinaArchetype.
   ///
-  /// The returned @c MachinaArchetype wraps a lambda that, when called with a
-  /// @c (PartGraph, part_id) pair, evaluates every accumulated step in order.
-  /// The overall result is @c true only when all steps succeed.
+  /// The returned @c MachinaArchetype wraps a lambda that, when called with
+  /// a
+  /// @c (PartGraph, part_id) pair, evaluates every accumulated step in
+  /// order. The overall result is @c true only when all steps succeed.
   ///
   /// @param name Human-readable name stamped on the archetype and used in
   ///             trace events.

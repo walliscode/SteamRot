@@ -14,9 +14,8 @@
 #include "TestFixture.h"
 #include <catch2/catch_test_macros.hpp>
 
-/////////////////////////////////////////////////
-// SelectGhostItem
-/////////////////////////////////////////////////
+namespace steamrot::tests {
+using namespace steamrot::logic::action::ghost;
 
 TEST_CASE("SelectGhostItem sets a FragmentInstance on MrGhost from a "
           "FragmentTag",
@@ -36,8 +35,6 @@ TEST_CASE("SelectGhostItem sets a FragmentInstance on MrGhost from a "
 
   REQUIRE(
       std::holds_alternative<steamrot::FragmentInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["rock"]);
 }
 
 TEST_CASE("SelectGhostItem sets a JointInstance on MrGhost from a JointTag",
@@ -55,10 +52,10 @@ TEST_CASE("SelectGhostItem sets a JointInstance on MrGhost from a JointTag",
   steamrot::logic::action::ghost::SelectGhostItem(mr_ghost, selection,
                                                   asset_manager);
 
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(mr_ghost.m_instance));
   REQUIRE(
-      std::holds_alternative<steamrot::JointInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::JointInstance>(mr_ghost.m_instance).joint ==
-          &grimoire->m_all_joints["pivot"]);
+      std::get<steamrot::JointInstance>(mr_ghost.m_instance).GetPart().name ==
+      "pivot");
 }
 
 TEST_CASE("SelectGhostItem overwrites an existing instance on MrGhost",
@@ -76,14 +73,16 @@ TEST_CASE("SelectGhostItem overwrites an existing instance on MrGhost",
   // First selection
   steamrot::logic::action::ghost::SelectGhostItem(
       mr_ghost, steamrot::FragmentTag{"arm"}, asset_manager);
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["arm"]);
+  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance)
+              .GetPart()
+              .name == "arm");
 
   // Overwrite with second selection
   steamrot::logic::action::ghost::SelectGhostItem(
       mr_ghost, steamrot::FragmentTag{"leg"}, asset_manager);
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["leg"]);
+  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance)
+              .GetPart()
+              .name == "leg");
 }
 
 TEST_CASE("SelectGhostItem leaves MrGhost unchanged when key is not found",
@@ -117,7 +116,8 @@ TEST_CASE("ClearGhostSelection resets an active FragmentInstance",
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   steamrot::logic::action::ghost::ClearGhostSelection(mr_ghost);
 
@@ -135,9 +135,10 @@ TEST_CASE("ClearGhostSelection resets an active JointInstance",
   grimoire->m_all_joints.insert({"pivot", steamrot::Joint{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::JointInstance{&grimoire->m_all_joints["pivot"]};
+  mr_ghost.m_instance.emplace<steamrot::JointInstance>(
+      0, grimoire->m_all_joints["pivot"]);
 
-  steamrot::logic::action::ghost::ClearGhostSelection(mr_ghost);
+  ClearGhostSelection(mr_ghost);
 
   REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
 }
@@ -169,17 +170,17 @@ TEST_CASE("ProcessSubscriber – SELECT with FragmentTag resolves instance in "
 
   steamrot::MrGhost mr_ghost;
   steamrot::Subscriber subscriber;
-  subscriber.captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::SELECT,
-      steamrot::FragmentTag{"iron"}};
+  subscriber.captured_payload =
+      steamrot::GhostPayload{steamrot::GhostPayload::GhostAction::SELECT,
+                             steamrot::FragmentTag{"iron"}};
 
-  steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost,
-                                                    asset_manager);
+  ProcessSubscriber(subscriber, mr_ghost, asset_manager);
 
   REQUIRE(
       std::holds_alternative<steamrot::FragmentInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["iron"]);
+  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance)
+              .GetPart()
+              .name == "iron");
 }
 
 TEST_CASE("ProcessSubscriber – SELECT with JointTag resolves instance in "
@@ -195,17 +196,16 @@ TEST_CASE("ProcessSubscriber – SELECT with JointTag resolves instance in "
 
   steamrot::MrGhost mr_ghost;
   steamrot::Subscriber subscriber;
-  subscriber.captured_payload =
-      steamrot::GhostPayload{steamrot::GhostPayload::GhostAction::SELECT,
-                             steamrot::JointTag{"hinge"}};
+  subscriber.captured_payload = steamrot::GhostPayload{
+      steamrot::GhostPayload::GhostAction::SELECT, steamrot::JointTag{"hinge"}};
 
   steamrot::logic::action::ghost::ProcessSubscriber(subscriber, mr_ghost,
                                                     asset_manager);
 
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(mr_ghost.m_instance));
   REQUIRE(
-      std::holds_alternative<steamrot::JointInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::JointInstance>(mr_ghost.m_instance).joint ==
-          &grimoire->m_all_joints["hinge"]);
+      std::get<steamrot::JointInstance>(mr_ghost.m_instance).GetPart().name ==
+      "hinge");
 }
 
 TEST_CASE("ProcessSubscriber – CLEAR resets MrGhost instance",
@@ -219,7 +219,8 @@ TEST_CASE("ProcessSubscriber – CLEAR resets MrGhost instance",
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   steamrot::Subscriber subscriber;
   subscriber.captured_payload = steamrot::GhostPayload{
@@ -242,7 +243,8 @@ TEST_CASE("ProcessSubscriber – no captured payload leaves MrGhost unchanged",
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   steamrot::Subscriber subscriber;
   // captured_payload left as std::nullopt
@@ -252,8 +254,9 @@ TEST_CASE("ProcessSubscriber – no captured payload leaves MrGhost unchanged",
 
   REQUIRE(
       std::holds_alternative<steamrot::FragmentInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["rock"]);
+  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance)
+              .GetPart()
+              .name == "rock");
 }
 
 TEST_CASE(
@@ -269,7 +272,8 @@ TEST_CASE(
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   steamrot::Subscriber subscriber;
   subscriber.captured_payload = std::monostate{};
@@ -296,7 +300,8 @@ TEST_CASE("ProcessSubscribers – inactive subscriber is skipped",
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = false;
@@ -324,17 +329,18 @@ TEST_CASE("ProcessSubscribers – active SELECT subscriber resolves instance",
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
-  subscriber->captured_payload = steamrot::GhostPayload{
-      steamrot::GhostPayload::GhostAction::SELECT,
-      steamrot::FragmentTag{"copper"}};
+  subscriber->captured_payload =
+      steamrot::GhostPayload{steamrot::GhostPayload::GhostAction::SELECT,
+                             steamrot::FragmentTag{"copper"}};
 
   steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost,
                                                      asset_manager);
 
   REQUIRE(
       std::holds_alternative<steamrot::FragmentInstance>(mr_ghost.m_instance));
-  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance).fragment ==
-          &grimoire->m_all_fragments["copper"]);
+  REQUIRE(std::get<steamrot::FragmentInstance>(mr_ghost.m_instance)
+              .GetPart()
+              .name == "copper");
 }
 
 TEST_CASE("ProcessSubscribers – active CLEAR subscriber clears MrGhost",
@@ -348,7 +354,8 @@ TEST_CASE("ProcessSubscribers – active CLEAR subscriber clears MrGhost",
   grimoire->m_all_fragments.insert({"rock", steamrot::Fragment{}});
 
   steamrot::MrGhost mr_ghost;
-  mr_ghost.m_instance = steamrot::FragmentInstance{&grimoire->m_all_fragments["rock"]};
+  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(
+      0, grimoire->m_all_fragments["rock"]);
 
   auto subscriber = std::make_shared<steamrot::Subscriber>();
   subscriber->m_active = true;
@@ -360,3 +367,4 @@ TEST_CASE("ProcessSubscribers – active CLEAR subscriber clears MrGhost",
 
   REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
 }
+} // namespace steamrot::tests

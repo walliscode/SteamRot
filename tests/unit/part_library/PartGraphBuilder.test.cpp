@@ -52,8 +52,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
     const auto &f0 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
     const auto &f1 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
 
-    REQUIRE(f0.id == 0);
-    REQUIRE(f1.id == 1);
+    REQUIRE(f0.GetId() == 0);
+    REQUIRE(f1.GetId() == 1);
   }
 
   SECTION("AddJointInstance assigns the correct stable ID to the instance",
@@ -66,8 +66,8 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
     const auto &j0 = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
     const auto &j1 = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
-    REQUIRE(j0.id == 0);
-    REQUIRE(j1.id == 1);
+    REQUIRE(j0.GetId() == 0);
+    REQUIRE(j1.GetId() == 1);
   }
 
   SECTION("AddFragmentInstance and AddJointInstance assign IDs from a shared "
@@ -80,9 +80,14 @@ TEST_CASE("PartGraphBuidler tests", "[unit][part_graphs][PartGraphBuilder]") {
     const tests::PartGraphPackage pkg = builder.Build();
 
     REQUIRE(pkg.part_graph.size() == 3);
-    REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0)).id == 0);
-    REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(1)).id == 1);
-    REQUIRE(std::get<steamrot::FragmentInstance>(pkg.part_graph.at(2)).id == 2);
+    REQUIRE(
+        std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0)).GetId() ==
+        0);
+    REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(1)).GetId() ==
+            1);
+    REQUIRE(
+        std::get<steamrot::FragmentInstance>(pkg.part_graph.at(2)).GetId() ==
+        2);
   }
 }
 
@@ -106,7 +111,7 @@ TEST_CASE("AddFragmentInstance creates a FragmentInstance with the correct "
         builder.AddFragmentInstance(tests::FragmentNames::TwoSockets, "f0")
             .Build();
     const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
-    REQUIRE(fi.sockets.size() == 2);
+    REQUIRE(fi.GetSocketCount() == 2);
   }
   SECTION("NoSocket fragment has zero sockets") {
     tests::PartGraphBuilder builder;
@@ -114,7 +119,7 @@ TEST_CASE("AddFragmentInstance creates a FragmentInstance with the correct "
         builder.AddFragmentInstance(tests::FragmentNames::NoSocket, "f0")
             .Build();
     const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
-    REQUIRE(fi.sockets.empty());
+    REQUIRE(fi.GetSocketCount() == 0);
   }
 }
 
@@ -126,14 +131,14 @@ TEST_CASE(
     const tests::PartGraphPackage pkg =
         builder.AddJointInstance(tests::JointNames::ThreeSockets, "j0").Build();
     const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
-    REQUIRE(ji.sockets.size() == 3);
+    REQUIRE(ji.GetSocketCount() == 3);
   }
   SECTION("NoSocket joint has zero sockets") {
     tests::PartGraphBuilder builder;
     const tests::PartGraphPackage pkg =
         builder.AddJointInstance(tests::JointNames::NoSocket, "j0").Build();
     const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
-    REQUIRE(ji.sockets.empty());
+    REQUIRE(ji.GetSocketCount() == 0);
   }
 }
 
@@ -153,9 +158,9 @@ TEST_CASE("Connect(fragment, joint) wires socket state on both ends",
   const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
-  REQUIRE(fi.sockets.at(0).connection_state ==
+  REQUIRE(fi.TryGetSocket(0)->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(ji.sockets.at(0).connection_state ==
+  REQUIRE(ji.TryGetSocket(0)->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
 }
 
@@ -172,9 +177,9 @@ TEST_CASE("Connect(joint, fragment) wires socket state on both ends",
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(0));
   const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
 
-  REQUIRE(ji.sockets.at(1).connection_state ==
+  REQUIRE(ji.TryGetSocket(1)->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
-  REQUIRE(fi.sockets.at(0).connection_state ==
+  REQUIRE(fi.TryGetSocket(0)->GetConnectionState() ==
           steamrot::SocketConnectionState::Connected);
 }
 
@@ -191,14 +196,14 @@ TEST_CASE("Connect sets connected_to peer IDs correctly",
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
   // Fragment socket[1] points to joint (id=1, socket=0)
-  REQUIRE(fi.sockets.at(1).connected_to.has_value());
-  REQUIRE(fi.sockets.at(1).connected_to->peer_part_id == 1);
-  REQUIRE(fi.sockets.at(1).connected_to->peer_socket_id == 0);
+  REQUIRE(fi.TryGetSocket(1)->GetConnection().has_value());
+  REQUIRE(fi.TryGetSocket(1)->GetConnection()->peer_part_id == 1);
+  REQUIRE(fi.TryGetSocket(1)->GetConnection()->peer_socket_id == 0);
 
   // Joint socket[0] points back to fragment (id=0, socket=1)
-  REQUIRE(ji.sockets.at(0).connected_to.has_value());
-  REQUIRE(ji.sockets.at(0).connected_to->peer_part_id == 0);
-  REQUIRE(ji.sockets.at(0).connected_to->peer_socket_id == 1);
+  REQUIRE(ji.TryGetSocket(0)->GetConnection().has_value());
+  REQUIRE(ji.TryGetSocket(0)->GetConnection()->peer_part_id == 0);
+  REQUIRE(ji.TryGetSocket(0)->GetConnection()->peer_socket_id == 1);
 }
 
 TEST_CASE("Connect increments connection_count on both ends",
@@ -213,8 +218,8 @@ TEST_CASE("Connect increments connection_count on both ends",
   const auto &fi = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(0));
   const auto &ji = std::get<steamrot::JointInstance>(pkg.part_graph.at(1));
 
-  REQUIRE(fi.connection_count == 1);
-  REQUIRE(ji.connection_count == 1);
+  REQUIRE(fi.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(ji.GetNumberOfConnectedSockets() == 1);
 }
 
 TEST_CASE("Connect can chain multiple connections",
@@ -235,9 +240,9 @@ TEST_CASE("Connect can chain multiple connections",
   const auto &f1 = std::get<steamrot::FragmentInstance>(pkg.part_graph.at(1));
   const auto &j0 = std::get<steamrot::JointInstance>(pkg.part_graph.at(2));
 
-  REQUIRE(f0.connection_count == 1);
-  REQUIRE(f1.connection_count == 1);
-  REQUIRE(j0.connection_count == 2);
+  REQUIRE(f0.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(f1.GetNumberOfConnectedSockets() == 1);
+  REQUIRE(j0.GetNumberOfConnectedSockets() == 2);
 }
 
 ////////////////////////////////////////////////////
@@ -336,6 +341,6 @@ TEST_CASE("Build resets the ID counter so the next build starts from 0",
 
   // First ID in the fresh build must be 0
   REQUIRE(pkg.part_graph.count(0) == 1);
-  REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(0)).id == 0);
+  REQUIRE(std::get<steamrot::JointInstance>(pkg.part_graph.at(0)).GetId() == 0);
 }
 } // namespace steamrot::tests

@@ -13,9 +13,13 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FailInfo.h"
 #include "GrimoireMachina.h"
+#include <expected>
+#include <variant>
 
 namespace steamrot {
 
-void create_grab_scaffold_one(GrimoireMachina &grimoire);
+std::expected<std::monostate, FailInfo>
+create_grab_scaffold_one(GrimoireMachina &grimoire);
 }

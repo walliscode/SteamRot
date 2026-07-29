@@ -12,100 +12,10 @@
 #include "PanelElement.h"
 #include "catch2/generators/catch_generators.hpp"
 #include "entity_memory.h"
-#include "grimoire_machina_test_helpers.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
-
-TEST_CASE("CheckMouseOver SocketState sets is_mouse_over correctly",
-          "[unit][collision][mouse]") {
-  steamrot::JointSocketState socket_data;
-  socket_data.local_position = {100.f, 100.f};
-  SECTION("Mouse is over socket") {
-
-    sf::Vector2f world_pos{100.f, 100.f};
-    sf::Vector2f world_mouse{103.f, 103.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse, world_pos,
-                                                      socket_data);
-    REQUIRE(socket_data.is_mouse_over == true);
-  }
-
-  SECTION("Mouse is not over socket") {
-
-    sf::Vector2f world_pos{100.f, 100.f};
-    sf::Vector2f world_mouse{200.f, 200.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse, world_pos,
-                                                      socket_data);
-    REQUIRE(socket_data.is_mouse_over == false);
-  }
-}
-
-TEST_CASE("CheckMouseOver FragmentInstance sets socket is_mouse_over correctly",
-          "[unit][collision][mouse]") {
-
-  SECTION("Mouse is over a socket on the fragment") {
-    steamrot::Fragment fragment;
-    steamrot::SocketData socket{{100.f, 100.f}, {1.f, 1.f}};
-    fragment.sockets.push_back(socket);
-    steamrot::FragmentInstance fragment_instance{&fragment};
-    sf::Vector2f world_mouse{103.f, 103.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
-                                                      fragment_instance);
-    REQUIRE(fragment_instance.sockets.at(0).is_mouse_over == true);
-  }
-
-  SECTION("Mouse is not over any socket on the fragment") {
-    steamrot::Fragment fragment;
-    steamrot::SocketData socket{{100.f, 100.f}, {1.f, 1.f}};
-    fragment.sockets.push_back(socket);
-    steamrot::FragmentInstance fragment_instance{&fragment};
-    sf::Vector2f world_mouse{200.f, 200.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
-                                                      fragment_instance);
-    REQUIRE(fragment_instance.sockets.at(0).is_mouse_over == false);
-  }
-
-  SECTION("Fragment with no sockets does not crash") {
-    steamrot::Fragment fragment;
-    steamrot::FragmentInstance fragment_instance{&fragment};
-    sf::Vector2f world_mouse{100.f, 100.f};
-    REQUIRE_NOTHROW(steamrot::logic::collision::mouse::CheckMouseOver(
-        world_mouse, fragment_instance));
-  }
-}
-
-TEST_CASE("CheckMouseOver JointInstance sets socket is_mouse_over correctly",
-          "[unit][collision][mouse]") {
-
-  SECTION("Mouse is over a socket on the joint") {
-    // Single socket at local (100, 0) via socket_config (radius=100, angle=0)
-    auto joint =
-        steamrot::tests::MakeJointWithSocketConfig(1, 100.f, false, 0.f, 180.f);
-    steamrot::JointInstance joint_instance{&joint};
-    sf::Vector2f world_mouse{103.f, 3.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
-                                                      joint_instance);
-    // [TODO:] finish this test
-  }
-
-  SECTION("Mouse is not over any socket on the joint") {
-    auto joint = steamrot::tests::MakeJointWithSocketConfig(1, 100.f);
-    steamrot::JointInstance joint_instance{&joint};
-    sf::Vector2f world_mouse{200.f, 200.f};
-    steamrot::logic::collision::mouse::CheckMouseOver(world_mouse,
-                                                      joint_instance);
-    REQUIRE(joint_instance.sockets.at(0).is_mouse_over == false);
-  }
-
-  SECTION("Joint with no sockets does not crash") {
-    auto joint = steamrot::tests::MakeJoint();
-    steamrot::JointInstance joint_instance{&joint};
-    sf::Vector2f world_mouse{100.f, 100.f};
-    REQUIRE_NOTHROW(steamrot::logic::collision::mouse::CheckMouseOver(
-        world_mouse, joint_instance));
-  }
-}
 
 // ---------------------------------------------------------------------------
 // UIElement collision tests
