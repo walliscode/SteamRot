@@ -110,7 +110,12 @@ public:
   /////////////////////////////////////////////////
   const Sockets &GetSockets() const { return sockets; }
 
-  size_t GetSocketCount() const { return sockets.size(); }
+  /////////////////////////////////////////////////
+  /// @brief Return the number of sockets in this instance.
+  ///
+  /// @return size_t count of sockets.
+  /////////////////////////////////////////////////
+  uint32_t GetSocketCount() const { return sockets.size(); }
 
   /////////////////////////////////////////////////
   /// @brief Get the referenced Part.
@@ -163,7 +168,13 @@ public:
   /////////////////////////////////////////////////
   const sf::Angle &GetTotalRotation() const { return total_rotation; }
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param angle [TODO:parameter]
+  /////////////////////////////////////////////////
   void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
+
   /////////////////////////////////////////////////
   /// @brief Add an angle to the tracked total rotation.
   ///
@@ -182,6 +193,11 @@ public:
     return (it == sockets.end()) ? nullptr : &it->second;
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Get number of connected sockets in this instance.
+  ///
+  /// @return number of sockets with connection state Connected.
+  /////////////////////////////////////////////////
   uint32_t GetNumberOfConnectedSockets() const {
     uint32_t count = 0;
     for (const auto &[socket_id, socket] : sockets) {
@@ -192,6 +208,14 @@ public:
     return count;
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Return the local position of a socket by its id, or (0, 0) if the
+  /// socket does not exist.
+  ///
+  /// @param socket_id  Socket identifier.
+  /// @return sf::Vector2f Local position of the socket, or (0, 0) if the socket
+  /// does not exist.
+  /////////////////////////////////////////////////
   const sf::Vector2f GetSocketLocalPosition(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
     if (!socket) {
@@ -328,13 +352,17 @@ public:
 
     // check sockets exist on both instances
     SocketType *socket = TryGetSocketMutable(socket_id);
+    if (!socket)
+      return std::unexpected(FailInfo{
+          FailMode::MissingData, "Socket with ID " + std::to_string(socket_id) +
+                                     " does not exist in this PartInstance."});
+
     auto *other_socket = other_instance.TryGetSocketMutable(other_socket_id);
-    if (!socket || !other_socket)
+    if (!other_socket)
       return std::unexpected(
           FailInfo{FailMode::MissingData,
-                   "Socket with ID " + std::to_string(socket_id) + " or " +
-                       std::to_string(other_socket_id) +
-                       " does not exist in one of the PartInstances."});
+                   "Socket with ID " + std::to_string(other_socket_id) +
+                       " does not exist in the other PartInstance."});
 
     // all checks necessary for connection creation:
     if (!socket->IsAvailable() || !other_socket->IsAvailable())

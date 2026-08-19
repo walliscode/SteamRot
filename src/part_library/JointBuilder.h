@@ -72,6 +72,7 @@ public:
                                 const bool has_fixed_socket,
                                 const float rotation_arc_min,
                                 const float rotation_arc_max);
+
   /////////////////////////////////////////////////
   /// @brief Finalizes the construction of the Joint and returns the constructed
   /// Joint object.
