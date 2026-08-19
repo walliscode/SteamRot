@@ -49,6 +49,7 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
                                       const uint32_t fragment_socket_id,
                                       const JointInstance &joint_instance,
                                       const uint32_t joint_socket_id) {
+  fragment_instance.AssertAlignmentCompatibilityWith(joint_instance);
 
   // check that the fragment socket id is valid
   const FragmentSocketState *fragment_socket =
@@ -135,6 +136,7 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
                                       const uint32_t joint_socket_id,
                                       const FragmentInstance &fragment_instance,
                                       const uint32_t fragment_socket_id) {
+  joint_instance.AssertAlignmentCompatibilityWith(fragment_instance);
 
   // check that the joint socket id is valid
   const JointSocketState *joint_socket =

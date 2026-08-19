@@ -354,7 +354,8 @@ public:
   void CheckCollisionWith(PartInstance<OtherTrait> &other_instance) {
     using OtherInstanceType = typename OtherTrait::InstanceType;
     static_assert(
-        IsCompatibleV<CollisionInteraction, InstanceType, OtherInstanceType>,
+        IsCompatible<CollisionInteraction, std::remove_cvref_t<InstanceType>,
+                     std::remove_cvref_t<OtherInstanceType>>::value,
         "CheckCollisionWith only supports explicitly compatible part instance "
         "pairs.");
     for (auto &[socket_id, socket] : sockets) {
@@ -374,6 +375,27 @@ public:
   }
 
   /////////////////////////////////////////////////
+  /// @brief Assert that this part instance may participate in alignment logic
+  /// with the given peer type.
+  ///
+  /// @tparam OtherTrait Template parameter for the other PartInstance type.
+  /// @param other_instance Peer instance used only for type selection.
+  /////////////////////////////////////////////////
+  template <typename OtherTrait>
+  void AssertAlignmentCompatibilityWith(
+      const PartInstance<OtherTrait> &other_instance) const {
+    using OtherInstanceType = typename OtherTrait::InstanceType;
+    static_assert(
+        IsCompatible<AlignmentInteraction, std::remove_cvref_t<InstanceType>,
+                     std::remove_cvref_t<OtherInstanceType>>::value,
+        "AssertAlignmentCompatibilityWith only supports explicitly compatible "
+        "part instance pairs.");
+    // TODO: Extend this compile-time contract with runtime alignment preflight
+    // checks when alignment ownership moves into the instance types.
+    (void)other_instance;
+  }
+
+  /////////////////////////////////////////////////
   /// @brief Create a connection to another explicitly compatible part instance
   /// type.
   ///
@@ -390,7 +412,8 @@ public:
                      uint32_t other_socket_id) {
     using OtherInstanceType = typename OtherTrait::InstanceType;
     static_assert(
-        IsCompatibleV<ConnectInteraction, InstanceType, OtherInstanceType>,
+        IsCompatible<ConnectInteraction, std::remove_cvref_t<InstanceType>,
+                     std::remove_cvref_t<OtherInstanceType>>::value,
         "CreateConnectionTo only supports explicitly compatible part instance "
         "pairs.");
 

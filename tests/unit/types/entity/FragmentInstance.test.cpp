@@ -16,15 +16,16 @@
 namespace steamrot::tests {
 
 static_assert(
-    IsCompatibleV<ConnectInteraction, FragmentInstance, JointInstance>);
+    IsCompatible<ConnectInteraction, FragmentInstance, JointInstance>::value);
 static_assert(
-    IsCompatibleV<CollisionInteraction, FragmentInstance, JointInstance>);
+    IsCompatible<CollisionInteraction, FragmentInstance, JointInstance>::value);
 static_assert(
-    IsCompatibleV<AlignmentInteraction, FragmentInstance, JointInstance>);
+    IsCompatible<AlignmentInteraction, FragmentInstance, JointInstance>::value);
 static_assert(
-    !IsCompatibleV<ConnectInteraction, FragmentInstance, FragmentInstance>);
+    !IsCompatible<ConnectInteraction, FragmentInstance, FragmentInstance>::value);
 static_assert(
-    !IsCompatibleV<CollisionInteraction, FragmentInstance, FragmentInstance>);
+    !IsCompatible<CollisionInteraction, FragmentInstance,
+                  FragmentInstance>::value);
 
 TEST_CASE("FragmentInstance::Constructors tests", "[FragmentInstance]") {
   SECTION("Construct with id and fragment") {

@@ -67,14 +67,4 @@ template <>
 struct IsCompatible<AlignmentInteraction, JointInstance, FragmentInstance>
     : std::true_type {};
 
-////////////////////////////////////////////////////////////
-/// @brief Helper variable template for compatibility lookups.
-///
-/// Removes cv/ref qualifiers before consulting @ref IsCompatible.
-////////////////////////////////////////////////////////////
-template <typename Interaction, typename A, typename B>
-inline constexpr bool IsCompatibleV =
-    IsCompatible<Interaction, std::remove_cvref_t<A>,
-                 std::remove_cvref_t<B>>::value;
-
 } // namespace steamrot
