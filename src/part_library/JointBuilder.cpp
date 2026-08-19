@@ -39,7 +39,6 @@ JointBuilder &JointBuilder::SetSocketConfig(
                    has_fixed_socket, rotation_arc_min, rotation_arc_max);
   return *this;
 }
-
 /////////////////////////////////////////////////
 Joint JointBuilder::Build(const std::string &name) {
   m_joint.name = name;

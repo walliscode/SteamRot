@@ -19,7 +19,6 @@
 namespace steamrot {
 
 enum class JointSocketPositioningStrategy {
-  EvenSpread,       ///< Evenly spread sockets along the joint's length.
   MaximizeDistance, ///< Maximize distance between sockets along the joint's
                     ///< length.
 };
@@ -32,12 +31,37 @@ struct JointTraits {
 class JointInstance : public PartInstance<JointTraits> {
 
 public:
-  JointInstance(const uint32_t id, const Joint &joint)
-      : PartInstance<JointTraits>(id, joint) {}
+  /////////////////////////////////////////////////
+  /// @brief Delete default constructor to prevent uninitialized instances.
+  /////////////////////////////////////////////////
+  JointInstance() = delete;
 
-  JointInstance(const uint32_t id, const Joint &joint, const std::string &alias)
-      : PartInstance<JointTraits>(id, alias, joint) {}
+  /////////////////////////////////////////////////
+  /// @brief Constructs a JointInstance with a given id and Joint reference.
+  ///
+  /// @param id Stable unique identifier for this instance.
+  /// @param joint Reference to the Joint this instance represents.
+  /////////////////////////////////////////////////
+  JointInstance(const uint32_t id, const Joint &joint);
 
+  /////////////////////////////////////////////////
+  /// @brief Constructs a JointInstance with a given id, Joint reference, and
+  /// alias.
+  ///
+  /// @param id Stable unique identifier for this instance.
+  /// @param joint Reference to the Joint this instance represents.
+  /// @param alias Human-readable identifier for this instance.
+  /////////////////////////////////////////////////
+  JointInstance(const uint32_t id, const Joint &joint,
+                const std::string &alias);
+
+  /////////////////////////////////////////////////
+  /// @brief Positions the sockets of this JointInstance according to the
+  /// specified strategy.
+  ///
+  /// @param positioning_strategy Enumeration value specifying the strategy to
+  /// use for positioning the sockets.
+  /////////////////////////////////////////////////
   void
   PositionSockets(const JointSocketPositioningStrategy positioning_strategy);
 
