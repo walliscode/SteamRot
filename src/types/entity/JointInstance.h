@@ -13,7 +13,7 @@
 /////////////////////////////////////////////////
 #include "Joint.h"
 #include "PartInstance.h"
-#include "SocketState.h"
+#include "PartTraits.h"
 #include <SFML/System/Vector2.hpp>
 
 namespace steamrot {
@@ -23,11 +23,6 @@ enum class JointSocketPositioningStrategy {
                     ///< length.
 };
 
-struct JointTraits {
-  using SocketType = JointSocketState;
-
-  using PartType = Joint;
-};
 class JointInstance : public PartInstance<JointTraits> {
 
 public:

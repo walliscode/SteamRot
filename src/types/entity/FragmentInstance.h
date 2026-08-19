@@ -13,15 +13,10 @@
 /////////////////////////////////////////////////
 #include "Fragment.h"
 #include "PartInstance.h"
+#include "PartTraits.h"
 #include "SocketState.h"
 
 namespace steamrot {
-
-struct FragmentTraits {
-  using SocketType = FragmentSocketState;
-
-  using PartType = Fragment;
-};
 
 class FragmentInstance : public PartInstance<FragmentTraits> {
 
