@@ -7,12 +7,24 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FragmentInstance.h"
+#include "PartInteractionCompatibility.h"
 #include "catch2/catch_approx.hpp"
 #include "fragment_library.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
+
+static_assert(
+    IsCompatibleV<ConnectInteraction, FragmentInstance, JointInstance>);
+static_assert(
+    IsCompatibleV<CollisionInteraction, FragmentInstance, JointInstance>);
+static_assert(
+    IsCompatibleV<AlignmentInteraction, FragmentInstance, JointInstance>);
+static_assert(
+    !IsCompatibleV<ConnectInteraction, FragmentInstance, FragmentInstance>);
+static_assert(
+    !IsCompatibleV<CollisionInteraction, FragmentInstance, FragmentInstance>);
 
 TEST_CASE("FragmentInstance::Constructors tests", "[FragmentInstance]") {
   SECTION("Construct with id and fragment") {

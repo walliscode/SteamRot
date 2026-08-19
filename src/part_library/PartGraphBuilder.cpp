@@ -9,7 +9,6 @@
 #include "PartGraphBuilder.h"
 #include "JointInstance.h"
 #include "catch2/catch_test_macros.hpp"
-#include "overload.h"
 #include "part_library.h"
 #include <expected>
 #include <variant>
@@ -158,28 +157,23 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
     FAIL("Connect: only Fragment\xE2\x86\x94Joint connections are allowed ("
          << from_id << " and " << to_id << " are the same type)");
 
-  // delegate to create_connection (always takes fragment first, then joint)
-  std::expected<std::monostate, std::string> result;
   if (from_is_fragment) {
     auto connection_result =
         std::get<FragmentInstance>(from_variant)
-            .CreateConnectionWithOtherInstance(
-                from_socket_id, std::get<JointInstance>(to_variant),
-                to_socket_id);
+            .CreateConnectionTo(from_socket_id,
+                                std::get<JointInstance>(to_variant),
+                                to_socket_id);
     if (!connection_result.has_value())
       FAIL(connection_result.error().message);
   } else {
     auto connection_result =
         std::get<FragmentInstance>(to_variant)
-            .CreateConnectionWithOtherInstance(
-                to_socket_id, std::get<JointInstance>(from_variant),
-                from_socket_id);
+            .CreateConnectionTo(to_socket_id,
+                                std::get<JointInstance>(from_variant),
+                                from_socket_id);
     if (!connection_result.has_value())
       FAIL(connection_result.error().message);
   }
-
-  if (!result.has_value())
-    FAIL(result.error());
 
   return *this;
 }
@@ -198,33 +192,29 @@ PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
   const uint32_t from_part_id = from_it->second;
   const uint32_t to_part_id = to_it->second;
 
-  std::visit(
-      overload{[&](FragmentInstance &from_fragment) {
-                 if (!std::holds_alternative<JointInstance>(
-                         m_package.part_graph.at(to_part_id)))
-                   FAIL("ConnectUnchecked: to_id '"
-                        << to_id << "' is not a JointInstance");
+  auto &from_variant = m_package.part_graph.at(from_part_id);
+  auto &to_variant = m_package.part_graph.at(to_part_id);
 
-                 JointInstance &to_joint = std::get<JointInstance>(
-                     m_package.part_graph.at(to_part_id));
-                 auto result = from_fragment.CreateConnectionWithOtherInstance(
-                     from_socket_id, to_joint, to_socket_id);
-                 if (!result.has_value())
-                   FAIL(result.error().message);
-               },
-               [&](JointInstance &from_joint) {
-                 if (!std::holds_alternative<FragmentInstance>(
-                         m_package.part_graph.at(to_part_id)))
-                   FAIL("ConnectUnchecked: to_id '"
-                        << to_id << "' is not a FragmentInstance");
-                 FragmentInstance &to_fragment = std::get<FragmentInstance>(
-                     m_package.part_graph.at(to_part_id));
-                 auto result = to_fragment.CreateConnectionWithOtherInstance(
-                     to_socket_id, from_joint, from_socket_id);
-                 if (!result.has_value())
-                   FAIL(result.error().message);
-               }},
-      m_package.part_graph.at(from_part_id));
+  const auto attach_bidirectional_connection = [&](auto &from_instance,
+                                                   auto &to_instance) {
+    auto from_result = from_instance.AttachSocketConnectionUnchecked(
+        from_socket_id, SocketConnection{.peer_part_id = to_instance.GetId(),
+                                         .peer_socket_id = to_socket_id});
+    if (!from_result.has_value())
+      FAIL(from_result.error().message);
+
+    auto to_result = to_instance.AttachSocketConnectionUnchecked(
+        to_socket_id, SocketConnection{.peer_part_id = from_instance.GetId(),
+                                       .peer_socket_id = from_socket_id});
+    if (!to_result.has_value())
+      FAIL(to_result.error().message);
+  };
+
+  std::visit(
+      [&](auto &from_instance, auto &to_instance) {
+        attach_bidirectional_connection(from_instance, to_instance);
+      },
+      from_variant, to_variant);
 
   return *this;
 }

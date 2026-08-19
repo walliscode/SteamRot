@@ -78,38 +78,32 @@ create_grab_scaffold_one(GrimoireMachina &grimoire) {
   FragmentInstance fi_6{6, grimoire.m_all_fragments.at("fragment_one")};
 
   // anchor -> arm A root
-  auto conn_ji_0_to_fi_1_result =
-      ji_0.CreateConnectionWithOtherInstance(0, fi_1, 0);
+  auto conn_ji_0_to_fi_1_result = ji_0.CreateConnectionTo(0, fi_1, 0);
   if (!conn_ji_0_to_fi_1_result)
     return std::unexpected(conn_ji_0_to_fi_1_result.error());
 
   // anchor -> arm B root
-  auto conn_ji_0_to_fi_4_result =
-      ji_0.CreateConnectionWithOtherInstance(1, fi_4, 0);
+  auto conn_ji_0_to_fi_4_result = ji_0.CreateConnectionTo(1, fi_4, 0);
   if (!conn_ji_0_to_fi_4_result)
     return std::unexpected(conn_ji_0_to_fi_4_result.error());
 
   // arm A middle
-  auto conn_fi_1_to_ji_2_result =
-      fi_1.CreateConnectionWithOtherInstance(1, ji_2, 0);
+  auto conn_fi_1_to_ji_2_result = fi_1.CreateConnectionTo(1, ji_2, 0);
   if (!conn_fi_1_to_ji_2_result)
     return std::unexpected(conn_fi_1_to_ji_2_result.error());
 
   // arm A end
-  auto conn_ji_2_to_fi_3_result =
-      ji_2.CreateConnectionWithOtherInstance(1, fi_3, 0);
+  auto conn_ji_2_to_fi_3_result = ji_2.CreateConnectionTo(1, fi_3, 0);
   if (!conn_ji_2_to_fi_3_result)
     return std::unexpected(conn_ji_2_to_fi_3_result.error());
 
   // arm B middle
-  auto conn_fi_4_to_ji_5_result =
-      fi_4.CreateConnectionWithOtherInstance(1, ji_5, 0);
+  auto conn_fi_4_to_ji_5_result = fi_4.CreateConnectionTo(1, ji_5, 0);
   if (!conn_fi_4_to_ji_5_result)
     return std::unexpected(conn_fi_4_to_ji_5_result.error());
 
   // arm B end
-  auto conn_ji_5_to_fi_6_result =
-      ji_5.CreateConnectionWithOtherInstance(1, fi_6, 0);
+  auto conn_ji_5_to_fi_6_result = ji_5.CreateConnectionTo(1, fi_6, 0);
   if (!conn_ji_5_to_fi_6_result)
     return std::unexpected(conn_ji_5_to_fi_6_result.error());
 

@@ -185,8 +185,9 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     JointInstance &existing_ji =
         std::get<JointInstance>(scaffold.parts.at(partgraph_part_id));
 
-    auto conn_result = placed_fi.CreateConnectionWithOtherInstance(
-        ghost_socket_index.value(), existing_ji, partgraph_socket_id);
+    auto conn_result =
+        placed_fi.CreateConnectionTo(ghost_socket_index.value(), existing_ji,
+                                     partgraph_socket_id);
 
   } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
     const JointInstance &ghost_ji =
@@ -204,8 +205,9 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
     FragmentInstance &existing_fi =
         std::get<FragmentInstance>(scaffold.parts.at(partgraph_part_id));
 
-    auto conn_result = placed_ji.CreateConnectionWithOtherInstance(
-        ghost_socket_index.value(), existing_fi, partgraph_socket_id);
+    auto conn_result =
+        placed_ji.CreateConnectionTo(ghost_socket_index.value(), existing_fi,
+                                     partgraph_socket_id);
   }
 }
 

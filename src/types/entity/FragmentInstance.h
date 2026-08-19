@@ -17,7 +17,10 @@
 
 namespace steamrot {
 
+class FragmentInstance;
+
 struct FragmentTraits {
+  using InstanceType = FragmentInstance;
   using SocketType = FragmentSocketState;
 
   using PartType = Fragment;

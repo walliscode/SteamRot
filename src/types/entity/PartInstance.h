@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "PartInteractionCompatibility.h"
 #include "SocketState.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
@@ -20,6 +21,7 @@
 #include <cstdint>
 #include <expected>
 #include <map>
+#include <optional>
 #include <string>
 #include <variant>
 
@@ -28,6 +30,7 @@ namespace steamrot {
 template <typename Trait> class PartInstance {
 
 public:
+  using InstanceType = typename Trait::InstanceType;
   using SocketType = typename Trait::SocketType;
   using Sockets = std::map<uint32_t, SocketType>;
   using Part = typename Trait::PartType;
@@ -312,22 +315,48 @@ public:
   }
 
   /////////////////////////////////////////////////
-  /// @brief Check for collisions between this PartInstance's sockets and
-  /// another
+  /// @brief Attach a raw connection endpoint to one socket without checking
+  /// part-type compatibility.
   ///
-  /// By using a template parameter for the other PartInstance type, this
-  /// function can be used to check for collisions between any two PartInstance
-  /// types, such as FragmentInstance and JointInstance. Coupled with the friend
-  /// class statement, allows derivates of PartInstance to access the private
-  /// members of other PartInstance types, enabling collision checks between
-  /// different part types.
+  /// Intended for low-level graph construction code that already owns the
+  /// endpoint IDs. Production pairwise interactions should prefer the typed
+  /// compatibility-checked APIs.
+  ///
+  /// @param socket_id Socket to attach.
+  /// @param connection Peer endpoint descriptor to store on the socket.
+  /////////////////////////////////////////////////
+  std::expected<std::monostate, FailInfo>
+  AttachSocketConnectionUnchecked(uint32_t socket_id,
+                                  const SocketConnection &connection) {
+    SocketType *socket = TryGetSocketMutable(socket_id);
+    if (!socket)
+      return std::unexpected(FailInfo{
+          FailMode::MissingData, "Socket with ID " + std::to_string(socket_id) +
+                                     " does not exist in this PartInstance."});
+
+    if (!socket->IsAvailable())
+      return std::unexpected(
+          FailInfo{FailMode::InvalidState,
+                   "Socket is not available for connection attachment."});
+
+    socket->SetConnection(connection);
+    return std::monostate{};
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Check socket proximity against another explicitly compatible part
+  /// instance type.
+  ///
   /// @tparam OtherTrait Template parameter for the other PartInstance type.
-  /// @param other_instance other PartInstance to check for collisions against.
+  /// @param other_instance Other PartInstance to check for collisions against.
   /////////////////////////////////////////////////
   template <typename OtherTrait>
-  void
-  CheckWithOtherInstanceForCollision(PartInstance<OtherTrait> &other_instance) {
-
+  void CheckCollisionWith(PartInstance<OtherTrait> &other_instance) {
+    using OtherInstanceType = typename OtherTrait::InstanceType;
+    static_assert(
+        IsCompatibleV<CollisionInteraction, InstanceType, OtherInstanceType>,
+        "CheckCollisionWith only supports explicitly compatible part instance "
+        "pairs.");
     for (auto &[socket_id, socket] : sockets) {
       for (auto &[other_id, other_socket] : other_instance.sockets) {
         if (!socket.IsAvailable() || !other_socket.IsAvailable())
@@ -344,11 +373,26 @@ public:
     }
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Create a connection to another explicitly compatible part instance
+  /// type.
+  ///
+  /// @tparam OtherTrait Template parameter for the other PartInstance type.
+  /// @param socket_id Socket on this instance.
+  /// @param other_instance Peer instance to connect to.
+  /// @param other_socket_id Socket on the peer instance.
+  /// @return Success or failure information.
+  /////////////////////////////////////////////////
   template <typename OtherTrait>
   std::expected<std::monostate, FailInfo>
-  CreateConnectionWithOtherInstance(uint32_t socket_id,
-                                    PartInstance<OtherTrait> &other_instance,
-                                    uint32_t other_socket_id) {
+  CreateConnectionTo(uint32_t socket_id,
+                     PartInstance<OtherTrait> &other_instance,
+                     uint32_t other_socket_id) {
+    using OtherInstanceType = typename OtherTrait::InstanceType;
+    static_assert(
+        IsCompatibleV<ConnectInteraction, InstanceType, OtherInstanceType>,
+        "CreateConnectionTo only supports explicitly compatible part instance "
+        "pairs.");
 
     // check sockets exist on both instances
     SocketType *socket = TryGetSocketMutable(socket_id);

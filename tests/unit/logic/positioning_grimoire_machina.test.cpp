@@ -251,9 +251,8 @@ TEST_CASE("align_fragment_onto_joint_socket tests") {
           joint_instance.SetTotalRotation(sf::degrees(tc.joint_rotation_deg));
         }
 
-        auto connection_result =
-            fragment_instance.CreateConnectionWithOtherInstance(
-                tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
+        auto connection_result = fragment_instance.CreateConnectionTo(
+            tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
         if (!connection_result.has_value()) {
           FAIL(connection_result.error().message);
         }
@@ -527,9 +526,8 @@ TEST_CASE("align_joint_onto_fragment_socket tests",
             JointSocketPositioningStrategy::MaximizeDistance);
 
         // ARRANGE //
-        auto connection_result =
-            fragment_instance.CreateConnectionWithOtherInstance(
-                tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
+        auto connection_result = fragment_instance.CreateConnectionTo(
+            tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
 
         if (!connection_result.has_value()) {
           FAIL("Failed to create connection between fragment and joint");

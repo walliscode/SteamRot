@@ -25,7 +25,7 @@ void reset_socket_proximity_state(PartGraph &part_graph) {
 /////////////////////////////////////////////////
 void check_socket_collisions(FragmentInstance &fragment_instance,
                              JointInstance &joint_instance) {
-  fragment_instance.CheckWithOtherInstanceForCollision(joint_instance);
+  fragment_instance.CheckCollisionWith(joint_instance);
 }
 
 /////////////////////////////////////////////////

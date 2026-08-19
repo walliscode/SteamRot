@@ -18,12 +18,15 @@
 
 namespace steamrot {
 
+class JointInstance;
+
 enum class JointSocketPositioningStrategy {
   MaximizeDistance, ///< Maximize distance between sockets along the joint's
                     ///< length.
 };
 
 struct JointTraits {
+  using InstanceType = JointInstance;
   using SocketType = JointSocketState;
 
   using PartType = Joint;

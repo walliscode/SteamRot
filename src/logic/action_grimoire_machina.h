@@ -114,7 +114,8 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 /// @ref check_PartGraph_for_connection_readiness. If both return a value the
 /// ghost instance is copied into @p scaffold (with a new stable ID) and the
 /// connection is recorded directly on both sockets via
-/// @ref create_connection (setting @c SocketData::connected_to on each end).
+/// @ref PartInstance::CreateConnectionTo (setting @c SocketData::connected_to
+/// on each end).
 ///
 /// By convention connections are only between a FragmentInstance and a
 /// JointInstance. Does nothing if the ghost and the PartGraph part have the
