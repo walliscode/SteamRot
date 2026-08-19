@@ -12,6 +12,7 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FailInfo.h"
+#include "PartTraits.h"
 #include "SocketState.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
@@ -325,6 +326,7 @@ public:
   /// @param other_instance other PartInstance to check for collisions against.
   /////////////////////////////////////////////////
   template <typename OtherTrait>
+    requires CompatibleTraits<Trait, OtherTrait>
   void
   CheckWithOtherInstanceForCollision(PartInstance<OtherTrait> &other_instance) {
 
@@ -345,6 +347,7 @@ public:
   }
 
   template <typename OtherTrait>
+    requires CompatibleTraits<Trait, OtherTrait>
   std::expected<std::monostate, FailInfo>
   CreateConnectionWithOtherInstance(uint32_t socket_id,
                                     PartInstance<OtherTrait> &other_instance,
