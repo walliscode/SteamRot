@@ -270,7 +270,12 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
   sf::Vector2f alignment_vector;
   for (const auto &[socket_id, socket_data] : end_of_arm_fi.GetSockets()) {
     if (socket_data.GetConnectionState() == SocketConnectionState::Connected) {
-      alignment_vector = end_of_arm_fi.GetSocketWorldAlignmentVector(socket_id);
+      // get the alignment vector of the connected socket in world space
+      // we are not built to deal with std::expected yet, so we will just use a
+      // default vector if the socket does not exist
+      alignment_vector =
+          end_of_arm_fi.GetSocketWorldAlignmentVector(socket_id).value_or(
+              sf::Vector2f(1.f, 0.f));
       break;
     }
   }

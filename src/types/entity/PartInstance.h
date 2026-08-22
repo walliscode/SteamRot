@@ -79,6 +79,7 @@ protected:
   }
 
 public:
+  virtual ~PartInstance() = default;
   /////////////////////////////////////////////////
   /// @brief Construct a PartInstance with an id and referenced Part.
   ///

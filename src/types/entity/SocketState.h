@@ -244,6 +244,13 @@ public:
   }
 
   /////////////////////////////////////////////////
+  /// @brief Set hover state directly, bypassing mouse position check.
+  ///
+  /// @param is_over Boolean indicating whether the mouse is over the socket.
+  /////////////////////////////////////////////////
+  void SetMouseOver(const bool is_over) { m_is_mouse_over = is_over; }
+
+  /////////////////////////////////////////////////
   /// @brief Reset interaction-only fields.
   /////////////////////////////////////////////////
   void ResetInteractionState() {

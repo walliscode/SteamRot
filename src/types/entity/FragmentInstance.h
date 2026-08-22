@@ -82,7 +82,7 @@ public:
   /// if the socket does not exist.
   /////////////////////////////////////////////////
   std::expected<sf::Vector2f, FailInfo>
-  GetSocketWorldAlignmentVector(uint32_t socket_id) const {
+  GetSocketWorldAlignmentVector(uint32_t socket_id) const override {
     const SocketType *socket = TryGetSocket(socket_id);
     if (!socket) {
       return std::unexpected(

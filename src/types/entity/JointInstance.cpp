@@ -7,6 +7,11 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "JointInstance.h"
+#include "FailInfo.h"
+#include "SocketState.h"
+#include <SFML/System/Vector2.hpp>
+#include <expected>
+#include <format>
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -37,6 +42,42 @@ void JointInstance::PositionSockets(
                                  part.socket_config);
     break;
   }
+}
+
+/////////////////////////////////////////////////
+std::expected<sf::Vector2f, FailInfo>
+JointInstance::GetSocketWorldAlignmentVector(uint32_t socket_id) const {
+
+  // if the socket does not exist, return an error
+  const JointSocketState *socket = TryGetSocket(socket_id);
+  if (!socket) {
+    return std::unexpected(
+        FailInfo{FailMode::MissingData,
+                 std::format("Socket ID {} does not exist.", socket_id)});
+  }
+
+  // calculate the local alignment vector going from the socket pivot to the
+  // socket's local position
+  const sf::Vector2f &local_alignment_vector =
+      socket->GetLocalPosition() - part.socket_pivot;
+
+  // if the local alignment vector is zero, return an error
+  if (local_alignment_vector == sf::Vector2f(0.f, 0.f)) {
+    return std::unexpected(FailInfo{
+        FailMode::InvalidState,
+        std::format("Socket ID {} has zero-length local alignment vector.",
+                    socket_id)});
+  }
+
+  // using the total rotation of the joint, rotate the local alignment vector to
+  // get the world alignment vector
+  sf::Transform rotation_transform;
+  rotation_transform.rotate(total_rotation);
+
+  const sf::Vector2f return_vector =
+      rotation_transform.transformPoint(local_alignment_vector);
+
+  return return_vector.normalized();
 }
 
 /////////////////////////////////////////////////
