@@ -31,6 +31,113 @@ TEST_CASE("JointInstance::JointInstance tests", "[JointInstance]") {
   REQUIRE(instance.GetSocketCount() == joint.socket_config.socket_count);
 }
 
+TEST_CASE("JointInstance::GetSocketCount tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  joint.socket_config.socket_count = 3;
+  JointInstance instance{1, joint};
+  // Act
+  uint32_t socket_count = instance.GetSocketCount();
+  // Assert
+  REQUIRE(socket_count == 3);
+}
+
+TEST_CASE("JointInstance::GetPart tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  JointInstance instance{1, joint};
+  // Act
+  const Joint &retrieved_joint = instance.GetPart();
+  // Assert
+  REQUIRE(&retrieved_joint == &joint);
+}
+
+TEST_CASE("JointInstance::GetId tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  JointInstance instance{42, joint};
+  // Act
+  uint32_t id = instance.GetId();
+  // Assert
+  REQUIRE(id == 42);
+}
+
+TEST_CASE("JointInstance::GetAlias tests", "[JointInstance]") {
+  SECTION("Default alias is 'none'") {
+    // Arrange
+    Joint joint{};
+    JointInstance instance{1, joint};
+    // Act
+    const std::string &alias = instance.GetAlias();
+    // Assert
+    REQUIRE(alias == "none");
+  }
+
+  SECTION("Custom alias is set correctly") {
+    // Arrange
+    Joint joint{};
+    std::string custom_alias = "TestJoint";
+    JointInstance instance{1, joint, custom_alias};
+    // Act
+    const std::string &alias = instance.GetAlias();
+    // Assert
+    REQUIRE(alias == custom_alias);
+  }
+}
+
+TEST_CASE("JointInstance::SetTransform tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  JointInstance instance{1, joint};
+  sf::Transform new_transform;
+  new_transform.translate({5.f, 10.f});
+  // Act
+  instance.SetTransform(new_transform);
+  // Assert
+  REQUIRE(instance.GetTransform() == new_transform);
+}
+
+TEST_CASE("JointInstance::SetTotalRotation tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  JointInstance instance{1, joint};
+  sf::Angle new_rotation = sf::degrees(45.f);
+  // Act
+  instance.SetTotalRotation(new_rotation);
+  // Assert
+  REQUIRE(instance.GetTotalRotation() == new_rotation);
+}
+
+TEST_CASE("JointInstance::AddToTotalRotation tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  JointInstance instance{1, joint};
+  sf::Angle initial_rotation = sf::degrees(30.f);
+  instance.SetTotalRotation(initial_rotation);
+  sf::Angle additional_rotation = sf::degrees(15.f);
+  // Act
+  instance.AddToTotalRotation(additional_rotation);
+  // Assert
+  REQUIRE(instance.GetTotalRotation() ==
+          initial_rotation + additional_rotation);
+}
+
+TEST_CASE("JointInstance::TryGetSocket tests", "[JointInstance]") {
+  // Arrange
+  Joint joint{};
+  joint.socket_config.socket_count = 2;
+  JointInstance instance{1, joint};
+  // Act & Assert
+  SECTION("Existing socket returns valid pointer") {
+    auto *socket = instance.TryGetSocket(0);
+    REQUIRE(socket != nullptr);
+  }
+  SECTION("Non-existing socket returns nullptr") {
+    auto *socket = instance.TryGetSocket(999);
+    REQUIRE(socket == nullptr);
+  }
+}
+
 TEST_CASE("maximise_joint_socket_spread tests",
           "[positioning_grimoire_machina]") {
   // Arrange
@@ -58,7 +165,8 @@ TEST_CASE("maximise_joint_socket_spread tests",
       config.rotation_arc_max = 90.f; // arc from 0° to 90°
       config.radius = 10.f;
       maximise_joint_socket_spread(sockets, pivot, config);
-      // Assert: sockets should be at radius distance from origin at 0° and 90°
+      // Assert: sockets should be at radius distance from origin at 0° and
+      // 90°
       sf::Vector2f expected_position_0{10.f, 0.f};
       sf::Vector2f expected_position_1{0.f, 10.f};
       REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
@@ -72,7 +180,8 @@ TEST_CASE("maximise_joint_socket_spread tests",
       config.rotation_arc_max = 180.f; // arc from 0° to 180°
       config.radius = 10.f;
       maximise_joint_socket_spread(sockets, pivot, config);
-      // Assert: sockets should be at radius distance from origin at 0° and 180°
+      // Assert: sockets should be at radius distance from origin at 0° and
+      // 180°
       sf::Vector2f expected_position_0{10.f, 0.f};
       sf::Vector2f expected_position_1{-10.f, 0.f};
       REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
@@ -86,7 +195,8 @@ TEST_CASE("maximise_joint_socket_spread tests",
       config.rotation_arc_max = 270.f; // arc from 0° to 270°
       config.radius = 10.f;
       maximise_joint_socket_spread(sockets, pivot, config);
-      // Assert: sockets should be at radius distance from origin at 0° and 270°
+      // Assert: sockets should be at radius distance from origin at 0° and
+      // 270°
       sf::Vector2f expected_position_0{10.f, 0.f};
       sf::Vector2f expected_position_1{0.f, -10.f};
       REQUIRE_THAT(sockets.at(0).GetLocalPosition(),

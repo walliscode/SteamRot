@@ -176,15 +176,6 @@ public:
   bool IsReadyToConnect() const { return IsAvailable(); }
 
   /////////////////////////////////////////////////
-  /// @brief Set hover state of this socket.
-  ///
-  /// @param is_mouse_over New hover state.
-  /////////////////////////////////////////////////
-  void SetMouseOver(const bool is_mouse_over) {
-    m_is_mouse_over = is_mouse_over;
-  }
-
-  /////////////////////////////////////////////////
   /// @brief Set optional nearest-socket distance value.
   ///
   /// @param distance Optional nearest distance.
@@ -204,14 +195,19 @@ public:
   /// @return True when state updated with new candidate, false otherwise.
   /////////////////////////////////////////////////
   bool ConsiderCandidateDistance(const float distance) {
+
+    // If the candidate is outside the proximity threshold, reject it.
     if (distance > k_proximity_distance_threshold)
       return false;
 
+    // compare if a distance is already stored, and if so, only accept the new
+    // candidate if it is strictly closer.
     if (m_distance_to_nearest_socket.has_value() &&
         distance >= m_distance_to_nearest_socket.value()) {
       return false;
     }
 
+    // otherwuse, accept the candidate and update the stored distance.
     m_distance_to_nearest_socket = distance;
     return true;
   }
@@ -270,9 +266,13 @@ public:
   /// @return Brightness scalar in range [0, 255].
   /////////////////////////////////////////////////
   uint32_t GetSocketBrightness() const {
+
+    // create a linear mapping from distance to brightness
     static constexpr float range =
         k_proximity_distance_threshold - k_connection_distance_threshold;
 
+    // assert at compile time that the range is positive to avoid division by
+    // zero
     static_assert(
         range > 0.f,
         "proximity threshold must be strictly greater than connection "
@@ -280,6 +280,8 @@ public:
     float distance = m_distance_to_nearest_socket.value_or(
         k_proximity_distance_threshold + 1.f);
 
+    // return the distance mapped to brightness in range [0, 255], clamped to
+    // that range
     const float t = (k_proximity_distance_threshold - distance) / range;
     const float clamped = std::clamp(t, 0.f, 1.f);
     return static_cast<uint8_t>(clamped * 255.f);
@@ -291,13 +293,6 @@ public:
   /// @return Local position vector reference.
   /////////////////////////////////////////////////
   virtual const sf::Vector2f &GetLocalPosition() const = 0;
-
-  /////////////////////////////////////////////////
-  /// @brief Returns socket-local alignment vector in owning part coordinates.
-  ///
-  /// @return Local alignment vector reference.
-  /////////////////////////////////////////////////
-  virtual const sf::Vector2f &GetLocalAlignmentVector() const = 0;
 };
 
 /////////////////////////////////////////////////
@@ -313,7 +308,7 @@ struct TestSocketState : public SocketState {
     return m_local_position;
   }
 
-  const sf::Vector2f &GetLocalAlignmentVector() const override {
+  const sf::Vector2f &GetLocalAlignmentVector() const {
     return m_alignment_vector;
   }
 
@@ -321,7 +316,6 @@ private:
   const sf::Vector2f &m_local_position;
   const sf::Vector2f &m_alignment_vector;
 };
-
 /////////////////////////////////////////////////
 /// @struct FragmentSocketState
 /// @brief Socket state for fragment sockets with fixed local geometry refs.
@@ -352,12 +346,19 @@ struct FragmentSocketState : public SocketState {
   ///
   /// @return Local alignment reference.
   /////////////////////////////////////////////////
-  const sf::Vector2f &GetLocalAlignmentVector() const override {
+  const sf::Vector2f &GetLocalAlignmentVector() const {
     return m_alignment_vector;
   }
 
 private:
+  /////////////////////////////////////////////////
+  /// @brief Refernece to local position from Fragment definition.
+  /////////////////////////////////////////////////
   const sf::Vector2f &m_local_position;
+
+  /////////////////////////////////////////////////
+  /// @brief Reference to local alignment vector from Fragment definition.
+  /////////////////////////////////////////////////
   const sf::Vector2f &m_alignment_vector;
 };
 
@@ -376,15 +377,6 @@ struct JointSocketState : public SocketState {
   }
 
   /////////////////////////////////////////////////
-  /// @brief Returns local alignment vector value.
-  ///
-  /// @return Local alignment reference.
-  /////////////////////////////////////////////////
-  const sf::Vector2f &GetLocalAlignmentVector() const override {
-    return m_alignment_vector;
-  }
-
-  /////////////////////////////////////////////////
   /// @brief Set local socket position.
   ///
   /// @param position New local position.
@@ -393,19 +385,12 @@ struct JointSocketState : public SocketState {
     m_local_position = position;
   }
 
-  /////////////////////////////////////////////////
-  /// @brief Set local alignment vector.
-  ///
-  /// @param alignment New local alignment vector.
-  /////////////////////////////////////////////////
-  void SetLocalAlignmentVector(const sf::Vector2f &alignment) {
-    m_alignment_vector =
-        alignment.normalized(); // Ensure alignment vector is normalized
-  }
-
 private:
+  /////////////////////////////////////////////////
+  /// @brief Local position of the socket, mutable to allow joint socket
+  /// positioning.
+  /////////////////////////////////////////////////
   sf::Vector2f m_local_position{0.f, 0.f};
-  sf::Vector2f m_alignment_vector{0.f, 0.f};
 };
 
 } // namespace steamrot

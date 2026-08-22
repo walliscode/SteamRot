@@ -7,6 +7,8 @@ add_executable(test_types
   entity/Fragment.test.cpp
   entity/FragmentInstance.test.cpp
   entity/JointInstance.test.cpp
+  entity/FragmentSocketState.test.cpp
+  entity/JointSocketState.test.cpp
 
   components/CUIState.test.cpp
   components/CMeta.test.cpp

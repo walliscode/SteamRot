@@ -11,10 +11,12 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FailInfo.h"
 #include "Joint.h"
 #include "PartInstance.h"
 #include "PartTraits.h"
 #include <SFML/System/Vector2.hpp>
+#include <expected>
 
 namespace steamrot {
 
@@ -60,8 +62,20 @@ public:
   void
   PositionSockets(const JointSocketPositioningStrategy positioning_strategy);
 
+  /////////////////////////////////////////////////
+  /// @brief Returns the world position of the socket pivot point for this
+  /// JointInstance.
+  ///
+  /// @return sf::Vector2f representing the world position of the socket pivot.
+  /////////////////////////////////////////////////
   sf::Vector2f GetSocketPivotWorldPosition() const {
     return GetTransform().transformPoint(part.socket_pivot);
+  }
+
+  std::expected<sf::Vector2f, FailInfo>
+  GetSocketWorldAlignmentVector(uint32_t socket_id) const override {
+
+    return sf::Vector2f{0.f, 0.f}; // TODO: implement this function
   }
 };
 

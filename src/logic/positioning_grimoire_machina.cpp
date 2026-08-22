@@ -79,16 +79,23 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
 
   // get the fragment socket alignment vector in world space and check it is not
   // 0,0
-  sf::Vector2f fragment_socket_alignment_vector =
+  auto fragment_align_vector_result =
       fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
+  //[TODO: this should be a fatal error, but for now we just ignore]
+  sf::Vector2f fragment_socket_alignment_vector =
+      fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
+
   if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
     return;
   }
 
   // get the joint socket alignment vector in world space and check it is not
   // 0,0
-  sf::Vector2f joint_socket_alignment_vector =
+  auto joint_align_vector_result =
       joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
+  // [TODO: this should be a fatal error, but for now we just ignore]
+  sf::Vector2f joint_socket_alignment_vector =
+      joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
 
   if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f})
     return;
@@ -160,8 +167,11 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
 
   // get the fragment socket alignment vector in world space and check it is not
   // 0,0
-  sf::Vector2f fragment_socket_alignment_vector =
+  auto fragment_align_vector_result =
       fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
+
+  sf::Vector2f fragment_socket_alignment_vector =
+      fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
 
   if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
     return;
@@ -169,8 +179,10 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
 
   // get the joint socket alignment vector in world space and check it is not
   // 0,0
-  sf::Vector2f joint_socket_alignment_vector =
+  auto joint_align_vector_result =
       joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
+  sf::Vector2f joint_socket_alignment_vector =
+      joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
 
   if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
     return;
@@ -198,8 +210,8 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
       fragment_socket_world - rotated_joint_socket_world;
 
   // BUILD THE TRANSFORM //
-  // transforms are applied in reverse order, so we build translate then rotate
-  // to achieve rotation then translation
+  // transforms are applied in reverse order, so we build translate then
+  // rotate to achieve rotation then translation
   joint_instance.SetTransform(sf::Transform::Identity);
   joint_instance.GetTransform().translate(translation_vector);
   joint_instance.GetTransform().rotate(rotation_angle);
@@ -389,9 +401,9 @@ void position_part_graph(PartGraph &part_graph) {
             }
 
             if (in_stack.contains(connection.peer_part_id)) {
-              std::cout
-                  << "      [cycle] peer currently in recursion stack part_id="
-                  << connection.peer_part_id << "\n";
+              std::cout << "      [cycle] peer currently in recursion stack "
+                           "part_id="
+                        << connection.peer_part_id << "\n";
             }
 
             std::cout << "      [recurse] -> part_id="
@@ -418,7 +430,6 @@ void position_part_graph(PartGraph &part_graph) {
 /////////////////////////////////////////////////
 void calculate_composite_box(sf::FloatRect &composite_box,
                              const sf::FloatRect &next_box) {
-
   auto left = std::min(composite_box.position.x, next_box.position.x);
   auto top = std::min(composite_box.position.y, next_box.position.y);
 

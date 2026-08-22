@@ -11,13 +11,21 @@
 /////////////////////////////////////////////////
 /// Headers
 /////////////////////////////////////////////////
+#include "FailInfo.h"
 #include "Fragment.h"
 #include "PartInstance.h"
 #include "PartTraits.h"
 #include "SocketState.h"
+#include <SFML/System/Vector2.hpp>
+#include <expected>
 
 namespace steamrot {
 
+/////////////////////////////////////////////////
+/// @class FragmentInstance
+/// @brief A instance of a Fragment part, with its own state and socket
+/// configuration.
+/////////////////////////////////////////////////
 class FragmentInstance : public PartInstance<FragmentTraits> {
 
 public:
@@ -64,6 +72,25 @@ public:
       sockets.emplace(i, FragmentSocketState{socket_data.local_position,
                                              socket_data.alignment_vector});
     }
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Get a socket world alignment vector
+  ///
+  /// @param socket_id Socket identifier.
+  /// @return Alignment vector of the socket in world coordinates, or an error
+  /// if the socket does not exist.
+  /////////////////////////////////////////////////
+  std::expected<sf::Vector2f, FailInfo>
+  GetSocketWorldAlignmentVector(uint32_t socket_id) const {
+    const SocketType *socket = TryGetSocket(socket_id);
+    if (!socket) {
+      return std::unexpected(
+          FailInfo{FailMode::MissingData,
+                   "Socket with ID " + std::to_string(socket_id) +
+                       " does not exist in this FragmentInstance."});
+    }
+    return socket->GetLocalAlignmentVector();
   }
 };
 } // namespace steamrot
