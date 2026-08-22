@@ -79,6 +79,7 @@ protected:
   }
 
 public:
+  virtual ~PartInstance() = default;
   /////////////////////////////////////////////////
   /// @brief Construct a PartInstance with an id and referenced Part.
   ///
@@ -247,30 +248,16 @@ public:
     }
     return socket->GetLocalAlignmentVector();
   }
+
   /////////////////////////////////////////////////
-  /// @brief Get a socket world alignment vector by rotating its local
-  /// alignment vector by this instance total rotation.
+  /// @brief Get a socket world alignment vector
   ///
+  /// This is currently Socket specific and must be implemented in the derived
+  /// class.
   /// @param socket_id Socket identifier.
-  /// @return World alignment vector, or (0, 0) if the socket does not exist.
   /////////////////////////////////////////////////
-  sf::Vector2f GetSocketWorldAlignmentVector(uint32_t socket_id) const {
-    const SocketType *socket = TryGetSocket(socket_id);
-    if (!socket) {
-      return sf::Vector2f(0.f, 0.f);
-    }
-
-    // get the socket's local alignment vector
-    const sf::Vector2f &alignment_vec = socket->GetLocalAlignmentVector();
-
-    // generate a transform from the total rotation of the part instance
-    sf::Transform rotation_transform;
-    rotation_transform.rotate(total_rotation);
-
-    // apply the rotation transform to the local alignment vector to give the
-    // world alignment vector and return
-    return rotation_transform.transformPoint(alignment_vec);
-  }
+  virtual std::expected<sf::Vector2f, FailInfo>
+  GetSocketWorldAlignmentVector(uint32_t socket_id) const = 0;
 
   /////////////////////////////////////////////////
   /// @brief Update mouse-over state for all sockets using current world-space
@@ -285,6 +272,12 @@ public:
     }
   }
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @param socket_id [TODO:parameter]
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   bool CheckIfSocketIsAvailable(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
     if (!socket) {
@@ -292,6 +285,11 @@ public:
     }
     return socket->GetConnectionState() == SocketConnectionState::Available;
   }
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
   std::optional<uint32_t> CheckIfAnySocketIsAvailable() const {
     for (const auto &[socket_id, socket] : sockets) {
       if (socket.GetConnectionState() == SocketConnectionState::Available) {
@@ -301,11 +299,18 @@ public:
     return std::nullopt;
   }
 
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  /////////////////////////////////////////////////
   void ResetAllSocketsInteractionState() {
     for (auto &[socket_id, socket] : sockets) {
       socket.ResetInteractionState();
     }
   }
+
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  /////////////////////////////////////////////////
   void ResetAllSocketState() {
     for (auto &[socket_id, socket] : sockets) {
       socket.ResetAllState();
