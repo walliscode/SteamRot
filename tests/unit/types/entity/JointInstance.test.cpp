@@ -538,11 +538,75 @@ TEST_CASE("JointInstance::CreateConnectionWithOtherInstance tests",
 }
 
 TEST_CASE("JointInstance::PositionSockets tests", "[JointInstance]") {
-  JointInstance instance{1, parts::JointSquareWithOneSocket};
 
-  SECTION("MaximizeDistance strategy does not throw") {
-    REQUIRE_NOTHROW(instance.PositionSockets(
-        JointSocketPositioningStrategy::MaximizeDistance));
+  SECTION("Joint with 1 socket") {
+    JointInstance instance{1, parts::JointSquareWithOneSocket};
+    REQUIRE(instance.GetPart().socket_pivot == sf::Vector2f{10.f, 10.f});
+    REQUIRE(instance.GetPart().socket_config.radius == 13.f);
+    REQUIRE(instance.GetSocketCount() == 1);
+
+    SECTION("MaximiseDistance strategty ") {
+
+      SECTION("Positions socket at arc midpoint") {
+        instance.PositionSockets(
+            JointSocketPositioningStrategy::MaximizeDistance);
+        // 45 degrees from pivot (10, 10) with radius 13 => (10 + 13/sqrt(2), 10
+        // + 13/sqrt(2))
+        const sf::Vector2f expected_position = {10.f + 13.f / std::sqrt(2.f),
+                                                10.f + 13.f / std::sqrt(2.f)};
+
+        REQUIRE_THAT(instance.GetSocketLocalPosition(0),
+                     EqualsVector2f(expected_position, 0.001f));
+      }
+    }
+  }
+
+  SECTION("Joint with 2 sockets") {
+    JointInstance instance{1, parts::JointSquareWithTwoSockets};
+    REQUIRE(instance.GetPart().socket_pivot == sf::Vector2f{10.f, 10.f});
+    REQUIRE(instance.GetPart().socket_config.radius == 13.f);
+    REQUIRE(instance.GetSocketCount() == 2);
+    SECTION("MaximiseDistance strategy") {
+      SECTION("Positions sockets at arc endpoints") {
+        instance.PositionSockets(
+            JointSocketPositioningStrategy::MaximizeDistance);
+        // 0 degrees from pivot (10, 10) with radius 13 => (10 + 13, 10)
+        const sf::Vector2f expected_position_0 = {10.f + 13.f, 10.f};
+        // 90 degrees from pivot (10, 10) with radius 13 => (10, 10 + 13)
+        const sf::Vector2f expected_position_1 = {10.f, 10.f + 13.f};
+        REQUIRE_THAT(instance.GetSocketLocalPosition(0),
+                     EqualsVector2f(expected_position_0, 0.001f));
+        REQUIRE_THAT(instance.GetSocketLocalPosition(1),
+                     EqualsVector2f(expected_position_1, 0.001f));
+      }
+    }
+  }
+
+  SECTION("Joint with 3 sockets") {
+    JointInstance instance{1, parts::JointSquareWithThreeSockets};
+    REQUIRE(instance.GetPart().socket_pivot == sf::Vector2f{10.f, 10.f});
+    REQUIRE(instance.GetPart().socket_config.radius == 13.f);
+    REQUIRE(instance.GetSocketCount() == 3);
+    SECTION("MaximiseDistance strategy") {
+      SECTION("Positions sockets evenly across arc") {
+        instance.PositionSockets(
+            JointSocketPositioningStrategy::MaximizeDistance);
+        // 0 degrees from pivot (10, 10) with radius 13 => (10 + 13, 10)
+        const sf::Vector2f expected_position_0 = {10.f + 13.f, 10.f};
+        // 45 degrees from pivot (10, 10) with radius 13 => (10 + 13/sqrt(2), 10
+        // + 13/sqrt(2))
+        const sf::Vector2f expected_position_1 = {10.f + 13.f / std::sqrt(2.f),
+                                                  10.f + 13.f / std::sqrt(2.f)};
+        // 90 degrees from pivot (10, 10) with radius 13 => (10, 10 + 13)
+        const sf::Vector2f expected_position_2 = {10.f, 10.f + 13.f};
+        REQUIRE_THAT(instance.GetSocketLocalPosition(0),
+                     EqualsVector2f(expected_position_0, 0.001f));
+        REQUIRE_THAT(instance.GetSocketLocalPosition(1),
+                     EqualsVector2f(expected_position_1, 0.001f));
+        REQUIRE_THAT(instance.GetSocketLocalPosition(2),
+                     EqualsVector2f(expected_position_2, 0.001f));
+      }
+    }
   }
 }
 TEST_CASE("maximise_joint_socket_spread tests",
@@ -554,6 +618,60 @@ TEST_CASE("maximise_joint_socket_spread tests",
   SECTION("Does not throw with zero sockets") {
     config.socket_count = 0;
     REQUIRE_NOTHROW(maximise_joint_socket_spread(sockets, pivot, config));
+  }
+
+  SECTION("Does not throw when sockets exist but socket_count is zero") {
+    sockets.emplace(0, JointSocketState{});
+    config.socket_count = 0;
+    config.rotation_arc_min = 0.f;
+    config.rotation_arc_max = 180.f;
+    config.radius = 10.f;
+
+    // Depending on implementation, this either early-returns or still places.
+    // We only enforce safety here.
+    REQUIRE_NOTHROW(maximise_joint_socket_spread(sockets, pivot, config));
+  }
+
+  SECTION("Joint with 1 socket") {
+    config.socket_count = 1;
+    sockets.emplace(0, JointSocketState{});
+    REQUIRE(sockets.size() == 1);
+
+    SECTION("0-90 degree arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 90.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({7.071f, 7.071f}, 0.001f));
+    }
+
+    SECTION("0-180 degree arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 180.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({0.f, 10.f}, 0.001f));
+    }
+
+    SECTION("0-360 degree arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 360.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({-10.f, 0.f}, 0.001f));
+    }
+
+    SECTION("90-270 degree arc") {
+      config.rotation_arc_min = 90.f;
+      config.rotation_arc_max = 270.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({-10.f, 0.f}, 0.001f));
+    }
   }
 
   SECTION("Joint with 2 sockets") {
@@ -585,6 +703,123 @@ TEST_CASE("maximise_joint_socket_spread tests",
       REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
                    EqualsVector2f({-10.f, 0.f}, 0.001f));
     }
+
+    SECTION("360 degree arc (full-circle branch: no duplicated endpoint)") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 360.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+
+      // step = 360 / 2 => 0, 180
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({-10.f, 0.f}, 0.001f));
+    }
+
+    SECTION("negative full circle (-360)") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = -360.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+
+      // step = -360 / 2 => 0, -180 (same point as +180)
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({-10.f, 0.f}, 0.001f));
+    }
+  }
+
+  SECTION("Joint with 3 sockets") {
+    config.socket_count = 3;
+    sockets.emplace(0, JointSocketState{});
+    sockets.emplace(1, JointSocketState{});
+    sockets.emplace(2, JointSocketState{});
+    REQUIRE(sockets.size() == 3);
+
+    SECTION("90 degree arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 90.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({7.071f, 7.071f}, 0.001f));
+      REQUIRE_THAT(sockets.at(2).GetLocalPosition(),
+                   EqualsVector2f({0.f, 10.f}, 0.001f));
+    }
+
+    SECTION("180 degree arc") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 180.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({0.f, 10.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(2).GetLocalPosition(),
+                   EqualsVector2f({-10.f, 0.f}, 0.001f));
+    }
+
+    SECTION("360 degree arc (should be 0,120,240)") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 360.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({-5.f, 8.660f}, 0.002f));
+      REQUIRE_THAT(sockets.at(2).GetLocalPosition(),
+                   EqualsVector2f({-5.f, -8.660f}, 0.002f));
+    }
+
+    SECTION(">360 degree arc (0 to 450 => step 150)") {
+      config.rotation_arc_min = 0.f;
+      config.rotation_arc_max = 450.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+
+      // expected angles: 0, 150, 300
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({-8.660f, 5.f}, 0.002f));
+      REQUIRE_THAT(sockets.at(2).GetLocalPosition(),
+                   EqualsVector2f({5.f, -8.660f}, 0.002f));
+    }
+
+    SECTION("negative arc (90 to -90 => clockwise through 0)") {
+      config.rotation_arc_min = 90.f;
+      config.rotation_arc_max = -90.f;
+      config.radius = 10.f;
+      maximise_joint_socket_spread(sockets, pivot, config);
+
+      // expected: 90, 0, -90
+      REQUIRE_THAT(sockets.at(0).GetLocalPosition(),
+                   EqualsVector2f({0.f, 10.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(1).GetLocalPosition(),
+                   EqualsVector2f({10.f, 0.f}, 0.001f));
+      REQUIRE_THAT(sockets.at(2).GetLocalPosition(),
+                   EqualsVector2f({0.f, -10.f}, 0.001f));
+    }
+  }
+
+  SECTION("Uses socket container size safely when socket_count mismatches") {
+    // Protects against accidental out-of-range if implementation loops by
+    // config.socket_count.
+    config.socket_count = 5; // mismatch on purpose
+    sockets.emplace(0, JointSocketState{});
+    sockets.emplace(1, JointSocketState{});
+    config.rotation_arc_min = 0.f;
+    config.rotation_arc_max = 180.f;
+    config.radius = 10.f;
+
+    REQUIRE_NOTHROW(maximise_joint_socket_spread(sockets, pivot, config));
   }
 }
 } // namespace steamrot::tests
