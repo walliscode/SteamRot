@@ -423,7 +423,7 @@ public:
   /////////////////////////////////////////////////
   template <typename OtherTrait>
   std::optional<PartToPartConnection> CheckForFirstConnectionWithOtherInstance(
-      PartInstance<OtherTrait> &other_instance) const {
+      const PartInstance<OtherTrait> &other_instance) const {
 
     const auto this_id = GetId();
     const auto other_id = other_instance.GetId();

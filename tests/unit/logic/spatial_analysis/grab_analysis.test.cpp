@@ -13,7 +13,6 @@
 #include "PartGraphBuilder.h"
 #include "SocketState.h"
 #include "Vector2fEqualsMatcher.h"
-#include "action_grimoire_machina.h"
 #include "catch2/catch_approx.hpp"
 #include "descriptors_machina_archetypes.h"
 #include "joint_library.h"
@@ -269,8 +268,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(std::holds_alternative<FragmentInstance>(arm_one_part_one));
   const FragmentInstance &arm_one_part_one_fi =
       std::get<FragmentInstance>(arm_one_part_one);
-  auto connection_one = action::grimoire_machina::check_for_connected_sockets(
-      anchor_joint, arm_one_part_one_fi);
+  auto connection_one = anchor_joint.CheckForFirstConnectionWithOtherInstance(
+      arm_one_part_one_fi);
   REQUIRE(connection_one.has_value());
   REQUIRE(connection_one->this_socket_id == 0);
   REQUIRE(connection_one->other_socket_id == 1);
@@ -293,11 +292,12 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(std::holds_alternative<JointInstance>(arm_one_part_two));
   const JointInstance &arm_one_part_two_ji =
       std::get<JointInstance>(arm_one_part_two);
-  auto connection_two = action::grimoire_machina::check_for_connected_sockets(
-      arm_one_part_two_ji, arm_one_part_one_fi);
+  auto connection_two =
+      arm_one_part_one_fi.CheckForFirstConnectionWithOtherInstance(
+          arm_one_part_two_ji);
   REQUIRE(connection_two.has_value());
-  REQUIRE(connection_two->this_socket_id == 1);
-  REQUIRE(connection_two->other_socket_id == 0);
+  REQUIRE(connection_two->this_socket_id == 0);
+  REQUIRE(connection_two->other_socket_id == 1);
 
   sf::Vector2f expected_arm_one_part_two_socket_1_position{44.55f, 44.55f};
   REQUIRE_THAT(arm_one_part_two_ji.GetTransform().transformPoint(
@@ -321,8 +321,9 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(std::holds_alternative<FragmentInstance>(arm_one_part_three));
   const FragmentInstance &arm_one_part_three_fi =
       std::get<FragmentInstance>(arm_one_part_three);
-  auto connection_three = action::grimoire_machina::check_for_connected_sockets(
-      arm_one_part_two_ji, arm_one_part_three_fi);
+  auto connection_three =
+      arm_one_part_two_ji.CheckForFirstConnectionWithOtherInstance(
+          arm_one_part_three_fi);
   REQUIRE(connection_three.has_value());
   REQUIRE(connection_three->this_socket_id == 0);
   REQUIRE(connection_three->other_socket_id == 0);
@@ -348,8 +349,11 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   const FragmentInstance &arm_two_part_one_fi =
       std::get<FragmentInstance>(arm_two_part_one);
   auto arm_two_connection_two =
-      action::grimoire_machina::check_for_connected_sockets(
-          anchor_joint, arm_two_part_one_fi);
+      anchor_joint.CheckForFirstConnectionWithOtherInstance(
+          arm_two_part_one_fi);
+  // auto arm_two_connection_two =
+  //     action::grimoire_machina::check_for_connected_sockets(
+  //         anchor_joint, arm_two_part_one_fi);
   REQUIRE(arm_two_connection_two.has_value());
   REQUIRE(arm_two_connection_two->this_socket_id == 1);
   REQUIRE(arm_two_connection_two->other_socket_id == 0);
@@ -370,9 +374,10 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(std::holds_alternative<JointInstance>(arm_two_part_two));
   const JointInstance &arm_two_part_two_ji =
       std::get<JointInstance>(arm_two_part_two);
+
   auto arm_two_connection_three =
-      action::grimoire_machina::check_for_connected_sockets(
-          arm_two_part_two_ji, arm_two_part_one_fi);
+      arm_two_part_one_fi.CheckForFirstConnectionWithOtherInstance(
+          arm_two_part_two_ji);
   REQUIRE(arm_two_connection_three.has_value());
   REQUIRE(arm_two_connection_three->this_socket_id == 0);
   REQUIRE(arm_two_connection_three->other_socket_id == 1);
@@ -398,9 +403,10 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_three));
   const FragmentInstance &arm_two_part_three_fi =
       std::get<FragmentInstance>(arm_two_part_three);
+
   auto arm_two_connection_four =
-      action::grimoire_machina::check_for_connected_sockets(
-          arm_two_part_two_ji, arm_two_part_three_fi);
+      arm_two_part_two_ji.CheckForFirstConnectionWithOtherInstance(
+          arm_two_part_three_fi);
   REQUIRE(arm_two_connection_four.has_value());
   REQUIRE(arm_two_connection_four->this_socket_id == 1);
   REQUIRE(arm_two_connection_four->other_socket_id == 0);
