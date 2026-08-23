@@ -14,7 +14,6 @@ target_include_directories(part_library
 target_link_libraries(part_library
   PUBLIC
     types
-    logic
     Catch2::Catch2
 )
 

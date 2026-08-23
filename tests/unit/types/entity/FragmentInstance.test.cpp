@@ -505,4 +505,144 @@ TEST_CASE("FragmentInstance::CreateConnectionWithOtherInstance tests",
   }
 }
 
+TEST_CASE("FragmentInstance::CheckForFirstConnectionWithOtherInstance tests",
+          "[FragmentInstance]") {
+  SECTION("Returns nullopt when checking self") {
+    FragmentInstance fragment_instance(1,
+                                       parts::FragmentRectangleWithOneSocket);
+
+    const auto result =
+        fragment_instance.CheckForFirstConnectionWithOtherInstance(
+            fragment_instance);
+
+    REQUIRE_FALSE(result.has_value());
+  }
+
+  SECTION("Returns nullopt when other instance has same id") {
+    FragmentInstance a(42, parts::FragmentRectangleWithOneSocket);
+    JointInstance b(42,
+                    parts::JointSquareWithOneSocket); // same ID, different type
+
+    const auto result = a.CheckForFirstConnectionWithOtherInstance(b);
+    REQUIRE_FALSE(result.has_value());
+  }
+
+  SECTION("Returns nullopt when no connection exists") {
+    FragmentInstance fragment_instance(1,
+                                       parts::FragmentRectangleWithOneSocket);
+    JointInstance joint_instance(2, parts::JointSquareWithOneSocket);
+
+    const auto result =
+        fragment_instance.CheckForFirstConnectionWithOtherInstance(
+            joint_instance);
+
+    REQUIRE_FALSE(result.has_value());
+  }
+
+  SECTION("Returns first existing valid reciprocal connection") {
+    FragmentInstance fragment_instance(1,
+                                       parts::FragmentRectangleWithOneSocket);
+    JointInstance joint_instance(2, parts::JointSquareWithOneSocket);
+
+    if (fragment_instance.GetSocketCount() == 0 ||
+        joint_instance.GetSocketCount() == 0) {
+      FAIL("No sockets defined by fixtures; connection case not applicable.");
+    }
+
+    auto create_result = fragment_instance.CreateConnectionWithOtherInstance(
+        0, joint_instance, 0);
+    REQUIRE(create_result.has_value());
+
+    const auto check_result =
+        fragment_instance.CheckForFirstConnectionWithOtherInstance(
+            joint_instance);
+
+    REQUIRE(check_result.has_value());
+    const auto &connection = check_result.value();
+    REQUIRE(connection.this_id == fragment_instance.GetId());
+    REQUIRE(connection.this_socket_id == 0u);
+    REQUIRE(connection.other_id == joint_instance.GetId());
+    REQUIRE(connection.other_socket_id == 0u);
+  }
+
+  SECTION("Symmetry: if A finds B, B finds A with swapped endpoints") {
+    FragmentInstance a(10, parts::FragmentRectangleWithOneSocket);
+    JointInstance b(20, parts::JointSquareWithOneSocket);
+
+    if (a.GetSocketCount() == 0 || b.GetSocketCount() == 0) {
+      FAIL("No sockets defined by fixtures; symmetry case not applicable.");
+    }
+
+    REQUIRE(a.CreateConnectionWithOtherInstance(0, b, 0).has_value());
+
+    const auto a_to_b = a.CheckForFirstConnectionWithOtherInstance(b);
+    const auto b_to_a = b.CheckForFirstConnectionWithOtherInstance(a);
+
+    REQUIRE(a_to_b.has_value());
+    REQUIRE(b_to_a.has_value());
+
+    REQUIRE(a_to_b->this_id == a.GetId());
+    REQUIRE(a_to_b->other_id == b.GetId());
+    REQUIRE(a_to_b->this_socket_id == 0u);
+    REQUIRE(a_to_b->other_socket_id == 0u);
+
+    REQUIRE(b_to_a->this_id == b.GetId());
+    REQUIRE(b_to_a->other_id == a.GetId());
+    REQUIRE(b_to_a->this_socket_id == 0u);
+    REQUIRE(b_to_a->other_socket_id == 0u);
+  }
+
+  SECTION(
+      "Returns nullopt when connection exists but points to different part") {
+    // Requires fixture types with >= 1 socket each and ability to form multiple
+    // links.
+    FragmentInstance a(1, parts::FragmentRectangleWithOneSocket);
+    JointInstance b(2, parts::JointSquareWithOneSocket);
+    JointInstance c(3, parts::JointSquareWithOneSocket);
+
+    if (a.GetSocketCount() == 0 || b.GetSocketCount() == 0 ||
+        c.GetSocketCount() == 0) {
+      FAIL("No sockets defined by fixtures; mismatch case not applicable.");
+    }
+
+    // Connect A to C, not B.
+    REQUIRE(a.CreateConnectionWithOtherInstance(0, c, 0).has_value());
+
+    const auto result = a.CheckForFirstConnectionWithOtherInstance(b);
+    REQUIRE_FALSE(result.has_value());
+  }
+
+  // Optional: only include if you have fixtures with multiple sockets.
+  SECTION("When multiple valid links exist, returns one valid link to target "
+          "instance") {
+    FragmentInstance a(
+        100, parts::FragmentRectangleWithTwoSockets); // adjust fixture name
+    JointInstance b(200,
+                    parts::JointSquareWithTwoSockets); // adjust fixture name
+
+    if (a.GetSocketCount() < 2 || b.GetSocketCount() < 2) {
+      SUCCEED("Fixture does not provide >=2 sockets; skipping multi-link "
+              "behavior check.");
+      return;
+    }
+
+    REQUIRE(a.CreateConnectionWithOtherInstance(0, b, 1).has_value());
+    REQUIRE(a.CreateConnectionWithOtherInstance(1, b, 0).has_value());
+
+    const auto result = a.CheckForFirstConnectionWithOtherInstance(b);
+    REQUIRE(result.has_value());
+
+    // Assert result is one of the valid pairs (depends on socket iteration
+    // order).
+    const bool is_first_pair =
+        result->this_socket_id == 0u && result->other_socket_id == 1u;
+    const bool is_second_pair =
+        result->this_socket_id == 1u && result->other_socket_id == 0u;
+
+    REQUIRE(result->this_id == a.GetId());
+    REQUIRE(result->other_id == b.GetId());
+    REQUIRE((is_first_pair || is_second_pair));
+  }
+}
+
 } // namespace steamrot::tests

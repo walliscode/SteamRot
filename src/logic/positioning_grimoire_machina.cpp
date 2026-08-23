@@ -9,7 +9,6 @@
 #include "positioning_grimoire_machina.h"
 #include "JointInstance.h"
 #include "SocketState.h"
-#include "action_grimoire_machina.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
@@ -64,8 +63,8 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
 
   // check that the fragment socket is connected to the joint socket
   auto check_connection_result =
-      action::grimoire_machina::check_for_connected_sockets(joint_instance,
-                                                            fragment_instance);
+      joint_instance.CheckForFirstConnectionWithOtherInstance(
+          fragment_instance);
   if (!check_connection_result.has_value()) {
     return;
   }
@@ -157,8 +156,8 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
 
   // check that the joint socket is connected to the fragment socket
   auto check_connection_result =
-      action::grimoire_machina::check_for_connected_sockets(joint_instance,
-                                                            fragment_instance);
+      joint_instance.CheckForFirstConnectionWithOtherInstance(
+          fragment_instance);
   if (!check_connection_result.has_value()) {
     return;
   }

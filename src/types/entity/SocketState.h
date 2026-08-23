@@ -44,29 +44,33 @@ struct SocketConnection {
 };
 
 /////////////////////////////////////////////////
-/// @struct JointFragmentConnection
-/// @brief Convenience bundle for both ends of one joint-fragment connection.
+/// @struct PartToPartConnection
+/// @brief Convenience bundle for both ends of one PartInstance-to-PartInstance
+/// socket connection.
 /////////////////////////////////////////////////
-struct JointFragmentConnection {
+struct PartToPartConnection {
   /////////////////////////////////////////////////
-  /// @brief Construct both ends of a joint-fragment connection pair.
+  /// @brief Construct both ends of a PartInstance-to-PartInstance socket
+  /// connection.
   ///
-  /// @param joint_id Stable ID of the joint instance.
-  /// @param joint_socket_id Socket ID on the joint instance.
-  /// @param fragment_id Stable ID of the fragment instance.
-  /// @param fragment_socket_id Socket ID on the fragment instance.
+  /// @param this_id Stable ID of PartInstance checking for connection.
+  /// @param this_socket_id Socket ID on the PartInstance checking for
+  /// connection.
+  /// @param other_id Stable ID of the other PartInstance in the connection.
+  /// @param other_socket_id Socket ID on the other PartInstance in the
+  /// connection.
   /////////////////////////////////////////////////
-  explicit JointFragmentConnection(const uint32_t joint_id,
-                                   const uint32_t joint_socket_id,
-                                   const uint32_t fragment_id,
-                                   const uint32_t fragment_socket_id)
-      : joint_id{joint_id}, joint_socket_id{joint_socket_id},
-        fragment_id{fragment_id}, fragment_socket_id{fragment_socket_id} {}
+  explicit PartToPartConnection(const uint32_t this_id,
+                                const uint32_t this_socket_id,
+                                const uint32_t other_id,
+                                const uint32_t other_socket_id)
+      : this_id{this_id}, this_socket_id{this_socket_id}, other_id{other_id},
+        other_socket_id{other_socket_id} {}
 
-  const uint32_t joint_id;
-  const uint32_t joint_socket_id;
-  const uint32_t fragment_id;
-  const uint32_t fragment_socket_id;
+  const uint32_t this_id;
+  const uint32_t this_socket_id;
+  const uint32_t other_id;
+  const uint32_t other_socket_id;
 };
 
 /////////////////////////////////////////////////

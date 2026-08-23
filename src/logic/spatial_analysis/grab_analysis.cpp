@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
-#include "action_grimoire_machina.h"
 #include "positioning_grimoire_machina.h"
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -139,12 +138,11 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
       if (i == 0) {
 
         // check that the part is connected to the anchor joint
-        auto connection = action::grimoire_machina::check_for_connected_sockets(
-            anchor_joint, std::get<FragmentInstance>(part_graph.at(part_id)));
+        auto connection = anchor_joint.CheckForFirstConnectionWithOtherInstance(
+            std::get<FragmentInstance>(part_graph.at(part_id)));
 
-        if (!connection) {
+        if (!connection)
           continue;
-        }
 
         // get the part and check it is a FragmentInstance
         if (!std::holds_alternative<FragmentInstance>(part_graph.at(part_id))) {
@@ -156,8 +154,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
         // align the part to the anchor joint
         positioning::grimoire_machina::align_fragment_onto_joint_socket(
-            fi, connection->fragment_socket_id, anchor_joint,
-            connection->joint_socket_id);
+            fi, connection->other_socket_id, anchor_joint,
+            connection->this_socket_id);
       }
 
       // then cycle through the rest of the arm and align each part to the
@@ -169,7 +167,9 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
           continue;
         }
 
-        // check the current part type
+        // [TODO:] once we have moved the alignment functions into the
+        // PartInstance classes, we can collapse this check the current part
+        // type
         if (std::holds_alternative<FragmentInstance>(part_graph.at(part_id)) &&
             std::holds_alternative<JointInstance>(
                 part_graph.at(prev_part_id))) {
@@ -179,17 +179,16 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
               std::get<JointInstance>(part_graph.at(prev_part_id));
 
           // check that the part is connected to the previous part
-          auto connection =
-              action::grimoire_machina::check_for_connected_sockets(ji, fi);
-          if (!connection) {
+          // auto connection =
+          //     action::grimoire_machina::check_for_connected_sockets(ji, fi);
+          auto connection = fi.CheckForFirstConnectionWithOtherInstance(ji);
 
+          if (!connection)
             continue;
-          }
 
           // align the part to the previous part
           positioning::grimoire_machina::align_fragment_onto_joint_socket(
-              fi, connection->fragment_socket_id, ji,
-              connection->joint_socket_id);
+              fi, connection->this_socket_id, ji, connection->other_socket_id);
 
         } else if (std::holds_alternative<JointInstance>(
                        part_graph.at(part_id)) &&
@@ -200,10 +199,9 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
               std::get<FragmentInstance>(part_graph.at(prev_part_id));
 
           // check that the part is connected to the previous part
-          auto connection =
-              action::grimoire_machina::check_for_connected_sockets(ji, fi);
-          if (!connection) {
-          }
+          auto connection = ji.CheckForFirstConnectionWithOtherInstance(fi);
+          if (!connection)
+            continue;
 
           // maximise the socket spread on the joint before aligning it to the
           // fragment
@@ -211,8 +209,7 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
           // align the part to the previous part
           positioning::grimoire_machina::align_joint_onto_fragment_socket(
-              ji, connection->joint_socket_id, fi,
-              connection->fragment_socket_id);
+              ji, connection->this_socket_id, fi, connection->other_socket_id);
         } else {
         }
       }

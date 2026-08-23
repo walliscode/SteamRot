@@ -366,11 +366,11 @@ TEST_CASE("SocketConnection::operator== tests",
 TEST_CASE("JointFragmentConnection::JointFragmentConnection tests",
           "[JointSocketState][JointFragmentConnection]") {
   SECTION("Stores all constructor parameters") {
-    JointFragmentConnection connection{11, 12, 21, 22};
-    REQUIRE(connection.joint_id == 11u);
-    REQUIRE(connection.joint_socket_id == 12u);
-    REQUIRE(connection.fragment_id == 21u);
-    REQUIRE(connection.fragment_socket_id == 22u);
+    PartToPartConnection connection{11, 12, 21, 22};
+    REQUIRE(connection.this_id == 11u);
+    REQUIRE(connection.this_socket_id == 12u);
+    REQUIRE(connection.other_id == 21u);
+    REQUIRE(connection.other_socket_id == 22u);
   }
 }
 

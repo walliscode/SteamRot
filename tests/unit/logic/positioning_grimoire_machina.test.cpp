@@ -14,7 +14,6 @@
 #include "PartGraphBuilder.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
-#include "action_grimoire_machina.h"
 #include "catch2/catch_approx.hpp"
 #include "fragment_library.h"
 #include "grimoire_machina_test_helpers.h"
@@ -993,8 +992,9 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     REQUIRE(std::holds_alternative<FragmentInstance>(fragment_instance_result));
     FragmentInstance &fragment_instance =
         std::get<FragmentInstance>(fragment_instance_result); // get fragment
-    REQUIRE(logic::action::grimoire_machina::check_for_connected_sockets(
-        joint_instance, fragment_instance));
+    REQUIRE(joint_instance
+                .CheckForFirstConnectionWithOtherInstance(fragment_instance)
+                .has_value()); // ensure connection exists
 
     // check positions before //
     const sf::Vector2f expected_ji_socket_0_world_before{19.19f, 19.19f};
