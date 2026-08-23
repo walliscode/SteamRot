@@ -272,8 +272,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   auto connection_one = action::grimoire_machina::check_for_connected_sockets(
       anchor_joint, arm_one_part_one_fi);
   REQUIRE(connection_one.has_value());
-  REQUIRE(connection_one->joint_socket_id == 0);
-  REQUIRE(connection_one->fragment_socket_id == 1);
+  REQUIRE(connection_one->this_socket_id == 0);
+  REQUIRE(connection_one->other_socket_id == 1);
   REQUIRE(arm_one_part_one_fi.GetTotalRotation().asDegrees() == -135.f);
 
   sf::Vector2f expected_arm_one_part_one_socket_1_position{9.19f, 9.19f};
@@ -296,8 +296,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   auto connection_two = action::grimoire_machina::check_for_connected_sockets(
       arm_one_part_two_ji, arm_one_part_one_fi);
   REQUIRE(connection_two.has_value());
-  REQUIRE(connection_two->joint_socket_id == 1);
-  REQUIRE(connection_two->fragment_socket_id == 0);
+  REQUIRE(connection_two->this_socket_id == 1);
+  REQUIRE(connection_two->other_socket_id == 0);
 
   sf::Vector2f expected_arm_one_part_two_socket_1_position{44.55f, 44.55f};
   REQUIRE_THAT(arm_one_part_two_ji.GetTransform().transformPoint(
@@ -324,8 +324,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   auto connection_three = action::grimoire_machina::check_for_connected_sockets(
       arm_one_part_two_ji, arm_one_part_three_fi);
   REQUIRE(connection_three.has_value());
-  REQUIRE(connection_three->joint_socket_id == 0);
-  REQUIRE(connection_three->fragment_socket_id == 0);
+  REQUIRE(connection_three->this_socket_id == 0);
+  REQUIRE(connection_three->other_socket_id == 0);
   REQUIRE(arm_one_part_three_fi.GetTotalRotation().asDegrees() == 135.f);
 
   sf::Vector2f expected_arm_one_part_three_socket_0_position{44.55f, 62.93f};
@@ -351,8 +351,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
       action::grimoire_machina::check_for_connected_sockets(
           anchor_joint, arm_two_part_one_fi);
   REQUIRE(arm_two_connection_two.has_value());
-  REQUIRE(arm_two_connection_two->joint_socket_id == 1);
-  REQUIRE(arm_two_connection_two->fragment_socket_id == 0);
+  REQUIRE(arm_two_connection_two->this_socket_id == 1);
+  REQUIRE(arm_two_connection_two->other_socket_id == 0);
   REQUIRE(arm_two_part_one_fi.GetTotalRotation().asDegrees() == 135.f);
 
   sf::Vector2f expected_arm_two_part_one_socket_0_position{-9.19f, 9.19f};
@@ -374,8 +374,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
       action::grimoire_machina::check_for_connected_sockets(
           arm_two_part_two_ji, arm_two_part_one_fi);
   REQUIRE(arm_two_connection_three.has_value());
-  REQUIRE(arm_two_connection_three->joint_socket_id == 0);
-  REQUIRE(arm_two_connection_three->fragment_socket_id == 1);
+  REQUIRE(arm_two_connection_three->this_socket_id == 0);
+  REQUIRE(arm_two_connection_three->other_socket_id == 1);
   REQUIRE(Catch::Approx(arm_two_part_two_ji.GetTotalRotation().asDegrees()) ==
           -45.f);
 
@@ -402,8 +402,8 @@ TEST_CASE("align_grab_result_to_open_state tests") {
       action::grimoire_machina::check_for_connected_sockets(
           arm_two_part_two_ji, arm_two_part_three_fi);
   REQUIRE(arm_two_connection_four.has_value());
-  REQUIRE(arm_two_connection_four->joint_socket_id == 1);
-  REQUIRE(arm_two_connection_four->fragment_socket_id == 0);
+  REQUIRE(arm_two_connection_four->this_socket_id == 1);
+  REQUIRE(arm_two_connection_four->other_socket_id == 0);
   REQUIRE(Catch::Approx(arm_two_part_three_fi.GetTotalRotation().asDegrees()) ==
           45.f);
 

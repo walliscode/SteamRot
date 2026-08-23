@@ -331,7 +331,7 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
 }
 
 /////////////////////////////////////////////////
-std::optional<JointFragmentConnection>
+std::optional<PartToPartConnection>
 check_for_connected_sockets(const JointInstance &joint_instance,
                             const FragmentInstance &fragment_instance) {
 
@@ -367,9 +367,9 @@ check_for_connected_sockets(const JointInstance &joint_instance,
               fragment_socket->GetConnection()->peer_socket_id ==
                   joint_socket_id) {
 
-            return JointFragmentConnection{joint_id, joint_socket_id,
-                                           fragment_instance.GetId(),
-                                           fragment_socket_id};
+            return PartToPartConnection{joint_id, joint_socket_id,
+                                        fragment_instance.GetId(),
+                                        fragment_socket_id};
           }
         }
       }

@@ -171,9 +171,9 @@ public:
   const sf::Angle &GetTotalRotation() const { return total_rotation; }
 
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief Override the tracked total rotation of this instance.
   ///
-  /// @param angle [TODO:parameter]
+  /// @param angle sf::Angle to set as the new total rotation.
   /////////////////////////////////////////////////
   void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
 
@@ -273,10 +273,12 @@ public:
   }
 
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief Check a specific socket's availability for connection. returns
+  /// false if the socket does not exist or is not available.
   ///
-  /// @param socket_id [TODO:parameter]
-  /// @return [TODO:return]
+  /// @param socket_id Stable unique identifier for the socket to check.
+  /// @return True if the socket exists and is available for connection; false
+  /// otherwise.
   /////////////////////////////////////////////////
   bool CheckIfSocketIsAvailable(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
@@ -286,9 +288,10 @@ public:
     return socket->GetConnectionState() == SocketConnectionState::Available;
   }
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief Check if any socket in this instance is available for connection.
   ///
-  /// @return [TODO:return]
+  /// @return an optional containing the first available socket id, or
+  /// std::nullopt if none are available.
   /////////////////////////////////////////////////
   std::optional<uint32_t> CheckIfAnySocketIsAvailable() const {
     for (const auto &[socket_id, socket] : sockets) {
@@ -300,7 +303,7 @@ public:
   }
 
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief resets all interaction state for all sockets
   /////////////////////////////////////////////////
   void ResetAllSocketsInteractionState() {
     for (auto &[socket_id, socket] : sockets) {
@@ -309,7 +312,7 @@ public:
   }
 
   /////////////////////////////////////////////////
-  /// @brief [TODO:description]
+  /// @brief Resets all state for all sockets
   /////////////////////////////////////////////////
   void ResetAllSocketState() {
     for (auto &[socket_id, socket] : sockets) {
@@ -351,6 +354,21 @@ public:
     }
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Creates a connection between this PartInstance and another
+  /// PartInstance, given the socket IDs to connect.
+  ///
+  /// @tparam OtherTrait The trait type of the other PartInstance, which must be
+  /// compatible with this PartInstance's trait. Compatibility can be found in
+  /// PartTraits.h.
+  /// @param socket_id Stable unique identifier for the socket in this
+  /// PartInstance to connect.
+  /// @param other_instance PartInstance of the other type to connect with.
+  /// @param other_socket_id Stable unique identifier for the socket in the
+  /// other PartInstance to connect.
+  /// @return std::monostate on success, or std::unexpected containing FailInfo
+  /// on failure.
+  /////////////////////////////////////////////////
   template <typename OtherTrait>
     requires CompatibleTraits<Trait, OtherTrait>
   std::expected<std::monostate, FailInfo>
@@ -391,6 +409,85 @@ public:
     other_socket->SetConnection(other_connection);
 
     return std::monostate{};
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief Checks for socket connections between this PartInstance and another
+  /// PartInstance.
+  ///
+  /// @tparam OtherTrait The type of the other PartInstance. Currently not
+  /// limited to any specific PartInstance type.
+  /// @param other_instance PartInstance of the other type to check for
+  /// connections with.
+  /// @return
+  /////////////////////////////////////////////////
+  template <typename OtherTrait>
+  std::optional<PartToPartConnection> CheckForFirstConnectionWithOtherInstance(
+      PartInstance<OtherTrait> &other_instance) const {
+
+    const auto this_id = GetId();
+    const auto other_id = other_instance.GetId();
+
+    // A PartInstance cannot be connected to itself.
+    if (this_id == other_id) {
+      return std::nullopt;
+    }
+
+    // Iterate through all sockets on this instance looking for a connection
+    // whose peer is the other instance.
+    for (const auto &[this_socket_id, this_socket] : sockets) {
+      // Skip sockets that are not marked connected.
+      if (this_socket.GetConnectionState() !=
+          SocketConnectionState::Connected) {
+        continue;
+      }
+
+      // Get this socket's connection payload (optional for safety/integrity).
+      const auto this_conn = this_socket.GetConnection();
+      if (!this_conn) {
+        continue; // State says "connected" but no payload; treat as non-match.
+      }
+
+      // Only consider connections that point to the queried other instance.
+      if (this_conn->peer_part_id != other_id) {
+        continue;
+      }
+
+      // The referenced peer socket must exist on the other instance.
+      const auto *other_socket =
+          other_instance.TryGetSocket(this_conn->peer_socket_id);
+      if (!other_socket) {
+        continue;
+      }
+
+      // Peer socket must also be marked connected.
+      if (other_socket->GetConnectionState() !=
+          SocketConnectionState::Connected) {
+        continue;
+      }
+
+      // Peer socket must have a reciprocal connection payload.
+      const auto other_conn = other_socket->GetConnection();
+      if (!other_conn) {
+        continue;
+      }
+
+      // Reciprocal integrity check:
+      // other_socket must point back to (this_id, this_socket_id).
+      if (other_conn->peer_part_id == this_id &&
+          other_conn->peer_socket_id == this_socket_id) {
+        // First valid, existing part-to-part connection found.
+        return PartToPartConnection{
+            this_id,
+            this_socket_id,
+            other_id,
+            this_conn->peer_socket_id,
+        };
+      }
+    }
+
+    // No valid reciprocal connection found between these two instances.
+    return std::nullopt;
   }
 };
 

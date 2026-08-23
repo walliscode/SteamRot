@@ -156,8 +156,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
         // align the part to the anchor joint
         positioning::grimoire_machina::align_fragment_onto_joint_socket(
-            fi, connection->fragment_socket_id, anchor_joint,
-            connection->joint_socket_id);
+            fi, connection->other_socket_id, anchor_joint,
+            connection->this_socket_id);
       }
 
       // then cycle through the rest of the arm and align each part to the
@@ -188,8 +188,7 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
           // align the part to the previous part
           positioning::grimoire_machina::align_fragment_onto_joint_socket(
-              fi, connection->fragment_socket_id, ji,
-              connection->joint_socket_id);
+              fi, connection->other_socket_id, ji, connection->this_socket_id);
 
         } else if (std::holds_alternative<JointInstance>(
                        part_graph.at(part_id)) &&
@@ -211,8 +210,7 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
           // align the part to the previous part
           positioning::grimoire_machina::align_joint_onto_fragment_socket(
-              ji, connection->joint_socket_id, fi,
-              connection->fragment_socket_id);
+              ji, connection->this_socket_id, fi, connection->other_socket_id);
         } else {
         }
       }

@@ -193,7 +193,7 @@ check_PartGraph_for_connection_readiness(const PartGraph &part_graph);
 /// @param joint_instance JointInstance to check for connected sockets
 /// @param fragment_instance FragmentInstance to check for connected sockets
 /////////////////////////////////////////////////
-std::optional<JointFragmentConnection>
+std::optional<PartToPartConnection>
 check_for_connected_sockets(const JointInstance &joint_instance,
                             const FragmentInstance &fragment_instance);
 } // namespace steamrot::logic::action::grimoire_machina
