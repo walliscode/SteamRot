@@ -15,6 +15,7 @@
 #include "joint_library.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
@@ -278,27 +279,57 @@ TEST_CASE("FragmentInstance::GetSocketLocalAlignmentVector tests",
 
 TEST_CASE("FragmentInstance::GetSocketWorldAlignmentVector tests",
           "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
 
   SECTION("Returns MissingData error when socket does not exist") {
+
+    FragmentInstance fragment_instance(1,
+                                       parts::FragmentRectangleWithOneSocket);
+
     const auto result = fragment_instance.GetSocketWorldAlignmentVector(999);
     REQUIRE_FALSE(result.has_value());
     REQUIRE(result.error().mode == FailMode::MissingData);
   }
 
-  SECTION("Returns local alignment vector when socket exists") {
-    if (fragment_instance.GetSocketCount() == 0) {
-      SUCCEED("No sockets defined by fixture; existence case not applicable.");
-      return;
+  SECTION("Returns local alignment vector modified by the FragmentInstances "
+          "rotation") {
+
+    FragmentInstance fragment_instance(0,
+                                       parts::FragmentRectangleWithTwoSockets);
+
+    REQUIRE_THAT(fragment_instance.GetSocketLocalAlignmentVector(0),
+                 EqualsVector2f({1.f, 0.f}, 0.001f));
+    REQUIRE_THAT(fragment_instance.GetSocketLocalAlignmentVector(1),
+                 EqualsVector2f({-1.f, 0.f}, 0.001f));
+
+    struct TestCase {
+      float rotation_deg;
+      sf::Vector2f expected_socket_0_world_alignment;
+      sf::Vector2f expected_socket_1_world_alignment;
+    };
+
+    std::vector<TestCase> test_cases = {
+        {0.f, {1.f, 0.f}, {0.f, 1.f}},
+        {45.f, {0.707f, 0.707f}, {-0.707f, 0.707f}},
+        {90.f, {0.f, 1.f}, {-1.f, 0.f}},
+        {135.f, {-0.707f, 0.707f}, {-0.707f, -0.707f}},
+        {180.f, {-1.f, 0.f}, {0.f, -1.f}},
+        {225.f, {-0.707f, -0.707f}, {0.707f, -0.707f}},
+        {270.f, {0.f, -1.f}, {1.f, 0.f}},
+    };
+
+    for (const auto &tc : test_cases) {
+      DYNAMIC_SECTION("Rotation " << tc.rotation_deg << " degrees") {
+        fragment_instance.GetTransform().rotate(sf::degrees(tc.rotation_deg));
+        const auto result_0 =
+            fragment_instance.GetSocketWorldAlignmentVector(0);
+        REQUIRE(result_0.has_value());
+        REQUIRE_THAT(
+            result_0.value(),
+            EqualsVector2f(tc.expected_socket_0_world_alignment, 0.001f));
+
+        REQUIRE(result_0->length() == Catch::Approx(1.f));
+      }
     }
-
-    const auto result = fragment_instance.GetSocketWorldAlignmentVector(0);
-    REQUIRE(result.has_value());
-
-    const sf::Vector2f expected =
-        parts::FragmentRectangleWithOneSocket.sockets[0].alignment_vector;
-    REQUIRE(Catch::Approx(result.value().x) == expected.x);
-    REQUIRE(Catch::Approx(result.value().y) == expected.y);
   }
 }
 
@@ -323,8 +354,8 @@ TEST_CASE("FragmentInstance::CheckIfSocketIsAvailable tests",
 
   SECTION("True when socket exists and is unconnected") {
     if (fragment_instance.GetSocketCount() == 0) {
-      SUCCEED(
-          "No sockets defined by fixture; availability case not applicable.");
+      SUCCEED("No sockets defined by fixture; availability case not "
+              "applicable.");
       return;
     }
     REQUIRE(fragment_instance.CheckIfSocketIsAvailable(0));
@@ -333,8 +364,8 @@ TEST_CASE("FragmentInstance::CheckIfSocketIsAvailable tests",
   SECTION("False after connection is created") {
     if (fragment_instance.GetSocketCount() == 0 ||
         joint_instance.GetSocketCount() == 0) {
-      SUCCEED(
-          "No sockets defined by fixtures; connection case not applicable.");
+      SUCCEED("No sockets defined by fixtures; connection case not "
+              "applicable.");
       return;
     }
 
@@ -363,8 +394,8 @@ TEST_CASE("FragmentInstance::CheckIfAnySocketIsAvailable tests",
   SECTION("Returns nullopt when all sockets are connected") {
     if (fragment_instance.GetSocketCount() == 0 ||
         joint_instance.GetSocketCount() == 0) {
-      SUCCEED(
-          "No sockets defined by fixtures; all-connected case not applicable.");
+      SUCCEED("No sockets defined by fixtures; all-connected case not "
+              "applicable.");
       return;
     }
 
@@ -490,8 +521,8 @@ TEST_CASE("FragmentInstance::CreateConnectionWithOtherInstance tests",
   SECTION("Returns InvalidState when attempting duplicate connection") {
     if (fragment_instance.GetSocketCount() == 0 ||
         joint_instance.GetSocketCount() == 0) {
-      SUCCEED(
-          "No sockets defined by fixtures; invalid-state case not applicable.");
+      SUCCEED("No sockets defined by fixtures; invalid-state case not "
+              "applicable.");
       return;
     }
 
@@ -547,7 +578,8 @@ TEST_CASE("FragmentInstance::CheckForFirstConnectionWithOtherInstance tests",
 
     if (fragment_instance.GetSocketCount() == 0 ||
         joint_instance.GetSocketCount() == 0) {
-      FAIL("No sockets defined by fixtures; connection case not applicable.");
+      FAIL("No sockets defined by fixtures; connection case not "
+           "applicable.");
     }
 
     auto create_result = fragment_instance.CreateConnectionWithOtherInstance(
@@ -593,10 +625,10 @@ TEST_CASE("FragmentInstance::CheckForFirstConnectionWithOtherInstance tests",
     REQUIRE(b_to_a->other_socket_id == 0u);
   }
 
-  SECTION(
-      "Returns nullopt when connection exists but points to different part") {
-    // Requires fixture types with >= 1 socket each and ability to form multiple
-    // links.
+  SECTION("Returns nullopt when connection exists but points to different "
+          "part") {
+    // Requires fixture types with >= 1 socket each and ability to form
+    // multiple links.
     FragmentInstance a(1, parts::FragmentRectangleWithOneSocket);
     JointInstance b(2, parts::JointSquareWithOneSocket);
     JointInstance c(3, parts::JointSquareWithOneSocket);
@@ -720,8 +752,8 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
       sf::Vector2f expected_fragment_socket_0_world_after_align;
       sf::Vector2f expected_fragment_socket_1_world_after_align;
 
-      // expected joint world positions (arranged by joint rotation; should not
-      // change)
+      // expected joint world positions (arranged by joint rotation; should
+      // not change)
       sf::Vector2f expected_joint_socket_0_world;
       sf::Vector2f expected_joint_socket_1_world;
       sf::Vector2f expected_joint_socket_pivot_world;

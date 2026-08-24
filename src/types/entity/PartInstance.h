@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <iostream>
 #include <map>
 #include <string>
 #include <variant>
@@ -497,23 +498,40 @@ public:
   AlignOntoOtherPartInstance(const uint32_t socket_id,
                              const PartInstance<OtherTrait> &other_instance,
                              const uint32_t other_socket_id) {
+    // --- debug helpers ---
+    auto dbg_vec = [](const char *label, const sf::Vector2f &v) {
+      std::cout << label << " = (" << v.x << ", " << v.y << ")\n";
+    };
+    auto dbg_angle_deg = [](const sf::Angle a) { return a.asDegrees(); };
+
+    std::cout << "\n[AlignOntoOtherPartInstance] BEGIN\n";
+    std::cout << "  this_id=" << GetId()
+              << ", other_id=" << other_instance.GetId()
+              << ", socket_id=" << socket_id
+              << ", other_socket_id=" << other_socket_id << "\n";
+
     // check sockets exist on both instances
     SocketType *socket = TryGetSocketMutable(socket_id);
-    if (!socket)
+    if (!socket) {
+      std::cout << "  FAIL: this socket does not exist\n";
       return std::unexpected(FailInfo{
           FailMode::BadValue,
           std::format("socket_id {} does not exist on part instance {}",
                       socket_id, GetId())});
+    }
 
     auto *other_socket = other_instance.TryGetSocket(other_socket_id);
-    if (!other_socket)
+    if (!other_socket) {
+      std::cout << "  FAIL: other socket does not exist\n";
       return std::unexpected(FailInfo{
           FailMode::BadValue,
           std::format("socket_id {} does not exist on part instance {}",
                       other_socket_id, other_instance.GetId())});
+    }
 
     // check for existing connection between the two instances
     if (!CheckForFirstConnectionWithOtherInstance(other_instance).has_value()) {
+      std::cout << "  FAIL: no connection exists between instances\n";
       return std::unexpected(FailInfo{
           FailMode::InvalidState,
           std::format("no connection exists between part instance {} and part "
@@ -521,12 +539,11 @@ public:
                       GetId(), other_instance.GetId())});
     }
 
-    // attempt toget the world alignment vector of both sockets
-    // return an error if either socket's world alignment vector cannot be
-    // retrieved
+    // attempt to get the world alignment vector of both sockets
     const auto this_socket_world_alignment_vector_result =
         GetSocketWorldAlignmentVector(socket_id);
     if (!this_socket_world_alignment_vector_result.has_value()) {
+      std::cout << "  FAIL: this world alignment vector unavailable\n";
       return std::unexpected(FailInfo{
           FailMode::InvalidState,
           std::format(
@@ -534,9 +551,11 @@ public:
               "part instance {}",
               socket_id, GetId())});
     }
+
     const auto other_socket_world_alignment_vector_result =
         other_instance.GetSocketWorldAlignmentVector(other_socket_id);
     if (!other_socket_world_alignment_vector_result.has_value()) {
+      std::cout << "  FAIL: other world alignment vector unavailable\n";
       return std::unexpected(FailInfo{
           FailMode::InvalidState,
           std::format(
@@ -551,29 +570,52 @@ public:
     const sf::Vector2f other_socket_world_alignment_vector =
         other_socket_world_alignment_vector_result.value();
 
+    dbg_vec("  this_socket_world_alignment_vector",
+            this_socket_world_alignment_vector);
+    dbg_vec("  other_socket_world_alignment_vector",
+            other_socket_world_alignment_vector);
+
     // calculate cross and dot for atan2
     float cross_val = this_socket_world_alignment_vector.cross(
         other_socket_world_alignment_vector);
     float dot_val = this_socket_world_alignment_vector.dot(
         other_socket_world_alignment_vector);
 
+    std::cout << "  cross_val=" << cross_val << ", dot_val=" << dot_val << "\n";
+
     // angle in radians from source -> target
     float angle = std::atan2(cross_val, dot_val);
     const sf::Angle rotation_angle = sf::radians(angle);
+
+    std::cout << "  angle_rad=" << angle
+              << ", rotation_angle_deg=" << dbg_angle_deg(rotation_angle)
+              << "\n";
 
     // create a rotation transform from this angle
     sf::Transform rotation_transform{sf::Transform::Identity};
     rotation_transform.rotate(rotation_angle);
 
+    const sf::Vector2f this_socket_world_before =
+        GetSocketWorldPosition(socket_id);
+    const sf::Vector2f other_socket_world =
+        other_instance.GetSocketWorldPosition(other_socket_id);
+
+    dbg_vec("  this_socket_world_before", this_socket_world_before);
+    dbg_vec("  other_socket_world", other_socket_world);
+
     // rotate the fragment socket world position by the rotation transform
     const sf::Vector2f rotated_this_socket_world_position =
-        rotation_transform.transformPoint(GetSocketWorldPosition(socket_id));
+        rotation_transform.transformPoint(this_socket_world_before);
+
+    dbg_vec("  rotated_this_socket_world_position",
+            rotated_this_socket_world_position);
 
     // calculate the translation vector to align the rotated socket with the
     // other socket
     const sf::Vector2f translation_vector =
-        other_instance.GetSocketWorldPosition(other_socket_id) -
-        rotated_this_socket_world_position;
+        other_socket_world - rotated_this_socket_world_position;
+
+    dbg_vec("  translation_vector", translation_vector);
 
     // BUILD THE FINAL TRANSFORM //
     // reset the transform to identity
@@ -585,6 +627,15 @@ public:
 
     // update the total rotation of this instance
     total_rotation = rotation_angle;
+
+    std::cout << "  total_rotation_deg(set)=" << dbg_angle_deg(total_rotation)
+              << "\n";
+
+    const sf::Vector2f this_socket_world_after =
+        GetSocketWorldPosition(socket_id);
+    dbg_vec("  this_socket_world_after", this_socket_world_after);
+
+    std::cout << "[AlignOntoOtherPartInstance] END\n";
 
     return std::monostate{};
   }

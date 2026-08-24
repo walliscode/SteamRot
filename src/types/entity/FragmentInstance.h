@@ -90,7 +90,9 @@ public:
                    "Socket with ID " + std::to_string(socket_id) +
                        " does not exist in this FragmentInstance."});
     }
-    return socket->GetLocalAlignmentVector().normalized();
+
+    return transform.transformPoint(socket->GetLocalAlignmentVector())
+        .normalized();
   }
 };
 } // namespace steamrot
