@@ -20,6 +20,7 @@
 #include <cmath>
 #include <cstdint>
 #include <expected>
+#include <format>
 #include <map>
 #include <string>
 #include <variant>
@@ -488,6 +489,104 @@ public:
 
     // No valid reciprocal connection found between these two instances.
     return std::nullopt;
+  }
+
+  template <typename OtherTrait>
+    requires CompatibleTraits<Trait, OtherTrait>
+  std::expected<std::monostate, FailInfo>
+  AlignOntoOtherPartInstance(const uint32_t socket_id,
+                             const PartInstance<OtherTrait> &other_instance,
+                             const uint32_t other_socket_id) {
+    // check sockets exist on both instances
+    SocketType *socket = TryGetSocketMutable(socket_id);
+    if (!socket)
+      return std::unexpected(FailInfo{
+          FailMode::BadValue,
+          std::format("socket_id {} does not exist on part instance {}",
+                      socket_id, GetId())});
+
+    auto *other_socket = other_instance.TryGetSocket(other_socket_id);
+    if (!other_socket)
+      return std::unexpected(FailInfo{
+          FailMode::BadValue,
+          std::format("socket_id {} does not exist on part instance {}",
+                      other_socket_id, other_instance.GetId())});
+
+    // check for existing connection between the two instances
+    if (!CheckForFirstConnectionWithOtherInstance(other_instance).has_value()) {
+      return std::unexpected(FailInfo{
+          FailMode::InvalidState,
+          std::format("no connection exists between part instance {} and part "
+                      "instance {}",
+                      GetId(), other_instance.GetId())});
+    }
+
+    // attempt toget the world alignment vector of both sockets
+    // return an error if either socket's world alignment vector cannot be
+    // retrieved
+    const auto this_socket_world_alignment_vector_result =
+        GetSocketWorldAlignmentVector(socket_id);
+    if (!this_socket_world_alignment_vector_result.has_value()) {
+      return std::unexpected(FailInfo{
+          FailMode::InvalidState,
+          std::format(
+              "failed to get world alignment vector for socket_id {} on "
+              "part instance {}",
+              socket_id, GetId())});
+    }
+    const auto other_socket_world_alignment_vector_result =
+        other_instance.GetSocketWorldAlignmentVector(other_socket_id);
+    if (!other_socket_world_alignment_vector_result.has_value()) {
+      return std::unexpected(FailInfo{
+          FailMode::InvalidState,
+          std::format(
+              "failed to get world alignment vector for socket_id {} on "
+              "part instance {}",
+              other_socket_id, other_instance.GetId())});
+    }
+
+    // pull out the values
+    const sf::Vector2f this_socket_world_alignment_vector =
+        this_socket_world_alignment_vector_result.value();
+    const sf::Vector2f other_socket_world_alignment_vector =
+        other_socket_world_alignment_vector_result.value();
+
+    // calculate cross and dot for atan2
+    float cross_val = this_socket_world_alignment_vector.cross(
+        other_socket_world_alignment_vector);
+    float dot_val = this_socket_world_alignment_vector.dot(
+        other_socket_world_alignment_vector);
+
+    // angle in radians from source -> target
+    float angle = std::atan2(cross_val, dot_val);
+    const sf::Angle rotation_angle = sf::radians(angle);
+
+    // create a rotation transform from this angle
+    sf::Transform rotation_transform{sf::Transform::Identity};
+    rotation_transform.rotate(rotation_angle);
+
+    // rotate the fragment socket world position by the rotation transform
+    const sf::Vector2f rotated_this_socket_world_position =
+        rotation_transform.transformPoint(GetSocketWorldPosition(socket_id));
+
+    // calculate the translation vector to align the rotated socket with the
+    // other socket
+    const sf::Vector2f translation_vector =
+        other_instance.GetSocketWorldPosition(other_socket_id) -
+        rotated_this_socket_world_position;
+
+    // BUILD THE FINAL TRANSFORM //
+    // reset the transform to identity
+    transform = sf::Transform::Identity;
+    // translate the rotated socket to the other socket's world position
+    transform.translate(translation_vector);
+    // rotate the instance to align the socket alignment vectors
+    transform.rotate(rotation_angle);
+
+    // update the total rotation of this instance
+    total_rotation = rotation_angle;
+
+    return std::monostate{};
   }
 };
 
