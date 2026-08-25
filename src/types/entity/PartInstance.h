@@ -15,6 +15,7 @@
 #include "PartTraits.h"
 #include "SocketState.h"
 #include <SFML/Graphics/Transform.hpp>
+#include <SFML/Graphics/Transformable.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
@@ -28,7 +29,7 @@
 
 namespace steamrot {
 
-template <typename Trait> class PartInstance {
+template <typename Trait> class PartInstance : public sf::Transformable {
 
 public:
   using SocketType = typename Trait::SocketType;
@@ -51,7 +52,7 @@ protected:
   /// @brief The global transform of this instance, including translation,
   /// rotation, and scale.
   /////////////////////////////////////////////////
-  sf::Transform transform{sf::Transform::Identity};
+  // sf::Transform transform{sf::Transform::Identity};
 
   /////////////////////////////////////////////////
   /// @brief Stable unique identifier for this instance.
@@ -67,7 +68,7 @@ protected:
   /////////////////////////////////////////////////
   /// @brief Total rotation applied to this instance in degrees.
   /////////////////////////////////////////////////
-  sf::Angle total_rotation{sf::degrees(0.f)};
+  // sf::Angle total_rotation{sf::degrees(0.f)};
 
   /////////////////////////////////////////////////
   /// @brief Find a socket by id.
@@ -147,44 +148,45 @@ public:
   ///
   /// @return Mutable reference to this instance transform.
   /////////////////////////////////////////////////
-  sf::Transform &GetTransform() { return transform; }
+  // sf::Transform &GetTransform() { return transform; }
 
   /////////////////////////////////////////////////
   /// @brief Get read-only access to the global transform.
   ///
   /// @return Const reference to this instance transform.
   /////////////////////////////////////////////////
-  const sf::Transform &GetTransform() const { return transform; }
+  // const sf::Transform &GetTransform() const { return transform; }
 
   /////////////////////////////////////////////////
   /// @brief Replace the global transform.
   ///
   /// @param new_transform New transform to apply.
   /////////////////////////////////////////////////
-  void SetTransform(const sf::Transform &new_transform) {
-    transform = new_transform;
-  }
+  // void SetTransform(const sf::Transform &new_transform) {
+  //   transform = new_transform;
+  // }
 
   /////////////////////////////////////////////////
   /// @brief Get read-only access to the total rotation of this instance.
   ///
   /// @return Const reference to the total rotation angle.
   /////////////////////////////////////////////////
-  const sf::Angle &GetTotalRotation() const { return total_rotation; }
+  // const sf::Angle &GetTotalRotation() const { return total_rotation; }
 
   /////////////////////////////////////////////////
   /// @brief Override the tracked total rotation of this instance.
   ///
   /// @param angle sf::Angle to set as the new total rotation.
   /////////////////////////////////////////////////
-  void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
+  // void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
 
   /////////////////////////////////////////////////
   /// @brief Add an angle to the tracked total rotation.
   ///
   /// @param angle Angle to accumulate.
   /////////////////////////////////////////////////
-  void AddToTotalRotation(const sf::Angle &angle) { total_rotation += angle; }
+  // void AddToTotalRotation(const sf::Angle &angle) { total_rotation += angle;
+  // }
 
   /////////////////////////////////////////////////
   /// @brief Find a socket by id (const overload).
@@ -240,7 +242,7 @@ public:
       return sf::Vector2f(0.f, 0.f);
     }
 
-    return transform.transformPoint(socket->GetLocalPosition());
+    return getTransform().transformPoint(socket->GetLocalPosition());
   }
 
   const sf::Vector2f GetSocketLocalAlignmentVector(uint32_t socket_id) const {
@@ -498,17 +500,6 @@ public:
   AlignOntoOtherPartInstance(const uint32_t socket_id,
                              const PartInstance<OtherTrait> &other_instance,
                              const uint32_t other_socket_id) {
-    // --- debug helpers ---
-    auto dbg_vec = [](const char *label, const sf::Vector2f &v) {
-      std::cout << label << " = (" << v.x << ", " << v.y << ")\n";
-    };
-    auto dbg_angle_deg = [](const sf::Angle a) { return a.asDegrees(); };
-
-    std::cout << "\n[AlignOntoOtherPartInstance] BEGIN\n";
-    std::cout << "  this_id=" << GetId()
-              << ", other_id=" << other_instance.GetId()
-              << ", socket_id=" << socket_id
-              << ", other_socket_id=" << other_socket_id << "\n";
 
     // check sockets exist on both instances
     SocketType *socket = TryGetSocketMutable(socket_id);
@@ -539,6 +530,7 @@ public:
                       GetId(), other_instance.GetId())});
     }
 
+    // ROTATION - THIS NEEDS TO GO FIRST //
     // attempt to get the world alignment vector of both sockets
     const auto this_socket_world_alignment_vector_result =
         GetSocketWorldAlignmentVector(socket_id);
@@ -570,72 +562,76 @@ public:
     const sf::Vector2f other_socket_world_alignment_vector =
         other_socket_world_alignment_vector_result.value();
 
-    dbg_vec("  this_socket_world_alignment_vector",
-            this_socket_world_alignment_vector);
-    dbg_vec("  other_socket_world_alignment_vector",
-            other_socket_world_alignment_vector);
-
-    // calculate cross and dot for atan2
-    float cross_val = this_socket_world_alignment_vector.cross(
+    // calculate angle from this socket alignment vector to the other socket
+    // alignment vector
+    const sf::Angle rotation_angle = this_socket_world_alignment_vector.angleTo(
         other_socket_world_alignment_vector);
-    float dot_val = this_socket_world_alignment_vector.dot(
-        other_socket_world_alignment_vector);
+    std::cout << "  rotation_angle = " << rotation_angle.asDegrees() << "\n";
 
-    std::cout << "  cross_val=" << cross_val << ", dot_val=" << dot_val << "\n";
+    // rotate this instance by the calculated angle around the pivot point of
+    // this socket
+    rotate(rotation_angle);
 
-    // angle in radians from source -> target
-    float angle = std::atan2(cross_val, dot_val);
-    const sf::Angle rotation_angle = sf::radians(angle);
+    // TRANSLATION //
+    // move from this sockets world position to the other sockets world position
+    move(other_instance.GetSocketWorldPosition(other_socket_id) -
+         GetSocketWorldPosition(socket_id));
 
-    std::cout << "  angle_rad=" << angle
-              << ", rotation_angle_deg=" << dbg_angle_deg(rotation_angle)
-              << "\n";
-
-    // create a rotation transform from this angle
-    sf::Transform rotation_transform{sf::Transform::Identity};
-    rotation_transform.rotate(rotation_angle);
-
-    const sf::Vector2f this_socket_world_before =
-        GetSocketWorldPosition(socket_id);
-    const sf::Vector2f other_socket_world =
-        other_instance.GetSocketWorldPosition(other_socket_id);
-
-    dbg_vec("  this_socket_world_before", this_socket_world_before);
-    dbg_vec("  other_socket_world", other_socket_world);
-
-    // rotate the fragment socket world position by the rotation transform
-    const sf::Vector2f rotated_this_socket_world_position =
-        rotation_transform.transformPoint(this_socket_world_before);
-
-    dbg_vec("  rotated_this_socket_world_position",
-            rotated_this_socket_world_position);
-
-    // calculate the translation vector to align the rotated socket with the
-    // other socket
-    const sf::Vector2f translation_vector =
-        other_socket_world - rotated_this_socket_world_position;
-
-    dbg_vec("  translation_vector", translation_vector);
-
-    // BUILD THE FINAL TRANSFORM //
-    // reset the transform to identity
-    transform = sf::Transform::Identity;
-    // translate the rotated socket to the other socket's world position
-    transform.translate(translation_vector);
-    // rotate the instance to align the socket alignment vectors
-    transform.rotate(rotation_angle);
-
-    // update the total rotation of this instance
-    total_rotation = rotation_angle;
-
-    std::cout << "  total_rotation_deg(set)=" << dbg_angle_deg(total_rotation)
-              << "\n";
-
-    const sf::Vector2f this_socket_world_after =
-        GetSocketWorldPosition(socket_id);
-    dbg_vec("  this_socket_world_after", this_socket_world_after);
-
-    std::cout << "[AlignOntoOtherPartInstance] END\n";
+    // // calculate cross and dot for atan2
+    // float cross_val = this_socket_world_alignment_vector.cross(
+    //     other_socket_world_alignment_vector);
+    // float dot_val = this_socket_world_alignment_vector.dot(
+    //     other_socket_world_alignment_vector);
+    //
+    //
+    //
+    // // angle in radians from source -> target
+    // float angle = std::atan2(cross_val, dot_val);
+    // const sf::Angle rotation_angle = sf::radians(angle);
+    //
+    // // create a rotation transform from this angle
+    // sf::Transform rotation_transform{sf::Transform::Identity};
+    // rotation_transform.rotate(rotation_angle);
+    //
+    // const sf::Vector2f this_socket_world_before =
+    //     GetSocketWorldPosition(socket_id);
+    // const sf::Vector2f other_socket_world =
+    //     other_instance.GetSocketWorldPosition(other_socket_id);
+    //
+    // dbg_vec("  this_socket_world_before", this_socket_world_before);
+    // dbg_vec("  other_socket_world", other_socket_world);
+    //
+    // // rotate the fragment socket world position by the rotation transform
+    // const sf::Vector2f rotated_this_socket_world_position =
+    //     rotation_transform.transformPoint(this_socket_world_before);
+    //
+    // dbg_vec("  rotated_this_socket_world_position",
+    //         rotated_this_socket_world_position);
+    //
+    // // calculate the translation vector to align the rotated socket with the
+    // // other socket
+    // const sf::Vector2f translation_vector =
+    //     other_socket_world - rotated_this_socket_world_position;
+    //
+    // dbg_vec("  translation_vector", translation_vector);
+    //
+    // // BUILD THE FINAL TRANSFORM //
+    // // reset the transform to identity
+    // getTransform() = sf::Transform::Identity;
+    // // translate the rotated socket to the other socket's world position
+    // setPosition(translation_vector);
+    // // rotate the instance to align the socket alignment vectors
+    // setRotation(rotation_angle);
+    //
+    // // // update the total rotation of this instance
+    // // total_rotation = rotation_angle;
+    //
+    // // std::cout << "  total_rotation_deg(set)=" <<
+    // // dbg_angle_deg(total_rotation)
+    // //           << "\n";
+    //
+    // const sf::Vector2f this_socket_world_after =
+    //     GetSocketWorldPosition(socket_id);
 
     return std::monostate{};
   }

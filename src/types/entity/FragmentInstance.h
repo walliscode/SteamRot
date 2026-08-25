@@ -91,7 +91,8 @@ public:
                        " does not exist in this FragmentInstance."});
     }
 
-    return transform.transformPoint(socket->GetLocalAlignmentVector())
+    return getTransform()
+        .transformPoint(socket->GetLocalAlignmentVector())
         .normalized();
   }
 };

@@ -49,91 +49,94 @@ void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
                                       const JointInstance &joint_instance,
                                       const uint32_t joint_socket_id) {
 
-  // check that the fragment socket id is valid
-  const FragmentSocketState *fragment_socket =
-      fragment_instance.TryGetSocket(fragment_socket_id);
-  if (!fragment_socket)
-    return;
-
-  // check that the joint socket id is valid
-  const JointSocketState *joint_socket =
-      joint_instance.TryGetSocket(joint_socket_id);
-  if (!joint_socket)
-    return;
-
-  // check that the fragment socket is connected to the joint socket
-  auto check_connection_result =
-      joint_instance.CheckForFirstConnectionWithOtherInstance(
-          fragment_instance);
-  if (!check_connection_result.has_value()) {
-    return;
-  }
-
-  // cache world position of the sockets
-  sf::Vector2f fragment_socket_world_position =
-      fragment_instance.GetSocketWorldPosition(fragment_socket_id);
-
-  sf::Vector2f joint_socket_world_position =
-      joint_instance.GetSocketWorldPosition(joint_socket_id);
-
-  // get the fragment socket alignment vector in world space and check it is not
-  // 0,0
-  auto fragment_align_vector_result =
-      fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
-  //[TODO: this should be a fatal error, but for now we just ignore]
-  sf::Vector2f fragment_socket_alignment_vector =
-      fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-
-  if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-    return;
-  }
-
-  // get the joint socket alignment vector in world space and check it is not
-  // 0,0
-  auto joint_align_vector_result =
-      joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
-  // [TODO: this should be a fatal error, but for now we just ignore]
-  sf::Vector2f joint_socket_alignment_vector =
-      joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-
-  if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f})
-    return;
-
-  sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
-      fragment_socket_alignment_vector, joint_socket_alignment_vector);
-
-  sf::Transform rotation_transform;
-  rotation_transform.rotate(rotation_angle);
-
-  const sf::Vector2f rotated_fragment_socket_world =
-      rotation_transform.transformPoint(fragment_socket_world_position);
-
-  // calculate the transform
-  sf::Vector2f translation_vector =
-      joint_socket_world_position -
-      // apply the rotation to the fragment socket world position before
-      // calculating the translation vector
-      rotated_fragment_socket_world;
-
-  // BUILDING THE TRANSFORM //
-  // transforms are applied in reverse order, so we build translate then rotate
-
-  // reset the transform of the fragment instance to identity
-  fragment_instance.SetTransform(sf::Transform::Identity);
-
-  // transform the fragment instance to the joint socket position
-  fragment_instance.GetTransform().translate(translation_vector);
-
-  // rotate the fragment instance to align the fragment socket alignment vector
-  // with the joint socket alignment vector
-  fragment_instance.GetTransform().rotate(rotation_angle);
-
-  // UPDATE FRAGMENT INSTANCE STATE //
-  fragment_instance.AddToTotalRotation(rotation_angle);
-
-  const sf::Vector2f fragment_socket_world_after =
-      fragment_instance.GetTransform().transformPoint(
-          fragment_socket->GetLocalPosition());
+  // // check that the fragment socket id is valid
+  // const FragmentSocketState *fragment_socket =
+  //     fragment_instance.TryGetSocket(fragment_socket_id);
+  // if (!fragment_socket)
+  //   return;
+  //
+  // // check that the joint socket id is valid
+  // const JointSocketState *joint_socket =
+  //     joint_instance.TryGetSocket(joint_socket_id);
+  // if (!joint_socket)
+  //   return;
+  //
+  // // check that the fragment socket is connected to the joint socket
+  // auto check_connection_result =
+  //     joint_instance.CheckForFirstConnectionWithOtherInstance(
+  //         fragment_instance);
+  // if (!check_connection_result.has_value()) {
+  //   return;
+  // }
+  //
+  // // cache world position of the sockets
+  // sf::Vector2f fragment_socket_world_position =
+  //     fragment_instance.GetSocketWorldPosition(fragment_socket_id);
+  //
+  // sf::Vector2f joint_socket_world_position =
+  //     joint_instance.GetSocketWorldPosition(joint_socket_id);
+  //
+  // // get the fragment socket alignment vector in world space and check it is
+  // not
+  // // 0,0
+  // auto fragment_align_vector_result =
+  //     fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
+  // //[TODO: this should be a fatal error, but for now we just ignore]
+  // sf::Vector2f fragment_socket_alignment_vector =
+  //     fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
+  //
+  // if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+  //   return;
+  // }
+  //
+  // // get the joint socket alignment vector in world space and check it is not
+  // // 0,0
+  // auto joint_align_vector_result =
+  //     joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
+  // // [TODO: this should be a fatal error, but for now we just ignore]
+  // sf::Vector2f joint_socket_alignment_vector =
+  //     joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
+  //
+  // if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f})
+  //   return;
+  //
+  // sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
+  //     fragment_socket_alignment_vector, joint_socket_alignment_vector);
+  //
+  // sf::Transform rotation_transform;
+  // rotation_transform.rotate(rotation_angle);
+  //
+  // const sf::Vector2f rotated_fragment_socket_world =
+  //     rotation_transform.transformPoint(fragment_socket_world_position);
+  //
+  // // calculate the transform
+  // sf::Vector2f translation_vector =
+  //     joint_socket_world_position -
+  //     // apply the rotation to the fragment socket world position before
+  //     // calculating the translation vector
+  //     rotated_fragment_socket_world;
+  //
+  // // BUILDING THE TRANSFORM //
+  // // transforms are applied in reverse order, so we build translate then
+  // rotate
+  //
+  // // reset the transform of the fragment instance to identity
+  // fragment_instance.SetTransform(sf::Transform::Identity);
+  //
+  // // transform the fragment instance to the joint socket position
+  // fragment_instance.GetTransform().translate(translation_vector);
+  //
+  // // rotate the fragment instance to align the fragment socket alignment
+  // vector
+  // // with the joint socket alignment vector
+  // fragment_instance.GetTransform().rotate(rotation_angle);
+  //
+  // // UPDATE FRAGMENT INSTANCE STATE //
+  // fragment_instance.AddToTotalRotation(rotation_angle);
+  //
+  // const sf::Vector2f fragment_socket_world_after =
+  //     fragment_instance.GetTransform().transformPoint(
+  //         fragment_socket->GetLocalPosition());
 }
 
 /////////////////////////////////////////////////
@@ -142,81 +145,85 @@ void align_joint_onto_fragment_socket(JointInstance &joint_instance,
                                       const FragmentInstance &fragment_instance,
                                       const uint32_t fragment_socket_id) {
 
-  // check that the joint socket id is valid
-  const JointSocketState *joint_socket =
-      joint_instance.TryGetSocket(joint_socket_id);
-  if (!joint_socket)
-    return;
-
-  // check that the fragment socket id is valid
-  const FragmentSocketState *fragment_socket =
-      fragment_instance.TryGetSocket(fragment_socket_id);
-  if (!fragment_socket)
-    return;
-
-  // check that the joint socket is connected to the fragment socket
-  auto check_connection_result =
-      joint_instance.CheckForFirstConnectionWithOtherInstance(
-          fragment_instance);
-  if (!check_connection_result.has_value()) {
-    return;
-  }
-
-  // ROTATION //
-
-  // get the fragment socket alignment vector in world space and check it is not
-  // 0,0
-  auto fragment_align_vector_result =
-      fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
-
-  sf::Vector2f fragment_socket_alignment_vector =
-      fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-
-  if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-    return;
-  }
-
-  // get the joint socket alignment vector in world space and check it is not
-  // 0,0
-  auto joint_align_vector_result =
-      joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
-  sf::Vector2f joint_socket_alignment_vector =
-      joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-
-  if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-    return;
-  }
-
-  // calculate the rotation angle required to align the joint socket alignment
-  // vector with the fragment socket alignment vector
-  sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
-      joint_socket_alignment_vector, fragment_socket_alignment_vector);
-
-  // build a rotation transform to apply before translation
-  sf::Transform rotation_transform{sf::Transform::Identity};
-  rotation_transform.rotate(rotation_angle);
-
-  // TRANSLATION //
-  // make sure to rotate the joint instance before calculating the translation
-  // vector
-  sf::Vector2f fragment_socket_world =
-      fragment_instance.GetSocketWorldPosition(fragment_socket_id);
-
-  sf::Vector2f rotated_joint_socket_world = rotation_transform.transformPoint(
-      joint_instance.GetSocketWorldPosition(joint_socket_id));
-
-  sf::Vector2f translation_vector =
-      fragment_socket_world - rotated_joint_socket_world;
-
-  // BUILD THE TRANSFORM //
-  // transforms are applied in reverse order, so we build translate then
-  // rotate to achieve rotation then translation
-  joint_instance.SetTransform(sf::Transform::Identity);
-  joint_instance.GetTransform().translate(translation_vector);
-  joint_instance.GetTransform().rotate(rotation_angle);
-
-  // add to the total rotation of the joint instance
-  joint_instance.AddToTotalRotation(rotation_angle);
+  // // check that the joint socket id is valid
+  // const JointSocketState *joint_socket =
+  //     joint_instance.TryGetSocket(joint_socket_id);
+  // if (!joint_socket)
+  //   return;
+  //
+  // // check that the fragment socket id is valid
+  // const FragmentSocketState *fragment_socket =
+  //     fragment_instance.TryGetSocket(fragment_socket_id);
+  // if (!fragment_socket)
+  //   return;
+  //
+  // // check that the joint socket is connected to the fragment socket
+  // auto check_connection_result =
+  //     joint_instance.CheckForFirstConnectionWithOtherInstance(
+  //         fragment_instance);
+  // if (!check_connection_result.has_value()) {
+  //   return;
+  // }
+  //
+  // // ROTATION //
+  //
+  // // get the fragment socket alignment vector in world space and check it is
+  // not
+  // // 0,0
+  // auto fragment_align_vector_result =
+  //     fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
+  //
+  // sf::Vector2f fragment_socket_alignment_vector =
+  //     fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
+  //
+  // if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+  //   return;
+  // }
+  //
+  // // get the joint socket alignment vector in world space and check it is not
+  // // 0,0
+  // auto joint_align_vector_result =
+  //     joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
+  // sf::Vector2f joint_socket_alignment_vector =
+  //     joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
+  //
+  // if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
+  //   return;
+  // }
+  //
+  // // calculate the rotation angle required to align the joint socket
+  // alignment
+  // // vector with the fragment socket alignment vector
+  // sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
+  //     joint_socket_alignment_vector, fragment_socket_alignment_vector);
+  //
+  // // build a rotation transform to apply before translation
+  // sf::Transform rotation_transform{sf::Transform::Identity};
+  // rotation_transform.rotate(rotation_angle);
+  //
+  // // TRANSLATION //
+  // // make sure to rotate the joint instance before calculating the
+  // translation
+  // // vector
+  // sf::Vector2f fragment_socket_world =
+  //     fragment_instance.GetSocketWorldPosition(fragment_socket_id);
+  //
+  // sf::Vector2f rotated_joint_socket_world =
+  // rotation_transform.transformPoint(
+  //     joint_instance.GetSocketWorldPosition(joint_socket_id));
+  //
+  // sf::Vector2f translation_vector =
+  //     fragment_socket_world - rotated_joint_socket_world;
+  //
+  // // BUILD THE TRANSFORM //
+  // // transforms are applied in reverse order, so we build translate then
+  // // rotate to achieve rotation then translation
+  // joint_instance.SetTransform(sf::Transform::Identity);
+  // joint_instance.GetTransform().translate(translation_vector);
+  // joint_instance.GetTransform().rotate(rotation_angle);
+  //
+  // // add to the total rotation of the joint instance
+  // joint_instance.AddToTotalRotation(rotation_angle);
 }
 
 /////////////////////////////////////////////////
@@ -248,9 +255,9 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
     sf::Vector2f center = va.getBounds().getCenter();
 
     // reset the transform of the fragment instance to identity
-    fragment_instance->SetTransform(sf::Transform::Identity);
+
     // apply the offset to the transform of the fragment instance
-    fragment_instance->GetTransform().translate(-center);
+    fragment_instance->setPosition(-center);
 
     return;
   }
@@ -261,12 +268,11 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
       return;
 
     // reset the transform of the joint instance to identity
-    joint_instance->SetTransform(sf::Transform::Identity);
+
     // we work of the origin of the joint for positioning
     // most Joints are likely to be set at 0,0 when creating, but we should
     // still account for the possibility of an offset
-    joint_instance->GetTransform().translate(
-        -joint_instance->GetPart().socket_pivot);
+    joint_instance->setPosition(-joint_instance->GetPart().socket_pivot);
 
     return;
   }
@@ -451,7 +457,7 @@ get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
                             .positioning_views[ViewDirection::Front]
                             .getBounds();
     // apply the local transform of the fragment instance to the bounding box
-    return fragment_instance->GetTransform().transformRect(box);
+    return fragment_instance->getTransform().transformRect(box);
 
   } else if (const JointInstance *joint_instance =
                  std::get_if<JointInstance>(&part_variant)) {
@@ -461,7 +467,7 @@ get_transformed_bounding_box(const PartInstanceVariant &part_variant) {
                             .getBounds();
 
     // apply the local transform of the joint instance to the bounding box
-    return joint_instance->GetTransform().transformRect(box);
+    return joint_instance->getTransform().transformRect(box);
   }
   // if part_variant is neither a FragmentInstance nor a JointInstance, return
   // an empty bounding box

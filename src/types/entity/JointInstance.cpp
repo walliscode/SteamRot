@@ -21,6 +21,10 @@ JointInstance::JointInstance(const uint32_t id, const Joint &joint)
   for (uint32_t i = 0; i < joint.socket_config.socket_count; ++i) {
     sockets.emplace(i, JointSocketState{});
   }
+
+  // set the origin of the joint to the pivot point defined in the joint's
+  // socket config
+  setOrigin(joint.socket_pivot);
 }
 
 /////////////////////////////////////////////////
@@ -31,6 +35,10 @@ JointInstance::JointInstance(const uint32_t id, const Joint &joint,
   for (uint32_t i = 0; i < joint.socket_config.socket_count; ++i) {
     sockets.emplace(i, JointSocketState{});
   }
+
+  // set the origin of the joint to the pivot point defined in the joint's
+  // socket config
+  setOrigin(joint.socket_pivot);
 }
 
 /////////////////////////////////////////////////
@@ -47,42 +55,33 @@ void JointInstance::PositionSockets(
 /////////////////////////////////////////////////
 std::expected<sf::Vector2f, FailInfo>
 JointInstance::GetSocketWorldAlignmentVector(uint32_t socket_id) const {
+  std::cout << std::format("[JointInstance::GetSocketWorldAlignmentVector] "
+                           "START joint_id={} socket_id={}\n",
+                           GetId(), socket_id);
 
   // if the socket does not exist, return an error
   const JointSocketState *socket = TryGetSocket(socket_id);
   if (!socket) {
+    std::cout << "  FAIL: socket does not exist\n";
     return std::unexpected(
         FailInfo{FailMode::MissingData,
                  std::format("Socket ID {} does not exist.", socket_id)});
   }
 
-  // calculate the local alignment vector going from the socket pivot to the
-  // socket's local position
-  const sf::Vector2f &local_alignment_vector =
-      socket->GetLocalPosition() - part.socket_pivot;
+  // translate the socket and pivot to world space using the joint's transform
+  const sf::Vector2f socket_world =
+      getTransform().transformPoint(socket->GetLocalPosition());
+  const sf::Vector2f pivot_world =
+      getTransform().transformPoint(part.socket_pivot);
 
-  // if the local alignment vector is zero, return an error
-  if (local_alignment_vector == sf::Vector2f(0.f, 0.f)) {
-    return std::unexpected(FailInfo{
-        FailMode::InvalidState,
-        std::format("Socket ID {} has zero-length local alignment vector.",
-                    socket_id)});
-  }
+  // calculate the alignment vector from the pivot to the socket in world space
+  const sf::Vector2f alignment_vector = socket_world - pivot_world;
 
-  // using the total rotation of the joint, rotate the local alignment vector to
-  // get the world alignment vector
-  sf::Transform rotation_transform;
-  rotation_transform.rotate(total_rotation);
-
-  const sf::Vector2f return_vector =
-      rotation_transform.transformPoint(local_alignment_vector);
-
-  return return_vector.normalized();
+  // return the normalized alignment vector
+  return alignment_vector.normalized();
 }
 
 /////////////////////////////////////////////////
-#include <cmath> // std::cos, std::sin, std::fmod, std::abs
-
 void maximise_joint_socket_spread(JointInstance::Sockets &joint_sockets,
                                   const sf::Vector2f &pivot,
                                   const SocketConfig &config) {
