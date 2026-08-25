@@ -31,8 +31,6 @@ TEST_CASE("FragmentInstance::FragmentInstance tests", "[FragmentInstance]") {
             &parts::FragmentRectangleWithOneSocket);
     REQUIRE(fragment_instance.GetSocketCount() ==
             parts::FragmentRectangleWithOneSocket.sockets.size());
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            0.0f);
   }
 
   SECTION("Construct with id, fragment, and alias") {
@@ -94,64 +92,6 @@ TEST_CASE("FragmentInstance::GetSocketCount tests", "[FragmentInstance]") {
   SECTION("Returns number of initialized sockets") {
     REQUIRE(fragment_instance.GetSocketCount() ==
             parts::FragmentRectangleWithOneSocket.sockets.size());
-  }
-}
-
-TEST_CASE("FragmentInstance::GetTransform and SetTransform tests",
-          "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket,
-                                     "test_fragment");
-
-  SECTION("Default transform is identity") {
-    const sf::Vector2f out =
-        fragment_instance.GetTransform().transformPoint({3.f, 4.f});
-    REQUIRE(Catch::Approx(out.x) == 3.f);
-    REQUIRE(Catch::Approx(out.y) == 4.f);
-  }
-
-  SECTION("SetTransform replaces transform") {
-    sf::Transform t;
-    t.translate({10.f, 20.f});
-    fragment_instance.SetTransform(t);
-
-    const sf::Vector2f out =
-        fragment_instance.GetTransform().transformPoint({1.f, 2.f});
-    REQUIRE(Catch::Approx(out.x) == 11.f);
-    REQUIRE(Catch::Approx(out.y) == 22.f);
-  }
-}
-
-TEST_CASE("FragmentInstance::GetTotalRotation and SetTotalRotation tests",
-          "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
-
-  SECTION("Initial total rotation is 0 degrees") {
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            0.0f);
-  }
-
-  SECTION("SetTotalRotation replaces tracked rotation") {
-    fragment_instance.SetTotalRotation(sf::degrees(33.f));
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            33.f);
-  }
-}
-
-TEST_CASE("FragmentInstance::AddToTotalRotation tests", "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
-
-  SECTION("Accumulates rotation values") {
-    fragment_instance.AddToTotalRotation(sf::degrees(45.0f));
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            45.0f);
-
-    fragment_instance.AddToTotalRotation(sf::degrees(30.0f));
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            75.0f);
-
-    fragment_instance.AddToTotalRotation(sf::degrees(-90.0f));
-    REQUIRE(Catch::Approx(fragment_instance.GetTotalRotation().asDegrees()) ==
-            -15.0f);
   }
 }
 
@@ -234,14 +174,8 @@ TEST_CASE("FragmentInstance::GetSocketWorldPosition tests",
   }
 
   SECTION("Applies transform to local socket position") {
-    if (fragment_instance.GetSocketCount() == 0) {
-      SUCCEED("No sockets defined by fixture; existence case not applicable.");
-      return;
-    }
-
-    sf::Transform t;
-    t.translate({10.f, 20.f});
-    fragment_instance.SetTransform(t);
+    fragment_instance.move(
+        {10.f, 20.f}); // apply translation to the fragment instance
 
     const sf::Vector2f local =
         parts::FragmentRectangleWithOneSocket.sockets[0].local_position;
@@ -319,7 +253,7 @@ TEST_CASE("FragmentInstance::GetSocketWorldAlignmentVector tests",
 
     for (const auto &tc : test_cases) {
       DYNAMIC_SECTION("Rotation " << tc.rotation_deg << " degrees") {
-        fragment_instance.GetTransform().rotate(sf::degrees(tc.rotation_deg));
+        fragment_instance.rotate(sf::degrees(tc.rotation_deg));
         const auto result_0 =
             fragment_instance.GetSocketWorldAlignmentVector(0);
         REQUIRE(result_0.has_value());
@@ -341,6 +275,7 @@ TEST_CASE("FragmentInstance::CheckMouseOverSockets tests",
     REQUIRE_NOTHROW(fragment_instance.CheckMouseOverSockets({0.f, 0.f}));
     REQUIRE_NOTHROW(fragment_instance.CheckMouseOverSockets({100.f, 100.f}));
   }
+  // [TODO: ] add proper tests
 }
 
 TEST_CASE("FragmentInstance::CheckIfSocketIsAvailable tests",
@@ -682,14 +617,13 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
           "[FragmentInstance]") {
   // Arrange
   FragmentInstance fragment_instance{0, parts::FragmentRectangleWithTwoSockets};
-  fragment_instance.SetTransform(sf::Transform::Identity); // reset transform
+
   REQUIRE_THAT(fragment_instance.GetSocketLocalPosition(0),
                steamrot::tests::EqualsVector2f({0.f, 5.f}, 0.001f));
   REQUIRE_THAT(fragment_instance.GetSocketLocalPosition(1),
                steamrot::tests::EqualsVector2f({50.f, 5.f}, 0.001f));
 
   JointInstance joint_instance{1, parts::JointSquareWithTwoSockets};
-  joint_instance.SetTransform(sf::Transform::Identity); // reset transform
   joint_instance.PositionSockets(
       JointSocketPositioningStrategy::MaximizeDistance);
 
@@ -767,22 +701,22 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
          0,
          0.f,
          0.f,
-         {23.f, 10.f},
-         {73.f, 10.f},
-         {23.f, 10.f},
-         {10.f, 23.f},
-         {10.f, 10.f},
+         {13.f, 0.f},
+         {63.f, 0.f},
+         {13.f, 0.f},
+         {0.f, 13.f},
+         {0.f, 0.f},
          0.01f},
         {"joint 0°, connect frag[0] -> joint[1]",
          0,
          1,
          0.f,
          90.f,
-         {10.f, 23.f},
-         {10.f, 73.f},
-         {23.f, 10.f},
-         {10.f, 23.f},
-         {10.f, 10.f},
+         {0.f, 13.f},
+         {0.f, 63.f},
+         {13.f, 0.f},
+         {0.f, 13.f},
+         {0.f, 0.f},
          0.01f},
 
         {"joint 90°, connect frag[0] -> joint[0]",
@@ -790,22 +724,22 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
          0,
          90.f,
          90.f,
-         {10.f, 23.f},
-         {10.f, 73.f},
-         {10.f, 23.f},
-         {-3.f, 10.f},
-         {10.f, 10.f},
+         {0.f, 13.f},
+         {0.f, 63.f},
+         {0.f, 13.f},
+         {-13.f, 0.f},
+         {0.f, 0.f},
          0.01f},
         {"joint 90°, connect frag[0] -> joint[1]",
          0,
          1,
          90.f,
          -180.f,
-         {-3.f, 10.f},
-         {-53.f, 10.f},
-         {10.f, 23.f},
-         {-3.f, 10.f},
-         {10.f, 10.f},
+         {-13.f, 0.f},
+         {-63.f, 0.f},
+         {0.f, 13.f},
+         {-13.f, 0.f},
+         {0.f, 0.f},
          0.01f},
 
         {"joint 180°, connect frag[0] -> joint[0]",
@@ -813,22 +747,22 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
          0,
          180.f,
          -180.f,
-         {-3.f, 10.f},
-         {-53.f, 10.f},
-         {-3.f, 10.f},
-         {10.f, -3.f},
-         {10.f, 10.f},
+         {-13.f, 0.f},
+         {-63.f, 0.f},
+         {-13.f, 0.f},
+         {0.f, -13.f},
+         {0.f, 0.f},
          0.01f},
         {"joint 270°, connect frag[0] -> joint[0]",
          0,
          0,
          270.f,
          -90.f,
-         {10.f, -3.f},
-         {10.f, -53.f},
-         {10.f, -3.f},
-         {23.f, 10.f},
-         {10.f, 10.f},
+         {0.f, -13.f},
+         {0.f, -63.f},
+         {0.f, -13.f},
+         {13.f, 0.f},
+         {0.f, 0.f},
          0.01f},
 
         {"joint 0°, connect frag[1] -> joint[0]",
@@ -836,22 +770,22 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
          0,
          0.f,
          180.f,
-         {73.f, 10.f},
-         {23.f, 10.f},
-         {23.f, 10.f},
-         {10.f, 23.f},
-         {10.f, 10.f},
+         {63.f, 0.f},
+         {13.f, 0.f},
+         {13.f, 0.f},
+         {0.f, 13.f},
+         {0.f, 0.f},
          0.01f},
         {"joint 0°, connect frag[1] -> joint[1]",
          1,
          1,
          0.f,
          -90.f,
-         {10.f, 73.f},
-         {10.f, 23.f},
-         {23.f, 10.f},
-         {10.f, 23.f},
-         {10.f, 10.f},
+         {0.f, 63.f},
+         {0.f, 13.f},
+         {13.f, 0.f},
+         {0.f, 13.f},
+         {0.f, 0.f},
          0.01f},
 
         {"joint 90°, connect frag[1] -> joint[0]",
@@ -859,40 +793,38 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
          0,
          90.f,
          -90.f,
-         {10.f, 73.f},
-         {10.f, 23.f},
-         {10.f, 23.f},
-         {-3.f, 10.f},
-         {10.f, 10.f},
+         {0.f, 63.f},
+         {0.f, 13.f},
+         {0.f, 13.f},
+         {-13.f, 0.f},
+         {0.f, 0.f},
          0.01f},
         {"joint 270°, connect frag[1] -> joint[1]",
          1,
          1,
          270.f,
          180.f,
-         {73.f, 10.f},
-         {23.f, 10.f},
-         {10.f, -3.f},
-         {23.f, 10.f},
-         {10.f, 10.f},
+         {63.f, 0.f},
+         {13.f, 0.f},
+         {0.f, -13.f},
+         {13.f, 0.f},
+         {0.f, 0.f},
          0.01f},
     };
 
     for (const auto &tc : cases) {
       DYNAMIC_SECTION(tc.name) {
         // reset per-case state so cases are isolated
-        fragment_instance.SetTransform(sf::Transform::Identity);
-        fragment_instance.SetTotalRotation(sf::degrees(0.f));
-        joint_instance.SetTransform(sf::Transform::Identity);
-        joint_instance.SetTotalRotation(sf::degrees(0.f));
+        fragment_instance.setPosition({0.f, 0.f});
+        fragment_instance.setRotation(sf::degrees(0.f));
+        joint_instance.setPosition({0.f, 0.f});
+        joint_instance.setRotation(sf::degrees(0.f));
         joint_instance.PositionSockets(
             JointSocketPositioningStrategy::MaximizeDistance);
 
         // ARRANGE //
         if (tc.joint_rotation_deg != 0.f) {
-          joint_instance.GetTransform().rotate(
-              sf::degrees(tc.joint_rotation_deg), {10.f, 10.f});
-          joint_instance.SetTotalRotation(sf::degrees(tc.joint_rotation_deg));
+          joint_instance.rotate(sf::degrees(tc.joint_rotation_deg));
         }
 
         auto connection_result =
@@ -934,7 +866,7 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
                            tc.position_tolerance));
 
         REQUIRE(normalize_degrees_0_360(
-                    fragment_instance.GetTotalRotation().asDegrees()) ==
+                    fragment_instance.getRotation().asDegrees()) ==
                 Catch::Approx(
                     normalize_degrees_0_360(tc.expected_fragment_rotation_deg))
                     .margin(0.1f));

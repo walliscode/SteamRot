@@ -71,28 +71,29 @@ void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
           camera_state, mouse_position, scene_texture);
   mr_ghost.m_position = world_mouse_position;
 
-  std::visit(overload{[&](FragmentInstance &instance) {
-                        const sf::FloatRect bounds =
-                            instance.GetPart()
-                                .positioning_views[ViewDirection::Front]
-                                .getBounds();
-                        instance.SetTransform(compute_instance_transform(
-                            bounds, world_mouse_position,
-                            mr_ghost.m_rotation_degrees));
-                      },
-                      [&](JointInstance &instance) {
-                        const sf::FloatRect bounds =
-                            instance.GetPart()
-                                .positioning_views[ViewDirection::Front]
-                                .getBounds();
-                        instance.SetTransform(compute_instance_transform(
-                            bounds, world_mouse_position,
-                            mr_ghost.m_rotation_degrees));
-                      },
-                      [](std::monostate &) {
-                        // std::monostate: nothing to update
-                      }},
-             mr_ghost.m_instance);
+  // [TODO:] needs redoing here
+  // std::visit(overload{[&](FragmentInstance &instance) {
+  //                       const sf::FloatRect bounds =
+  //                           instance.GetPart()
+  //                               .positioning_views[ViewDirection::Front]
+  //                               .getBounds();
+  //                       instance.SetTransform(compute_instance_transform(
+  //                           bounds, world_mouse_position,
+  //                           mr_ghost.m_rotation_degrees));
+  //                     },
+  //                     [&](JointInstance &instance) {
+  //                       const sf::FloatRect bounds =
+  //                           instance.GetPart()
+  //                               .positioning_views[ViewDirection::Front]
+  //                               .getBounds();
+  //                       instance.SetTransform(compute_instance_transform(
+  //                           bounds, world_mouse_position,
+  //                           mr_ghost.m_rotation_degrees));
+  //                     },
+  //                     [](std::monostate &) {
+  //                       // std::monostate: nothing to update
+  //                     }},
+  //            mr_ghost.m_instance);
 }
 
 /////////////////////////////////////////////////

@@ -69,7 +69,7 @@ public:
   /// @return sf::Vector2f representing the world position of the socket pivot.
   /////////////////////////////////////////////////
   sf::Vector2f GetSocketPivotWorldPosition() const {
-    return GetTransform().transformPoint(part.socket_pivot);
+    return getTransform().transformPoint(part.socket_pivot);
   }
 
   /////////////////////////////////////////////////
