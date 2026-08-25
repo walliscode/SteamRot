@@ -55,14 +55,11 @@ void JointInstance::PositionSockets(
 /////////////////////////////////////////////////
 std::expected<sf::Vector2f, FailInfo>
 JointInstance::GetSocketWorldAlignmentVector(uint32_t socket_id) const {
-  std::cout << std::format("[JointInstance::GetSocketWorldAlignmentVector] "
-                           "START joint_id={} socket_id={}\n",
-                           GetId(), socket_id);
 
   // if the socket does not exist, return an error
   const JointSocketState *socket = TryGetSocket(socket_id);
   if (!socket) {
-    std::cout << "  FAIL: socket does not exist\n";
+
     return std::unexpected(
         FailInfo{FailMode::MissingData,
                  std::format("Socket ID {} does not exist.", socket_id)});
