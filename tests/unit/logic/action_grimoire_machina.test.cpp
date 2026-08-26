@@ -206,7 +206,7 @@ TEST_CASE("PlaceGhostOnScaffold first piece: fragment instance has identity "
 
   REQUIRE(std::get<steamrot::FragmentInstance>(
               grimoire_machina.m_scaffold_form->parts.at(0))
-              .GetTransform() == sf::Transform::Identity);
+              .getTransform() == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -268,7 +268,7 @@ TEST_CASE(
 
   REQUIRE(std::get<steamrot::JointInstance>(
               grimoire_machina.m_scaffold_form->parts.at(0))
-              .GetTransform() == sf::Transform::Identity);
+              .getTransform() == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -525,7 +525,7 @@ TEST_CASE("PlaceFirstPiece: placed fragment has identity transform",
 
   REQUIRE(std::get<steamrot::FragmentInstance>(
               grimoire_machina.m_scaffold_form->parts.at(0))
-              .GetTransform() == sf::Transform::Identity);
+              .getTransform() == sf::Transform::Identity);
 }
 
 TEST_CASE("PlaceFirstPiece: placed joint has identity transform",
@@ -544,7 +544,7 @@ TEST_CASE("PlaceFirstPiece: placed joint has identity transform",
 
   REQUIRE(std::get<steamrot::JointInstance>(
               grimoire_machina.m_scaffold_form->parts.at(0))
-              .GetTransform() == sf::Transform::Identity);
+              .getTransform() == sf::Transform::Identity);
 }
 
 /////////////////////////////////////////////////

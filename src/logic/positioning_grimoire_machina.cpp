@@ -8,13 +8,14 @@
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
 #include "JointInstance.h"
-#include "SocketState.h"
+#include "MachinaFormScaffold.h"
+#include "PartInstance.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
-#include <iostream>
+
 #include <variant>
 
 namespace steamrot::logic::positioning::grimoire_machina {
@@ -41,189 +42,6 @@ sf::Angle rotation_of_vector_to_target_vector(const sf::Vector2f &source,
   sf::Angle result = sf::radians(angle);
 
   return result;
-}
-
-/////////////////////////////////////////////////
-void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
-                                      const uint32_t fragment_socket_id,
-                                      const JointInstance &joint_instance,
-                                      const uint32_t joint_socket_id) {
-
-  // // check that the fragment socket id is valid
-  // const FragmentSocketState *fragment_socket =
-  //     fragment_instance.TryGetSocket(fragment_socket_id);
-  // if (!fragment_socket)
-  //   return;
-  //
-  // // check that the joint socket id is valid
-  // const JointSocketState *joint_socket =
-  //     joint_instance.TryGetSocket(joint_socket_id);
-  // if (!joint_socket)
-  //   return;
-  //
-  // // check that the fragment socket is connected to the joint socket
-  // auto check_connection_result =
-  //     joint_instance.CheckForFirstConnectionWithOtherInstance(
-  //         fragment_instance);
-  // if (!check_connection_result.has_value()) {
-  //   return;
-  // }
-  //
-  // // cache world position of the sockets
-  // sf::Vector2f fragment_socket_world_position =
-  //     fragment_instance.GetSocketWorldPosition(fragment_socket_id);
-  //
-  // sf::Vector2f joint_socket_world_position =
-  //     joint_instance.GetSocketWorldPosition(joint_socket_id);
-  //
-  // // get the fragment socket alignment vector in world space and check it is
-  // not
-  // // 0,0
-  // auto fragment_align_vector_result =
-  //     fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
-  // //[TODO: this should be a fatal error, but for now we just ignore]
-  // sf::Vector2f fragment_socket_alignment_vector =
-  //     fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-  //
-  // if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-  //   return;
-  // }
-  //
-  // // get the joint socket alignment vector in world space and check it is not
-  // // 0,0
-  // auto joint_align_vector_result =
-  //     joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
-  // // [TODO: this should be a fatal error, but for now we just ignore]
-  // sf::Vector2f joint_socket_alignment_vector =
-  //     joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-  //
-  // if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f})
-  //   return;
-  //
-  // sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
-  //     fragment_socket_alignment_vector, joint_socket_alignment_vector);
-  //
-  // sf::Transform rotation_transform;
-  // rotation_transform.rotate(rotation_angle);
-  //
-  // const sf::Vector2f rotated_fragment_socket_world =
-  //     rotation_transform.transformPoint(fragment_socket_world_position);
-  //
-  // // calculate the transform
-  // sf::Vector2f translation_vector =
-  //     joint_socket_world_position -
-  //     // apply the rotation to the fragment socket world position before
-  //     // calculating the translation vector
-  //     rotated_fragment_socket_world;
-  //
-  // // BUILDING THE TRANSFORM //
-  // // transforms are applied in reverse order, so we build translate then
-  // rotate
-  //
-  // // reset the transform of the fragment instance to identity
-  // fragment_instance.SetTransform(sf::Transform::Identity);
-  //
-  // // transform the fragment instance to the joint socket position
-  // fragment_instance.GetTransform().translate(translation_vector);
-  //
-  // // rotate the fragment instance to align the fragment socket alignment
-  // vector
-  // // with the joint socket alignment vector
-  // fragment_instance.GetTransform().rotate(rotation_angle);
-  //
-  // // UPDATE FRAGMENT INSTANCE STATE //
-  // fragment_instance.AddToTotalRotation(rotation_angle);
-  //
-  // const sf::Vector2f fragment_socket_world_after =
-  //     fragment_instance.GetTransform().transformPoint(
-  //         fragment_socket->GetLocalPosition());
-}
-
-/////////////////////////////////////////////////
-void align_joint_onto_fragment_socket(JointInstance &joint_instance,
-                                      const uint32_t joint_socket_id,
-                                      const FragmentInstance &fragment_instance,
-                                      const uint32_t fragment_socket_id) {
-
-  // // check that the joint socket id is valid
-  // const JointSocketState *joint_socket =
-  //     joint_instance.TryGetSocket(joint_socket_id);
-  // if (!joint_socket)
-  //   return;
-  //
-  // // check that the fragment socket id is valid
-  // const FragmentSocketState *fragment_socket =
-  //     fragment_instance.TryGetSocket(fragment_socket_id);
-  // if (!fragment_socket)
-  //   return;
-  //
-  // // check that the joint socket is connected to the fragment socket
-  // auto check_connection_result =
-  //     joint_instance.CheckForFirstConnectionWithOtherInstance(
-  //         fragment_instance);
-  // if (!check_connection_result.has_value()) {
-  //   return;
-  // }
-  //
-  // // ROTATION //
-  //
-  // // get the fragment socket alignment vector in world space and check it is
-  // not
-  // // 0,0
-  // auto fragment_align_vector_result =
-  //     fragment_instance.GetSocketWorldAlignmentVector(fragment_socket_id);
-  //
-  // sf::Vector2f fragment_socket_alignment_vector =
-  //     fragment_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-  //
-  // if (fragment_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-  //   return;
-  // }
-  //
-  // // get the joint socket alignment vector in world space and check it is not
-  // // 0,0
-  // auto joint_align_vector_result =
-  //     joint_instance.GetSocketWorldAlignmentVector(joint_socket_id);
-  // sf::Vector2f joint_socket_alignment_vector =
-  //     joint_align_vector_result.value_or(sf::Vector2f{0.f, 0.f});
-  //
-  // if (joint_socket_alignment_vector == sf::Vector2f{0.f, 0.f}) {
-  //   return;
-  // }
-  //
-  // // calculate the rotation angle required to align the joint socket
-  // alignment
-  // // vector with the fragment socket alignment vector
-  // sf::Angle rotation_angle = rotation_of_vector_to_target_vector(
-  //     joint_socket_alignment_vector, fragment_socket_alignment_vector);
-  //
-  // // build a rotation transform to apply before translation
-  // sf::Transform rotation_transform{sf::Transform::Identity};
-  // rotation_transform.rotate(rotation_angle);
-  //
-  // // TRANSLATION //
-  // // make sure to rotate the joint instance before calculating the
-  // translation
-  // // vector
-  // sf::Vector2f fragment_socket_world =
-  //     fragment_instance.GetSocketWorldPosition(fragment_socket_id);
-  //
-  // sf::Vector2f rotated_joint_socket_world =
-  // rotation_transform.transformPoint(
-  //     joint_instance.GetSocketWorldPosition(joint_socket_id));
-  //
-  // sf::Vector2f translation_vector =
-  //     fragment_socket_world - rotated_joint_socket_world;
-  //
-  // // BUILD THE TRANSFORM //
-  // // transforms are applied in reverse order, so we build translate then
-  // // rotate to achieve rotation then translation
-  // joint_instance.SetTransform(sf::Transform::Identity);
-  // joint_instance.GetTransform().translate(translation_vector);
-  // joint_instance.GetTransform().rotate(rotation_angle);
-  //
-  // // add to the total rotation of the joint instance
-  // joint_instance.AddToTotalRotation(rotation_angle);
 }
 
 /////////////////////////////////////////////////
@@ -290,147 +108,92 @@ void position_machina_form_scaffold(PartGraph &parts) {
 
 /////////////////////////////////////////////////
 void position_part_graph(PartGraph &part_graph) {
-  std::cout << "[position_part_graph] begin, size=" << part_graph.size()
-            << "\n";
 
-  if (part_graph.empty()) {
-    std::cout << "[position_part_graph] graph is empty, returning\n";
-    return;
-  }
-
-  std::unordered_set<uint32_t> visited;
-  std::unordered_set<uint32_t> in_stack; // optional: cycle diagnostics
-
-  auto position_part_graph_recursive = [&](this auto &&self,
-                                           const uint32_t part_id) -> void {
-    std::cout << "[position_part_graph_recursive] enter part_id=" << part_id
-              << "\n";
-
-    // already done
-    if (visited.contains(part_id)) {
-      std::cout << "  [skip] already visited part_id=" << part_id << "\n";
-      return;
-    }
-
-    // part must exist
-    auto current_it = part_graph.find(part_id);
-    if (current_it == part_graph.end()) {
-      std::cout << "  [warn] part_id not found: " << part_id << "\n";
-      return;
-    }
-
-    // mark EARLY to prevent cycles/back-edges from re-processing this node
-    visited.insert(part_id);
-    in_stack.insert(part_id);
-
-    std::visit(
-        [&](auto &current_part_instance) {
-          using CurrentT = std::decay_t<decltype(current_part_instance)>;
-
-          for (const auto &[current_socket_id, current_socket_state] :
-               current_part_instance.GetSockets()) {
-
-            if (current_socket_state.GetConnectionState() !=
-                    SocketConnectionState::Connected ||
-                !current_socket_state.GetConnection().has_value()) {
-              std::cout << "      [skip] socket not fully connected\n";
-              continue;
-            }
-
-            const SocketConnection &connection =
-                *current_socket_state.GetConnection();
-
-            // early skip if peer already visited
-            if (visited.contains(connection.peer_part_id)) {
-              std::cout
-                  << "      [skip] connected part already visited part_id="
-                  << connection.peer_part_id << "\n";
-              continue;
-            }
-
-            auto connected_it = part_graph.find(connection.peer_part_id);
-            if (connected_it == part_graph.end()) {
-              std::cout << "      [warn] connected part not found: "
-                        << connection.peer_part_id << "\n";
-              continue;
-            }
-
-            auto &connected_part_variant = connected_it->second;
-
-            std::cout << "      [visit-check] current="
-                      << (std::is_same_v<CurrentT, FragmentInstance>
-                              ? "Fragment"
-                              : "Joint")
-                      << " connected_is_joint="
-                      << (std::holds_alternative<JointInstance>(
-                              connected_part_variant)
-                              ? "true"
-                              : "false")
-                      << " connected_is_fragment="
-                      << (std::holds_alternative<FragmentInstance>(
-                              connected_part_variant)
-                              ? "true"
-                              : "false")
-                      << "\n";
-
-            if constexpr (std::is_same_v<CurrentT, FragmentInstance>) {
-              if (std::holds_alternative<JointInstance>(
-                      connected_part_variant)) {
-                std::cout << "      [align] Joint onto Fragment "
-                          << "(peer_socket=" << connection.peer_socket_id
-                          << ", current_socket=" << current_socket_id << ")\n";
-
-                align_joint_onto_fragment_socket(
-                    std::get<JointInstance>(connected_part_variant),
-                    connection.peer_socket_id, current_part_instance,
-                    current_socket_id);
-              } else {
-                std::cout << "      [skip] Fragment -> non-Joint pairing\n";
-                continue;
-              }
-            } else if constexpr (std::is_same_v<CurrentT, JointInstance>) {
-              if (std::holds_alternative<FragmentInstance>(
-                      connected_part_variant)) {
-                std::cout << "      [align] Fragment onto Joint "
-                          << "(peer_socket=" << connection.peer_socket_id
-                          << ", current_socket=" << current_socket_id << ")\n";
-
-                align_fragment_onto_joint_socket(
-                    std::get<FragmentInstance>(connected_part_variant),
-                    connection.peer_socket_id, current_part_instance,
-                    current_socket_id);
-              } else {
-                std::cout << "      [skip] Joint -> non-Fragment pairing\n";
-                continue;
-              }
-            }
-
-            if (in_stack.contains(connection.peer_part_id)) {
-              std::cout << "      [cycle] peer currently in recursion stack "
-                           "part_id="
-                        << connection.peer_part_id << "\n";
-            }
-
-            std::cout << "      [recurse] -> part_id="
-                      << connection.peer_part_id << "\n";
-            self(connection.peer_part_id);
-          }
-        },
-        current_it->second);
-
-    in_stack.erase(part_id);
-    std::cout << "[position_part_graph_recursive] exit part_id=" << part_id
-              << " visited_count=" << visited.size() << "\n";
-  };
-
-  if (part_graph.find(0) != part_graph.end()) {
-    std::cout << "[start] root part_id=0\n";
-    position_part_graph_recursive(0);
-  } else {
-    std::cout << "[warn] part_id 0 not found in part graph\n";
-  }
-
-  std::cout << "[position_part_graph] end\n";
+  // if (part_graph.empty()) {
+  //   return;
+  // }
+  //
+  // std::unordered_set<uint32_t> visited;
+  // std::unordered_set<uint32_t> in_stack; // optional: cycle diagnostics
+  //
+  // auto position_part_graph_recursive = [&](this auto &&self,
+  //                                          const uint32_t part_id) -> void {
+  //   // already done
+  //   if (visited.contains(part_id)) {
+  //     return;
+  //   }
+  //
+  //   // part must exist
+  //   auto current_it = part_graph.find(part_id);
+  //   if (current_it == part_graph.end()) {
+  //     return;
+  //   }
+  //   const auto &current_part_variant = current_it->second;
+  //
+  //   // mark EARLY to prevent cycles/back-edges from re-processing this node
+  //   visited.insert(part_id);
+  //   in_stack.insert(part_id);
+  //
+  //   // define lambda for aligning two part instances togther
+  //   auto align_parts = [](const PartInstanceVariant &parent_instance,
+  //                         const uint32_t parent_socket_id,
+  //                         PartInstanceVariant &child_instance,
+  //                         const uint32_t child_socket_id) {
+  //
+  //   };
+  //
+  //   std::visit(
+  //       [&](auto &current_part_instance) {
+  //         for (const auto &[current_socket_id, current_socket_state] :
+  //              current_part_instance.GetSockets()) {
+  //
+  //           if (current_socket_state.GetConnectionState() !=
+  //                   SocketConnectionState::Connected ||
+  //               !current_socket_state.GetConnection().has_value()) {
+  //             continue;
+  //           }
+  //
+  //           const SocketConnection &connection =
+  //               *current_socket_state.GetConnection();
+  //
+  //           // early skip if peer already visited
+  //           if (visited.contains(connection.peer_part_id)) {
+  //             continue;
+  //           }
+  //
+  //           auto connected_it = part_graph.find(connection.peer_part_id);
+  //           if (connected_it == part_graph.end()) {
+  //             continue;
+  //           }
+  //
+  //           auto &connected_part_variant = connected_it->second;
+  //
+  //           std::visit(
+  //               [&](auto &connected_part_instance) {
+  //                 // align the connected part instance to the current part
+  //                 auto result = try_align_part_instances(
+  //                     current_part_instance, current_socket_id,
+  //                     connected_part_instance, connection.peer_socket_id);
+  //                 // recursively position the connected part
+  //               },
+  //               connected_part_variant);
+  //         }
+  //       },
+  //       current_it->second);
+  //
+  //   in_stack.erase(part_id);
+  //   std::cout << "[position_part_graph_recursive] exit part_id=" << part_id
+  //             << " visited_count=" << visited.size() << "\n";
+  // };
+  //
+  // if (part_graph.find(0) != part_graph.end()) {
+  //   std::cout << "[start] root part_id=0\n";
+  //   position_part_graph_recursive(0);
+  // } else {
+  //   std::cout << "[warn] part_id 0 not found in part graph\n";
+  // }
+  //
+  // std::cout << "[position_part_graph] end\n";
 }
 /////////////////////////////////////////////////
 void calculate_composite_box(sf::FloatRect &composite_box,
