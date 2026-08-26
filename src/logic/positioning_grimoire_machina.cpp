@@ -57,43 +57,14 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts) {
     return;
   }
 
-  // get variant
-  if (FragmentInstance *fragment_instance =
-          std::get_if<FragmentInstance>(&it->second)) {
-
-    // if views is empty, return early
-    if (fragment_instance->GetPart().positioning_views.empty())
-      return;
-
-    // working off the FRONT view only, get the center of the bounding box of
-    // the FRONT view's vertex array
-    const sf::VertexArray &va =
-        fragment_instance->GetPart().positioning_views[ViewDirection::Front];
-    // get centre using built in sfml functions
-    sf::Vector2f center = va.getBounds().getCenter();
-
-    // reset the transform of the fragment instance to identity
-
-    // apply the offset to the transform of the fragment instance
-    fragment_instance->setPosition(-center);
-
-    return;
-  }
-
-  if (JointInstance *joint_instance = std::get_if<JointInstance>(&it->second)) {
-    // if views is empty, return early
-    if (joint_instance->GetPart().positioning_views.empty())
-      return;
-
-    // reset the transform of the joint instance to identity
-
-    // we work of the origin of the joint for positioning
-    // most Joints are likely to be set at 0,0 when creating, but we should
-    // still account for the possibility of an offset
-    joint_instance->setPosition(-joint_instance->GetPart().socket_pivot);
-
-    return;
-  }
+  // this should be positioned at 0,0
+  std::visit(
+      [&](auto &part_instance) {
+        // set the position of the part instance to 0,0 which should be the
+        // center of the crafting scene
+        part_instance.setPosition({0, 0});
+      },
+      it->second);
 }
 
 /////////////////////////////////////////////////

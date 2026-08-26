@@ -8,14 +8,12 @@
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
 #include "Fragment.h"
-#include "Joint.h"
 #include "JointInstance.h"
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
 #include "fragment_library.h"
-#include "grimoire_machina_test_helpers.h"
 #include "joint_library.h"
 #include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -28,7 +26,7 @@ using namespace steamrot::logic::positioning::grimoire_machina;
 TEST_CASE("position_first_part_of_machina_form tests",
           "[positioning_grimoire_machina]") {
   // Arrange
-  steamrot::PartGraph parts;
+  PartGraph parts;
 
   SECTION("Does not throw when parts is empty") {
     // Act & Assert
@@ -37,67 +35,52 @@ TEST_CASE("position_first_part_of_machina_form tests",
 
   SECTION("Does not throw when Fragment has no sockets") {
     // Arrange
-    steamrot::Fragment fragment{}; // empty fragment
-    steamrot::FragmentInstance fragment_instance{
-        0, fragment}; // instance of that fragment
-    parts.emplace(fragment_instance.GetId(),
-                  fragment_instance); // add to parts map
+    Fragment fragment{};
+    FragmentInstance fragment_instance{0, fragment};
+    parts.emplace(fragment_instance.GetId(), fragment_instance);
 
     REQUIRE(parts.size() == 1); // sanity check
     // Act & Assert
-    REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
-                        position_first_part_of_machina_form_scaffold(parts));
+    REQUIRE_NOTHROW(position_first_part_of_machina_form_scaffold(parts));
   }
 
   SECTION("Positions centre of first Fragmentinstance's FRONT view at 0,0") {
     // Arrange
-    auto fragment = steamrot::tests::MakeFragmentWithFrontView();
-    steamrot::FragmentInstance fragment_instance{0, fragment};
+
+    FragmentInstance fragment_instance{0,
+                                       parts::FragmentRectangleWithOneSocket};
     parts.emplace(fragment_instance.GetId(), fragment_instance);
     REQUIRE(parts.size() == 1); // sanity check
     // pull out reference to the Fragmentinstance we just added so we can check
     // its transform after
-    steamrot::FragmentInstance &instance =
-        std::get<steamrot::FragmentInstance>(parts.at(0));
+    FragmentInstance &instance = std::get<FragmentInstance>(parts.at(0));
 
     // Act
-    steamrot::logic::positioning::grimoire_machina::
-        position_first_part_of_machina_form_scaffold(parts);
+    position_first_part_of_machina_form_scaffold(parts);
 
-    // we expect the center to be translated to the origin
-    sf::Vector2f expected_position{0.f, 0.f};
-
-    // centre of box around triangle is at {15,15}
-    sf::Vector2f actual_position =
-        instance.getTransform().transformPoint({15.f, 15.f});
-
-    REQUIRE_THAT(actual_position,
-                 steamrot::tests::EqualsVector2f(expected_position));
+    // Assert
+    REQUIRE_THAT(fragment_instance.getPosition(),
+                 EqualsVector2f(sf::Vector2f{0.f, 0.f}));
   }
 
   SECTION("Positions origin of first JointInstance at 0,0") {
     // Arrange
-    auto joint = steamrot::tests::MakeJointWithFrontView();
-    joint.socket_pivot = {5.f, 5.f}; // set origin to (5,5)
-    steamrot::JointInstance joint_instance{0, joint};
+    JointInstance joint_instance{0, parts::JointSquareWithOneSocket};
     parts.emplace(joint_instance.GetId(), joint_instance);
     REQUIRE(parts.size() == 1); // sanity check
+    //
     // pull out reference to the JointInstance we just added so we can check
     // its transform after
-    steamrot::JointInstance &instance =
-        std::get<steamrot::JointInstance>(parts.at(0));
+    JointInstance &instance = std::get<JointInstance>(parts.at(0));
     // Act
-    steamrot::logic::positioning::grimoire_machina::
-        position_first_part_of_machina_form_scaffold(parts);
+
+    position_first_part_of_machina_form_scaffold(parts);
 
     // we expect the joint origin to be translated to {0,0}
     sf::Vector2f expected_position{0.f, 0.f};
 
-    sf::Vector2f actual_position =
-        instance.getTransform().transformPoint(instance.GetPart().socket_pivot);
-
-    REQUIRE_THAT(actual_position,
-                 steamrot::tests::EqualsVector2f(expected_position));
+    REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(expected_position));
   }
 }
 
