@@ -43,7 +43,7 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
   const sf::Vector2f ji_one_socket_0_local_position =
       ji_one.GetSocketLocalPosition(0);
 
-  REQUIRE(ji_one.GetTransform() == sf::Transform::Identity);
+  REQUIRE(ji_one.getTransform() == sf::Transform::Identity);
   REQUIRE_THAT(ji_one_socket_0_local_position,
                Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
   REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
@@ -85,7 +85,7 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
 
       // ASSERT //
       REQUIRE_THAT(
-          ji_one.GetTransform().transformPoint(ji_one_socket_0_local_position),
+          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
     }
 
@@ -97,7 +97,7 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
                                                            {10.f, 10.f});
       // ASSERT //
       REQUIRE_THAT(
-          ji_one.GetTransform().transformPoint(ji_one_socket_0_local_position),
+          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
     }
 
@@ -109,7 +109,7 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
                                                            {-10.f, -10.f});
       // ASSERT //
       REQUIRE_THAT(
-          ji_one.GetTransform().transformPoint(ji_one_socket_0_local_position),
+          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
     }
   }
@@ -123,10 +123,10 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_two, {0.f, 0.f});
       // ASSERT //
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_0_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_1_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
           Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
     }
 
@@ -139,10 +139,10 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
                                                            {10.f, 10.f});
       // ASSERT //
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_0_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_1_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
           Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
     }
     SECTION("anchor point at (-10,-10)") {
@@ -154,10 +154,10 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
                                                            {-10.f, -10.f});
       // ASSERT //
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_0_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
           Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
       REQUIRE_THAT(
-          ji_two.GetTransform().transformPoint(ji_two_socket_1_local_position),
+          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
           Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
     }
   }
@@ -171,13 +171,13 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
                                                            {0.f, 0.f});
       // ASSERT //
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_0_local_position),
                    Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_1_local_position),
                    Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_2_local_position),
                    Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
     }
@@ -191,13 +191,13 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
                                                            {10.f, 10.f});
       // ASSERT //
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_0_local_position),
                    Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_1_local_position),
                    Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_2_local_position),
                    Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
     }
@@ -210,13 +210,13 @@ TEST_CASE("align_anchor_joint_to_anchor_point tests") {
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
                                                            {-10.f, -10.f});
       // ASSERT //
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_0_local_position),
                    Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_1_local_position),
                    Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.GetTransform().transformPoint(
+      REQUIRE_THAT(ji_three.getTransform().transformPoint(
                        ji_three_socket_2_local_position),
                    Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
     }
@@ -251,12 +251,12 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                    expected_anchor_joint_socket_pivot_position, 0.01f));
   sf::Vector2f expected_anchor_joint_socket_0_position{9.19f, 9.19f};
   REQUIRE_THAT(
-      anchor_joint.GetTransform().transformPoint(
+      anchor_joint.getTransform().transformPoint(
           anchor_joint.GetSockets().at(0).GetLocalPosition()),
       Vector2fEqualsMatcher(expected_anchor_joint_socket_0_position, 0.01f));
   sf::Vector2f expected_anchor_joint_socket_1_position{-9.19f, 9.19f};
   REQUIRE_THAT(
-      anchor_joint.GetTransform().transformPoint(
+      anchor_joint.getTransform().transformPoint(
           anchor_joint.GetSockets().at(1).GetLocalPosition()),
       Vector2fEqualsMatcher(expected_anchor_joint_socket_1_position, 0.01f));
 
@@ -273,16 +273,16 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_one.has_value());
   REQUIRE(connection_one->this_socket_id == 0);
   REQUIRE(connection_one->other_socket_id == 1);
-  REQUIRE(arm_one_part_one_fi.GetTotalRotation().asDegrees() == -135.f);
+  REQUIRE(arm_one_part_one_fi.getRotation().asDegrees() == -135.f);
 
   sf::Vector2f expected_arm_one_part_one_socket_1_position{9.19f, 9.19f};
-  REQUIRE_THAT(arm_one_part_one_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_one_fi.getTransform().transformPoint(
                    arm_one_part_one_fi.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_one_socket_1_position, 0.01f));
 
   sf::Vector2f expected_arm_one_part_one_socket_0_position{44.55f, 44.55f};
-  REQUIRE_THAT(arm_one_part_one_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_one_fi.getTransform().transformPoint(
                    arm_one_part_one_fi.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_one_socket_0_position, 0.01f));
@@ -300,7 +300,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_two->other_socket_id == 1);
 
   sf::Vector2f expected_arm_one_part_two_socket_1_position{44.55f, 44.55f};
-  REQUIRE_THAT(arm_one_part_two_ji.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_two_ji.getTransform().transformPoint(
                    arm_one_part_two_ji.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_two_socket_1_position, 0.01f));
@@ -311,7 +311,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                    expected_arm_one_part_two_socket_pivot_position, 0.01f));
 
   sf::Vector2f expected_arm_one_part_two_socket_0_position{44.55f, 62.93f};
-  REQUIRE_THAT(arm_one_part_two_ji.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_two_ji.getTransform().transformPoint(
                    arm_one_part_two_ji.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_two_socket_0_position, 0.01f));
@@ -327,16 +327,16 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_three.has_value());
   REQUIRE(connection_three->this_socket_id == 0);
   REQUIRE(connection_three->other_socket_id == 0);
-  REQUIRE(arm_one_part_three_fi.GetTotalRotation().asDegrees() == 135.f);
+  REQUIRE(arm_one_part_three_fi.getRotation().asDegrees() == 135.f);
 
   sf::Vector2f expected_arm_one_part_three_socket_0_position{44.55f, 62.93f};
-  REQUIRE_THAT(arm_one_part_three_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_three_fi.getTransform().transformPoint(
                    arm_one_part_three_fi.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_three_socket_0_position, 0.01f));
 
   sf::Vector2f expected_arm_one_part_three_socket_1_position{9.19f, 98.28f};
-  REQUIRE_THAT(arm_one_part_three_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_one_part_three_fi.getTransform().transformPoint(
                    arm_one_part_three_fi.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_one_part_three_socket_1_position, 0.01f));
@@ -357,15 +357,15 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(arm_two_connection_two.has_value());
   REQUIRE(arm_two_connection_two->this_socket_id == 1);
   REQUIRE(arm_two_connection_two->other_socket_id == 0);
-  REQUIRE(arm_two_part_one_fi.GetTotalRotation().asDegrees() == 135.f);
+  REQUIRE(arm_two_part_one_fi.getRotation().asDegrees() == 135.f);
 
   sf::Vector2f expected_arm_two_part_one_socket_0_position{-9.19f, 9.19f};
-  REQUIRE_THAT(arm_two_part_one_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_one_fi.getTransform().transformPoint(
                    arm_two_part_one_fi.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_one_socket_0_position, 0.01f));
   sf::Vector2f expected_arm_two_part_one_socket_1_position{-44.55f, 44.55f};
-  REQUIRE_THAT(arm_two_part_one_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_one_fi.getTransform().transformPoint(
                    arm_two_part_one_fi.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_one_socket_1_position, 0.01f));
@@ -381,11 +381,11 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(arm_two_connection_three.has_value());
   REQUIRE(arm_two_connection_three->this_socket_id == 0);
   REQUIRE(arm_two_connection_three->other_socket_id == 1);
-  REQUIRE(Catch::Approx(arm_two_part_two_ji.GetTotalRotation().asDegrees()) ==
+  REQUIRE(Catch::Approx(arm_two_part_two_ji.getRotation().asDegrees()) ==
           -45.f);
 
   sf::Vector2f expected_arm_two_part_two_socket_0_position{-44.55f, 44.55f};
-  REQUIRE_THAT(arm_two_part_two_ji.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_two_ji.getTransform().transformPoint(
                    arm_two_part_two_ji.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_two_socket_0_position, 0.01f));
@@ -394,7 +394,7 @@ TEST_CASE("align_grab_result_to_open_state tests") {
                Vector2fEqualsMatcher(
                    expected_arm_two_part_two_socket_pivot_position, 0.01f));
   sf::Vector2f expected_arm_two_part_two_socket_1_position{-44.55f, 62.93f};
-  REQUIRE_THAT(arm_two_part_two_ji.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_two_ji.getTransform().transformPoint(
                    arm_two_part_two_ji.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_two_socket_1_position, 0.01f));
@@ -410,16 +410,16 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(arm_two_connection_four.has_value());
   REQUIRE(arm_two_connection_four->this_socket_id == 1);
   REQUIRE(arm_two_connection_four->other_socket_id == 0);
-  REQUIRE(Catch::Approx(arm_two_part_three_fi.GetTotalRotation().asDegrees()) ==
+  REQUIRE(Catch::Approx(arm_two_part_three_fi.getRotation().asDegrees()) ==
           45.f);
 
   sf::Vector2f expected_arm_two_part_three_socket_0_position{-44.55f, 62.93f};
-  REQUIRE_THAT(arm_two_part_three_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_three_fi.getTransform().transformPoint(
                    arm_two_part_three_fi.GetSockets().at(0).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_three_socket_0_position, 0.01f));
   sf::Vector2f expected_arm_two_part_three_socket_1_position{-9.19f, 98.28f};
-  REQUIRE_THAT(arm_two_part_three_fi.GetTransform().transformPoint(
+  REQUIRE_THAT(arm_two_part_three_fi.getTransform().transformPoint(
                    arm_two_part_three_fi.GetSockets().at(1).GetLocalPosition()),
                Vector2fEqualsMatcher(
                    expected_arm_two_part_three_socket_1_position, 0.01f));
@@ -471,40 +471,40 @@ TEST_CASE("end_of_arm_is_grab_ready tests") {
                  Vector2fEqualsMatcher({1.f, 0.f}, 0.01f));
 
     SECTION("rotation 0 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(0.f));
+      left_arm_end_fi.setRotation(sf::degrees(0.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
 
     SECTION("rotation 45 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(45.f));
+      left_arm_end_fi.setRotation(sf::degrees(45.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 90 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(90.f));
+      left_arm_end_fi.setRotation(sf::degrees(90.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
 
     SECTION("rotation 135 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(135.f));
+      left_arm_end_fi.setRotation(sf::degrees(135.f));
       REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 180 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(180.f));
+      left_arm_end_fi.setRotation(sf::degrees(180.f));
       REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 225 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(225.f));
+      left_arm_end_fi.setRotation(sf::degrees(225.f));
       REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
 
     SECTION("rotation 270 degrees") {
-      left_arm_end_fi.SetTotalRotation(sf::degrees(270.f));
+      left_arm_end_fi.setRotation(sf::degrees(270.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           left_arm, true, anchor_joint, valid_grab_pkg.part_graph));
     }
@@ -524,39 +524,39 @@ TEST_CASE("end_of_arm_is_grab_ready tests") {
                  Vector2fEqualsMatcher({1.f, 0.f}, 0.01f));
 
     SECTION("rotation 0 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(0.f));
+      right_arm_end_fi.setRotation(sf::degrees(0.f));
       REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
 
     SECTION("rotation 45 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(45.f));
+      right_arm_end_fi.setRotation(sf::degrees(45.f));
       REQUIRE_FALSE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 90 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(90.f));
+      right_arm_end_fi.setRotation(sf::degrees(90.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
 
     SECTION("rotation 135 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(135.f));
+      right_arm_end_fi.setRotation(sf::degrees(135.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 180 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(180.f));
+      right_arm_end_fi.setRotation(sf::degrees(180.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 225 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(225.f));
+      right_arm_end_fi.setRotation(sf::degrees(225.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
     SECTION("rotation 270 degrees") {
-      right_arm_end_fi.SetTotalRotation(sf::degrees(270.f));
+      right_arm_end_fi.setRotation(sf::degrees(270.f));
       REQUIRE(spatial_analysis::end_of_arm_is_grab_ready(
           right_arm, false, anchor_joint, valid_grab_pkg.part_graph));
     }
@@ -591,18 +591,18 @@ TEST_CASE("all_arms_are_grab_ready tests") {
       std::get<FragmentInstance>(left_arm_end_part);
 
   SECTION("both arms are grab ready") {
-    left_arm_end_fi.SetTotalRotation(sf::degrees(90.f));
-    right_arm_end_fi.SetTotalRotation(sf::degrees(90.f));
+    left_arm_end_fi.setRotation(sf::degrees(90.f));
+    right_arm_end_fi.setRotation(sf::degrees(90.f));
     REQUIRE(spatial_analysis::all_arms_are_grab_ready(
         grab_result, valid_grab_pkg.part_graph));
   }
   SECTION("left arm is not grab ready") {
-    left_arm_end_fi.SetTotalRotation(sf::degrees(135.f));
+    left_arm_end_fi.setRotation(sf::degrees(135.f));
     REQUIRE_FALSE(spatial_analysis::all_arms_are_grab_ready(
         grab_result, valid_grab_pkg.part_graph));
   }
   SECTION("right arm is not grab ready") {
-    right_arm_end_fi.SetTotalRotation(sf::degrees(45.f));
+    right_arm_end_fi.setRotation(sf::degrees(45.f));
     REQUIRE_FALSE(spatial_analysis::all_arms_are_grab_ready(
         grab_result, valid_grab_pkg.part_graph));
   }

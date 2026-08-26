@@ -892,4 +892,5 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
     }
   }
 }
+
 } // namespace steamrot::tests

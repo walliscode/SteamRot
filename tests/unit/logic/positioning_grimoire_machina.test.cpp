@@ -14,19 +14,11 @@
 #include "PartGraphBuilder.h"
 #include "Vector2fEqualsMatcher.h"
 #include "ViewDirection.h"
-#include "catch2/catch_approx.hpp"
 #include "fragment_library.h"
 #include "grimoire_machina_test_helpers.h"
 #include "joint_library.h"
-#include <SFML/Graphics/PrimitiveType.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/Transform.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <cstdint>
-#include <iostream>
 #include <string>
 
 namespace steamrot::tests {
@@ -77,7 +69,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
 
     // centre of box around triangle is at {15,15}
     sf::Vector2f actual_position =
-        instance.GetTransform().transformPoint({15.f, 15.f});
+        instance.getTransform().transformPoint({15.f, 15.f});
 
     REQUIRE_THAT(actual_position,
                  steamrot::tests::EqualsVector2f(expected_position));
@@ -102,7 +94,7 @@ TEST_CASE("position_first_part_of_machina_form tests",
     sf::Vector2f expected_position{0.f, 0.f};
 
     sf::Vector2f actual_position =
-        instance.GetTransform().transformPoint(instance.GetPart().socket_pivot);
+        instance.getTransform().transformPoint(instance.GetPart().socket_pivot);
 
     REQUIRE_THAT(actual_position,
                  steamrot::tests::EqualsVector2f(expected_position));
@@ -150,689 +142,6 @@ TEST_CASE("rotate_vector_to_target_vector tests") {
     }
   }
 }
-
-TEST_CASE("align_fragment_onto_joint_socket tests") {
-  FragmentInstance fragment_instance{0, parts::FragmentRectangleWithTwoSockets};
-  fragment_instance.SetTransform(sf::Transform::Identity); // reset transform
-  JointInstance joint_instance{0, parts::JointSquareWithTwoSockets};
-  joint_instance.SetTransform(sf::Transform::Identity); // reset transform
-  joint_instance.PositionSockets(
-      JointSocketPositioningStrategy::MaximizeDistance);
-
-  REQUIRE_THAT(joint_instance.GetSocketLocalPosition(0),
-               EqualsVector2f({23.f, 10.f}, 0.001f));
-  REQUIRE_THAT(joint_instance.GetSocketLocalPosition(1),
-               EqualsVector2f({10.f, 23.f}, 0.001f));
-
-  // Normalize to [-180, 180] to compare equivalent rotations
-  // e.g. 270 == -90, 180 == -180.
-  auto normalize_degrees = [](float deg) {
-    float d = std::fmod(deg, 360.f);
-    if (d < 0.f)
-      d += 360.f; // map negatives into [0,360)
-
-    // snap tiny noise near bounds
-    if (std::fabs(d) < 1e-4f || std::fabs(d - 360.f) < 1e-4f)
-      d = 0.f;
-
-    // round to 1 decimal place
-    d = std::round(d * 10.f) / 10.f;
-    return d;
-  };
-  ;
-
-  SECTION("Does not throw if fragment socket id is invalid") {
-    REQUIRE_NOTHROW(align_fragment_onto_joint_socket(fragment_instance, 99,
-                                                     joint_instance, 0));
-  }
-
-  SECTION("Does not throw if joint socket id is invalid") {
-    REQUIRE_NOTHROW(align_fragment_onto_joint_socket(fragment_instance, 0,
-                                                     joint_instance, 99));
-  }
-
-  SECTION("Does not align if no connection between fragment and joint") {
-    align_fragment_onto_joint_socket(fragment_instance, 0, joint_instance, 0);
-
-    REQUIRE_THAT(fragment_instance.GetTransform().transformPoint(
-                     fragment_instance.GetSocketLocalPosition(0)),
-                 !steamrot::tests::EqualsVector2f(
-                     joint_instance.GetTransform().transformPoint(
-                         joint_instance.GetSocketLocalPosition(0)),
-                     0.001f));
-  }
-
-  SECTION("Alignment cases (table-driven)") {
-    struct AlignmentCase {
-      const char *name;
-      uint32_t fragment_socket_id;
-      uint32_t joint_socket_id;
-      float joint_rotation_deg;
-      float expected_fragment_rotation_deg;
-      std::optional<sf::Vector2f> expected_fragment_socket1_world;
-    };
-
-    const std::vector<AlignmentCase> cases{
-        {"joint 0°, connect frag[0] -> joint[0]", 0, 0, 0.f, 0.f,
-         sf::Vector2f{73.f, 10.f}},
-        {"joint 0°, connect frag[0] -> joint[1]", 0, 1, 0.f, 90.f,
-         sf::Vector2f{10.f, 73.f}},
-        {"joint 90°, connect frag[0] -> joint[0]", 0, 0, 90.f, 90.f,
-         std::nullopt},
-        // shortest signed angle is -180 (equivalent to 180)
-        {"joint 90°, connect frag[0] -> joint[1]", 0, 1, 90.f, -180.f,
-         std::nullopt},
-        // shortest signed angle is -180 (equivalent to 180)
-        {"joint 180°, connect frag[0] -> joint[0]", 0, 0, 180.f, -180.f,
-         std::nullopt},
-        // shortest signed angle is -90 (equivalent to 270)
-        {"joint 270°, connect frag[0] -> joint[0]", 0, 0, 270.f, -90.f,
-         std::nullopt},
-    };
-
-    for (const auto &tc : cases) {
-      DYNAMIC_SECTION(tc.name) {
-
-        // reset per-case state so DYNAMIC_SECTION cases remain isolated
-        fragment_instance.SetTransform(sf::Transform::Identity);
-        fragment_instance.SetTotalRotation(sf::degrees(0.f));
-        joint_instance.SetTransform(sf::Transform::Identity);
-        joint_instance.SetTotalRotation(sf::degrees(0.f));
-        joint_instance.PositionSockets(
-            JointSocketPositioningStrategy::MaximizeDistance);
-
-        if (tc.joint_rotation_deg != 0.f) {
-          // add rotation to the transform
-          joint_instance.GetTransform().rotate(
-              sf::degrees(tc.joint_rotation_deg), {10.f, 10.f});
-
-          // add rotation to the total rotation
-          joint_instance.SetTotalRotation(sf::degrees(tc.joint_rotation_deg));
-        }
-
-        auto connection_result =
-            fragment_instance.CreateConnectionWithOtherInstance(
-                tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
-        if (!connection_result.has_value()) {
-          FAIL(connection_result.error().message);
-        }
-
-        align_fragment_onto_joint_socket(fragment_instance,
-                                         tc.fragment_socket_id, joint_instance,
-                                         tc.joint_socket_id);
-
-        const auto frag_socket_world =
-            fragment_instance.GetTransform().transformPoint(
-                fragment_instance.GetSocketLocalPosition(
-                    tc.fragment_socket_id));
-
-        const auto joint_socket_world =
-            joint_instance.GetTransform().transformPoint(
-                joint_instance.GetSocketLocalPosition(tc.joint_socket_id));
-
-        REQUIRE_THAT(frag_socket_world,
-                     EqualsVector2f(joint_socket_world, 0.001f));
-
-        REQUIRE(
-            normalize_degrees(
-                fragment_instance.GetTotalRotation().asDegrees()) ==
-            Catch::Approx(normalize_degrees(tc.expected_fragment_rotation_deg))
-                .margin(0.1f));
-
-        if (tc.expected_fragment_socket1_world.has_value()) {
-          REQUIRE_THAT(
-              fragment_instance.GetTransform().transformPoint(
-                  fragment_instance.GetSocketLocalPosition(1)),
-              EqualsVector2f(*tc.expected_fragment_socket1_world, 0.001f));
-        }
-      }
-    }
-  }
-}
-
-TEST_CASE("align_joint_onto_fragment_socket tests",
-          "[positioning_grimoire_machina]") {
-  // Arrange
-  FragmentInstance fragment_instance{0, parts::FragmentRectangleWithTwoSockets};
-  fragment_instance.SetTransform(sf::Transform::Identity); // reset transform
-  REQUIRE_THAT(fragment_instance.GetSocketLocalPosition(0),
-               steamrot::tests::EqualsVector2f({0.f, 5.f}, 0.001f));
-  REQUIRE_THAT(fragment_instance.GetSocketLocalPosition(1),
-               steamrot::tests::EqualsVector2f({50.f, 5.f}, 0.001f));
-
-  JointInstance joint_instance{1, parts::JointSquareWithTwoSockets};
-  joint_instance.SetTransform(sf::Transform::Identity); // reset transform
-  joint_instance.PositionSockets(
-      JointSocketPositioningStrategy::MaximizeDistance);
-
-  // check the positions of the sockets
-  REQUIRE_THAT(joint_instance.GetSocketLocalPosition(0),
-               steamrot::tests::EqualsVector2f({23.f, 10.f}, 0.001f));
-  REQUIRE_THAT(joint_instance.GetSocketLocalPosition(1),
-               steamrot::tests::EqualsVector2f({10.f, 23.f}, 0.001f));
-
-  auto normalize_degrees_0_360 = [](float deg) {
-    float d = std::fmod(deg, 360.f);
-    std::cout << "normalize_degrees_0_360: deg=" << deg << ", d=" << d
-              << std::endl;
-    if (d < 0.f)
-      d += 360.f; // map negatives into [0,360)
-
-    // snap tiny noise near bounds
-    if (std::fabs(d) < 1e-4f || std::fabs(d - 360.f) < 1e-4f)
-      d = 0.f;
-
-    // round to 1 decimal place
-    d = std::round(d * 10.f) / 10.f;
-    return d;
-  };
-
-  SECTION("Does not throw if fragment socket id is invalid") {
-    REQUIRE_NOTHROW(align_joint_onto_fragment_socket(joint_instance, 0,
-                                                     fragment_instance, 99));
-  }
-
-  SECTION("Does not throw if joint socket id is invalid") {
-    REQUIRE_NOTHROW(align_joint_onto_fragment_socket(joint_instance, 99,
-                                                     fragment_instance, 0));
-  }
-
-  SECTION("Does not align if no connection between fragment and joint") {
-    // Act
-    align_joint_onto_fragment_socket(joint_instance, 0, fragment_instance, 0);
-    // Assert: joint should not be aligned to fragment socket
-    REQUIRE_THAT(joint_instance.GetTransform().transformPoint(
-                     joint_instance.GetSocketLocalPosition(0)),
-                 !steamrot::tests::EqualsVector2f(
-                     fragment_instance.GetTransform().transformPoint(
-                         fragment_instance.GetSocketLocalPosition(0)),
-                     0.001f));
-  }
-
-  SECTION("Alignment cases (table-driven)") {
-    struct AlignmentCase {
-      const char *name;
-      uint32_t fragment_socket_id;
-      uint32_t joint_socket_id;
-      float fragment_rotation_deg;
-      float expected_joint_rotation_deg;
-      sf::Vector2f expected_fragment_socket_0_world;
-      sf::Vector2f expected_fragment_socket_1_world;
-      sf::Vector2f expected_joint_socket_0_world;
-      sf::Vector2f expected_joint_socket_1_world;
-      sf::Vector2f expected_joint_socket_pivot_world;
-      float position_tolerance;
-    };
-
-    const std::vector<AlignmentCase> cases{
-        {"fragment 0°, connect frag[0] -> joint[0]",
-         0,
-         0,
-         0,
-         0,
-         {0.f, 5.f},
-         {50.f, 5.f},
-         {0.f, 5.f},
-         {-13.f, 18.f},
-         {-13.f, 5.f},
-         0.01f},
-        {"fragment 45°, connect frag[0] -> joint[0]",
-         0,
-         0,
-         45.f,
-         45.f,
-         {-3.535f, 3.535f},
-         {31.82f, 38.89f},
-         {-3.535f, 3.535f},
-         {-21.93f, 3.535f},
-         {-12.73f, -5.66f},
-         0.01f},
-        {
-            "fragment 90°, connect frag[0] -> joint[0]",
-            0,
-            0,
-            90.f,
-            90.f,
-            {-5.f, 0.f},
-            {-5.f, 50.f},
-            {-5.f, 0.f},
-            {-18.f, -13.f},
-            {-5.f, -13.f},
-            0.01f,
-        },
-        {"fragment 135°, connect frag[0] -> joint[0]",
-         0,
-         0,
-         135.f,
-         135.f,
-         {-3.535f, -3.535f},
-         {-38.89f, 31.82f},
-         {-3.535f, -3.535f},
-         {-3.535f, -21.93f},
-         {5.66f, -12.73f},
-         0.01f},
-        {"fragment 180°, connect frag[0] -> joint[0]",
-         0,
-         0,
-         180.f,
-         180.f,
-         {0.f, -5.f},
-         {-50.f, -5.f},
-         {0.f, -5.f},
-         {13.f, -18.f},
-         {13.f, -5.f},
-         0.01f},
-        {
-            "fragment 270°, connect frag[0] -> joint[0]",
-            0,
-            0,
-            270.f,
-            270.f,
-            {5.f, 0.f},
-            {5.f, -50.f},
-            {5.f, 0.f},
-            {18.f, 13.f},
-            {5.f, 13.f},
-            0.01f,
-        },
-        {"fragment 0°, connect frag[0] -> joint[1]",
-         0,
-         1,
-         0.f,
-         -90.f,
-         {0.f, 5.f},
-         {50.f, 5.f},
-         {-13.f, -8.f},
-         {0.f, 5.f},
-         {-13.f, 5.f},
-         0.01f},
-        {"fragment 45°, connect frag[0] -> joint[1]",
-         0,
-         1,
-         45.f,
-         -45.f,
-         {-3.535f, 3.535f},
-         {31.82f, 38.89f},
-         {-3.535f, -14.84f},
-         {-3.535f, 3.535f},
-         {-12.73f, -5.66f},
-         0.01f},
-        {"fragment 90°, connect frag[0] -> joint[1]",
-         0,
-         1,
-         90.f,
-         0.f,
-         {-5.f, 0.f},
-         {-5.f, 50.f},
-         {8.f, -13.f},
-         {-5.f, 0.f},
-         {-5.f, -13.f},
-         0.01f},
-        {"fragment 180°, connect frag[0] -> joint[1]",
-         0,
-         1,
-         180.f,
-         90.f,
-         {0.f, -5.f},
-         {-50.f, -5.f},
-         {13.f, 8.f},
-         {0.f, -5.f},
-         {13.f, -5.f},
-         0.01f},
-        {"fragment 270°, connect frag[0] -> joint[1]",
-         0,
-         1,
-         270.f,
-         180.f,
-         {5.f, 0.f},
-         {5.f, -50.f},
-         {-8.f, 13.f},
-         {5.f, 0.f},
-         {5.f, 13.f},
-         0.01f},
-        {"fragment 0°, connect frag[1] -> joint[0]",
-         1,
-         0,
-         0.f,
-         180.f,
-         {0.f, 5.f},
-         {50.f, 5.f},
-         {50.f, 5.f},
-         {63.f, -8.f},
-         {63.f, 5.f},
-         0.01f},
-        {"fragment 90°, connect frag[1] -> joint[0]",
-         1,
-         0,
-         90.f,
-         -90.f,
-         {-5.f, 0.f},
-         {-5.f, 50.f},
-         {-5.f, 50.f},
-         {8.f, 63.f},
-         {-5.f, 63.f},
-         0.01f}
-
-    };
-
-    for (const auto &tc : cases) {
-      DYNAMIC_SECTION(tc.name) {
-        // reset per-case state so cases are isolated
-        fragment_instance.SetTransform(sf::Transform::Identity);
-        fragment_instance.SetTotalRotation(sf::degrees(0.f));
-        joint_instance.SetTransform(sf::Transform::Identity);
-        joint_instance.SetTotalRotation(sf::degrees(0.f));
-        joint_instance.PositionSockets(
-            JointSocketPositioningStrategy::MaximizeDistance);
-
-        // ARRANGE //
-        auto connection_result =
-            fragment_instance.CreateConnectionWithOtherInstance(
-                tc.fragment_socket_id, joint_instance, tc.joint_socket_id);
-
-        if (!connection_result.has_value()) {
-          FAIL("Failed to create connection between fragment and joint");
-        }
-
-        // apply the fragment rotation for this test case
-        fragment_instance.GetTransform().rotate(
-            sf::degrees(tc.fragment_rotation_deg));
-        // add to the total rotation as well
-        fragment_instance.AddToTotalRotation(
-            sf::degrees(tc.fragment_rotation_deg));
-
-        // sanity-check rotated fragment sockets (same pattern in each case)
-        REQUIRE_THAT(fragment_instance.GetTransform().transformPoint(
-                         fragment_instance.GetSocketLocalPosition(0)),
-                     EqualsVector2f(tc.expected_fragment_socket_0_world,
-                                    tc.position_tolerance));
-        REQUIRE_THAT(fragment_instance.GetTransform().transformPoint(
-                         fragment_instance.GetSocketLocalPosition(1)),
-                     EqualsVector2f(tc.expected_fragment_socket_1_world,
-                                    tc.position_tolerance));
-
-        // ACT //
-        align_joint_onto_fragment_socket(joint_instance, tc.joint_socket_id,
-                                         fragment_instance,
-                                         tc.fragment_socket_id);
-
-        // ASSERT //
-        REQUIRE_THAT(joint_instance.GetTransform().transformPoint(
-                         joint_instance.GetSocketLocalPosition(0)),
-                     EqualsVector2f(tc.expected_joint_socket_0_world,
-                                    tc.position_tolerance));
-
-        REQUIRE_THAT(joint_instance.GetTransform().transformPoint(
-                         joint_instance.GetPart().socket_pivot),
-                     EqualsVector2f(tc.expected_joint_socket_pivot_world,
-                                    tc.position_tolerance));
-
-        REQUIRE_THAT(joint_instance.GetTransform().transformPoint(
-                         joint_instance.GetSocketLocalPosition(1)),
-                     EqualsVector2f(tc.expected_joint_socket_1_world,
-                                    tc.position_tolerance));
-
-        REQUIRE(normalize_degrees_0_360(
-                    joint_instance.GetTotalRotation().asDegrees()) ==
-                Catch::Approx(
-                    normalize_degrees_0_360(tc.expected_joint_rotation_deg))
-                    .margin(0.1f));
-
-        // connected socket world positions should coincide
-        const auto joint_connected_socket_world =
-            joint_instance.GetTransform().transformPoint(
-                joint_instance.GetSocketLocalPosition(tc.joint_socket_id));
-        const auto fragment_connected_socket_world =
-            fragment_instance.GetTransform().transformPoint(
-                fragment_instance.GetSocketLocalPosition(
-                    tc.fragment_socket_id));
-
-        REQUIRE_THAT(joint_connected_socket_world,
-                     EqualsVector2f(fragment_connected_socket_world, 0.001f));
-      }
-    }
-  }
-}
-
-// TEST_CASE("compute_socket_local_positions_even_spread tests",
-//           "[positioning_grimoire_machina]") {
-//   // Arrange
-//   steamrot::SocketConfig config;
-//   sf::Vector2f origin{0.f, 0.f};
-//   std::vector<sf::Vector2f> local_positions; // prepare vector for 3 sockets
-//
-//   SECTION("Does not throw with zero sockets") {
-//
-//     // Arrange
-//     config.socket_count = 0;
-//     // Act & Assert
-//     REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
-//                         compute_socket_local_positions_even_spread(
-//                             config, origin, local_positions));
-//   }
-//   SECTION("Clears and resizes local_positions to socket_count") {
-//     // Arrange
-//     config.socket_count = 3;
-//     local_positions = {{1.f, 1.f},
-//                        {2.f, 2.f},
-//                        {3.f, 3.f},
-//                        {4.f, 4.f}}; // start with 4 positions
-//     // Act
-//     REQUIRE_NOTHROW(steamrot::logic::positioning::grimoire_machina::
-//                         compute_socket_local_positions_even_spread(
-//                             config, origin, local_positions));
-//     // Assert: local_positions should be cleared and resized to 3
-//     REQUIRE(local_positions.size() == 3);
-//   }
-//   SECTION("One socket tests") {
-//     // Arrange
-//     config.socket_count = 1;
-//
-//     SECTION("90° arc") {
-//
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 90.f; // arc from 0° to 90°
-//
-//       SECTION("radius 0") {
-//         config.radius = 0.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: socket should be at origin
-//         REQUIRE_THAT(local_positions[0],
-//                      steamrot::tests::EqualsVector2f(origin, 0.001f));
-//       }
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//
-//         // Assert: socket should be at radius distance from origin at 45°
-//         sf::Vector2f expected_position{
-//             7.071f, 7.071f}; // (10 * cos(45°), 10 * sin(45°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position, 0.001f));
-//       }
-//       SECTION("radius 20") {
-//         config.radius = 20.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: socket should be at radius distance from origin at 45°
-//         sf::Vector2f expected_position{
-//             14.142f, 14.142f}; // (20 * cos(45°), 20 * sin(45°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position, 0.001f));
-//       }
-//     }
-//     SECTION("180° arc") {
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 180.f; // arc from 0° to 180°
-//       //
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: socket should be at radius distance from origin at 90°
-//         sf::Vector2f expected_position{0.f,
-//                                        10.f}; // (10 * cos(90°), 10 *
-//                                        sin(90°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position, 0.001f));
-//       }
-//       SECTION("radius 20") {
-//         config.radius = 20.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: socket should be at radius distance from origin at 90°
-//         sf::Vector2f expected_position{0.f,
-//                                        20.f}; // (20 * cos(90°), 20 *
-//                                        sin(90°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position, 0.001f));
-//       }
-//     }
-//   }
-//
-//   SECTION("Two socket tests") {
-//     // arrange
-//     config.socket_count = 2;
-//
-//     SECTION("90° arc") {
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 90.f; // arc from 0° to 90°
-//
-//       SECTION("radius 0") {
-//         config.radius = 0.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at origin
-//         REQUIRE_THAT(local_positions[0],
-//                      steamrot::tests::EqualsVector2f(origin, 0.001f));
-//         REQUIRE_THAT(local_positions[1],
-//                      steamrot::tests::EqualsVector2f(origin, 0.001f));
-//       }
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°
-//         // and 90°
-//         sf::Vector2f expected_position_0{10.f,
-//                                          0.f}; // (10 * cos(0°), 10 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             0.f, 10.f}; // (10 * cos(90°), 10 * sin(90°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//       }
-//       SECTION("radius 20") {
-//         config.radius = 20.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°
-//         // and 90°
-//         sf::Vector2f expected_position_0{20.f,
-//                                          0.f}; // (20 * cos(0°), 20 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             0.f, 20.f}; // (20 * cos(90°), 20 * sin(90°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//       }
-//     }
-//     SECTION("180° arc") {
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 180.f; // arc from 0° to 180°
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°
-//         // and 180°
-//         sf::Vector2f expected_position_0{10.f,
-//                                          0.f}; // (10 * cos(0°), 10 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             -10.f, 0.f}; // (10 * cos(180°), 10 * sin(180°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//       }
-//       SECTION("radius 20") {
-//         config.radius = 20.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°
-//         // and 180°
-//         sf::Vector2f expected_position_0{20.f,
-//                                          0.f}; // (20 * cos(0°), 20 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             -20.f, 0.f}; // (20 * cos(180°), 20 * sin(180°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//       }
-//     }
-//   }
-//   SECTION("Three socket tests") {
-//     // arrange
-//     config.socket_count = 3;
-//     SECTION("90° arc") {
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 90.f; // arc from 0° to 90°
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°,
-//         // 45°, and 90°
-//         sf::Vector2f expected_position_0{10.f,
-//                                          0.f}; // (10 * cos(0°), 10 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             7.071f, 7.071f}; // (10 * cos(45°), 10 * sin(45°))
-//         sf::Vector2f expected_position_2{
-//             0.f, 10.f}; // (10 * cos(90°), 10 * sin(90°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//         REQUIRE_THAT(local_positions[2], steamrot::tests::EqualsVector2f(
-//                                              expected_position_2, 0.001f));
-//       }
-//     }
-//     SECTION("180° arc") {
-//       config.rotation_arc_min = 0.f;
-//       config.rotation_arc_max = 180.f; // arc from 0° to 180°
-//       SECTION("radius 10") {
-//         config.radius = 10.f;
-//         compute_socket_local_positions_even_spread(config, origin,
-//                                                    local_positions);
-//         // Assert: sockets should be at radius distance from origin at 0°,
-//         // 90°, and 180°
-//         sf::Vector2f expected_position_0{10.f,
-//                                          0.f}; // (10 * cos(0°), 10 *
-//                                          sin(0°))
-//         sf::Vector2f expected_position_1{
-//             0.f, 10.f}; // (10 * cos(90°), 10 * sin(90°))
-//         sf::Vector2f expected_position_2{
-//             -10.f, 0.f}; // (10 * cos(180°), 10 * sin(180°))
-//         REQUIRE_THAT(local_positions[0], steamrot::tests::EqualsVector2f(
-//                                              expected_position_0, 0.001f));
-//         REQUIRE_THAT(local_positions[1], steamrot::tests::EqualsVector2f(
-//                                              expected_position_1, 0.001f));
-//         REQUIRE_THAT(local_positions[2], steamrot::tests::EqualsVector2f(
-//                                              expected_position_2, 0.001f));
-//       }
-//     }
-//   }
-// }
 
 // TEST_CASE("check_if_allowed_joint_socket_configuration tests",
 //           "[unit][positioning_grimoire_machina]") {
@@ -1024,7 +333,7 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
                  EqualsVector2f(expected_fi_socket_0_world_after, 0.01f));
 
     // rotates 45 degrees to align the fragment socket with the joint socket
-    REQUIRE(fragment_instance.GetTotalRotation().asDegrees() == 45.f);
+    REQUIRE(fragment_instance.getRotation().asDegrees() == 45.f);
   }
   SECTION("Positions a chain graph: j0 - f1 - j2") {
     PartGraphBuilder builder;
@@ -1237,7 +546,7 @@ TEST_CASE("calculate_outer_box tests") {
     PartGraph part_graph;
     FragmentInstance fragment_instance{0, fragment};
     // apply a local transform to the fragment instance
-    fragment_instance.GetTransform().translate({10.f, 10.f});
+    fragment_instance.move({10.f, 10.f});
     part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
@@ -1253,7 +562,7 @@ TEST_CASE("calculate_outer_box tests") {
     PartGraph part_graph;
     FragmentInstance fragment_instance{0, fragment_large};
     // apply a local transform to the fragment instance
-    fragment_instance.GetTransform().translate({10.f, 10.f});
+    fragment_instance.move({10.f, 10.f});
     part_graph.emplace(fragment_instance.GetId(), fragment_instance);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
@@ -1269,10 +578,10 @@ TEST_CASE("calculate_outer_box tests") {
           "applied, does not exceed minimum box size") {
     PartGraph part_graph;
     FragmentInstance fragment_instance1{0, fragment};
-    fragment_instance1.GetTransform().translate({10.f, 10.f});
+    fragment_instance1.move({10.f, 10.f});
     part_graph.emplace(fragment_instance1.GetId(), fragment_instance1);
     FragmentInstance fragment_instance2{1, fragment2};
-    fragment_instance2.GetTransform().translate({-5.f, -5.f});
+    fragment_instance2.move({-5.f, -5.f});
     part_graph.emplace(fragment_instance2.GetId(), fragment_instance2);
     sf::FloatRect outer_box =
         calculate_outer_box(part_graph, SubGraph{}); // empty subgraph
@@ -1288,10 +597,10 @@ TEST_CASE("calculate_outer_box tests") {
     PartGraph part_graph;
     FragmentInstance fragment_instance1{0, fragment};
 
-    fragment_instance1.GetTransform().translate({10.f, 10.f});
+    fragment_instance1.move({10.f, 10.f});
     part_graph.emplace(fragment_instance1.GetId(), fragment_instance1);
     FragmentInstance fragment_instance2{1, fragment2};
-    fragment_instance2.GetTransform().translate({-5.f, -5.f});
+    fragment_instance2.move({-5.f, -5.f});
     part_graph.emplace(fragment_instance2.GetId(), fragment_instance2);
     SubGraph sub_graph{0}; // only include the first part
     sf::FloatRect outer_box = calculate_outer_box(part_graph, sub_graph);

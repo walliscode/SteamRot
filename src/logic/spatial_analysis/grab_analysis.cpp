@@ -9,9 +9,6 @@
 /////////////////////////////////////////////////
 #include "grab_analysis.h"
 #include "MachinaFormScaffold.h"
-#include "positioning_grimoire_machina.h"
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
 #include <cmath>
 
 namespace steamrot::logic::spatial_analysis {
@@ -87,11 +84,8 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
       rotation_transform.transformPoint(anchor_joint.GetPart().socket_pivot);
 
   // TRANSFORM //
-  anchor_joint.GetTransform().translate(translation_vector);
-  anchor_joint.GetTransform().rotate(rotation_angle);
-
-  // update state of the anchor joint
-  anchor_joint.AddToTotalRotation(rotation_angle);
+  anchor_joint.move(translation_vector);
+  anchor_joint.rotate(rotation_angle);
 };
 
 /////////////////////////////////////////////////
@@ -111,7 +105,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
 
   // as this is the coordination fuction we can set the initial transform of the
   // anchor joint to identity
-  anchor_joint.SetTransform(sf::Transform::Identity);
+  anchor_joint.setPosition({0.f, 0.f});
+  anchor_joint.setRotation(sf::degrees(0.f));
 
   // LOCAL TRANSFORMS //
   // spread the sockets on the anchor joint to maximum
@@ -153,9 +148,12 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
             std::get<FragmentInstance>(part_graph.at(part_id));
 
         // align the part to the anchor joint
-        positioning::grimoire_machina::align_fragment_onto_joint_socket(
-            fi, connection->other_socket_id, anchor_joint,
+        auto align_result = fi.AlignOntoOtherPartInstance(
+            connection->other_socket_id, anchor_joint,
             connection->this_socket_id);
+
+        // [TODO:] we should handle the error here, but for now we will just
+        // continue
       }
 
       // then cycle through the rest of the arm and align each part to the
@@ -187,8 +185,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
             continue;
 
           // align the part to the previous part
-          positioning::grimoire_machina::align_fragment_onto_joint_socket(
-              fi, connection->this_socket_id, ji, connection->other_socket_id);
+          auto align_result = fi.AlignOntoOtherPartInstance(
+              connection->this_socket_id, ji, connection->other_socket_id);
 
         } else if (std::holds_alternative<JointInstance>(
                        part_graph.at(part_id)) &&
@@ -208,8 +206,8 @@ void align_grab_result_to_open_state(GrabResult &grab_result,
           ji.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
           // align the part to the previous part
-          positioning::grimoire_machina::align_joint_onto_fragment_socket(
-              ji, connection->this_socket_id, fi, connection->other_socket_id);
+          auto align_result = ji.AlignOntoOtherPartInstance(
+              connection->this_socket_id, fi, connection->other_socket_id);
         } else {
         }
       }
@@ -243,7 +241,7 @@ bool end_of_arm_is_grab_ready(const SubGraph &arm, const bool is_left_arm,
   // add the anchor joint's total rotation to the arc mid degrees to get the
   // world rotation
   const sf::Angle world_arc_mid_degrees =
-      anchor_joint.GetTotalRotation() + sf::degrees(arc_mid_degrees);
+      anchor_joint.getRotation() + sf::degrees(arc_mid_degrees);
 
   // convert the world arc mid degrees to a sf::Vector2f representing the
   // direction. Makes use of the normalized vector to get the direction only

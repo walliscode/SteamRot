@@ -34,6 +34,7 @@ public:
   using SocketType = typename Trait::SocketType;
   using Sockets = std::map<uint32_t, SocketType>;
   using Part = typename Trait::PartType;
+  using TraitType = Trait;
 
 protected:
   template <typename> friend class PartInstance;
@@ -48,12 +49,6 @@ protected:
   Sockets sockets;
 
   /////////////////////////////////////////////////
-  /// @brief The global transform of this instance, including translation,
-  /// rotation, and scale.
-  /////////////////////////////////////////////////
-  // sf::Transform transform{sf::Transform::Identity};
-
-  /////////////////////////////////////////////////
   /// @brief Stable unique identifier for this instance.
   /////////////////////////////////////////////////
   const uint32_t id;
@@ -63,11 +58,6 @@ protected:
   /// Defaults to "none" if not provided.
   /////////////////////////////////////////////////
   const std::string alias{"none"};
-
-  /////////////////////////////////////////////////
-  /// @brief Total rotation applied to this instance in degrees.
-  /////////////////////////////////////////////////
-  // sf::Angle total_rotation{sf::degrees(0.f)};
 
   /////////////////////////////////////////////////
   /// @brief Find a socket by id.
@@ -141,51 +131,6 @@ public:
   /// @return Human-readable alias string.
   /////////////////////////////////////////////////
   const std::string &GetAlias() const { return alias; }
-
-  /////////////////////////////////////////////////
-  /// @brief Get mutable access to the global transform.
-  ///
-  /// @return Mutable reference to this instance transform.
-  /////////////////////////////////////////////////
-  // sf::Transform &GetTransform() { return transform; }
-
-  /////////////////////////////////////////////////
-  /// @brief Get read-only access to the global transform.
-  ///
-  /// @return Const reference to this instance transform.
-  /////////////////////////////////////////////////
-  // const sf::Transform &GetTransform() const { return transform; }
-
-  /////////////////////////////////////////////////
-  /// @brief Replace the global transform.
-  ///
-  /// @param new_transform New transform to apply.
-  /////////////////////////////////////////////////
-  // void SetTransform(const sf::Transform &new_transform) {
-  //   transform = new_transform;
-  // }
-
-  /////////////////////////////////////////////////
-  /// @brief Get read-only access to the total rotation of this instance.
-  ///
-  /// @return Const reference to the total rotation angle.
-  /////////////////////////////////////////////////
-  // const sf::Angle &GetTotalRotation() const { return total_rotation; }
-
-  /////////////////////////////////////////////////
-  /// @brief Override the tracked total rotation of this instance.
-  ///
-  /// @param angle sf::Angle to set as the new total rotation.
-  /////////////////////////////////////////////////
-  // void SetTotalRotation(const sf::Angle &angle) { total_rotation = angle; }
-
-  /////////////////////////////////////////////////
-  /// @brief Add an angle to the tracked total rotation.
-  ///
-  /// @param angle Angle to accumulate.
-  /////////////////////////////////////////////////
-  // void AddToTotalRotation(const sf::Angle &angle) { total_rotation += angle;
-  // }
 
   /////////////////////////////////////////////////
   /// @brief Find a socket by id (const overload).

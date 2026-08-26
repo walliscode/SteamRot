@@ -1135,12 +1135,6 @@ TEST_CASE("JointInstance::AlignOntoOtherPartInstance tests",
 
     for (const auto &tc : cases) {
       DYNAMIC_SECTION(tc.name) {
-        std::cout << "\n===== CASE: " << tc.name << " =====\n";
-        std::cout << "fragment_socket_id=" << tc.fragment_socket_id
-                  << ", joint_socket_id=" << tc.joint_socket_id
-                  << ", fragment_rotation_deg=" << tc.fragment_rotation_deg
-                  << ", expected_joint_rotation_deg="
-                  << tc.expected_joint_rotation_deg << "\n";
 
         // reset per-case state so cases are isolated
 

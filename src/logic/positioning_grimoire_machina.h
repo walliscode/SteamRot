@@ -30,36 +30,6 @@ rotation_of_vector_to_target_vector(const sf::Vector2f &source_vector,
                                     const sf::Vector2f &target_vector);
 
 /////////////////////////////////////////////////
-/// @brief Aligns a FragmentInstance onto a JointInstance socket by way of the
-/// FragmentInstance socket
-///
-/// @param fragment_instance FragmentInstance to be aligned onto the
-/// JointInstance socket
-/// @param frament_socket_id fragment socket id to be used for alignment
-/// @param joint_instance JointInstance to be aligned onto
-/// @param joint_socket_id joint socket id to be used for alignment
-/////////////////////////////////////////////////
-void align_fragment_onto_joint_socket(FragmentInstance &fragment_instance,
-                                      const uint32_t frament_socket_id,
-                                      const JointInstance &joint_instance,
-                                      const uint32_t joint_socket_id);
-
-/////////////////////////////////////////////////
-/// @brief Aligns a JointInstance onto a FragmentInstance socket by way of the
-/// JointInstance socket
-///
-/// @param joint_instance JointInstance to be aligned onto the FragmentInstance
-/// socket
-/// @param joint_socket_id Joint socket id to be used for alignment
-/// @param fragment_instance FragmentInstance to be aligned onto
-/// @param fragment_socket_id Fragment socket id to be used for alignment
-/////////////////////////////////////////////////
-void align_joint_onto_fragment_socket(JointInstance &joint_instance,
-                                      const uint32_t joint_socket_id,
-                                      const FragmentInstance &fragment_instance,
-                                      const uint32_t fragment_socket_id);
-
-/////////////////////////////////////////////////
 /// @brief Identifies the PartInstance with a socket index of 0 and positions at
 /// 0,0 of the canvas
 /////////////////////////////////////////////////

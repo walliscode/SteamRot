@@ -11,6 +11,7 @@
 #include "Joint.h"
 #include "MrGhost.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Angle.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
@@ -133,10 +134,11 @@ TEST_CASE("draw_ghost_item draws fragment geometry at the instance transform",
 
   // Fragment has a 20x20 white square at local origin.
   // Set transform to translate(25, 25) — square lands at [25..45, 25..45].
-  steamrot::Fragment fragment = MakePopulatedFragment("arm");
-  steamrot::FragmentInstance instance{0, fragment};
-  instance.SetTransform(sf::Transform::Identity);
-  instance.GetTransform().translate({25.f, 25.f});
+  Fragment fragment = MakePopulatedFragment("arm");
+  FragmentInstance instance{0, fragment};
+  instance.setRotation(sf::degrees(0));
+  instance.setPosition({0.f, 0.f});
+  instance.move({25.f, 25.f});
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance.emplace<FragmentInstance>(instance);
@@ -184,9 +186,9 @@ TEST_CASE("draw_ghost_item renders fragment geometry at a far-corner position",
 
   steamrot::Fragment fragment = MakePopulatedFragment("rock");
   steamrot::FragmentInstance instance{0, fragment};
-  instance.SetTransform(sf::Transform::Identity);
+
   // translate(175, 175) — square lands at [175..195, 175..195]
-  instance.GetTransform().translate({175.f, 175.f});
+  instance.move({175.f, 175.f});
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance.emplace<FragmentInstance>(instance);
@@ -218,10 +220,10 @@ TEST_CASE("draw_ghost_item draws socket circle for a FragmentInstance",
   fragment.sockets.push_back(socket);
 
   steamrot::FragmentInstance instance{0, fragment};
-  instance.SetTransform(sf::Transform::Identity);
+
   // translate(75, 75): square at [75..95, 75..95]
   // socket at world = transform.transformPoint(25, 10) = (100, 85)
-  instance.GetTransform().translate({75.f, 75.f});
+  instance.move({75.f, 75.f});
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance.emplace<FragmentInstance>(instance);
@@ -249,8 +251,8 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment has no sockets",
   // Fragment with geometry but NO sockets
   steamrot::Fragment fragment = MakePopulatedFragment("bare");
   steamrot::FragmentInstance instance{0, fragment};
-  instance.SetTransform(sf::Transform::Identity);
-  instance.GetTransform().translate({75.f, 75.f});
+
+  instance.move({75.f, 75.f}); // translate(75, 75): square at [75..95, 75..95]
 
   steamrot::MrGhost mr_ghost;
   mr_ghost.m_instance.emplace<FragmentInstance>(instance);
