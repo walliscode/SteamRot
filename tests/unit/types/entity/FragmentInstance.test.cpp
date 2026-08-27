@@ -7,12 +7,15 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "FragmentInstance.h"
+#include "ColorEqualsMatcher.h"
 #include "JointInstance.h"
 #include "SocketState.h"
 #include "Vector2fEqualsMatcher.h"
 #include "catch2/catch_approx.hpp"
+#include "catch2/matchers/catch_matchers.hpp"
 #include "fragment_library.h"
 #include "joint_library.h"
+#include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -269,13 +272,54 @@ TEST_CASE("FragmentInstance::GetSocketWorldAlignmentVector tests",
 
 TEST_CASE("FragmentInstance::CheckMouseOverSockets tests",
           "[FragmentInstance]") {
-  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
+  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithTwoSockets);
+  sf::Vector2f world_mouse(0.f, 0.f);
+
+  const SocketState *socket_0 = fragment_instance.TryGetSocket(0);
+  REQUIRE(socket_0);
+  const SocketState *socket_1 = fragment_instance.TryGetSocket(1);
+  REQUIRE(socket_1);
+
+  REQUIRE_FALSE(socket_0->IsMouseOver());
+  REQUIRE_FALSE(socket_1->IsMouseOver());
+
+  // test positions of sockets in world space
+  REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
+               EqualsVector2f({0.f, 5.f}, 0.001f));
+  REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(1),
+               EqualsVector2f({50.f, 5.f}, 0.001f));
 
   SECTION("Does not throw when called") {
     REQUIRE_NOTHROW(fragment_instance.CheckMouseOverSockets({0.f, 0.f}));
     REQUIRE_NOTHROW(fragment_instance.CheckMouseOverSockets({100.f, 100.f}));
   }
-  // [TODO: ] add proper tests
+
+  SECTION("Sets mouse-over state for sockets within radius") {
+    fragment_instance.CheckMouseOverSockets({0.f, 0.f});
+    REQUIRE(socket_0->IsMouseOver());
+    REQUIRE_FALSE(socket_1->IsMouseOver());
+  }
+
+  SECTION("Clears mouse-over state for sockets outside radius") {
+    fragment_instance.CheckMouseOverSockets({0.f, 0.f});
+    REQUIRE(socket_0->IsMouseOver());
+    REQUIRE_FALSE(socket_1->IsMouseOver());
+
+    fragment_instance.CheckMouseOverSockets({100.f, 100.f});
+    REQUIRE_FALSE(socket_0->IsMouseOver());
+    REQUIRE_FALSE(socket_1->IsMouseOver());
+  }
+
+  SECTION("moving the fragment instance updates mouse-over state") {
+    fragment_instance.CheckMouseOverSockets({0.f, 0.f});
+    REQUIRE(socket_0->IsMouseOver());
+    REQUIRE_FALSE(socket_1->IsMouseOver());
+
+    fragment_instance.move({50.f, 0.f});
+    fragment_instance.CheckMouseOverSockets({0.f, 0.f});
+    REQUIRE_FALSE(socket_0->IsMouseOver());
+    REQUIRE_FALSE(socket_1->IsMouseOver());
+  }
 }
 
 TEST_CASE("FragmentInstance::CheckIfSocketIsAvailable tests",
@@ -357,7 +401,7 @@ TEST_CASE("FragmentInstance::ResetAllSocketsInteractionState tests",
     REQUIRE(socket != nullptr);
 
     socket->SetDistanceToNearestSocket(1.0f);
-    socket->CheckMouseOver({0.f, 0.f}, {0.f, 0.f}, 5.f);
+    // socket->CheckMouseOver({0.f, 0.f}, {0.f, 0.f}, 5.f);
     REQUIRE(socket->GetDistanceToNearestSocket().has_value());
     REQUIRE(socket->IsMouseOver());
 
@@ -889,6 +933,113 @@ TEST_CASE("FragmentInstance::AlignOntoOtherPartInstance tests",
         REQUIRE_THAT(fragment_connected_socket_world,
                      EqualsVector2f(joint_connected_socket_world, 0.001f));
       }
+    }
+  }
+}
+TEST_CASE("FragmentInstance::DrawSockets tests", "[unit][FragmentInstance]") {
+
+  sf::RenderTexture texture{{100, 100}};
+  texture.clear(sf::Color::Black);
+
+  SECTION("FragmentRectangleWithTwoSockets") {
+    FragmentInstance fragment_instance(1,
+                                       parts::FragmentRectangleWithOneSocket);
+
+    SECTION("DrawSockets produces white pixels at world_pos when not "
+            "hovered/proximal") {
+
+      // Arrange
+      fragment_instance.ResetAllSocketsInteractionState();
+
+      // Act
+      fragment_instance.DrawSockets(texture);
+      texture.display();
+
+      const sf::Image image = texture.getTexture().copyToImage();
+
+      // Assert
+      for (const auto &[socket_id, socket_state] :
+           fragment_instance.GetSockets()) {
+        const sf::Vector2f world_pos =
+            fragment_instance.GetSocketWorldPosition(socket_id);
+        REQUIRE_THAT(image.getPixel({world_pos}),
+                     ColorEqualsMatcher(sf::Color::White));
+      }
+    }
+
+    SECTION(
+        "DrawSockets produces blue pixels at world pos when mouse is over") {
+      // Arrange
+      fragment_instance.ResetAllSocketsInteractionState();
+      fragment_instance.CheckMouseOverSockets({0.f, 0.f});
+      // Act
+      fragment_instance.DrawSockets(texture);
+      texture.display();
+      const sf::Image image = texture.getTexture().copyToImage();
+      // Assert
+      for (const auto &[socket_id, socket_state] :
+           fragment_instance.GetSockets()) {
+        const sf::Vector2f world_pos =
+            fragment_instance.GetSocketWorldPosition(socket_id);
+        if (socket_state.IsMouseOver()) {
+          REQUIRE_THAT(image.getPixel({world_pos}),
+                       ColorEqualsMatcher(sf::Color::Blue));
+        } else {
+          REQUIRE_THAT(image.getPixel({world_pos}),
+                       ColorEqualsMatcher(sf::Color::White));
+        }
+      }
+    }
+
+    SECTION("DrawSockets produces green pixels at world pos when within "
+            "connection distance") {
+      // Arrange
+      fragment_instance.ResetAllSocketsInteractionState();
+      JointInstance joint_instance(2, parts::JointSquareWithOneSocket);
+
+      // this should produce the socket at 9.19,9.19
+      joint_instance.PositionSockets(
+          JointSocketPositioningStrategy::MaximizeDistance);
+      // move the joint instance to be near the fragment instance so that the
+      // sockets are within connection distance
+      joint_instance.move(
+          {-9.f, -5.f}); // move the other fragment to be near the first
+      fragment_instance.CheckWithOtherInstanceForCollision(joint_instance);
+
+      // Act
+      fragment_instance.DrawSockets(texture);
+      texture.display();
+      const sf::Image image = texture.getTexture().copyToImage();
+
+      // Assert
+      // both position for the fragment_socket 0 and joint socket 0 should be
+      // green
+      REQUIRE_THAT(
+          image.getPixel({fragment_instance.GetSocketWorldPosition(0)}),
+          ColorEqualsMatcher(sf::Color::Green));
+      REQUIRE_THAT(image.getPixel({joint_instance.GetSocketWorldPosition(0)}),
+                   ColorEqualsMatcher(sf::Color::Green));
+    }
+
+    SECTION("DrawSockets produces blue pixels at world pos when within "
+            "proximal distance but not connections distance") {
+      // Arrange
+      fragment_instance.ResetAllSocketsInteractionState();
+      JointInstance joint_instance(2, parts::JointSquareWithTwoSockets);
+      joint_instance.PositionSockets(
+          JointSocketPositioningStrategy::MaximizeDistance);
+      joint_instance.move({-7, -3});
+      fragment_instance.CheckWithOtherInstanceForCollision(joint_instance);
+
+      // Act
+      fragment_instance.DrawSockets(texture);
+      texture.display();
+      const sf::Image image = texture.getTexture().copyToImage();
+
+      // Assert
+      // both positions for the fragment_socket 0 and joint socket 0 should be
+      // some modified blue
+      // [TODO:] modify colour with brightness to check
     }
   }
 }

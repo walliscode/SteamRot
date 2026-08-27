@@ -286,46 +286,6 @@ TEST_CASE("SocketState::GetConnectionState tests",
   }
 }
 
-TEST_CASE("SocketState::IsReadyToConnect tests",
-          "[FragmentSocketState][SocketState]") {
-  sf::Vector2f local_position(0.f, 0.f);
-  sf::Vector2f alignment_vector(1.f, 0.f);
-  FragmentSocketState socket_state{local_position, alignment_vector};
-
-  SECTION("True when available") { REQUIRE(socket_state.IsReadyToConnect()); }
-
-  SECTION("False when connected") {
-    socket_state.SetConnection(SocketConnection{11, 22});
-    REQUIRE_FALSE(socket_state.IsReadyToConnect());
-  }
-}
-
-TEST_CASE("SocketState::CheckMouseOver tests",
-          "[FragmentSocketState][SocketState]") {
-  sf::Vector2f local_position(0.f, 0.f);
-  sf::Vector2f alignment_vector(1.f, 0.f);
-  FragmentSocketState socket_state{local_position, alignment_vector};
-  const sf::Vector2f socket_world_pos(10.f, 10.f);
-
-  SECTION("Sets true when mouse is inside radius") {
-    socket_state.CheckMouseOver(sf::Vector2f(12.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE(socket_state.IsMouseOver());
-  }
-
-  SECTION("Sets true when mouse is exactly on radius boundary") {
-    socket_state.CheckMouseOver(sf::Vector2f(13.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE(socket_state.IsMouseOver());
-  }
-
-  SECTION("Sets false when mouse is outside radius") {
-    socket_state.CheckMouseOver(sf::Vector2f(14.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE_FALSE(socket_state.IsMouseOver());
-  }
-}
-
 TEST_CASE("SocketState::ResetInteractionState tests",
           "[FragmentSocketState][SocketState]") {
   sf::Vector2f local_position(0.f, 0.f);

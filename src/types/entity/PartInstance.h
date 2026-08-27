@@ -14,6 +14,8 @@
 #include "FailInfo.h"
 #include "PartTraits.h"
 #include "SocketState.h"
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/System/Angle.hpp>
@@ -216,7 +218,13 @@ public:
   void CheckMouseOverSockets(const sf::Vector2f &world_mouse) {
     for (auto &[socket_id, socket] : sockets) {
       const sf::Vector2f world_pos = GetSocketWorldPosition(socket_id);
-      socket.CheckMouseOver(world_mouse, world_pos);
+
+      // get the distance between the mouse and the socket world position
+      const sf::Vector2f diff = world_mouse - world_pos;
+
+      // if the distance is less than the radius, set the socket's mouse-over
+      // state to true
+      socket.SetMouseOver(diff.length() <= 5.f);
     }
   }
 
@@ -521,6 +529,59 @@ public:
          GetSocketWorldPosition(socket_id));
 
     return std::monostate{};
+  }
+
+  void DrawSockets(sf::RenderTexture &texture) const {
+
+    static constexpr float k_outer_radius = 2.f;
+    static constexpr float k_inner_radius = 1.f;
+    static constexpr int k_point_count = 10;
+
+    // Outer white circle drawn for every visible socket state.
+    sf::CircleShape outer(k_outer_radius, k_point_count);
+    outer.setOrigin({k_outer_radius, k_outer_radius});
+
+    // draw an inner circle based on the socket state
+    sf::CircleShape inner(k_inner_radius, k_point_count);
+    inner.setOrigin({k_inner_radius, k_inner_radius});
+
+    // cycle through all sockets and draw them based on their state
+    for (const auto &[socket_id, socket_state] : sockets) {
+
+      // transform the socket's local position to get its world position, then
+      // use to draw the socket
+      const sf::Vector2f world_pos = GetSocketWorldPosition(socket_id);
+      outer.setPosition(world_pos);
+      inner.setPosition(world_pos);
+
+      // uses priority order to determine which state to draw, starting with the
+      // most important state
+      if (socket_state.IsWithinConnectionDistance()) {
+        // Ready to connect: white outer + green inner circle.
+        outer.setFillColor(sf::Color::White);
+        texture.draw(outer);
+
+        inner.setFillColor(sf::Color::Green);
+        texture.draw(inner);
+
+      } else if (socket_state.IsAnotherSocketNear()) {
+
+        // Near but not ready: white outer + blue inner circle whose brightness
+        // scales with proximity (proximity_scale 0 = dim, 255 = full blue).
+        outer.setFillColor(sf::Color::White);
+        texture.draw(outer);
+
+        const uint8_t brightness = socket_state.GetSocketBrightness();
+        inner.setFillColor(sf::Color{0, 0, brightness});
+        texture.draw(inner);
+
+      } else {
+        // Default: white outer, or blue outer when the mouse hovers.
+        outer.setFillColor(socket_state.IsMouseOver() ? sf::Color::Blue
+                                                      : sf::Color::White);
+        texture.draw(outer);
+      }
+    }
   }
 };
 

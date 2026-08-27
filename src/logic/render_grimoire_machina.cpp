@@ -73,7 +73,7 @@ void draw_fragment_instance(sf::RenderTexture &texture,
   draw_view(texture, fragment_instance.GetPart().positioning_views,
             ViewDirection::Front, states);
   if (draw_sockets)
-    draw_fragment_instance_sockets(texture, fragment_instance);
+    fragment_instance.DrawSockets(texture);
 }
 
 /////////////////////////////////////////////////
@@ -85,71 +85,7 @@ void draw_joint_instance(sf::RenderTexture &texture,
   draw_view(texture, joint_instance.GetPart().positioning_views,
             ViewDirection::Front, states);
   if (draw_sockets)
-    draw_joint_instance_sockets(texture, joint_instance);
-}
-
-/////////////////////////////////////////////////
-void draw_fragment_instance_sockets(sf::RenderTexture &texture,
-                                    FragmentInstance &fragment_instance) {
-  for (auto &[socket_id, socket] : fragment_instance.GetSockets()) {
-    const sf::Vector2f world_pos =
-        fragment_instance.GetSocketWorldPosition(socket_id);
-    draw_socket(texture, world_pos, socket);
-  }
-}
-
-/////////////////////////////////////////////////
-void draw_joint_instance_sockets(sf::RenderTexture &texture,
-                                 JointInstance &joint_instance) {
-  for (auto &[socket_id, socket] : joint_instance.GetSockets()) {
-    // transform the socket's local position to get its world position, then
-    // draw
-    const sf::Vector2f world_pos =
-        joint_instance.GetSocketWorldPosition(socket_id);
-    draw_socket(texture, world_pos, socket);
-  }
-}
-
-/////////////////////////////////////////////////
-void draw_socket(sf::RenderTexture &texture, sf::Vector2f world_pos,
-                 const SocketState &socket_state) {
-  static constexpr float k_outer_radius = 2.f;
-  static constexpr float k_inner_radius = 1.f;
-  static constexpr int k_point_count = 10;
-
-  // Outer white circle drawn for every visible socket state.
-  sf::CircleShape outer(k_outer_radius, k_point_count);
-  outer.setOrigin({k_outer_radius, k_outer_radius});
-  outer.setPosition(world_pos);
-
-  if (socket_state.IsReadyToConnect()) {
-    // Ready to connect: white outer + green inner circle.
-    outer.setFillColor(sf::Color::White);
-    texture.draw(outer);
-
-    sf::CircleShape inner(k_inner_radius, k_point_count);
-    inner.setOrigin({k_inner_radius, k_inner_radius});
-    inner.setPosition(world_pos);
-    inner.setFillColor(sf::Color::Green);
-    texture.draw(inner);
-  } else if (socket_state.IsAnotherSocketNear()) {
-    // Near but not ready: white outer + blue inner circle whose brightness
-    // scales with proximity (proximity_scale 0 = dim, 255 = full blue).
-    outer.setFillColor(sf::Color::White);
-    texture.draw(outer);
-
-    const uint8_t brightness = socket_state.GetSocketBrightness();
-    sf::CircleShape inner(k_inner_radius, k_point_count);
-    inner.setOrigin({k_inner_radius, k_inner_radius});
-    inner.setPosition(world_pos);
-    inner.setFillColor(sf::Color{0, 0, brightness});
-    texture.draw(inner);
-  } else {
-    // Default: white outer, or blue outer when the mouse hovers.
-    outer.setFillColor(socket_state.IsMouseOver() ? sf::Color::Blue
-                                                  : sf::Color::White);
-    texture.draw(outer);
-  }
+    joint_instance.DrawSockets(texture);
 }
 
 /////////////////////////////////////////////////

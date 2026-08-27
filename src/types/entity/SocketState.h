@@ -133,6 +133,7 @@ public:
   bool IsWithinConnectionDistance() const {
     if (!m_distance_to_nearest_socket.has_value())
       return false;
+
     return m_distance_to_nearest_socket.value() <=
            k_connection_distance_threshold;
   }
@@ -171,13 +172,6 @@ public:
     return IsAvailable() ? SocketConnectionState::Available
                          : SocketConnectionState::Connected;
   }
-
-  /////////////////////////////////////////////////
-  /// @brief Returns whether this socket is ready to connect.
-  ///
-  /// @return True if ready to connect, false otherwise.
-  /////////////////////////////////////////////////
-  bool IsReadyToConnect() const { return IsAvailable(); }
 
   /////////////////////////////////////////////////
   /// @brief Set optional nearest-socket distance value.
@@ -231,24 +225,8 @@ public:
   void ClearConnection() { m_connected_to = std::nullopt; }
 
   /////////////////////////////////////////////////
-  /// @brief Update hover state from world-space mouse and socket position.
-  ///
-  /// @param world_mouse Mouse position in world space.
-  /// @param world_pos Socket position in world space.
-  /// @param radius Hit radius used for overlap test.
-  /////////////////////////////////////////////////
-  void CheckMouseOver(const sf::Vector2f &world_mouse,
-                      const sf::Vector2f &world_pos, const float radius = 5.f) {
-
-    // Check if the mouse is within the hit radius of the socket position.
-    m_is_mouse_over =
-        (world_mouse - world_pos).x * (world_mouse - world_pos).x +
-            (world_mouse - world_pos).y * (world_mouse - world_pos).y <=
-        radius * radius;
-  }
-
-  /////////////////////////////////////////////////
-  /// @brief Set hover state directly, bypassing mouse position check.
+  /// @brief Set hover state directly, bypassing mouse position check. used for
+  /// testing but is a code smell
   ///
   /// @param is_over Boolean indicating whether the mouse is over the socket.
   /////////////////////////////////////////////////

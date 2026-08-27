@@ -24,9 +24,9 @@ TEST_CASE("JointSocketState::JointSocketState tests", "[JointSocketState]") {
     REQUIRE_FALSE(socket_state.GetDistanceToNearestSocket().has_value());
     REQUIRE_FALSE(socket_state.GetConnection().has_value());
     REQUIRE(socket_state.IsAvailable());
+    REQUIRE(socket_state.IsWithinConnectionDistance() == false);
     REQUIRE(socket_state.GetConnectionState() ==
             SocketConnectionState::Available);
-    REQUIRE(socket_state.IsReadyToConnect());
   }
 }
 TEST_CASE("JointSocketState::GetLocalPosition tests", "[JointSocketState]") {
@@ -249,42 +249,6 @@ TEST_CASE("SocketState::GetConnectionState tests",
     socket_state.SetConnection(SocketConnection{3, 4});
     REQUIRE(socket_state.GetConnectionState() ==
             SocketConnectionState::Connected);
-  }
-}
-
-TEST_CASE("SocketState::IsReadyToConnect tests",
-          "[JointSocketState][SocketState]") {
-  JointSocketState socket_state;
-
-  SECTION("True when available") { REQUIRE(socket_state.IsReadyToConnect()); }
-
-  SECTION("False when connected") {
-    socket_state.SetConnection(SocketConnection{11, 22});
-    REQUIRE_FALSE(socket_state.IsReadyToConnect());
-  }
-}
-
-TEST_CASE("SocketState::CheckMouseOver tests",
-          "[JointSocketState][SocketState]") {
-  JointSocketState socket_state;
-  const sf::Vector2f socket_world_pos(10.f, 10.f);
-
-  SECTION("Sets true when mouse is inside radius") {
-    socket_state.CheckMouseOver(sf::Vector2f(12.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE(socket_state.IsMouseOver());
-  }
-
-  SECTION("Sets true when mouse is exactly on radius boundary") {
-    socket_state.CheckMouseOver(sf::Vector2f(13.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE(socket_state.IsMouseOver());
-  }
-
-  SECTION("Sets false when mouse is outside radius") {
-    socket_state.CheckMouseOver(sf::Vector2f(14.f, 10.f), socket_world_pos,
-                                3.f);
-    REQUIRE_FALSE(socket_state.IsMouseOver());
   }
 }
 
