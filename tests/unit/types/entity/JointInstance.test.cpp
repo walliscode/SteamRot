@@ -364,7 +364,6 @@ TEST_CASE("JointInstance::ResetAllSocketsInteractionState tests",
     REQUIRE(socket != nullptr);
 
     socket->SetDistanceToNearestSocket(1.0f);
-    socket->CheckMouseOver({0.f, 0.f}, {0.f, 0.f}, 5.f);
     REQUIRE(socket->GetDistanceToNearestSocket().has_value());
     REQUIRE(socket->IsMouseOver());
 

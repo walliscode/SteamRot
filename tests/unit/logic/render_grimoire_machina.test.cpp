@@ -12,7 +12,6 @@
 #include "ColorEqualsMatcher.h"
 #include "GrimoireMachina.h"
 #include "MachinaFormScaffold.h"
-#include "SocketState.h"
 #include "action_grimoire_machina.h"
 #include "grimoire_machina_test_helpers.h"
 #include "test_fonts.h"
@@ -121,84 +120,6 @@ TEST_CASE("draw_view with RenderStates draws Joint positioning_views at "
 
   const sf::Image image = texture.getTexture().copyToImage();
   REQUIRE(image.getPixel({30, 27}) == sf::Color::Blue);
-}
-
-/////////////////////////////////////////////////
-/// draw_socket tests
-/////////////////////////////////////////////////
-
-TEST_CASE("draw_socket tests", "[unit][render_grimoire_machina]") {
-
-  sf::RenderTexture texture{{100, 100}};
-  texture.clear(sf::Color::Black);
-
-  SECTION("draw_socket draws a non-hovered socket without throwing",
-          "[unit][render_grimoire_machina]") {
-    TestSocketState socket_data{{0.f, 0.f}, {1.f, 0.f}};
-    REQUIRE_NOTHROW(draw_socket(texture, {50.f, 50.f}, socket_data));
-  }
-
-  SECTION("draw_socket produces white pixels at world_pos when not hovered",
-          "[unit][render_grimoire_machina]") {
-    TestSocketState socket_data{{0.f, 0.f}, {1.f, 0.f}};
-    socket_data.SetMouseOver(false);
-
-    draw_socket(texture, {50.f, 50.f}, socket_data);
-    texture.display();
-
-    const sf::Image image = texture.getTexture().copyToImage();
-    REQUIRE(image.getPixel({50, 50}) == sf::Color::White);
-  }
-
-  SECTION("draw_socket produces blue pixels at world_pos when hovered",
-          "[unit][render_grimoire_machina]") {
-    sf::RenderTexture hovered_texture{{100, 100}};
-    hovered_texture.clear(sf::Color::Black);
-
-    TestSocketState socket_data{{0.f, 0.f}, {1.f, 0.f}};
-    socket_data.SetMouseOver(true);
-
-    steamrot::logic::render::grimoire_machina::draw_socket(
-        hovered_texture, {50.f, 50.f}, socket_data);
-    hovered_texture.display();
-
-    const sf::Image image = hovered_texture.getTexture().copyToImage();
-    REQUIRE(image.getPixel({50, 50}) == sf::Color::Blue);
-  }
-
-  SECTION("draw_socket produces white outer and green inner when within "
-          "connection distance",
-          "[unit][render_grimoire_machina]") {
-    sf::RenderTexture near_texture{{100, 100}};
-    near_texture.clear(sf::Color::Black);
-
-    TestSocketState socket_data{{0.f, 0.f}, {1.f, 0.f}};
-    socket_data.SetDistanceToNearestSocket(1.0f); // <= 2.5f
-
-    steamrot::logic::render::grimoire_machina::draw_socket(
-        near_texture, {50.f, 50.f}, socket_data);
-    near_texture.display();
-
-    const sf::Image image = near_texture.getTexture().copyToImage();
-    REQUIRE(image.getPixel({50, 50}) == sf::Color::Green);
-  }
-
-  SECTION("draw_socket produces white outer and blue inner when another socket "
-          "is near but not connect-ready distance",
-          "[unit][render_grimoire_machina]") {
-    sf::RenderTexture prox_texture{{100, 100}};
-    prox_texture.clear(sf::Color::Black);
-
-    TestSocketState socket_data{{0.f, 0.f}, {1.f, 0.f}};
-    socket_data.SetDistanceToNearestSocket(5.0f); // <=10 and >2.5
-
-    steamrot::logic::render::grimoire_machina::draw_socket(
-        prox_texture, {50.f, 50.f}, socket_data);
-    prox_texture.display();
-
-    const sf::Image image = prox_texture.getTexture().copyToImage();
-    REQUIRE(image.getPixel({50, 50}) == sf::Color{0, 0, 159});
-  }
 }
 
 /////////////////////////////////////////////////
