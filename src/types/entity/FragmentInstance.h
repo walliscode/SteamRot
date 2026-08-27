@@ -90,9 +90,11 @@ public:
                    "Socket with ID " + std::to_string(socket_id) +
                        " does not exist in this FragmentInstance."});
     }
-
-    return getTransform()
-        .transformPoint(socket->GetLocalAlignmentVector())
+    // pull out the total rotation of the fragment instance and apply it to the
+    // socket's local alignment vector. Nomalize the result to ensure it is a
+    // unit vector.
+    return socket->GetLocalAlignmentVector()
+        .rotatedBy(getRotation())
         .normalized();
   }
 };

@@ -250,13 +250,202 @@ TEST_CASE("rotate_vector_to_target_vector tests") {
 //   }
 // }
 
-TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
+TEST_CASE("position_from_node tests", "[unit][positioning_grimoire_machina]") {
 
-  SECTION("Does not throw when part graph is empty") {
+  // Arrange
+  std::unordered_set<uint32_t> visited;
+  std::unordered_set<uint32_t> in_stack;
+  SECTION("returns std::monostate when part graph is empty") {
+    PartGraph part_graph;
+    auto position_result = position_from_node(part_graph, 0, visited, in_stack);
+  }
+
+  SECTION("Returns unexpected when part_id does not exist in part graph") {
+    PartGraph part_graph;
+    FragmentInstance fragment_instance{1,
+                                       parts::FragmentRectangleWithOneSocket};
+    part_graph.emplace(fragment_instance.GetId(), fragment_instance);
+
+    auto position_result = position_from_node(part_graph, 0, visited, in_stack);
+    REQUIRE_FALSE(position_result.has_value());
+    REQUIRE(position_result.error().mode == FailMode::BadValue);
+    REQUIRE(position_result.error().message ==
+            "part_id 0 does not exist in part graph");
+  }
+  SECTION("Positions a simple part graph with one fragment and one joint") {
+
+    // ARRANGE //
+    std::unordered_set<uint32_t> visited;
+    std::unordered_set<uint32_t> in_stack;
+
+    PartGraphBuilder builder;
+    PartGraphPackage part_graph_package =
+        builder.AddJointInstance(parts::JointSquareWithOneSocket, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f1")
+            .Connect("f1", 0, "j0", 0)
+            .Build();
+
+    PartGraph &part_graph = part_graph_package.part_graph;
+    // get references to the fragment and joint instances
+    auto &joint_instance_result =
+        part_graph.at(part_graph_package.id_to_part_graph_id.at("j0"));
+    REQUIRE(std::holds_alternative<JointInstance>(joint_instance_result));
+    JointInstance &joint_instance =
+        std::get<JointInstance>(joint_instance_result); // get joint instance
+    REQUIRE(joint_instance.GetId() == 0);
+    joint_instance.PositionSockets(
+        JointSocketPositioningStrategy::MaximizeDistance);
+    //
+    auto &fragment_instance_result =
+        part_graph.at(part_graph_package.id_to_part_graph_id.at("f1"));
+    REQUIRE(std::holds_alternative<FragmentInstance>(fragment_instance_result));
+    FragmentInstance &fragment_instance =
+        std::get<FragmentInstance>(fragment_instance_result); // get fragment
+    REQUIRE(fragment_instance.GetId() == 1);
+    REQUIRE(joint_instance
+                .CheckForFirstConnectionWithOtherInstance(fragment_instance)
+                .has_value()); // ensure connection exists
+
+    // check positions before //
+    const sf::Vector2f expected_ji_socket_0_world_before{9.19f, 9.19f};
+    REQUIRE_THAT(joint_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
+
+    const sf::Vector2f expected_ji_socket_pivot_world_before{0.f, 0.f};
+    REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
+
+    const sf::Vector2f expected_fi_socket_0_world_before{0.f, 5.f};
+    REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(expected_fi_socket_0_world_before, 0.01f));
+
+    // ACT //
+
+    auto result = position_from_node(part_graph, 0, visited, in_stack);
+    if (!result.has_value()) {
+      FAIL("position_from_node failed with error: " + result.error().message);
+    }
+
+    // ASSERT //
+    // joint and joint sockets should not have moved but the fragment should
+    // have been positioned onto the joint socket via the connection
+    REQUIRE_THAT(joint_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
+    REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
+
+    const sf::Vector2f expected_fi_socket_0_world_after{9.19f, 9.19f};
+    REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(expected_fi_socket_0_world_after, 0.01f));
+
+    // rotates 45 degrees to align the fragment socket with the joint socket
+    REQUIRE(fragment_instance.getRotation().asDegrees() == 45.f);
+  }
+  SECTION("Positions a chain graph: j0 - f1 - j2") {
+
+    // Arrange
+    PartGraphBuilder builder;
+    PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWithOneSocket, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithTwoSockets, "f1")
+            .AddJointInstance(parts::JointSquareWithOneSocket, "j2")
+            .Connect("f1", 0, "j0", 0)
+            .Connect("f1", 1, "j2", 0)
+            .Build();
+
+    PartGraph &g = pkg.part_graph;
+
+    auto &j0v = g.at(pkg.id_to_part_graph_id.at("j0"));
+    auto &f1v = g.at(pkg.id_to_part_graph_id.at("f1"));
+    auto &j2v = g.at(pkg.id_to_part_graph_id.at("j2"));
+
+    auto &j0 = std::get<JointInstance>(j0v);
+    auto &f1 = std::get<FragmentInstance>(f1v);
+    auto &j2 = std::get<JointInstance>(j2v);
+    REQUIRE(j0.GetId() == 0);
+    REQUIRE(f1.GetId() == 1);
+    REQUIRE(j2.GetId() == 2);
+
+    j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+    j2.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+
+    // Act
+    auto result = position_from_node(g, j0.GetId(), visited, in_stack);
+    if (!result.has_value()) {
+      FAIL("position_from_node failed with error: " + result.error().message);
+    }
+
+    // j0 socket positions
+    REQUIRE_THAT(j0.GetSocketWorldPosition(0),
+                 EqualsVector2f(sf::Vector2f{9.19f, 9.19f}, 0.01f));
+    REQUIRE_THAT(j0.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(sf::Vector2f{0.f, 0.f}, 0.01f));
+
+    // f1 socket 0 should align to j0 socket 0
+    REQUIRE_THAT(f1.GetSocketWorldPosition(0),
+                 EqualsVector2f(sf::Vector2f{9.19f, 9.19f}, 0.01f));
+    REQUIRE_THAT(f1.GetSocketWorldPosition(1),
+                 EqualsVector2f(sf::Vector2f{44.55f, 44.55f}, 0.01f));
+    REQUIRE(f1.getRotation().asDegrees() == 45.f);
+
+    // j2 socket positions
+    REQUIRE_THAT(j2.GetSocketWorldPosition(0),
+                 EqualsVector2f(sf::Vector2f{44.55f, 44.55f}, 0.01f));
+    REQUIRE_THAT(j2.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(sf::Vector2f{53.74f, 53.74f}, 0.01f));
+    REQUIRE(j2.getRotation().asDegrees() == 180.f);
+  }
+  SECTION("Positions a branching graph: j0 connected to f1 and f2") {
+    // Arrange
+    PartGraphBuilder builder;
+    PartGraphPackage pkg =
+        builder.AddJointInstance(parts::JointSquareWithTwoSockets, "j0")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f1")
+            .AddFragmentInstance(parts::FragmentRectangleWithOneSocket, "f2")
+            .Connect("f1", 0, "j0", 0)
+            .Connect("f2", 0, "j0", 1)
+            .Build();
+
+    PartGraph &g = pkg.part_graph;
+
+    auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
+    j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+    auto &f1 =
+        std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f1")));
+    auto &f2 =
+        std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f2")));
+
+    // Act
+    auto result = position_from_node(g, j0.GetId(), visited, in_stack);
+    if (!result.has_value()) {
+      FAIL("position_from_node failed with error: " + result.error().message);
+    }
+
+    // Assert
+    // j0 positions
+    REQUIRE_THAT(j0.GetSocketWorldPosition(0),
+                 EqualsVector2f(sf::Vector2f{13.f, 0.f}, 0.01f));
+    REQUIRE_THAT(j0.GetSocketWorldPosition(1),
+                 EqualsVector2f(sf::Vector2f{0.f, 13.f}, 0.01f));
+    REQUIRE_THAT(j0.GetSocketPivotWorldPosition(),
+                 EqualsVector2f(sf::Vector2f{0.f, 0.f}, 0.01f));
+    // f1 positions
+    REQUIRE_THAT(f1.GetSocketWorldPosition(0),
+                 EqualsVector2f({13.f, 0.f}, 0.01f));
+    REQUIRE(f1.getRotation().asDegrees() == 0.f);
+
+    REQUIRE_THAT(f2.GetSocketWorldPosition(0),
+                 EqualsVector2f({0.f, 13.f}, 0.01f));
+    REQUIRE(f2.getRotation().asDegrees() == 90.f);
+  }
+}
+TEST_CASE("position_part_graph_from_first_added tests",
+          "[unit][positioning_grimoire_machina]") {
+
+  SECTION("Returns std::monostate when part graph is empty") {
     steamrot::PartGraph part_graph;
-    REQUIRE_NOTHROW(
-        steamrot::logic::positioning::grimoire_machina::position_part_graph(
-            part_graph));
+    auto result = position_part_graph_from_first_added(part_graph);
+    REQUIRE(result.has_value());
   }
 
   SECTION("Positions a simple part graph with one fragment and one joint") {
@@ -289,10 +478,10 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
                 .has_value()); // ensure connection exists
 
     // check positions before //
-    const sf::Vector2f expected_ji_socket_0_world_before{19.19f, 19.19f};
+    const sf::Vector2f expected_ji_socket_0_world_before{9.19f, 9.19f};
     REQUIRE_THAT(joint_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_ji_socket_0_world_before, 0.01f));
-    const sf::Vector2f expected_ji_socket_pivot_world_before{10.f, 10.f};
+    const sf::Vector2f expected_ji_socket_pivot_world_before{0.f, 0.f};
     REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
                  EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
 
@@ -301,7 +490,11 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
                  EqualsVector2f(expected_fi_socket_0_world_before, 0.01f));
 
     // ACT //
-    position_part_graph(part_graph);
+    auto result = position_part_graph_from_first_added(part_graph);
+    if (!result.has_value()) {
+      FAIL("position_part_graph_from_first_added failed with error: " +
+           result.error().message);
+    }
 
     // ASSERT //
     // joint and joint sockets should not have moved but the fragment should
@@ -311,7 +504,7 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     REQUIRE_THAT(joint_instance.GetSocketPivotWorldPosition(),
                  EqualsVector2f(expected_ji_socket_pivot_world_before, 0.01f));
 
-    const sf::Vector2f expected_fi_socket_0_world_after{19.19f, 19.19f};
+    const sf::Vector2f expected_fi_socket_0_world_after{9.19f, 9.19f};
     REQUIRE_THAT(fragment_instance.GetSocketWorldPosition(0),
                  EqualsVector2f(expected_fi_socket_0_world_after, 0.01f));
 
@@ -341,7 +534,7 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
     j2.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
-    position_part_graph(g);
+    auto result = position_part_graph_from_first_added(g);
 
     // f1 socket 0 should align to j0 socket 0
     REQUIRE_THAT(f1.GetSocketWorldPosition(0),
@@ -367,7 +560,7 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     auto &f2 =
         std::get<FragmentInstance>(g.at(pkg.id_to_part_graph_id.at("f2")));
 
-    position_part_graph(g);
+    auto result = position_part_graph_from_first_added(g);
 
     REQUIRE_THAT(f1.GetSocketWorldPosition(0),
                  EqualsVector2f(j0.GetSocketWorldPosition(0), 0.01f));
@@ -390,7 +583,8 @@ TEST_CASE("position_part_graph tests", "[unit][positioning_grimoire_machina]") {
     auto &j0 = std::get<JointInstance>(g.at(pkg.id_to_part_graph_id.at("j0")));
     j0.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
-    REQUIRE_NOTHROW(position_part_graph(g));
+    auto result = position_part_graph_from_first_added(g);
+    REQUIRE(result.has_value());
   }
 }
 
