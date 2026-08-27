@@ -15,6 +15,8 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <expected>
+#include <variant>
 
 namespace steamrot::logic::positioning::grimoire_machina {
 
@@ -44,12 +46,30 @@ void position_first_part_of_machina_form_scaffold(PartGraph &parts);
 void position_machina_form_scaffold(PartGraph &parts);
 
 /////////////////////////////////////////////////
-/// @brief Starting from PartInstance 0 of the PartGraph, positions all parts in
-/// the graph based on their connections and socket configurations.
+/// @brief recursively positions the parts of a PartGraph starting from a given
+/// part_id. It uses depth-first search to traverse the graph and align
+/// connected parts based on their socket connections.
 ///
-/// @param part_graph PartGraph to position
+/// @param part_graph PartGraph containing the parts to be positioned
+/// @param part_id Id of the part to start positioning from
+/// @param visited visited set of part ids to avoid re-positioning already
+/// positioned parts
+/// @param in_stack in_stack set of part ids to detect cycles in the graph
 /////////////////////////////////////////////////
-void position_part_graph(PartGraph &part_graph);
+std::expected<std::monostate, FailInfo>
+position_from_node(PartGraph &part_graph, uint32_t part_id,
+                   std::unordered_set<uint32_t> &visited,
+                   std::unordered_set<uint32_t> &in_stack);
+
+/////////////////////////////////////////////////
+/// @brief Convenience function to position the parts of a PartGraph starting
+/// from the first added part (id 0). It initializes the visited and in_stack
+/// sets and calls position_from_node.
+///
+/// @param part_graph PartGraph containing the parts to be positioned
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+position_part_graph_from_first_added(PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief expands teh composite box to include the next box, effectively

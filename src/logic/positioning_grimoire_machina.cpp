@@ -7,15 +7,19 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_grimoire_machina.h"
+#include "FailInfo.h"
 #include "JointInstance.h"
 #include "MachinaFormScaffold.h"
 #include "PartInstance.h"
+#include "part_instance_ops.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/System/Angle.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 
+#include <expected>
+#include <format>
 #include <variant>
 
 namespace steamrot::logic::positioning::grimoire_machina {
@@ -77,94 +81,116 @@ void position_machina_form_scaffold(PartGraph &parts) {
   position_first_part_of_machina_form_scaffold(parts);
 }
 
-/////////////////////////////////////////////////
-void position_part_graph(PartGraph &part_graph) {
+std::expected<std::monostate, FailInfo>
+position_from_node(PartGraph &part_graph, uint32_t part_id,
+                   std::unordered_set<uint32_t> &visited,
+                   std::unordered_set<uint32_t> &in_stack) {
+  // if the part graph is empty, return early
+  if (part_graph.empty())
+    return std::monostate{};
 
-  // if (part_graph.empty()) {
-  //   return;
-  // }
-  //
-  // std::unordered_set<uint32_t> visited;
-  // std::unordered_set<uint32_t> in_stack; // optional: cycle diagnostics
-  //
-  // auto position_part_graph_recursive = [&](this auto &&self,
-  //                                          const uint32_t part_id) -> void {
-  //   // already done
-  //   if (visited.contains(part_id)) {
-  //     return;
-  //   }
-  //
-  //   // part must exist
-  //   auto current_it = part_graph.find(part_id);
-  //   if (current_it == part_graph.end()) {
-  //     return;
-  //   }
-  //   const auto &current_part_variant = current_it->second;
-  //
-  //   // mark EARLY to prevent cycles/back-edges from re-processing this node
-  //   visited.insert(part_id);
-  //   in_stack.insert(part_id);
-  //
-  //   // define lambda for aligning two part instances togther
-  //   auto align_parts = [](const PartInstanceVariant &parent_instance,
-  //                         const uint32_t parent_socket_id,
-  //                         PartInstanceVariant &child_instance,
-  //                         const uint32_t child_socket_id) {
-  //
-  //   };
-  //
-  //   std::visit(
-  //       [&](auto &current_part_instance) {
-  //         for (const auto &[current_socket_id, current_socket_state] :
-  //              current_part_instance.GetSockets()) {
-  //
-  //           if (current_socket_state.GetConnectionState() !=
-  //                   SocketConnectionState::Connected ||
-  //               !current_socket_state.GetConnection().has_value()) {
-  //             continue;
-  //           }
-  //
-  //           const SocketConnection &connection =
-  //               *current_socket_state.GetConnection();
-  //
-  //           // early skip if peer already visited
-  //           if (visited.contains(connection.peer_part_id)) {
-  //             continue;
-  //           }
-  //
-  //           auto connected_it = part_graph.find(connection.peer_part_id);
-  //           if (connected_it == part_graph.end()) {
-  //             continue;
-  //           }
-  //
-  //           auto &connected_part_variant = connected_it->second;
-  //
-  //           std::visit(
-  //               [&](auto &connected_part_instance) {
-  //                 // align the connected part instance to the current part
-  //                 auto result = try_align_part_instances(
-  //                     current_part_instance, current_socket_id,
-  //                     connected_part_instance, connection.peer_socket_id);
-  //                 // recursively position the connected part
-  //               },
-  //               connected_part_variant);
-  //         }
-  //       },
-  //       current_it->second);
-  //
-  //   in_stack.erase(part_id);
-  //   std::cout << "[position_part_graph_recursive] exit part_id=" << part_id
-  //             << " visited_count=" << visited.size() << "\n";
-  // };
-  //
-  // if (part_graph.find(0) != part_graph.end()) {
-  //   std::cout << "[start] root part_id=0\n";
-  //   position_part_graph_recursive(0);
-  // } else {
-  //   std::cout << "[warn] part_id 0 not found in part graph\n";
-  // }
-  //
-  // std::cout << "[position_part_graph] end\n";
+  // if the part has already been visited, return early
+  if (visited.contains(part_id))
+    return std::monostate{};
+
+  // cycles are currently not allowed or not handled, so if a cycle is detected,
+  // return an error
+  if (in_stack.contains(part_id)) {
+    return std::unexpected(
+        FailInfo{FailMode::BadValue,
+                 std::format("cycle detected at part_id {}", part_id)});
+  }
+
+  // if the part_id does not exist in the part graph, return an error
+  const auto parent_it = part_graph.find(part_id);
+  if (parent_it == part_graph.end()) {
+    return std::unexpected(FailInfo{
+        FailMode::BadValue,
+        std::format("part_id {} does not exist in part graph", part_id)});
+  }
+
+  // mark the part as visited and add it to the in_stack set
+  visited.insert(part_id);
+  in_stack.insert(part_id);
+
+  // use a guard to ensure that the part is removed from the in_stack set when
+  // stack unwinds, even if an error occurs
+  // neat little RAII trick
+  struct StackGuard {
+    std::unordered_set<uint32_t> &stack;
+    uint32_t id;
+
+    ~StackGuard() { stack.erase(id); }
+  } guard{in_stack, part_id};
+
+  // std::visit needed as we are passing a variant to the function
+  return std::visit(
+      [&](auto &parent_part) -> std::expected<std::monostate, FailInfo> {
+        // iterate through each socket of the parent part
+        for (const auto &[socket_id, socket_state] : parent_part.GetSockets()) {
+
+          // if the socket is available, skip it
+          if (socket_state.IsAvailable()) {
+            continue;
+          }
+
+          // get the connection for the socket
+          const SocketConnection &connection = *socket_state.GetConnection();
+
+          // if the connected part has already been visited, skip it
+          if (visited.contains(connection.peer_part_id)) {
+            continue;
+          }
+
+          auto connected_it = part_graph.find(connection.peer_part_id);
+          if (connected_it == part_graph.end()) {
+            continue;
+          }
+
+          auto &child_part = connected_it->second;
+          const uint32_t child_id = connected_it->first;
+
+          // align the child part instance to the parent part
+          auto align_result = std::visit(
+              [&](auto &child_part) -> std::expected<std::monostate, FailInfo> {
+                // the first instance passed through gets aligned to the second
+                // instance, so we need to pass the parent part first and the
+                // child part second
+                return try_align_part_instances(child_part,
+                                                connection.peer_socket_id,
+                                                parent_part, socket_id);
+              },
+              child_part);
+
+          // uniwind the stack and return the error if alignment fails
+          if (!align_result.has_value()) {
+            return align_result;
+          }
+
+          // recursively position the child part and its connected parts
+          auto recurse_result =
+              position_from_node(part_graph, child_id, visited, in_stack);
+
+          // uniwind the stack and return the error if recursion fails
+          if (!recurse_result.has_value())
+            return recurse_result;
+        }
+
+        // return std::monostate to indicate success
+        return std::monostate{};
+      },
+      parent_it->second);
+}
+/////////////////////////////////////////////////
+std::expected<std::monostate, FailInfo>
+position_part_graph_from_first_added(PartGraph &part_graph) {
+
+  // set up variables to for calling position_from_node
+  std::unordered_set<uint32_t> visited;
+  std::unordered_set<uint32_t> in_stack;
+
+  // the first part added should have an id of 0
+  return position_from_node(part_graph, 0, visited, in_stack);
 }
 /////////////////////////////////////////////////
 void calculate_composite_box(sf::FloatRect &composite_box,
