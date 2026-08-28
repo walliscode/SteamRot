@@ -28,17 +28,14 @@ void render_machina_form(sf::RenderTexture &texture,
     return;
   }
 
-  const bool draw_sockets = scaffold->are_sockets_visible;
-
   // draw the PartGraph
   for (auto &[id, part] : scaffold->parts) {
 
-    if (auto *joint = std::get_if<JointInstance>(&part))
-      draw_joint_instance(texture, *joint, draw_sockets);
-
-    else if (auto *fragment = std::get_if<FragmentInstance>(&part)) {
-      draw_fragment_instance(texture, *fragment, draw_sockets);
-    }
+    std::visit(
+        [&](const auto &part_instance) {
+          part_instance.DrawInstance(texture, scaffold->are_sockets_visible);
+        },
+        part);
   }
 
   // pass the status box to the pick_and_draw_status_box function
@@ -63,42 +60,6 @@ void draw_no_machina_form_indicator(sf::RenderTexture &texture) {
 /////////////////////////////////////////////////
 void draw_empty_active_machina_form(sf::RenderTexture &texture,
                                     MachinaForm &form) {}
-
-/////////////////////////////////////////////////
-void draw_fragment_instance(sf::RenderTexture &texture,
-                            FragmentInstance &fragment_instance,
-                            const bool draw_sockets) {
-  sf::RenderStates states;
-  states.transform = fragment_instance.getTransform();
-  draw_view(texture, fragment_instance.GetPart().positioning_views,
-            ViewDirection::Front, states);
-  if (draw_sockets)
-    fragment_instance.DrawSockets(texture);
-}
-
-/////////////////////////////////////////////////
-void draw_joint_instance(sf::RenderTexture &texture,
-                         JointInstance &joint_instance,
-                         const bool draw_sockets) {
-  sf::RenderStates states;
-  states.transform = joint_instance.getTransform();
-  draw_view(texture, joint_instance.GetPart().positioning_views,
-            ViewDirection::Front, states);
-  if (draw_sockets)
-    joint_instance.DrawSockets(texture);
-}
-
-/////////////////////////////////////////////////
-void draw_view(sf::RenderTexture &texture, const Views &views,
-               ViewDirection view_direction) {
-  texture.draw(views[view_direction]);
-}
-
-/////////////////////////////////////////////////
-void draw_view(sf::RenderTexture &texture, const Views &views,
-               ViewDirection view_direction, const sf::RenderStates &states) {
-  texture.draw(views[view_direction], states);
-}
 
 /////////////////////////////////////////////////
 void draw_status_box(sf::FloatRect box, sf::Color color,

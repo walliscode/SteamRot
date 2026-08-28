@@ -583,6 +583,18 @@ public:
       }
     }
   }
+
+  void DrawInstance(sf::RenderTexture &texture, const bool draw_sockets) const {
+
+    // get the correct View for this part. For now we just deal with the Front
+    // view, but this can be expanded later to support other views.
+    const Views &view = part.positioning_views;
+    texture.draw(view[ViewDirection::Front], getTransform());
+
+    // draw the sockets if requested
+    if (draw_sockets)
+      DrawSockets(texture);
+  }
 };
 
 } // namespace steamrot
