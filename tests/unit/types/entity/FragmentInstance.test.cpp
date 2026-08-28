@@ -1044,4 +1044,29 @@ TEST_CASE("FragmentInstance::DrawSockets tests", "[unit][FragmentInstance]") {
   }
 }
 
+TEST_CASE("FragmentInstance::DrawInstance tests", "[unit][FragmentInstance]") {
+  sf::RenderTexture texture{{100, 100}};
+  texture.clear(sf::Color::Black);
+
+  FragmentInstance fragment_instance(0, parts::FragmentRectangleWithTwoSockets);
+
+  SECTION(
+      "DrawInstance produces non-black pixels at fragment's world position") {
+    // Arrange
+    fragment_instance.setPosition({10.f, 10.f});
+    // Act
+    fragment_instance.DrawInstance(texture, false);
+    texture.display();
+    const sf::Image image = texture.getTexture().copyToImage();
+    // Assert
+    // Check that the pixel at the fragment's world position is white
+
+    const sf::Vector2f world_pos = fragment_instance.getPosition();
+    REQUIRE_THAT(image.getPixel({15, 15}),
+                 ColorEqualsMatcher(sf::Color::White));
+
+    // this could do with some more fleshing out
+  }
+}
+
 } // namespace steamrot::tests

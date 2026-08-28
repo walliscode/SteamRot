@@ -15,12 +15,7 @@
 #include "GrimoireMachina.h"
 #include "MachinaForm.h"
 #include "MachinaFormScaffold.h"
-#include "ViewDirection.h"
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics.hpp>
 
 namespace steamrot::logic::render::grimoire_machina {
 
@@ -60,60 +55,6 @@ void draw_no_machina_form_indicator(sf::RenderTexture &texture);
 /////////////////////////////////////////////////
 void draw_empty_active_machina_form(sf::RenderTexture &texture,
                                     MachinaForm &form);
-
-/////////////////////////////////////////////////
-/// @brief Draw a placed FragmentInstance onto the crafting canvas.
-///
-/// Applies the instance's stored transform as RenderStates, draws the
-/// fragment's Front view geometry at the placed position, then draws all
-/// socket indicators on top when @p draw_sockets is true.
-///
-/// @param texture           RenderTexture to draw on.
-/// @param fragment_instance FragmentInstance to render.
-/// @param draw_sockets      Whether to draw the instance's sockets.
-/////////////////////////////////////////////////
-void draw_fragment_instance(sf::RenderTexture &texture,
-                            FragmentInstance &fragment_instance,
-                            bool draw_sockets);
-
-/////////////////////////////////////////////////
-/// @brief Draw a placed JointInstance onto the crafting canvas.
-///
-/// Applies the instance's stored transform as RenderStates, draws the
-/// joint's Front view geometry at the placed position, then draws all
-/// socket indicators on top when @p draw_sockets is true.
-///
-/// @param texture        RenderTexture to draw on.
-/// @param joint_instance JointInstance to render.
-/// @param draw_sockets   Whether to draw the instance's sockets.
-/////////////////////////////////////////////////
-void draw_joint_instance(sf::RenderTexture &texture,
-                         JointInstance &joint_instance, bool draw_sockets);
-
-/////////////////////////////////////////////////
-/// @brief Draw the given view of a Views object.
-///
-/// @param texture        RenderTexture to draw on.
-/// @param views          Views object containing the vertex arrays to draw.
-/// @param view_direction ViewDirection specifying which view to draw.
-/////////////////////////////////////////////////
-void draw_view(sf::RenderTexture &texture, const Views &views,
-               ViewDirection view_direction);
-
-/////////////////////////////////////////////////
-/// @brief Draw the given view of a Views object with custom render states.
-///
-/// Like the three-argument overload but applies @p states (e.g. a translation
-/// transform) when drawing, so the geometry can be positioned at an arbitrary
-/// location such as the cursor.
-///
-/// @param texture        RenderTexture to draw on.
-/// @param views          Views object containing the vertex arrays to draw.
-/// @param view_direction ViewDirection specifying which view to draw.
-/// @param states         RenderStates applied when drawing (transform, etc.).
-/////////////////////////////////////////////////
-void draw_view(sf::RenderTexture &texture, const Views &views,
-               ViewDirection view_direction, const sf::RenderStates &states);
 
 /////////////////////////////////////////////////
 /// @brief Draw a status box with the given parameters.
