@@ -12,6 +12,7 @@
 #include "MachinaFormScaffold.h"
 #include "PartGraphBuilder.h"
 #include "SocketState.h"
+#include "TerminalDescriptorFormatter.h"
 #include "Vector2fEqualsMatcher.h"
 #include "catch2/catch_approx.hpp"
 #include "descriptors_machina_archetypes.h"
@@ -32,7 +33,10 @@ TEST_CASE("valid_grab_pkg passes grab structural tests") {
       descriptors::MA::Grab()(valid_grab_pkg.part_graph,
                               valid_grab_pkg.id_to_part_graph_id.at("j3"), 0);
 
-  REQUIRE(result);
+  // grab formatter to print the trace if the test fails
+  descriptors::TerminalDescriptorFormatter fmt;
+  if (!result)
+    FAIL(fmt.Format(result.m_trace));
 }
 
 TEST_CASE("align_anchor_joint_to_anchor_point tests") {

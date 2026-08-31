@@ -29,8 +29,25 @@ using PartInstanceVariant = std::variant<JointInstance, FragmentInstance>;
 
 using PartGraph = std::map<uint32_t, PartInstanceVariant>;
 
-using StructuralAnalysisResults =
-    std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>;
+/////////////////////////////////////////////////
+/// @class StructuralAnalysisResults
+/// @brief Stores any data/results produced by a structural analysis run. This
+/// is designed to be
+///  a simple data container, and does not contain any logic for running the
+///  analysis itself.
+/////////////////////////////////////////////////
+struct StructuralAnalysisResults {
+  /////////////////////////////////////////////////
+  /// @brief If the analysis run was successful, this will contain the results
+  /// of the successful archetype evaluations, keyed by archetype name. Each
+  /// PartGraph may produce multiple results for each archetype.
+  /////////////////////////////////////////////////
+  std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>
+      successful_results;
+
+  std::unordered_map<std::string, std::vector<MachinaArchetypeResult>>
+      failed_results;
+};
 
 enum class StructuralAnalysisState {
   NotRun,       ///< No analysis has been run yet.

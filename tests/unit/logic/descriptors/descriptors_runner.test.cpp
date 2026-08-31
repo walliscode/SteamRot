@@ -24,19 +24,27 @@ TEST_CASE("run_structural_analysis tests", "[descriptors_runner]") {
 
   SECTION("results_storage is cleared before analysis") {
     // Pre-fill results_storage with dummy data
-    results_storage["dummy_fragment"].push_back(MachinaArchetypeResult{});
+    results_storage.successful_results["dummy_fragment"].push_back(
+        MachinaArchetypeResult{});
+    results_storage.failed_results["dummy_fragment"].push_back(
+        MachinaArchetypeResult{});
+
+    REQUIRE(!results_storage.successful_results.empty());
+    REQUIRE(!results_storage.failed_results.empty());
 
     // Act
     run_structural_analysis(graph, results_storage);
     // Assert
-    REQUIRE(results_storage.empty());
+    REQUIRE(results_storage.successful_results.empty());
+    REQUIRE(results_storage.failed_results.empty());
   }
 
   SECTION("results storage is empty when graph is empty") {
     // Act
     run_structural_analysis(graph, results_storage);
     // Assert
-    REQUIRE(results_storage.empty());
+    REQUIRE(results_storage.successful_results.empty());
+    REQUIRE(results_storage.failed_results.empty());
   }
 
   SECTION("results storage is populated when given a valid grab graph") {
@@ -47,8 +55,11 @@ TEST_CASE("run_structural_analysis tests", "[descriptors_runner]") {
     run_structural_analysis(grab_pkg.part_graph, results_storage);
 
     // Assert
-    REQUIRE(results_storage.find("grab_results") != results_storage.end());
-    REQUIRE(results_storage["grab_results"].size() == 1);
+    REQUIRE(results_storage.successful_results.find("grab_results") !=
+            results_storage.successful_results.end());
+    REQUIRE(results_storage.successful_results["grab_results"].size() == 1);
+
+    REQUIRE(results_storage.failed_results.empty());
   }
 }
 } // namespace steamrot::tests

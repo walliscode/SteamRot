@@ -20,7 +20,7 @@ struct TestContext {
 TEST_CASE("make_scope_begin_event resolves anchor alias from part graph",
           "[unit][logic][descriptors]") {
   const AnalysisEvent event = make_scope_begin_event(
-      "test_chain", ScopeKind::Chain, steamrot::tests::pair.part_graph, 2, 0);
+      "test_chain", ScopeKind::Chain, pair().part_graph, 2, 0);
 
   REQUIRE(event.kind == TraceEventKind::ScopeBegin);
   REQUIRE(event.scope_name == "test_chain");
@@ -33,9 +33,8 @@ TEST_CASE("make_scope_begin_event resolves anchor alias from part graph",
 
 TEST_CASE("node and traversal helpers resolve aliases from part graph",
           "[unit][logic][descriptors]") {
-  const AnalysisEvent node_eval =
-      make_node_eval_event(1, 1, "is_joint", steamrot::tests::pair.part_graph,
-                           true, "node holds JointInstance");
+  const AnalysisEvent node_eval = make_node_eval_event(
+      1, 1, "is_joint", pair().part_graph, true, "node holds JointInstance");
   REQUIRE(node_eval.kind == TraceEventKind::NodeEval);
   REQUIRE(node_eval.part_id == 1);
   REQUIRE(node_eval.predicate_name == "is_joint");
@@ -43,8 +42,8 @@ TEST_CASE("node and traversal helpers resolve aliases from part graph",
   REQUIRE(node_eval.result);
   REQUIRE(node_eval.reason == "node holds JointInstance");
 
-  const AnalysisEvent moving = make_moving_to_neighbour_event(
-      3, 0, 11, 1, 22, steamrot::tests::pair.part_graph);
+  const AnalysisEvent moving =
+      make_moving_to_neighbour_event(3, 0, 11, 1, 22, pair().part_graph);
   REQUIRE(moving.kind == TraceEventKind::MovingToNeighbour);
   REQUIRE(moving.from_id == 0);
   REQUIRE(moving.to_id == 1);
@@ -53,8 +52,8 @@ TEST_CASE("node and traversal helpers resolve aliases from part graph",
   REQUIRE(moving.from_id_alias == "f0");
   REQUIRE(moving.to_id_alias == "j0");
 
-  const AnalysisEvent backtracking = make_backtracking_event(
-      3, 1, 22, 0, 11, steamrot::tests::pair.part_graph);
+  const AnalysisEvent backtracking =
+      make_backtracking_event(3, 1, 22, 0, 11, pair().part_graph);
   REQUIRE(backtracking.kind == TraceEventKind::Backtracking);
   REQUIRE(backtracking.from_id == 1);
   REQUIRE(backtracking.to_id == 0);

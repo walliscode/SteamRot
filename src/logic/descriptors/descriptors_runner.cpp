@@ -16,7 +16,8 @@ namespace steamrot::logic::descriptors {
 void run_structural_analysis(PartGraph &graph,
                              StructuralAnalysisResults &results_storage) {
   // Clear previous results
-  results_storage.clear();
+  results_storage.successful_results.clear();
+  results_storage.failed_results.clear();
 
   // Iterate over each part in the graph
   for (const auto &[id, part_variant] : graph) {
@@ -27,7 +28,7 @@ void run_structural_analysis(PartGraph &graph,
     // run grab analysis
     MachinaArchetypeResult grab_result = MA::Grab()(graph, id, starting_depth);
     if (grab_result) {
-      results_storage["grab_results"].push_back(grab_result);
+      results_storage.successful_results["grab_results"].push_back(grab_result);
     }
   }
 }

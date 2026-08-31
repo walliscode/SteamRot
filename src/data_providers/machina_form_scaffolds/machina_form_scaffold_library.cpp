@@ -142,7 +142,8 @@ create_grab_scaffold_one(GrimoireMachina &grimoire) {
   // scaffold
   MachinaArchetypeResult archetype_result;
   archetype_result.result_sub_graphs = grab_result;
-  scaffold->structural_analysis_results["Grab"].push_back(archetype_result);
+  scaffold->structural_analysis_results.successful_results["Grab"].push_back(
+      archetype_result);
 
   // Assign the populated scaffold to the GrimoireMachina
   grimoire.m_scaffold_form = std::move(scaffold);
