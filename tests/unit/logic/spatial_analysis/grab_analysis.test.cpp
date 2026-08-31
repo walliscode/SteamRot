@@ -42,187 +42,168 @@ TEST_CASE("valid_grab_pkg passes grab structural tests") {
 TEST_CASE("align_anchor_joint_to_anchor_point tests") {
 
   // ARRANGE //
-  JointInstance ji_one = JointInstance{0, parts::JointSquareWithOneSocket};
-  ji_one.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
-  const sf::Vector2f ji_one_socket_0_local_position =
-      ji_one.GetSocketLocalPosition(0);
-
-  REQUIRE(ji_one.getTransform() == sf::Transform::Identity);
-  REQUIRE_THAT(ji_one_socket_0_local_position,
-               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
-  REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
-               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
-
-  JointInstance ji_two = JointInstance{0, parts::JointSquareWithTwoSockets};
-  ji_two.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
-  const sf::Vector2f ji_two_socket_0_local_position =
-      ji_two.GetSockets().at(0).GetLocalPosition();
-  const sf::Vector2f ji_two_socket_1_local_position =
-      ji_two.GetSockets().at(1).GetLocalPosition();
-  REQUIRE_THAT(ji_two_socket_0_local_position,
-               Vector2fEqualsMatcher({23.0f, 10.0f}));
-  REQUIRE_THAT(ji_two_socket_1_local_position,
-               Vector2fEqualsMatcher({10.0f, 23.0f}));
-
-  JointInstance ji_three = JointInstance{0, parts::JointSquareWithThreeSockets};
-  ji_three.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
-  const sf::Vector2f ji_three_socket_0_local_position =
-      ji_three.GetSockets().at(0).GetLocalPosition();
-  const sf::Vector2f ji_three_socket_1_local_position =
-      ji_three.GetSockets().at(1).GetLocalPosition();
-  const sf::Vector2f ji_three_socket_2_local_position =
-      ji_three.GetSockets().at(2).GetLocalPosition();
-  REQUIRE_THAT(ji_three_socket_0_local_position,
-               Vector2fEqualsMatcher({23.0f, 10.0f}));
-  REQUIRE_THAT(ji_three_socket_1_local_position,
-               Vector2fEqualsMatcher({19.19f, 19.19f}, 0.01f));
-  REQUIRE_THAT(ji_three_socket_2_local_position,
-               Vector2fEqualsMatcher({10.0f, 23.0f}));
 
   SECTION("ji_one tests") {
+
+    JointInstance ji_one = JointInstance{0, parts::JointSquareWithOneSocket};
+    ji_one.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+
+    REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
+                 EqualsVector2f({9.19f, 9.19f}, 0.01f));
+    REQUIRE_THAT(ji_one.GetSocketPivotWorldPosition(),
+                 EqualsVector2f({0.f, 0.f}, 0.01f));
+
     SECTION("anchor point at (0,0)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{0.f, 13.f};
 
       // ACT //
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_one, {0.f, 0.f});
 
       // ASSERT //
-      REQUIRE_THAT(
-          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+
+      // the socket pivot should be at the anchor point
+      REQUIRE_THAT(ji_one.GetSocketPivotWorldPosition(),
+                   EqualsVector2f({0, 0}, 0.01f));
+      // for 0-90 degrees rotation arc, the socket should be pointing straight
+      // down
+      REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
+                   EqualsVector2f({0.f, 13.f}, 0.01f));
     }
 
     SECTION("anchor point at (10,10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{10.f, 23.f};
       // ACT //
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_one,
                                                            {10.f, 10.f});
       // ASSERT //
-      REQUIRE_THAT(
-          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
+      REQUIRE_THAT(ji_one.GetSocketPivotWorldPosition(),
+                   EqualsVector2f({10.f, 10.f}, 0.01f));
+      REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
+                   EqualsVector2f({10.f, 23.f}, 0.01f));
     }
 
     SECTION("anchor point at (-10,-10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{-10.f, 3.f};
       // ACT //
       spatial_analysis::align_anchor_joint_to_anchor_point(ji_one,
                                                            {-10.f, -10.f});
       // ASSERT //
-      REQUIRE_THAT(
-          ji_one.getTransform().transformPoint(ji_one_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-    }
-  }
-
-  SECTION("ji_two tests") {
-    SECTION("anchor point at (0,0)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{9.19f, 9.19f};
-      sf::Vector2f expected_socket_1_position{-9.19f, 9.19f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two, {0.f, 0.f});
-      // ASSERT //
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
-          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
+      REQUIRE_THAT(ji_one.GetSocketPivotWorldPosition(),
+                   EqualsVector2f({-10.f, -10.f}, 0.01f));
+      REQUIRE_THAT(ji_one.GetSocketWorldPosition(0),
+                   EqualsVector2f({-10.f, 3.f}, 0.01f));
     }
 
-    SECTION("anchor point at (10,10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{19.19f, 19.19f};
-      sf::Vector2f expected_socket_1_position{0.808f, 19.19f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
-                                                           {10.f, 10.f});
-      // ASSERT //
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
-          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-    }
-    SECTION("anchor point at (-10,-10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{-0.81f, -0.81f};
-      sf::Vector2f expected_socket_1_position{-19.19f, -0.81f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
-                                                           {-10.f, -10.f});
-      // ASSERT //
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_0_local_position),
-          Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(
-          ji_two.getTransform().transformPoint(ji_two_socket_1_local_position),
-          Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-    }
-  }
-  SECTION("ji_three tests") {
-    SECTION("anchor point at (0,0)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{9.19f, 9.19f};
-      sf::Vector2f expected_socket_1_position{0.f, 13.f};
-      sf::Vector2f expected_socket_2_position{-9.19f, 9.19f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
-                                                           {0.f, 0.f});
-      // ASSERT //
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_0_local_position),
-                   Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_1_local_position),
-                   Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_2_local_position),
-                   Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
-    }
+    SECTION("ji_two tests") {
 
-    SECTION("anchor point at (10,10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{19.19f, 19.19f};
-      sf::Vector2f expected_socket_1_position{10.f, 23.f};
-      sf::Vector2f expected_socket_2_position{0.81f, 19.19f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
-                                                           {10.f, 10.f});
-      // ASSERT //
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_0_local_position),
-                   Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_1_local_position),
-                   Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_2_local_position),
-                   Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
+      JointInstance ji_two = JointInstance{0, parts::JointSquareWithTwoSockets};
+      ji_two.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
+
+      REQUIRE_THAT(ji_two.GetSocketWorldPosition(0),
+                   EqualsVector2f({13, 0}, 0.01f));
+      REQUIRE_THAT(ji_two.GetSocketWorldPosition(1),
+                   EqualsVector2f({0, 13}, 0.01f));
+      REQUIRE_THAT(ji_two.GetSocketPivotWorldPosition(),
+                   EqualsVector2f({0.f, 0.f}, 0.01f));
+
+      SECTION("anchor point at (0,0)") {
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
+                                                             {0.f, 0.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_two.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({0.f, 0.f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(0),
+                     EqualsVector2f({9.19f, 9.19f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(1),
+                     EqualsVector2f({-9.19f, 9.19f}, 0.01f));
+      }
+
+      SECTION("anchor point at (10,10)") {
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
+                                                             {10.f, 10.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_two.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({10.f, 10.f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(0),
+                     EqualsVector2f({19.19f, 19.19f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(1),
+                     EqualsVector2f({0.81f, 19.19f}, 0.01f));
+      }
+
+      SECTION("anchor point at (-10,-10)") {
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_two,
+                                                             {-10.f, -10.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_two.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({-10.f, -10.f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(0),
+                     EqualsVector2f({-0.81f, -0.81f}, 0.01f));
+        REQUIRE_THAT(ji_two.GetSocketWorldPosition(1),
+                     EqualsVector2f({-19.19f, -0.81f}, 0.01f));
+      }
     }
-    SECTION("anchor point at (-10,-10)") {
-      // ARRANGE //
-      sf::Vector2f expected_socket_0_position{-0.81f, -0.81f};
-      sf::Vector2f expected_socket_1_position{-10.f, 3.f};
-      sf::Vector2f expected_socket_2_position{-19.19f, -0.81f};
-      // ACT //
-      spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
-                                                           {-10.f, -10.f});
-      // ASSERT //
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_0_local_position),
-                   Vector2fEqualsMatcher(expected_socket_0_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_1_local_position),
-                   Vector2fEqualsMatcher(expected_socket_1_position, 0.01f));
-      REQUIRE_THAT(ji_three.getTransform().transformPoint(
-                       ji_three_socket_2_local_position),
-                   Vector2fEqualsMatcher(expected_socket_2_position, 0.01f));
+    SECTION("ji_three tests") {
+
+      JointInstance ji_three =
+          JointInstance{0, parts::JointSquareWithThreeSockets};
+      ji_three.PositionSockets(
+          JointSocketPositioningStrategy::MaximizeDistance);
+
+      REQUIRE_THAT(ji_three.GetSocketWorldPosition(0),
+                   EqualsVector2f({13.f, 0.f}, 0.01f));
+      REQUIRE_THAT(ji_three.GetSocketWorldPosition(1),
+                   EqualsVector2f({9.19f, 9.19f}, 0.01f));
+      REQUIRE_THAT(ji_three.GetSocketWorldPosition(2),
+                   EqualsVector2f({0, 13.f}, 0.01f));
+      REQUIRE_THAT(ji_three.GetSocketPivotWorldPosition(),
+                   EqualsVector2f({0.f, 0.f}, 0.01f));
+
+      SECTION("anchor point at (0,0)") {
+
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                             {0.f, 0.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_three.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({0.f, 0.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(0),
+                     EqualsVector2f({9.19f, 9.19f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(1),
+                     EqualsVector2f({0.f, 13.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(2),
+                     EqualsVector2f({-9.19f, 9.19f}, 0.01f));
+      }
+
+      SECTION("anchor point at (10,10)") {
+
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                             {10.f, 10.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_three.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({10.f, 10.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(0),
+                     EqualsVector2f({19.19f, 19.19f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(1),
+                     EqualsVector2f({10.f, 23.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(2),
+                     EqualsVector2f({0.81f, 19.19f}, 0.01f));
+      }
+      SECTION("anchor point at (-10,-10)") {
+
+        // ACT //
+        spatial_analysis::align_anchor_joint_to_anchor_point(ji_three,
+                                                             {-10.f, -10.f});
+        // ASSERT //
+        REQUIRE_THAT(ji_three.GetSocketPivotWorldPosition(),
+                     EqualsVector2f({-10.f, -10.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(0),
+                     EqualsVector2f({-0.81f, -0.81f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(1),
+                     EqualsVector2f({-10.f, 3.f}, 0.01f));
+        REQUIRE_THAT(ji_three.GetSocketWorldPosition(2),
+                     EqualsVector2f({-19.19f, -0.81f}, 0.01f));
+      }
     }
   }
 }

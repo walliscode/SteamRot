@@ -72,20 +72,9 @@ void align_anchor_joint_to_anchor_point(JointInstance &anchor_joint,
   // then we convert that to a sf::Angle object
   sf::Angle rotation_angle = sf::degrees(arc_mid);
 
-  // then to a transform we an apply to the socket pivot
-  sf::Transform rotation_transform{sf::Transform::Identity};
-  rotation_transform.rotate(rotation_angle);
-
-  // TRANSLATION //
-  // we need to translate the socket_pivot to the anchor point, AFTER it has
-  // been rotated. This sidesteps the need to specify a pivot point
-  const sf::Vector2f translation_vector =
-      anchor_point -
-      rotation_transform.transformPoint(anchor_joint.GetPart().socket_pivot);
-
   // TRANSFORM //
-  anchor_joint.move(translation_vector);
-  anchor_joint.rotate(rotation_angle);
+  anchor_joint.setRotation(rotation_angle);
+  anchor_joint.setPosition(anchor_point);
 };
 
 /////////////////////////////////////////////////
