@@ -82,7 +82,9 @@ NodeDescriptor has_exactly_n_edges(size_t n, std::string name) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
+            [](const auto &inst) -> size_t {
+              return inst.GetNumberOfConnectedSockets();
+            },
             part_it->second);
         return NodeDescriptorResult{
             count == n, "connection_count=" + std::to_string(count) +
@@ -106,7 +108,9 @@ NodeDescriptor has_minimum_n_edges(size_t n) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
+            [](const auto &inst) -> size_t {
+              return inst.GetNumberOfConnectedSockets();
+            },
             part_it->second);
         return NodeDescriptorResult{
             count >= n, "connection_count=" + std::to_string(count) +
@@ -130,7 +134,9 @@ NodeDescriptor has_maximum_n_edges(size_t n) {
           return NodeDescriptorResult{false, "incorrect key: part_id=" +
                                                  std::to_string(id)};
         const size_t count = std::visit(
-            [](const auto &inst) -> size_t { return inst.GetSocketCount(); },
+            [](const auto &inst) -> size_t {
+              return inst.GetNumberOfConnectedSockets();
+            },
             part_it->second);
         return NodeDescriptorResult{
             count <= n, "connection_count=" + std::to_string(count) +

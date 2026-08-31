@@ -9,7 +9,6 @@
 #include "PartGraphBuilder.h"
 #include "JointInstance.h"
 #include "catch2/catch_test_macros.hpp"
-#include "overload.h"
 #include "part_library.h"
 #include <expected>
 #include <variant>
@@ -180,51 +179,6 @@ PartGraphBuilder &PartGraphBuilder::Connect(const std::string &from_id,
 
   if (!result.has_value())
     FAIL(result.error());
-
-  return *this;
-}
-/////////////////////////////////////////////////
-PartGraphBuilder &PartGraphBuilder::ConnectUnchecked(
-    const std::string &from_id, const uint32_t from_socket_id,
-    const std::string &to_id, const uint32_t to_socket_id) {
-  const auto from_it = m_package.id_to_part_graph_id.find(from_id);
-  if (from_it == m_package.id_to_part_graph_id.end())
-    FAIL("ConnectUnchecked: from_id '" << from_id << "' not found");
-
-  const auto to_it = m_package.id_to_part_graph_id.find(to_id);
-  if (to_it == m_package.id_to_part_graph_id.end())
-    FAIL("ConnectUnchecked: to_id '" << to_id << "' not found");
-
-  const uint32_t from_part_id = from_it->second;
-  const uint32_t to_part_id = to_it->second;
-
-  std::visit(
-      overload{[&](FragmentInstance &from_fragment) {
-                 if (!std::holds_alternative<JointInstance>(
-                         m_package.part_graph.at(to_part_id)))
-                   FAIL("ConnectUnchecked: to_id '"
-                        << to_id << "' is not a JointInstance");
-
-                 JointInstance &to_joint = std::get<JointInstance>(
-                     m_package.part_graph.at(to_part_id));
-                 auto result = from_fragment.CreateConnectionWithOtherInstance(
-                     from_socket_id, to_joint, to_socket_id);
-                 if (!result.has_value())
-                   FAIL(result.error().message);
-               },
-               [&](JointInstance &from_joint) {
-                 if (!std::holds_alternative<FragmentInstance>(
-                         m_package.part_graph.at(to_part_id)))
-                   FAIL("ConnectUnchecked: to_id '"
-                        << to_id << "' is not a FragmentInstance");
-                 FragmentInstance &to_fragment = std::get<FragmentInstance>(
-                     m_package.part_graph.at(to_part_id));
-                 auto result = to_fragment.CreateConnectionWithOtherInstance(
-                     to_socket_id, from_joint, from_socket_id);
-                 if (!result.has_value())
-                   FAIL(result.error().message);
-               }},
-      m_package.part_graph.at(from_part_id));
 
   return *this;
 }

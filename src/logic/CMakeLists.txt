@@ -1,3 +1,4 @@
+add_subdirectory(descriptors)
 add_subdirectory(spatial_analysis)
 add_subdirectory(render)
 
@@ -49,21 +50,13 @@ add_library(logic
 
   collision_grimoire_machina.cpp
 
-  # descriptors
-  descriptors/ChainDescriptorBuilder.cpp
-  descriptors/descriptors_general.cpp
-  descriptors/descriptors_node_descriptors.cpp
-  descriptors/descriptors_chain_descriptors.cpp
-  descriptors/descriptors_machina_archetypes.cpp
-  descriptors/TerminalDescriptorFormatter.cpp
-  descriptors/depth_first_search.cpp
-  descriptors/descriptors_runner.cpp
+
 )
 
 target_include_directories(logic
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/descriptors
+
 )
 
 target_link_libraries(logic
@@ -75,5 +68,6 @@ target_link_libraries(logic
   resources
   conmat::conmat
   machina_form_scaffolds
+  descriptors
 
 )

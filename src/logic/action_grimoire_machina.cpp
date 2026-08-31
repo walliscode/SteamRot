@@ -102,7 +102,7 @@ void process_logic_events(Subscriber &subscriber,
                                          scaffold->structural_analysis_results);
 
     // update the StucturalAnalysisState
-    if (scaffold->structural_analysis_results.empty()) {
+    if (scaffold->structural_analysis_results.successful_results.empty()) {
       scaffold->structural_analysis_state =
           StructuralAnalysisState::NothingFound;
     } else {

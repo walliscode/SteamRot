@@ -9,6 +9,7 @@
 #include "ChainDescriptorBuilder.h"
 #include <catch2/catch_test_macros.hpp>
 
+namespace steamrot::tests {
 using namespace steamrot::logic::descriptors;
 
 // Helper function to create a simple NodeDescriptor for testing
@@ -93,3 +94,4 @@ TEST_CASE("ChainDescriptorBuilder supports multiple steps",
   REQUIRE(steps[1].kind == ChainStepKind::WhileIsTrue);
   REQUIRE(steps[2].kind == ChainStepKind::Sequence);
 }
+} // namespace steamrot::tests

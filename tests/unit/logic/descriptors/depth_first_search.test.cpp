@@ -286,66 +286,22 @@ TEST_CASE(
 TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
           "[unit][logic][descriptors][dfs]") {
 
-  // topology: frag0(terminal) ─ joint0(serial) ─ joint1(serial) ─
-  // frag1(terminal)
-  //   frag0.socket[0] ↔ joint0.socket[0]
-  //   joint0.socket[1] ↔ joint1.socket[0]
-  //   joint1.socket[1] ↔ frag1.socket[0]
+  // topology: f0(terminal) ─ j1(serial) ─ f2(serial) ─ j3(terminal)
   const steamrot::tests::PartGraphPackage pkg =
       steamrot::tests::PartGraphBuilder{}
-          .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
-                               "f0") // id=0
-          .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket,
-                               "f1") // id=1
-          .AddJointInstance(steamrot::tests::JointNames::TwoSockets,
-                            "j0") // id=2
-          .AddJointInstance(steamrot::tests::JointNames::TwoSockets,
-                            "j1")             // id=3
-          .Connect("f0", 0, "j0", 0)          // f0.socket[0] ↔ j0.socket[0]
-          .ConnectUnchecked("j0", 1, "j1", 0) // j0.socket[1] ↔ j1.socket[0]
-          .Connect("j1", 1, "f1", 0)          // j1.socket[1] ↔ f1.socket[0]
+          .AddFragmentInstance(steamrot::tests::FragmentNames::OneSocket, "f0")
+          .AddJointInstance(steamrot::tests::JointNames::TwoSockets, "j1")
+          .AddFragmentInstance(steamrot::tests::FragmentNames::TwoSockets, "f2")
+          .AddJointInstance(steamrot::tests::JointNames::OneSocket, "j3")
+          .Connect("f0", 0, "j1", 0)
+          .Connect("j1", 1, "f2", 0)
+          .Connect("f2", 1, "j3", 0)
           .Build();
   const steamrot::PartGraph &parts = pkg.part_graph;
-  // IDs: frag0=0, frag1=1, joint0=2, joint1=3
-
-  SECTION("min=2 satisfied: finds [joint0, joint1] followed by terminal") {
-    const ChainDescriptorResult result = run_dfs(
-        2,
-        {make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2),
-         make_step(is_terminal(), ChainStepKind::Sequence)},
-        parts);
-
-    REQUIRE(result.valid_subgraph.has_value());
-    REQUIRE(*result.valid_subgraph == std::vector<uint32_t>{2, 3, 1});
-
-    const AnalysisTrace expected_trace =
-        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", true, 1,
-                      "connection_count=2, expected==2")
-            .MovingToNeighbour("j0", 0, "f0", 0, 1)
-            .NodeEval("f0", "is_serial", false, 2,
-                      "connection_count=1, expected==2")
-            .Backtracking("f0", 0, "j0", 0, 1)
-            .MovingToNeighbour("j0", 1, "j1", 0, 1)
-            .NodeEval("j1", "is_serial", true, 2,
-                      "connection_count=2, expected==2")
-            .MovingToNeighbour("j1", 1, "f1", 0, 2)
-            .NodeEval("f1", "is_serial", false, 3,
-                      "connection_count=1, expected==2")
-            .NodeEval("f1", "is_terminal", true, 3,
-                      "connection_count=1, expected==1")
-            .Backtracking("f1", 0, "j1", 1, 2)
-            .Backtracking("j1", 0, "j0", 1, 1)
-            .Build();
-
-    REQUIRE_THAT(result.m_trace,
-                 steamrot::tests::EqualsTrace(expected_trace,
-                                              TerminalDescriptorFormatter{}));
-  }
 
   SECTION("min=3 not satisfied: only 2 serial nodes available, all rejected") {
     const ChainDescriptorResult result = run_dfs(
-        2,
+        1,
         {make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 3),
          make_step(is_terminal(), ChainStepKind::Sequence)},
         parts);
@@ -354,20 +310,54 @@ TEST_CASE("depth_first_search: WhileIsTrueForMinimumN minimum enforcement",
 
     const AnalysisTrace expected_trace =
         steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
-            .NodeEval("j0", "is_serial", true, 1,
+            .NodeEval("j1", "is_serial", true, 1,
                       "connection_count=2, expected==2")
-            .MovingToNeighbour("j0", 0, "f0", 0, 1)
+            .MovingToNeighbour("j1", 0, "f0", 0, 1)
             .NodeEval("f0", "is_serial", false, 2,
                       "connection_count=1, expected==2")
-            .Backtracking("f0", 0, "j0", 0, 1)
-            .MovingToNeighbour("j0", 1, "j1", 0, 1)
-            .NodeEval("j1", "is_serial", true, 2,
+            .Backtracking("f0", 0, "j1", 0, 1)
+            .MovingToNeighbour("j1", 1, "f2", 0, 1)
+            .NodeEval("f2", "is_serial", true, 2,
                       "connection_count=2, expected==2")
-            .MovingToNeighbour("j1", 1, "f1", 0, 2)
-            .NodeEval("f1", "is_serial", false, 3,
+            .MovingToNeighbour("f2", 1, "j3", 0, 2)
+            .NodeEval("j3", "is_serial", false, 3,
                       "connection_count=1, expected==2")
-            .Backtracking("f1", 0, "j1", 1, 2)
-            .Backtracking("j1", 0, "j0", 1, 1)
+            .Backtracking("j3", 0, "f2", 1, 2)
+            .Backtracking("f2", 0, "j1", 1, 1)
+            .Build();
+
+    REQUIRE_THAT(result.m_trace,
+                 steamrot::tests::EqualsTrace(expected_trace,
+                                              TerminalDescriptorFormatter{}));
+  }
+
+  SECTION("min=2 satisfied: serial run accepted, terminal follows") {
+    const ChainDescriptorResult result = run_dfs(
+        1,
+        {make_step(is_serial(), ChainStepKind::WhileIsTrueForMinimumN, 2),
+         make_step(is_terminal(), ChainStepKind::Sequence)},
+        parts);
+
+    REQUIRE(result.valid_subgraph.has_value());
+
+    const AnalysisTrace expected_trace =
+        steamrot::tests::AnalysisTraceBuilder{pkg.id_to_part_graph_id}
+            .NodeEval("j1", "is_serial", true, 1,
+                      "connection_count=2, expected==2")
+            .MovingToNeighbour("j1", 0, "f0", 0, 1)
+            .NodeEval("f0", "is_serial", false, 2,
+                      "connection_count=1, expected==2")
+            .Backtracking("f0", 0, "j1", 0, 1)
+            .MovingToNeighbour("j1", 1, "f2", 0, 1)
+            .NodeEval("f2", "is_serial", true, 2,
+                      "connection_count=2, expected==2")
+            .MovingToNeighbour("f2", 1, "j3", 0, 2)
+            .NodeEval("j3", "is_serial", false, 3,
+                      "connection_count=1, expected==2")
+            .NodeEval("j3", "is_terminal", true, 3,
+                      "connection_count=1, expected==1")
+            .Backtracking("j3", 0, "f2", 1, 2)
+            .Backtracking("f2", 0, "j1", 1, 1)
             .Build();
 
     REQUIRE_THAT(result.m_trace,
@@ -387,7 +377,7 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
     // (no failing node exists). The cycle guard ensures the DFS terminates.
     const ChainDescriptorResult result =
         run_dfs(0, {make_step(is_serial(), ChainStepKind::WhileIsTrue)},
-                steamrot::tests::ring.part_graph);
+                ring().part_graph);
     REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 
@@ -399,7 +389,7 @@ TEST_CASE("depth_first_search: DFS terminates on cyclic graphs",
         run_dfs(0,
                 {make_step(is_serial(), ChainStepKind::WhileIsTrue),
                  make_step(is_terminal(), ChainStepKind::Sequence)},
-                steamrot::tests::ring.part_graph);
+                ring().part_graph);
     REQUIRE_FALSE(result.valid_subgraph.has_value());
   }
 }

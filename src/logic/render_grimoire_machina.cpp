@@ -143,7 +143,7 @@ void pick_and_draw_status_box(const MachinaFormScaffold &scaffold,
 
     // for each archetype result, we will draw a box around the subgraph
     for (const auto &[archetype_name, results] :
-         scaffold.structural_analysis_results) {
+         scaffold.structural_analysis_results.successful_results) {
 
       // we can use std::visit as each variant should have a get_unique_nodes()
       // function to get the unique nodes in the subgraph

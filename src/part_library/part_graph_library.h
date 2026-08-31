@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////
 /// @file
-/// @brief Declaration of objects for the part graph library
-/// This provides predefined PartGraphPackages for testing and analysis
+/// @brief Declaration of objects for the part graph library.
+/// This provides predefined PartGraphPackages for testing and analysis.
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////
@@ -17,26 +17,40 @@
 namespace steamrot::tests {
 
 /////////////////////////////////////////////////
-/// @brief A simple pair of a joint and a fragment
+/// @brief Accessor for a simple pair of a joint and a fragment.
+///
+/// Uses function-local static initialization to avoid global dynamic-init
+/// side effects during Catch2 test discovery.
 /////////////////////////////////////////////////
-extern const PartGraphPackage pair;
+const PartGraphPackage &pair();
 
 /////////////////////////////////////////////////
-/// @brief A linear chain of three parts: fragment ── joint ── fragment
+/// @brief Accessor for a linear chain of three parts:
+///        fragment ── joint ── fragment.
+///
+/// Uses function-local static initialization to avoid global dynamic-init
+/// side effects during Catch2 test discovery.
 /////////////////////////////////////////////////
-extern const PartGraphPackage linear_chain_3;
+const PartGraphPackage &linear_chain_3();
 
 /////////////////////////////////////////////////
-/// @brief A linear chain of five parts: fragment ── joint ── fragment ── joint
-/// ── fragment
+/// @brief Accessor for a linear chain of five parts:
+///        fragment ── joint ── fragment ── joint ── fragment.
+///
+/// Uses function-local static initialization to avoid global dynamic-init
+/// side effects during Catch2 test discovery.
 /////////////////////////////////////////////////
-extern const PartGraphPackage linear_chain_5;
+const PartGraphPackage &linear_chain_5();
 
 /////////////////////////////////////////////////
-/// @brief Three joints wired in a cycle:
+/// @brief Accessor for three joints wired in a cycle:
 ///        joint0.socket[0] ↔ joint1.socket[0]
 ///        joint1.socket[1] ↔ joint2.socket[0]
 ///        joint2.socket[1] ↔ joint0.socket[1]
+///
+/// Uses function-local static initialization to avoid global dynamic-init
+/// side effects during Catch2 test discovery.
 /////////////////////////////////////////////////
-extern const PartGraphPackage ring;
+const PartGraphPackage &ring();
+
 } // namespace steamrot::tests
