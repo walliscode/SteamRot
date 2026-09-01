@@ -14,17 +14,13 @@
 #include "FailInfo.h"
 #include "PartTraits.h"
 #include "SocketState.h"
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Transform.hpp>
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include <cmath>
 #include <cstdint>
 #include <expected>
 #include <format>
 #include <map>
+#include <set>
 #include <string>
 #include <variant>
 
@@ -158,6 +154,16 @@ public:
       }
     }
     return count;
+  }
+
+  std::set<uint32_t> GetConnectedSocketIds() const {
+    std::set<uint32_t> connected_socket_ids;
+    for (const auto &[socket_id, socket] : sockets) {
+      if (socket.GetConnectionState() == SocketConnectionState::Connected) {
+        connected_socket_ids.insert(socket_id);
+      }
+    }
+    return connected_socket_ids;
   }
 
   /////////////////////////////////////////////////

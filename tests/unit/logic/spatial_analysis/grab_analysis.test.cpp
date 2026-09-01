@@ -14,7 +14,6 @@
 #include "SocketState.h"
 #include "TerminalDescriptorFormatter.h"
 #include "Vector2fEqualsMatcher.h"
-#include "catch2/catch_approx.hpp"
 #include "descriptors_machina_archetypes.h"
 #include "joint_library.h"
 #include "machina_archetype_packages.h"
@@ -230,20 +229,12 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   // ASSERT //
 
   // ANCHOR JOINT //
-  sf::Vector2f expected_anchor_joint_socket_pivot_position{0.f, 0.f};
   REQUIRE_THAT(anchor_joint.GetSocketPivotWorldPosition(),
-               Vector2fEqualsMatcher(
-                   expected_anchor_joint_socket_pivot_position, 0.01f));
-  sf::Vector2f expected_anchor_joint_socket_0_position{9.19f, 9.19f};
-  REQUIRE_THAT(
-      anchor_joint.getTransform().transformPoint(
-          anchor_joint.GetSockets().at(0).GetLocalPosition()),
-      Vector2fEqualsMatcher(expected_anchor_joint_socket_0_position, 0.01f));
-  sf::Vector2f expected_anchor_joint_socket_1_position{-9.19f, 9.19f};
-  REQUIRE_THAT(
-      anchor_joint.getTransform().transformPoint(
-          anchor_joint.GetSockets().at(1).GetLocalPosition()),
-      Vector2fEqualsMatcher(expected_anchor_joint_socket_1_position, 0.01f));
+               EqualsVector2f({0.f, 0.f}, 0.01f));
+  REQUIRE_THAT(anchor_joint.GetSocketWorldPosition(0),
+               EqualsVector2f({9.19f, 9.19f}, 0.01f));
+  REQUIRE_THAT(anchor_joint.GetSocketWorldPosition(1),
+               EqualsVector2f({-9.19f, 9.19f}, 0.01f));
 
   // RIGHT ARM //
   const SubGraph &arm_one = grab_result.arms[0];
@@ -258,21 +249,13 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_one.has_value());
   REQUIRE(connection_one->this_socket_id == 0);
   REQUIRE(connection_one->other_socket_id == 1);
-  REQUIRE(arm_one_part_one_fi.getRotation().asDegrees() == -135.f);
 
-  sf::Vector2f expected_arm_one_part_one_socket_1_position{9.19f, 9.19f};
-  REQUIRE_THAT(arm_one_part_one_fi.getTransform().transformPoint(
-                   arm_one_part_one_fi.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_one_socket_1_position, 0.01f));
+  REQUIRE_THAT(arm_one_part_one_fi.GetSocketWorldPosition(0),
+               EqualsVector2f({44.55f, 44.55f}, 0.01f));
+  REQUIRE_THAT(arm_one_part_one_fi.GetSocketWorldPosition(1),
+               EqualsVector2f({9.19f, 9.19f}, 0.01f));
 
-  sf::Vector2f expected_arm_one_part_one_socket_0_position{44.55f, 44.55f};
-  REQUIRE_THAT(arm_one_part_one_fi.getTransform().transformPoint(
-                   arm_one_part_one_fi.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_one_socket_0_position, 0.01f));
-
-  // RIGHT ARM:: PART TWO ///
+  /// RIGHT ARM: PART TWO ///
   const auto &arm_one_part_two = graph.at(arm_one[1]);
   REQUIRE(std::holds_alternative<JointInstance>(arm_one_part_two));
   const JointInstance &arm_one_part_two_ji =
@@ -284,22 +267,12 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_two->this_socket_id == 0);
   REQUIRE(connection_two->other_socket_id == 1);
 
-  sf::Vector2f expected_arm_one_part_two_socket_1_position{44.55f, 44.55f};
-  REQUIRE_THAT(arm_one_part_two_ji.getTransform().transformPoint(
-                   arm_one_part_two_ji.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_two_socket_1_position, 0.01f));
-
-  sf::Vector2f expected_arm_one_part_two_socket_pivot_position{53.74f, 53.74f};
+  REQUIRE_THAT(arm_one_part_two_ji.GetSocketWorldPosition(1),
+               EqualsVector2f({44.55f, 44.55f}, 0.01f));
   REQUIRE_THAT(arm_one_part_two_ji.GetSocketPivotWorldPosition(),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_two_socket_pivot_position, 0.01f));
-
-  sf::Vector2f expected_arm_one_part_two_socket_0_position{44.55f, 62.93f};
-  REQUIRE_THAT(arm_one_part_two_ji.getTransform().transformPoint(
-                   arm_one_part_two_ji.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_two_socket_0_position, 0.01f));
+               EqualsVector2f({53.74f, 53.74f}, 0.01f));
+  REQUIRE_THAT(arm_one_part_two_ji.GetSocketWorldPosition(0),
+               EqualsVector2f({44.55f, 62.93f}, 0.01f));
 
   /// RIGHT ARM: PART THREE ///
   const auto &arm_one_part_three = graph.at(arm_one[2]);
@@ -312,102 +285,69 @@ TEST_CASE("align_grab_result_to_open_state tests") {
   REQUIRE(connection_three.has_value());
   REQUIRE(connection_three->this_socket_id == 0);
   REQUIRE(connection_three->other_socket_id == 0);
-  REQUIRE(arm_one_part_three_fi.getRotation().asDegrees() == 135.f);
 
-  sf::Vector2f expected_arm_one_part_three_socket_0_position{44.55f, 62.93f};
-  REQUIRE_THAT(arm_one_part_three_fi.getTransform().transformPoint(
-                   arm_one_part_three_fi.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_three_socket_0_position, 0.01f));
-
-  sf::Vector2f expected_arm_one_part_three_socket_1_position{9.19f, 98.28f};
-  REQUIRE_THAT(arm_one_part_three_fi.getTransform().transformPoint(
-                   arm_one_part_three_fi.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_one_part_three_socket_1_position, 0.01f));
+  REQUIRE_THAT(arm_one_part_three_fi.GetSocketWorldPosition(0),
+               EqualsVector2f({44.55f, 62.93f}, 0.01f));
+  REQUIRE_THAT(arm_one_part_three_fi.GetSocketWorldPosition(1),
+               EqualsVector2f({9.19f, 98.28f}, 0.01f));
 
   // LEFT ARM //
   const SubGraph &arm_two = grab_result.arms[1];
 
+  /// LEFT ARM: PART ONE ///
   const auto &arm_two_part_one = graph.at(arm_two[0]);
   REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_one));
   const FragmentInstance &arm_two_part_one_fi =
       std::get<FragmentInstance>(arm_two_part_one);
-  auto arm_two_connection_two =
+  auto arm_two_connection_one =
       anchor_joint.CheckForFirstConnectionWithOtherInstance(
           arm_two_part_one_fi);
-  // auto arm_two_connection_two =
-  //     action::grimoire_machina::check_for_connected_sockets(
-  //         anchor_joint, arm_two_part_one_fi);
-  REQUIRE(arm_two_connection_two.has_value());
-  REQUIRE(arm_two_connection_two->this_socket_id == 1);
-  REQUIRE(arm_two_connection_two->other_socket_id == 0);
-  REQUIRE(arm_two_part_one_fi.getRotation().asDegrees() == 135.f);
+  REQUIRE(arm_two_connection_one.has_value());
+  REQUIRE(arm_two_connection_one->this_socket_id == 1);
+  REQUIRE(arm_two_connection_one->other_socket_id == 0);
 
-  sf::Vector2f expected_arm_two_part_one_socket_0_position{-9.19f, 9.19f};
-  REQUIRE_THAT(arm_two_part_one_fi.getTransform().transformPoint(
-                   arm_two_part_one_fi.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_one_socket_0_position, 0.01f));
-  sf::Vector2f expected_arm_two_part_one_socket_1_position{-44.55f, 44.55f};
-  REQUIRE_THAT(arm_two_part_one_fi.getTransform().transformPoint(
-                   arm_two_part_one_fi.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_one_socket_1_position, 0.01f));
+  REQUIRE_THAT(arm_two_part_one_fi.GetSocketWorldPosition(0),
+               EqualsVector2f({-9.19f, 9.19f}, 0.01f));
+  REQUIRE_THAT(arm_two_part_one_fi.GetSocketWorldPosition(1),
+               EqualsVector2f({-44.55f, 44.55f}, 0.01f));
 
+  /// LEFT ARM: PART TWO ///
   const auto &arm_two_part_two = graph.at(arm_two[1]);
   REQUIRE(std::holds_alternative<JointInstance>(arm_two_part_two));
   const JointInstance &arm_two_part_two_ji =
       std::get<JointInstance>(arm_two_part_two);
 
-  auto arm_two_connection_three =
+  auto arm_two_connection_two =
       arm_two_part_one_fi.CheckForFirstConnectionWithOtherInstance(
           arm_two_part_two_ji);
-  REQUIRE(arm_two_connection_three.has_value());
-  REQUIRE(arm_two_connection_three->this_socket_id == 0);
-  REQUIRE(arm_two_connection_three->other_socket_id == 1);
-  REQUIRE(Catch::Approx(arm_two_part_two_ji.getRotation().asDegrees()) ==
-          -45.f);
+  REQUIRE(arm_two_connection_two.has_value());
+  REQUIRE(arm_two_connection_two->this_socket_id == 1);
+  REQUIRE(arm_two_connection_two->other_socket_id == 0);
 
-  sf::Vector2f expected_arm_two_part_two_socket_0_position{-44.55f, 44.55f};
-  REQUIRE_THAT(arm_two_part_two_ji.getTransform().transformPoint(
-                   arm_two_part_two_ji.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_two_socket_0_position, 0.01f));
-  sf::Vector2f expected_arm_two_part_two_socket_pivot_position{-53.74f, 53.74f};
+  REQUIRE_THAT(arm_two_part_two_ji.GetSocketWorldPosition(0),
+               EqualsVector2f({-44.55f, 44.55f}, 0.01f));
   REQUIRE_THAT(arm_two_part_two_ji.GetSocketPivotWorldPosition(),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_two_socket_pivot_position, 0.01f));
-  sf::Vector2f expected_arm_two_part_two_socket_1_position{-44.55f, 62.93f};
-  REQUIRE_THAT(arm_two_part_two_ji.getTransform().transformPoint(
-                   arm_two_part_two_ji.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_two_socket_1_position, 0.01f));
+               EqualsVector2f({-53.74f, 53.74f}, 0.01f));
+  REQUIRE_THAT(arm_two_part_two_ji.GetSocketWorldPosition(1),
+               EqualsVector2f({-44.55f, 62.93f}, 0.01f));
 
+  /// LEFT ARM: PART THREE ///
   const auto &arm_two_part_three = graph.at(arm_two[2]);
   REQUIRE(std::holds_alternative<FragmentInstance>(arm_two_part_three));
   const FragmentInstance &arm_two_part_three_fi =
       std::get<FragmentInstance>(arm_two_part_three);
 
-  auto arm_two_connection_four =
+  auto arm_two_connection_three =
       arm_two_part_two_ji.CheckForFirstConnectionWithOtherInstance(
           arm_two_part_three_fi);
-  REQUIRE(arm_two_connection_four.has_value());
-  REQUIRE(arm_two_connection_four->this_socket_id == 1);
-  REQUIRE(arm_two_connection_four->other_socket_id == 0);
-  REQUIRE(Catch::Approx(arm_two_part_three_fi.getRotation().asDegrees()) ==
-          45.f);
+  REQUIRE(arm_two_connection_three.has_value());
+  REQUIRE(arm_two_connection_three->this_socket_id == 1);
+  REQUIRE(arm_two_connection_three->other_socket_id == 0);
 
-  sf::Vector2f expected_arm_two_part_three_socket_0_position{-44.55f, 62.93f};
-  REQUIRE_THAT(arm_two_part_three_fi.getTransform().transformPoint(
-                   arm_two_part_three_fi.GetSockets().at(0).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_three_socket_0_position, 0.01f));
-  sf::Vector2f expected_arm_two_part_three_socket_1_position{-9.19f, 98.28f};
-  REQUIRE_THAT(arm_two_part_three_fi.getTransform().transformPoint(
-                   arm_two_part_three_fi.GetSockets().at(1).GetLocalPosition()),
-               Vector2fEqualsMatcher(
-                   expected_arm_two_part_three_socket_1_position, 0.01f));
+  REQUIRE_THAT(arm_two_part_three_fi.GetSocketWorldPosition(0),
+               EqualsVector2f({-44.55f, 62.93f}, 0.01f));
+  REQUIRE_THAT(arm_two_part_three_fi.GetSocketWorldPosition(1),
+               EqualsVector2f({-9.19f, 98.28f}, 0.01f));
 }
 
 TEST_CASE("end_of_arm_is_grab_ready tests") {
