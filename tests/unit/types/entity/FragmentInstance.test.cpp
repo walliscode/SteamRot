@@ -391,17 +391,13 @@ TEST_CASE("FragmentInstance::ResetAllSocketsInteractionState tests",
   FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
 
   SECTION("Clears distance/mouse-over interaction fields on all sockets") {
-    if (fragment_instance.GetSocketCount() == 0) {
-      SUCCEED("No sockets defined by fixture; reset case not applicable.");
-      return;
-    }
 
     auto *socket =
         const_cast<FragmentSocketState *>(fragment_instance.TryGetSocket(0));
     REQUIRE(socket != nullptr);
 
     socket->SetDistanceToNearestSocket(1.0f);
-    // socket->CheckMouseOver({0.f, 0.f}, {0.f, 0.f}, 5.f);
+    socket->SetMouseOver(true);
     REQUIRE(socket->GetDistanceToNearestSocket().has_value());
     REQUIRE(socket->IsMouseOver());
 
