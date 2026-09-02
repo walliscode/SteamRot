@@ -156,22 +156,19 @@ TEST_CASE("JointInstance::GetSocketLocalPosition tests", "[JointInstance]") {
 
 TEST_CASE("JointInstance::GetSocketWorldPosition tests", "[JointInstance]") {
   JointInstance instance{1, parts::JointSquareWithOneSocket};
+  instance.PositionSockets(JointSocketPositioningStrategy::MaximizeDistance);
 
+  REQUIRE_THAT(instance.GetSocketWorldPosition(0),
+               EqualsVector2f({9.19f, 9.19f}, 0.01f));
   SECTION("Returns zero vector when socket does not exist") {
-    const sf::Vector2f p = instance.GetSocketWorldPosition(999);
-    REQUIRE(Catch::Approx(p.x) == 0.f);
-    REQUIRE(Catch::Approx(p.y) == 0.f);
+    REQUIRE_THAT(instance.GetSocketWorldPosition(999),
+                 EqualsVector2f({0.f, 0.f}, 0.0001f));
   }
 
   SECTION("Applies transform to local socket position") {
-
-    instance.move({10.f, 20.f}); // apply translation to the joint instance
-
-    const sf::Vector2f local = instance.TryGetSocket(0)->GetLocalPosition();
-    const sf::Vector2f p = instance.GetSocketWorldPosition(0);
-
-    REQUIRE(Catch::Approx(p.x) == local.x + 10.f);
-    REQUIRE(Catch::Approx(p.y) == local.y + 20.f);
+    instance.move({5.f, -3.f});
+    REQUIRE_THAT(instance.GetSocketWorldPosition(0),
+                 EqualsVector2f({14.19f, 6.19f}, 0.01f));
   }
 }
 
@@ -355,15 +352,12 @@ TEST_CASE("JointInstance::ResetAllSocketsInteractionState tests",
   JointInstance instance{1, parts::JointSquareWithOneSocket};
 
   SECTION("Clears distance/mouse-over interaction fields on all sockets") {
-    if (instance.GetSocketCount() == 0) {
-      SUCCEED("No sockets defined by fixture; reset case not applicable.");
-      return;
-    }
 
     auto *socket = const_cast<JointSocketState *>(instance.TryGetSocket(0));
     REQUIRE(socket != nullptr);
 
     socket->SetDistanceToNearestSocket(1.0f);
+    socket->SetMouseOver(true);
     REQUIRE(socket->GetDistanceToNearestSocket().has_value());
     REQUIRE(socket->IsMouseOver());
 
