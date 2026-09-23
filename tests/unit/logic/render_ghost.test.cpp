@@ -266,4 +266,27 @@ TEST_CASE("draw_ghost_item draws no socket pixels when fragment has no sockets",
   // painted — with no sockets it must remain black.
   REQUIRE(image.getPixel({100, 85}) == sf::Color::Black);
 }
+
+TEST_CASE("draw_ghost_item draws socket pixels even when the ghost has no "
+          "geometry",
+          "[unit][render_ghost]") {
+  sf::RenderTexture texture{{100, 100}};
+  texture.clear(sf::Color::Black);
+
+  steamrot::Fragment fragment;
+  fragment.name = "socket_only";
+  fragment.sockets.emplace_back(sf::Vector2f{25.f, 10.f},
+                                sf::Vector2f{1.f, 0.f});
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_instance.emplace<FragmentInstance>(0, fragment);
+
+  steamrot::logic::render::ghost::draw_ghost_item(texture, mr_ghost);
+  texture.display();
+
+  const sf::Image image = texture.getTexture().copyToImage();
+
+  REQUIRE(image.getPixel({25, 10}) != sf::Color::Black);
+  REQUIRE(image.getPixel({50, 50}) == sf::Color::Black);
+}
 } // namespace steamrot::tests

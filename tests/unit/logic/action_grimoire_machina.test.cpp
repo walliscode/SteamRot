@@ -14,6 +14,7 @@
 #include "SocketState.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "grimoire_machina_test_helpers.h"
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
@@ -571,6 +572,102 @@ TEST_CASE("PlaceFirstPiece only places one piece per game instance",
       grimoire_machina.m_scaffold_form->parts.at(0)));
 }
 
+/////////////////////////////////////////////
+/// PlaceNextPiece tests
+/////////////////////////////////////////////
+
+TEST_CASE("PlaceNextPiece does nothing when scaffold is empty",
+          "[unit][actions][grimoire_machina][PlaceNextPiece]") {
+  steamrot::tests::PartGraphBuilder builder;
+  steamrot::MachinaFormScaffold scaffold;
+
+  steamrot::MrGhost mr_ghost;
+  mr_ghost.m_instance.emplace<FragmentInstance>(
+      builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket));
+
+  place_next_piece(scaffold, mr_ghost);
+
+  REQUIRE(scaffold.parts.empty());
+}
+
+TEST_CASE("PlaceNextPiece connects a fragment ghost to an existing joint",
+          "[unit][actions][grimoire_machina][PlaceNextPiece]") {
+  steamrot::tests::PartGraphBuilder builder;
+  steamrot::MachinaFormScaffold scaffold;
+
+  JointInstance existing_joint =
+      builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
+  const uint32_t existing_joint_id = existing_joint.GetId();
+  scaffold.parts.emplace(existing_joint_id, existing_joint);
+  scaffold.next_id = existing_joint_id + 1;
+
+  steamrot::MrGhost mr_ghost;
+  FragmentInstance ghost_fragment =
+      builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
+  mr_ghost.m_instance.emplace<FragmentInstance>(ghost_fragment);
+
+  place_next_piece(scaffold, mr_ghost);
+
+  REQUIRE(scaffold.parts.size() == 2);
+  REQUIRE(scaffold.next_id == existing_joint_id + 2);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      scaffold.parts.at(existing_joint_id + 1)));
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      mr_ghost.m_instance));
+
+  const auto &placed_fragment =
+      std::get<steamrot::FragmentInstance>(scaffold.parts.at(existing_joint_id +
+                                                             1));
+  const auto &connected_joint =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(existing_joint_id));
+
+  REQUIRE(placed_fragment.GetSockets().at(0).GetConnection().has_value());
+  REQUIRE(connected_joint.GetSockets().at(0).GetConnection().has_value());
+  REQUIRE(placed_fragment.GetSockets().at(0).GetConnection().value() ==
+          steamrot::SocketConnection{existing_joint_id, 0});
+  REQUIRE(connected_joint.GetSockets().at(0).GetConnection().value() ==
+          steamrot::SocketConnection{placed_fragment.GetId(), 0});
+}
+
+TEST_CASE("PlaceNextPiece connects a joint ghost to an existing fragment",
+          "[unit][actions][grimoire_machina][PlaceNextPiece]") {
+  steamrot::tests::PartGraphBuilder builder;
+  steamrot::MachinaFormScaffold scaffold;
+
+  FragmentInstance existing_fragment =
+      builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket);
+  const uint32_t existing_fragment_id = existing_fragment.GetId();
+  scaffold.parts.emplace(existing_fragment_id, existing_fragment);
+  scaffold.next_id = existing_fragment_id + 1;
+
+  steamrot::MrGhost mr_ghost;
+  JointInstance ghost_joint =
+      builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket);
+  mr_ghost.m_instance.emplace<JointInstance>(ghost_joint);
+
+  place_next_piece(scaffold, mr_ghost);
+
+  REQUIRE(scaffold.parts.size() == 2);
+  REQUIRE(scaffold.next_id == existing_fragment_id + 2);
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(
+      scaffold.parts.at(existing_fragment_id + 1)));
+  REQUIRE(std::holds_alternative<steamrot::JointInstance>(mr_ghost.m_instance));
+
+  const auto &placed_joint =
+      std::get<steamrot::JointInstance>(scaffold.parts.at(existing_fragment_id +
+                                                          1));
+  const auto &connected_fragment =
+      std::get<steamrot::FragmentInstance>(
+          scaffold.parts.at(existing_fragment_id));
+
+  REQUIRE(placed_joint.GetSockets().at(0).GetConnection().has_value());
+  REQUIRE(connected_fragment.GetSockets().at(0).GetConnection().has_value());
+  REQUIRE(placed_joint.GetSockets().at(0).GetConnection().value() ==
+          steamrot::SocketConnection{existing_fragment_id, 0});
+  REQUIRE(connected_fragment.GetSockets().at(0).GetConnection().value() ==
+          steamrot::SocketConnection{placed_joint.GetId(), 0});
+}
+
 /////////////////////////////////////////////////
 /// ProcessLogicEvents tests
 /////////////////////////////////////////////////
@@ -793,6 +890,34 @@ TEST_CASE("ProcessUserInputEvents: SELECT with monostate ghost does not place",
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
 }
 
+TEST_CASE("ProcessUserInputEvents: SELECT leaves the ghost selection active "
+          "after placement",
+          "[unit][actions][grimoire_machina][ProcessUserInputEvents]") {
+  steamrot::tests::TestFixture fixture;
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina =
+      steamrot::tests::MakeGrimoireWithFragmentAndSocket("frag", {25.f, 10.f});
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  fixture.GetMrGhost().m_instance.emplace<FragmentInstance>(
+      0, grimoire_machina.m_all_fragments["frag"]);
+
+  steamrot::Subscriber subscriber;
+  subscriber.m_active = true;
+  subscriber.event_type = steamrot::EventType::USER_INPUT;
+  subscriber.captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
+  steamrot::logic::action::grimoire_machina::proces_user_input_events(
+      subscriber, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      scene_context.mr_ghost.m_instance));
+}
+
 /////////////////////////////////////////////////
 /// ProcessSubscribers tests
 /////////////////////////////////////////////////
@@ -921,6 +1046,35 @@ TEST_CASE(
   REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == true);
 }
 
+TEST_CASE("ProcessSubscribers: SELECT subscriber places onto the scaffold "
+          "without clearing the ghost selection",
+          "[unit][actions][grimoire_machina][ProcessSubscribers]") {
+  steamrot::tests::TestFixture fixture;
+  fixture.Initialize();
+  steamrot::SceneContext &scene_context = fixture.GetSceneContext();
+
+  steamrot::GrimoireMachina grimoire_machina =
+      steamrot::tests::MakeGrimoireWithFragmentAndSocket("frag", {25.f, 10.f});
+  grimoire_machina.m_scaffold_form =
+      std::make_unique<steamrot::MachinaFormScaffold>();
+
+  fixture.GetMrGhost().m_instance.emplace<FragmentInstance>(
+      0, grimoire_machina.m_all_fragments["frag"]);
+
+  auto subscriber = std::make_shared<steamrot::Subscriber>();
+  subscriber->m_active = true;
+  subscriber->event_type = steamrot::EventType::USER_INPUT;
+  subscriber->captured_payload =
+      steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
+
+  steamrot::logic::action::grimoire_machina::process_subscribers(
+      {subscriber}, scene_context, grimoire_machina);
+
+  REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+      scene_context.mr_ghost.m_instance));
+}
+
 TEST_CASE("check_MrGhost_for_connection_readiness tests",
           "[unit][actions][grimoire_machina][check_MrGhost_for_connection_"
           "readiness]") {
@@ -962,6 +1116,58 @@ TEST_CASE("check_MrGhost_for_connection_readiness tests",
 
 TEST_CASE("check_PartGraph_for_connection_readiness tests",
           "[unit][actions][grimoire_machina][check_PartGraph_for_connection_"
-          "readiness]") {}
+          "readiness]") {
+  steamrot::tests::PartGraphBuilder builder;
+
+  SECTION("returns false for an empty PartGraph") {
+    steamrot::PartGraph empty_graph;
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartGraph_for_connection_readiness(empty_graph);
+
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("returns false when all parts have no sockets") {
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(
+        0, builder.MakeFragmentInstance(steamrot::tests::FragmentNames::NoSocket));
+    part_graph.emplace(
+        1, builder.MakeJointInstance(steamrot::tests::JointNames::NoSocket));
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartGraph_for_connection_readiness(part_graph);
+
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("returns the first available fragment socket") {
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(
+        0, builder.MakeFragmentInstance(steamrot::tests::FragmentNames::OneSocket));
+    part_graph.emplace(
+        1, builder.MakeJointInstance(steamrot::tests::JointNames::NoSocket));
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartGraph_for_connection_readiness(part_graph);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == std::make_pair(0u, 0u));
+  }
+
+  SECTION("returns the first available joint socket") {
+    steamrot::PartGraph part_graph;
+    part_graph.emplace(
+        0, builder.MakeFragmentInstance(steamrot::tests::FragmentNames::NoSocket));
+    part_graph.emplace(
+        1, builder.MakeJointInstance(steamrot::tests::JointNames::OneSocket));
+
+    auto result = steamrot::logic::action::grimoire_machina::
+        check_PartGraph_for_connection_readiness(part_graph);
+
+    REQUIRE(result.has_value());
+    REQUIRE(result.value() == std::make_pair(1u, 0u));
+  }
+}
 
 } // namespace steamrot::tests

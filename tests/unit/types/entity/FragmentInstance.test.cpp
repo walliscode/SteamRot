@@ -937,6 +937,18 @@ TEST_CASE("FragmentInstance::DrawSockets tests", "[unit][FragmentInstance]") {
   sf::RenderTexture texture{{100, 100}};
   texture.clear(sf::Color::Black);
 
+  SECTION("Fragment with no sockets draws no socket pixels") {
+    Fragment empty_fragment;
+    FragmentInstance fragment_instance(9, empty_fragment);
+
+    fragment_instance.DrawSockets(texture);
+    texture.display();
+
+    const sf::Image image = texture.getTexture().copyToImage();
+    REQUIRE_THAT(image.getPixel({50, 50}),
+                 ColorEqualsMatcher(sf::Color::Black));
+  }
+
   SECTION("FragmentRectangleWithTwoSockets") {
     FragmentInstance fragment_instance(1,
                                        parts::FragmentRectangleWithOneSocket);
@@ -1062,6 +1074,60 @@ TEST_CASE("FragmentInstance::DrawInstance tests", "[unit][FragmentInstance]") {
                  ColorEqualsMatcher(sf::Color::White));
 
     // this could do with some more fleshing out
+  }
+
+  SECTION(
+     "DrawInstance with draw_sockets=false leaves socket-only pixels black") {
+   Fragment fragment;
+
+   sf::VertexArray view(sf::PrimitiveType::Triangles, 6);
+   view[0] = sf::Vertex{{0.f, 0.f}, sf::Color::White};
+   view[1] = sf::Vertex{{20.f, 0.f}, sf::Color::White};
+   view[2] = sf::Vertex{{20.f, 20.f}, sf::Color::White};
+   view[3] = sf::Vertex{{0.f, 0.f}, sf::Color::White};
+   view[4] = sf::Vertex{{20.f, 20.f}, sf::Color::White};
+   view[5] = sf::Vertex{{0.f, 20.f}, sf::Color::White};
+   fragment.positioning_views.insert_or_assign(ViewDirection::Front,
+                                               std::move(view));
+   fragment.sockets.emplace_back(sf::Vector2f{25.f, 10.f},
+                                 sf::Vector2f{1.f, 0.f});
+
+   FragmentInstance socketed_fragment_instance(1, fragment);
+   socketed_fragment_instance.setPosition({30.f, 30.f});
+
+   texture.clear(sf::Color::Black);
+   socketed_fragment_instance.DrawInstance(texture, false);
+   texture.display();
+
+   const sf::Image image = texture.getTexture().copyToImage();
+   REQUIRE_THAT(image.getPixel({55, 40}),
+                ColorEqualsMatcher(sf::Color::Black));
+  }
+
+  SECTION("DrawInstance with draw_sockets=true paints socket-only pixels") {
+   Fragment fragment;
+
+   sf::VertexArray view(sf::PrimitiveType::Triangles, 6);
+   view[0] = sf::Vertex{{0.f, 0.f}, sf::Color::White};
+   view[1] = sf::Vertex{{20.f, 0.f}, sf::Color::White};
+   view[2] = sf::Vertex{{20.f, 20.f}, sf::Color::White};
+   view[3] = sf::Vertex{{0.f, 0.f}, sf::Color::White};
+   view[4] = sf::Vertex{{20.f, 20.f}, sf::Color::White};
+   view[5] = sf::Vertex{{0.f, 20.f}, sf::Color::White};
+   fragment.positioning_views.insert_or_assign(ViewDirection::Front,
+                                               std::move(view));
+   fragment.sockets.emplace_back(sf::Vector2f{25.f, 10.f},
+                                 sf::Vector2f{1.f, 0.f});
+
+   FragmentInstance socketed_fragment_instance(2, fragment);
+   socketed_fragment_instance.setPosition({30.f, 30.f});
+
+   texture.clear(sf::Color::Black);
+   socketed_fragment_instance.DrawInstance(texture, true);
+   texture.display();
+
+   const sf::Image image = texture.getTexture().copyToImage();
+   REQUIRE(image.getPixel({55, 40}) != sf::Color::Black);
   }
 }
 

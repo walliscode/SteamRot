@@ -20,6 +20,7 @@ GhostRenderLogic.test.cpp
 positioning_ui.test.cpp
 collision_mouse.test.cpp
 collision_grimoire_machina.test.cpp
+grimoire_machina_regression.test.cpp
 )
 
 target_include_directories(test_logic

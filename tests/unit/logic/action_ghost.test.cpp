@@ -209,6 +209,38 @@ TEST_CASE("ProcessSubscriber tests ") {
     REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
   }
 
+  SECTION("ProcessSubscriber – SELECT persists until an explicit CLEAR",
+          "[unit][action_ghost]") {
+    FragmentTag fragment_tag{"gear"};
+    Fragment fragment;
+    fragment.name = fragment_tag.key;
+    grimoire->m_all_fragments.insert({fragment_tag.key, fragment});
+
+    steamrot::MrGhost mr_ghost;
+
+    steamrot::Subscriber select_subscriber;
+    select_subscriber.captured_payload =
+        GhostPayload{GhostPayload::GhostAction::SELECT, FragmentTag{"gear"}};
+
+    ProcessSubscriber(select_subscriber, mr_ghost, asset_manager);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+        mr_ghost.m_instance));
+
+    steamrot::Subscriber unrelated_subscriber;
+    unrelated_subscriber.captured_payload = std::monostate{};
+
+    ProcessSubscriber(unrelated_subscriber, mr_ghost, asset_manager);
+    REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
+        mr_ghost.m_instance));
+
+    steamrot::Subscriber clear_subscriber;
+    clear_subscriber.captured_payload = steamrot::GhostPayload{
+        steamrot::GhostPayload::GhostAction::CLEAR, std::monostate{}};
+
+    ProcessSubscriber(clear_subscriber, mr_ghost, asset_manager);
+    REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
+  }
+
   SECTION("ProcessSubscriber – no captured payload leaves MrGhost unchanged",
           "[unit][action_ghost]") {
     FragmentTag fragment_tag{"rock"};
@@ -322,6 +354,32 @@ TEST_CASE("ProcessSubscriber tests ") {
 
     steamrot::logic::action::ghost::ProcessSubscribers({subscriber}, mr_ghost,
                                                        asset_manager);
+
+    REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
+  }
+
+  SECTION("ProcessSubscribers – ordered SELECT then CLEAR leaves MrGhost empty",
+          "[unit][action_ghost]") {
+    FragmentTag fragment_tag{"copper"};
+    Fragment fragment;
+    fragment.name = fragment_tag.key;
+    grimoire->m_all_fragments.insert({fragment_tag.key, fragment});
+
+    steamrot::MrGhost mr_ghost;
+
+    auto select_subscriber = std::make_shared<steamrot::Subscriber>();
+    select_subscriber->m_active = true;
+    select_subscriber->captured_payload = steamrot::GhostPayload{
+        steamrot::GhostPayload::GhostAction::SELECT,
+        steamrot::FragmentTag{"copper"}};
+
+    auto clear_subscriber = std::make_shared<steamrot::Subscriber>();
+    clear_subscriber->m_active = true;
+    clear_subscriber->captured_payload = steamrot::GhostPayload{
+        steamrot::GhostPayload::GhostAction::CLEAR, std::monostate{}};
+
+    steamrot::logic::action::ghost::ProcessSubscribers(
+        {select_subscriber, clear_subscriber}, mr_ghost, asset_manager);
 
     REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
   }
