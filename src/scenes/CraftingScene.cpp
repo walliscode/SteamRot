@@ -31,14 +31,14 @@ void RunLogicsForTypes(const logic::LogicVector &logics,
       logic->RunLogic();
     }
   }
+}
 
-  /////////////////////////////////////////////////
-  void RunLogicsExceptTypes(const logic::LogicVector &logics,
-                            std::initializer_list<LogicType> excluded_types) {
-    for (const auto &logic : logics) {
-      if (!MatchesAnyLogicType(*logic, excluded_types)) {
-        logic->RunLogic();
-      }
+/////////////////////////////////////////////////
+void RunLogicsExceptTypes(const logic::LogicVector &logics,
+                          std::initializer_list<LogicType> excluded_types) {
+  for (const auto &logic : logics) {
+    if (!MatchesAnyLogicType(*logic, excluded_types)) {
+      logic->RunLogic();
     }
   }
 }
