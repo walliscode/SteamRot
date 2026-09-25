@@ -141,11 +141,9 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Collision LogicType");
   }
   const auto &collision_logics = collision_it->second;
-  REQUIRE(collision_logics.size() == 2);
+  REQUIRE(collision_logics.size() == 1);
   REQUIRE(dynamic_cast<steamrot::logic::UICollisionLogic *>(
       collision_logics[0].get()));
-  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaCollisionLogic *>(
-      collision_logics[1].get()));
 
   ///// CHECKING ACTION LOGICS /////
   auto action_it = logic_collection.find(steamrot::LogicGrouping::Action);
@@ -186,7 +184,7 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
     FAIL("LogicCollection does not contain Movement LogicType");
   }
   const auto &positioning_logics = positioning_it->second;
-  REQUIRE(positioning_logics.size() == 4);
+  REQUIRE(positioning_logics.size() == 5);
   REQUIRE(dynamic_cast<steamrot::logic::UIPositioningLogic *>(
       positioning_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
@@ -195,6 +193,8 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
       positioning_logics[2].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
       positioning_logics[3].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaCollisionLogic *>(
+      positioning_logics[4].get()));
 }
 
 TEST_CASE("LogicFactory::ConfigureLogicObject returns unexpected if LogicType "

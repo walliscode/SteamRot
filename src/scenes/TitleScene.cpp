@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "TitleScene.h"
-#include "positioning_camera.h"
 
 namespace steamrot {
 /////////////////////////////////////////////////
@@ -35,8 +34,6 @@ void TitleScene::sCollision() {
 void TitleScene::sRender() {
   // clear the render texture and the start of each Scene render step
   m_scene_resources.scene_texture.clear(sf::Color::Black);
-
-  logic::positioning::camera::apply_ui_view(m_scene_resources.scene_texture);
 
   for (auto &render_logic :
        m_scene_resources.logic_map[LogicGrouping::Render]) {
