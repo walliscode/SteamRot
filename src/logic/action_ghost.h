@@ -33,8 +33,8 @@ namespace steamrot::logic::action::ghost {
 /// @param asset_manager AssetManager used to resolve the tag to a Part
 ///                     definition.
 /////////////////////////////////////////////////
-void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection,
-                     AssetManager &asset_manager);
+void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
+                       AssetManager &asset_manager);
 
 /////////////////////////////////////////////////
 /// @brief Clear the current ghost instance on MrGhost.

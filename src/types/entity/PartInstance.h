@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <expected>
 #include <format>
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -598,8 +599,13 @@ public:
     texture.draw(view[ViewDirection::Front], getTransform());
 
     // draw the sockets if requested
-    if (draw_sockets)
+    if (draw_sockets) {
+      std::cout << "Drawing sockets for part instance " << GetId() << std::endl;
       DrawSockets(texture);
+    } else {
+      std::cout << "Not drawing sockets for part instance " << GetId()
+                << std::endl;
+    }
   }
 };
 

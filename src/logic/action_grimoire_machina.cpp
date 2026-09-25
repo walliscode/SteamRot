@@ -226,9 +226,9 @@ void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
 }
 
 /////////////////////////////////////////////////
-void proces_user_input_events(Subscriber &subscriber,
-                              const SceneContext &scene_context,
-                              GrimoireMachina &grimoire_machina) {
+void process_user_input_events(Subscriber &subscriber,
+                               const SceneContext &scene_context,
+                               GrimoireMachina &grimoire_machina) {
 
   if (!subscriber.captured_payload.has_value())
     return;
@@ -255,6 +255,7 @@ void proces_user_input_events(Subscriber &subscriber,
 
   case InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY:
     if (grimoire_machina.m_scaffold_form)
+
       toggle_socket_visibility(*grimoire_machina.m_scaffold_form);
     break;
 
@@ -275,7 +276,7 @@ void process_subscribers(
       process_logic_events(*subscriber, grimoire_machina);
 
     else if (subscriber->event_type == EventType::USER_INPUT)
-      proces_user_input_events(*subscriber, scene_context, grimoire_machina);
+      process_user_input_events(*subscriber, scene_context, grimoire_machina);
   }
 }
 
