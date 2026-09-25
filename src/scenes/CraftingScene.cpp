@@ -31,6 +31,16 @@ void RunLogicsForTypes(const logic::LogicVector &logics,
       logic->RunLogic();
     }
   }
+
+  /////////////////////////////////////////////////
+  void RunLogicsExceptTypes(const logic::LogicVector &logics,
+                            std::initializer_list<LogicType> excluded_types) {
+    for (const auto &logic : logics) {
+      if (!MatchesAnyLogicType(*logic, excluded_types)) {
+        logic->RunLogic();
+      }
+    }
+  }
 }
 
 } // anonymous namespace
@@ -80,8 +90,8 @@ void CraftingScene::sRender() {
   logic::render::draw_grid_background({50, 50}, 1, sf::Color(255, 255, 255, 50),
                                       m_scene_resources.scene_texture);
 
-  RunLogicsForTypes(m_scene_resources.logic_map[LogicGrouping::Render],
-                    {LogicType::GrimoireMachinaRender, LogicType::GhostRender});
+  RunLogicsExceptTypes(m_scene_resources.logic_map[LogicGrouping::Render],
+                       {LogicType::UIRender});
 
   logic::positioning::camera::apply_ui_view(m_scene_resources.scene_texture);
   RunLogicsForTypes(m_scene_resources.logic_map[LogicGrouping::Render],

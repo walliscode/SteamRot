@@ -29,6 +29,16 @@ void RunLogicsForTypes(const logic::LogicVector &logics,
       logic->RunLogic();
     }
   }
+
+  /////////////////////////////////////////////////
+  void RunLogicsExceptTypes(const logic::LogicVector &logics,
+                            std::initializer_list<LogicType> excluded_types) {
+    for (const auto &logic : logics) {
+      if (!MatchesAnyLogicType(*logic, excluded_types)) {
+        logic->RunLogic();
+      }
+    }
+  }
 }
 
 } // anonymous namespace
@@ -50,8 +60,8 @@ void SpatialAnalysisScene::sRender() {
 
   logic::positioning::camera::apply_world_view(
       m_scene_resources.scene_texture, m_scene_state.camera_state);
-  RunLogicsForTypes(m_scene_resources.logic_map[LogicGrouping::Render],
-                    {LogicType::GrimoireMachinaRender});
+  RunLogicsExceptTypes(m_scene_resources.logic_map[LogicGrouping::Render],
+                       {LogicType::UIRender});
 
   logic::positioning::camera::apply_ui_view(m_scene_resources.scene_texture);
   RunLogicsForTypes(m_scene_resources.logic_map[LogicGrouping::Render],
