@@ -173,9 +173,11 @@ void CheckMouseOverAllCUserInterfaceComponentsInTier(
 /////////////////////////////////////////////////
 void ProcessScaffoldCollisions(MachinaFormScaffold &scaffold,
                                sf::Vector2f world_mouse) {
+  // length of parts for debugging
   for (auto &[id, part] : scaffold.parts) {
     std::visit(
         [&](auto &instance) { instance.CheckMouseOverSockets(world_mouse); },
+
         part);
   }
 }

@@ -1063,6 +1063,60 @@ TEST_CASE("FragmentInstance::DrawInstance tests", "[unit][FragmentInstance]") {
 
     // this could do with some more fleshing out
   }
+
+  SECTION("DrawInstance shows black pixels at socket world positions when "
+          "socket is hovered but "
+          "draw_sockets is false") {
+    // Arrange
+    fragment_instance.setPosition({10.f, 10.f});
+    // Act
+    fragment_instance.CheckMouseOverSockets({10.f, 10.f});
+    fragment_instance.DrawInstance(texture, false);
+    texture.display();
+    const sf::Image image = texture.getTexture().copyToImage();
+    // Assert
+    const sf::Vector2f socket_world_pos =
+        fragment_instance.GetSocketWorldPosition(0);
+    // underlying fragment is drawn which is white
+    REQUIRE_THAT(image.getPixel({socket_world_pos}),
+                 ColorEqualsMatcher(sf::Color::White));
+  }
+
+  SECTION("DrawInstance shows blue pixels at socket world positions when "
+          "socket is hovered and draw_sockets is true") {
+    // Arrange
+    fragment_instance.setPosition({10.f, 10.f});
+    // Act
+    fragment_instance.CheckMouseOverSockets({10.f, 10.f});
+    fragment_instance.DrawInstance(texture, true);
+    texture.display();
+    const sf::Image image = texture.getTexture().copyToImage();
+    // Assert
+    const sf::Vector2f socket_world_pos =
+        fragment_instance.GetSocketWorldPosition(0);
+    REQUIRE_THAT(image.getPixel({socket_world_pos}),
+                 ColorEqualsMatcher(sf::Color::Blue));
+  }
+
+  SECTION("DrawInstance shows green pixels at socket world positions when "
+          "socket is within connection distance and draw_sockets is true") {
+    // Arrange
+    fragment_instance.setPosition({10.f, 10.f});
+    JointInstance joint_instance(2, parts::JointSquareWithOneSocket);
+    joint_instance.PositionSockets(
+        JointSocketPositioningStrategy::MaximizeDistance);
+    joint_instance.move({3.f, 7.f});
+    fragment_instance.CheckWithOtherInstanceForCollision(joint_instance);
+    // Act
+    fragment_instance.DrawInstance(texture, true);
+    texture.display();
+    const sf::Image image = texture.getTexture().copyToImage();
+    // Assert
+    const sf::Vector2f socket_world_pos =
+        fragment_instance.GetSocketWorldPosition(0);
+    REQUIRE_THAT(image.getPixel({socket_world_pos}),
+                 ColorEqualsMatcher(sf::Color::Green));
+  }
 }
 
 } // namespace steamrot::tests

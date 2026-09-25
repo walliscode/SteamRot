@@ -614,37 +614,21 @@ TEST_CASE("ProcessLogicEvents: active CLEAR subscriber clears existing "
 /////////////////////////////////////////////////
 /// ToggleSocketVisibility tests
 /////////////////////////////////////////////////
-
-TEST_CASE(
-    "ToggleSocketVisibility toggles are_sockets_visible from false to true",
-    "[unit][actions][grimoire_machina][ToggleSocketVisibility]") {
-  steamrot::MachinaFormScaffold scaffold;
-  REQUIRE(scaffold.are_sockets_visible == false);
-
-  steamrot::logic::action::grimoire_machina::toggle_socket_visibility(scaffold);
-
-  REQUIRE(scaffold.are_sockets_visible == true);
-}
-
-TEST_CASE("ToggleSocketVisibility toggles are_sockets_visible from true to "
-          "false",
-          "[unit][actions][grimoire_machina][ToggleSocketVisibility]") {
-  steamrot::MachinaFormScaffold scaffold;
-  scaffold.are_sockets_visible = true;
-
-  steamrot::logic::action::grimoire_machina::toggle_socket_visibility(scaffold);
-
-  REQUIRE(scaffold.are_sockets_visible == false);
-}
-
-TEST_CASE("ToggleSocketVisibility: toggling twice returns to original state",
-          "[unit][actions][grimoire_machina][ToggleSocketVisibility]") {
-  steamrot::MachinaFormScaffold scaffold;
-
-  steamrot::logic::action::grimoire_machina::toggle_socket_visibility(scaffold);
-  steamrot::logic::action::grimoire_machina::toggle_socket_visibility(scaffold);
-
-  REQUIRE(scaffold.are_sockets_visible == false);
+TEST_CASE("toggle_socket_visibility tests") {
+  SECTION("toggle_socket_visibility toggles are_sockets_visible from false to "
+          "true") {
+    MachinaFormScaffold scaffold;
+    REQUIRE(scaffold.are_sockets_visible == false);
+    toggle_socket_visibility(scaffold);
+    REQUIRE(scaffold.are_sockets_visible == true);
+  }
+  SECTION("toggle_socket_visibility toggles are_sockets_visible from true to "
+          "false") {
+    MachinaFormScaffold scaffold;
+    scaffold.are_sockets_visible = true;
+    toggle_socket_visibility(scaffold);
+    REQUIRE(scaffold.are_sockets_visible == false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -667,7 +651,7 @@ TEST_CASE("ProcessUserInputEvents: missing captured_payload is ignored without "
   // no captured_payload
 
   REQUIRE_NOTHROW(
-      steamrot::logic::action::grimoire_machina::proces_user_input_events(
+      steamrot::logic::action::grimoire_machina::process_user_input_events(
           subscriber, scene_context, grimoire_machina));
 
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
@@ -690,7 +674,7 @@ TEST_CASE("ProcessUserInputEvents: TOGGLE_SOCKET_VISIBILITY toggles socket "
   subscriber.captured_payload = steamrot::InputPayload{
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
-  steamrot::logic::action::grimoire_machina::proces_user_input_events(
+  steamrot::logic::action::grimoire_machina::process_user_input_events(
       subscriber, scene_context, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->are_sockets_visible == true);
@@ -712,7 +696,7 @@ TEST_CASE("ProcessUserInputEvents: TOGGLE_SOCKET_VISIBILITY with no scaffold "
       steamrot::InputPayload::InputAction::TOGGLE_SOCKET_VISIBILITY};
 
   REQUIRE_NOTHROW(
-      steamrot::logic::action::grimoire_machina::proces_user_input_events(
+      steamrot::logic::action::grimoire_machina::process_user_input_events(
           subscriber, scene_context, grimoire_machina));
 }
 
@@ -737,7 +721,7 @@ TEST_CASE(
   subscriber.captured_payload =
       steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
 
-  steamrot::logic::action::grimoire_machina::proces_user_input_events(
+  steamrot::logic::action::grimoire_machina::process_user_input_events(
       subscriber, scene_context, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
@@ -763,7 +747,7 @@ TEST_CASE("ProcessUserInputEvents: SELECT with valid conditions places joint",
   subscriber.captured_payload =
       steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
 
-  steamrot::logic::action::grimoire_machina::proces_user_input_events(
+  steamrot::logic::action::grimoire_machina::process_user_input_events(
       subscriber, scene_context, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
@@ -787,7 +771,7 @@ TEST_CASE("ProcessUserInputEvents: SELECT with monostate ghost does not place",
   subscriber.captured_payload =
       steamrot::InputPayload{steamrot::InputPayload::InputAction::SELECT};
 
-  steamrot::logic::action::grimoire_machina::proces_user_input_events(
+  steamrot::logic::action::grimoire_machina::process_user_input_events(
       subscriber, scene_context, grimoire_machina);
 
   REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());

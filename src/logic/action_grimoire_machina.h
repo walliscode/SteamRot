@@ -85,9 +85,9 @@ void process_logic_events(Subscriber &subscriber,
 /// state, camera, and mouse position.
 /// @param grimoire_machina GrimoireMachina instance to mutate.
 /////////////////////////////////////////////////
-void proces_user_input_events(Subscriber &subscriber,
-                              const SceneContext &scene_context,
-                              GrimoireMachina &grimoire_machina);
+void process_user_input_events(Subscriber &subscriber,
+                               const SceneContext &scene_context,
+                               GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item as the very first piece on

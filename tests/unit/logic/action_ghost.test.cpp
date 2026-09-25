@@ -38,7 +38,7 @@ TEST_CASE("SelectGhostItem tests") {
 
     MrGhost mr_ghost;
     GhostSelection selection = FragmentTag{"rock"};
-    SelectGhostItem(mr_ghost, selection, asset_manager);
+    select_ghost_item(mr_ghost, selection, asset_manager);
 
     REQUIRE(std::holds_alternative<steamrot::FragmentInstance>(
         mr_ghost.m_instance));
@@ -56,7 +56,7 @@ TEST_CASE("SelectGhostItem tests") {
 
     MrGhost mr_ghost;
     GhostSelection selection = JointTag{"pivot"};
-    SelectGhostItem(mr_ghost, selection, asset_manager);
+    select_ghost_item(mr_ghost, selection, asset_manager);
 
     REQUIRE(std::holds_alternative<JointInstance>(mr_ghost.m_instance));
     REQUIRE(std::get<JointInstance>(mr_ghost.m_instance).GetPart().name ==
@@ -76,12 +76,12 @@ TEST_CASE("SelectGhostItem tests") {
 
     MrGhost mr_ghost;
     // First selection
-    SelectGhostItem(mr_ghost, FragmentTag{"arm"}, asset_manager);
+    select_ghost_item(mr_ghost, FragmentTag{"arm"}, asset_manager);
     REQUIRE(std::get<FragmentInstance>(mr_ghost.m_instance).GetPart().name ==
             "arm");
 
     // Overwrite with second selection
-    SelectGhostItem(mr_ghost, FragmentTag{"leg"}, asset_manager);
+    select_ghost_item(mr_ghost, FragmentTag{"leg"}, asset_manager);
     REQUIRE(std::get<FragmentInstance>(mr_ghost.m_instance).GetPart().name ==
             "leg");
   }
@@ -91,7 +91,7 @@ TEST_CASE("SelectGhostItem tests") {
 
     MrGhost mr_ghost;
     GhostSelection selection = FragmentTag{"missing"};
-    SelectGhostItem(mr_ghost, selection, asset_manager);
+    select_ghost_item(mr_ghost, selection, asset_manager);
 
     REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
   }

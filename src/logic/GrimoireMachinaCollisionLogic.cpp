@@ -31,6 +31,7 @@ void GrimoireMachinaCollisionLogic::ProcessLogic() {
       grimoire_machina.m_scaffold_form.get();
 
   if (active_scaffold_form) {
+    // Check for collisions between the mouse and the active scaffold
     collision::mouse::ProcessScaffoldCollisions(
         *active_scaffold_form, m_scene_context.world_mouse_position);
 

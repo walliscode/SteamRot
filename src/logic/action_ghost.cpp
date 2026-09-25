@@ -13,8 +13,8 @@
 namespace steamrot::logic::action::ghost {
 
 /////////////////////////////////////////////////
-void SelectGhostItem(MrGhost &mr_ghost, const GhostSelection &selection,
-                     AssetManager &asset_manager) {
+void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
+                       AssetManager &asset_manager) {
   auto grimoire_result = asset_manager.GetGrimoireMachina();
   if (!grimoire_result.has_value())
     return;
@@ -53,7 +53,7 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost,
 
   switch (ghost_payload.action) {
   case GhostPayload::GhostAction::SELECT:
-    SelectGhostItem(mr_ghost, ghost_payload.m_selection, asset_manager);
+    select_ghost_item(mr_ghost, ghost_payload.m_selection, asset_manager);
     break;
 
   case GhostPayload::GhostAction::CLEAR:
