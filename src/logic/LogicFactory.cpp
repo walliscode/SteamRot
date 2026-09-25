@@ -316,7 +316,7 @@ LogicFactory::ConfigureCraftingLogics(LogicCollection &logic_collection) {
 
   static constexpr std::array positioning_logic_types = {
       LogicType::UIPositioning, LogicType::GrimoireMachinaPositioning,
-      LogicType::GhostPositioning, LogicType::CameraPositioning};
+      LogicType::CameraPositioning, LogicType::GhostPositioning};
 
   // Add Logics to collection using the helper function
   auto collision_result = AddLogicsToCollection(

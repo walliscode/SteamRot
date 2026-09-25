@@ -191,9 +191,9 @@ TEST_CASE("LogicFactory::ProvideLogicCollection returns valid LogicCollection "
       positioning_logics[0].get()));
   REQUIRE(dynamic_cast<steamrot::logic::GrimoireMachinaPositioningLogic *>(
       positioning_logics[1].get()));
-  REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
-      positioning_logics[2].get()));
   REQUIRE(dynamic_cast<steamrot::logic::CameraPositioningLogic *>(
+      positioning_logics[2].get()));
+  REQUIRE(dynamic_cast<steamrot::logic::GhostPositioningLogic *>(
       positioning_logics[3].get()));
 }
 

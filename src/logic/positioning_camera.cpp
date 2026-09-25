@@ -21,11 +21,35 @@ sf::View get_world_view(const CameraState &camera_state,
 }
 
 /////////////////////////////////////////////////
+sf::View get_ui_view(const sf::RenderTexture &texture) {
+  return texture.getDefaultView();
+}
+
+/////////////////////////////////////////////////
+void apply_world_view(sf::RenderTexture &texture,
+                      const CameraState &camera_state) {
+  texture.setView(get_world_view(camera_state, texture));
+}
+
+/////////////////////////////////////////////////
+void apply_ui_view(sf::RenderTexture &texture) {
+  texture.setView(get_ui_view(texture));
+}
+
+/////////////////////////////////////////////////
 sf::Vector2f map_to_world_coords(const CameraState &camera_state,
                                  sf::Vector2i screen_pos,
                                  const sf::RenderTexture &texture) {
   return texture.mapPixelToCoords(screen_pos,
                                   get_world_view(camera_state, texture));
+}
+
+/////////////////////////////////////////////////
+void update_world_mouse_position(sf::Vector2f &world_mouse_position,
+                                 const CameraState &camera_state,
+                                 sf::Vector2i screen_pos,
+                                 const sf::RenderTexture &texture) {
+  world_mouse_position = map_to_world_coords(camera_state, screen_pos, texture);
 }
 
 /////////////////////////////////////////////////

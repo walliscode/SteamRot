@@ -51,6 +51,22 @@ TEST_CASE(
   REQUIRE(view.getCenter().y == 200.f);
 }
 
+TEST_CASE("positioning_camera::GetUIView returns the texture default view",
+          "[unit][positioning_camera]") {
+  sf::RenderTexture texture;
+  auto resize_result = texture.resize({640u, 480u});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
+
+  const sf::View default_view = texture.getDefaultView();
+  const sf::View ui_view =
+      steamrot::logic::positioning::camera::get_ui_view(texture);
+
+  REQUIRE(ui_view.getCenter() == default_view.getCenter());
+  REQUIRE(ui_view.getSize() == default_view.getSize());
+}
+
 TEST_CASE("positioning_camera::MapToWorldCoords: default camera maps screen "
           "centre to "
           "world origin",
@@ -73,6 +89,60 @@ TEST_CASE("positioning_camera::MapToWorldCoords: default camera maps screen "
   // Screen centre should map to world (0, 0) when camera is at origin
   REQUIRE(std::abs(world_pos.x) < 0.01f);
   REQUIRE(std::abs(world_pos.y) < 0.01f);
+}
+
+TEST_CASE("positioning_camera::update_world_mouse_position uses finalized camera "
+          "state",
+          "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_panning_right = true;
+  camera_state.m_panning_down = true;
+
+  sf::RenderTexture texture;
+  constexpr unsigned int w = 800u;
+  constexpr unsigned int h = 600u;
+  auto resize_result = texture.resize({w, h});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
+
+  steamrot::logic::positioning::camera::apply_pan(camera_state);
+
+  sf::Vector2f world_mouse_position{-999.f, -999.f};
+  steamrot::logic::positioning::camera::update_world_mouse_position(
+      world_mouse_position, camera_state,
+      {static_cast<int>(w / 2), static_cast<int>(h / 2)}, texture);
+
+  REQUIRE(world_mouse_position.x == camera_state.m_position.x);
+  REQUIRE(world_mouse_position.y == camera_state.m_position.y);
+}
+
+TEST_CASE("positioning_camera::apply_world_view and apply_ui_view set explicit "
+          "render views",
+          "[unit][positioning_camera]") {
+  steamrot::CameraState camera_state;
+  camera_state.m_position = {120.f, 80.f};
+  camera_state.m_zoom_level = 2.f;
+
+  sf::RenderTexture texture;
+  auto resize_result = texture.resize({800u, 600u});
+  if (!resize_result) {
+    FAIL("Failed to resize RenderTexture");
+  }
+
+  steamrot::logic::positioning::camera::apply_world_view(texture, camera_state);
+  REQUIRE(texture.getView().getCenter() ==
+          steamrot::logic::positioning::camera::get_world_view(camera_state,
+                                                                texture)
+              .getCenter());
+
+  steamrot::logic::positioning::camera::apply_ui_view(texture);
+  REQUIRE(texture.getView().getCenter().x ==
+          texture.getDefaultView().getCenter().x);
+  REQUIRE(texture.getView().getCenter().y ==
+          texture.getDefaultView().getCenter().y);
+  REQUIRE(texture.getView().getSize().x == texture.getDefaultView().getSize().x);
+  REQUIRE(texture.getView().getSize().y == texture.getDefaultView().getSize().y);
 }
 
 /////////////////////////////////////////////////

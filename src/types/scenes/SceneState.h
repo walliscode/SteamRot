@@ -45,8 +45,9 @@ struct SceneState {
   /// @brief Camera/view state for the scene.
   ///
   /// Holds the current zoom level and world-space camera position applied to
-  /// world-space rendering. Owned here as part of scene runtime state and
-  /// exposed to all Logic classes via SceneContext::camera_state.
+  /// world-space rendering and world-mouse projection. Owned here as part of
+  /// scene runtime state and exposed to all Logic classes via
+  /// SceneContext::camera_state.
   /////////////////////////////////////////////////
   CameraState camera_state{};
 };
