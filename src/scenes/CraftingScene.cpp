@@ -7,7 +7,6 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "CraftingScene.h"
-#include "LogicType.h"
 #include "render/render_background.h"
 #include <SFML/Graphics/Color.hpp>
 

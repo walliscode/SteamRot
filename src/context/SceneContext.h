@@ -87,7 +87,7 @@ struct SceneContext {
   EventHandler &event_handler;
 
   /////////////////////////////////////////////////
-  /// @brief Reference to mouse position in the game window (local).
+  /// @brief Reference to mouse position in the game window (screen-space pixels).
   /////////////////////////////////////////////////
   sf::Vector2i &mouse_position;
 
@@ -116,10 +116,10 @@ struct SceneContext {
   /////////////////////////////////////////////////
   /// @brief World-space mouse position for the current tick.
   ///
-  /// Computed once per tick by GhostPositioningLogic via
-  /// positioning::camera::MapToWorldCoords.  World-space systems (ghost rendering,
-  /// grimoire collision, piece placement) read this value; screen-space
-  /// systems (UI collision) use mouse_position instead.
+  /// Computed once per tick by CameraPositioningLogic after camera state has
+  /// been finalized for the frame. World-space systems (ghost positioning /
+  /// rendering, grimoire collision, piece placement) read this value;
+  /// screen-space systems (UI collision) use mouse_position instead.
   ///
   /// Coordinate contract:
   ///   mouse_position       (sf::Vector2i) — screen pixels — UI collision only

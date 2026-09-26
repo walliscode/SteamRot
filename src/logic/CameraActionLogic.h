@@ -38,7 +38,7 @@ public:
   CameraActionLogic(const SceneContext scene_context);
 
   /////////////////////////////////////////////////
-  /// @brief Returns LogicType::CameraPositioning.
+  /// @brief Returns LogicType::CameraAction.
   /////////////////////////////////////////////////
   LogicType GetLogicType() const override { return LogicType::CameraAction; }
 };

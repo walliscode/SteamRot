@@ -18,18 +18,18 @@ namespace steamrot::logic {
 
 /////////////////////////////////////////////////
 /// @class CameraPositioningLogic
-/// @brief Positioning logic that applies camera-based events to the camera state.
+/// @brief Positioning logic that finalizes camera movement for the current tick.
 ///
-/// Subscribes to EventType::CAMERA via logic_config.json data-driven
-/// configuration. Each tick that a CAMERA event is active the subscriber
-/// captures the CameraPayload and applies its scroll delta to
-/// SceneContext::camera_state via positioning::camera::ApplyZoom.
+/// Each tick this logic applies continuous camera pan movement from the current
+/// CameraState flags, then computes the scene-wide authoritative
+/// SceneContext::world_mouse_position from the finalized camera state and the
+/// current screen-space mouse cursor.
 /////////////////////////////////////////////////
 class CameraPositioningLogic : public Logic {
 
 private:
   /////////////////////////////////////////////////
-  /// @brief Process all active CAMERA subscribers.
+  /// @brief Apply camera pan and refresh the authoritative world mouse position.
   /////////////////////////////////////////////////
   void ProcessLogic() override;
 
@@ -37,8 +37,8 @@ public:
   /////////////////////////////////////////////////
   /// @brief Constructor for CameraPositioningLogic.
   ///
-  /// @param scene_context SceneContext providing event_handler and
-  ///                      camera_state references.
+  /// @param scene_context SceneContext providing camera and mouse state
+  ///                      references.
   /////////////////////////////////////////////////
   CameraPositioningLogic(const SceneContext scene_context);
 

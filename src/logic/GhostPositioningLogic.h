@@ -22,8 +22,8 @@ namespace steamrot::logic {
 ///
 /// Each tick this Logic processes active subscribers: if a ROTATE_GHOST input
 /// event has been captured, it increments MrGhost::m_rotation_degrees by 90
-/// degrees. It then writes the current mouse cursor position into
-/// MrGhost::m_position and rebuilds the instance transform (including both
+/// degrees. It then consumes SceneContext::world_mouse_position, writes it into
+/// MrGhost::m_position, and rebuilds the instance transform (including both
 /// translation and the accumulated rotation) so that other Logic classes can
 /// render the ghost item at the correct world position and orientation.
 /////////////////////////////////////////////////

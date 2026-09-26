@@ -5,6 +5,7 @@
 #include "CUserInterface.h"
 #include "UIPriorityTier.h"
 #include "archetypes.h"
+#include "positioning_camera.h"
 #include "render_ui.h"
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -21,8 +22,7 @@ void UIRenderLogic::ProcessLogic() {
 
   // Reset to the default (unzoomed) view so UI elements are always drawn
   // at their fixed screen-space positions, unaffected by world zoom.
-  m_scene_context.scene_texture.setView(
-      m_scene_context.scene_texture.getDefaultView());
+  positioning::camera::apply_ui_view(m_scene_context.scene_texture);
 
   // Get all UI entities once; draw order is controlled by fixed tier passes.
   std::set<size_t> entity_index_set =

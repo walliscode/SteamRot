@@ -8,7 +8,6 @@
 /////////////////////////////////////////////////
 #include "positioning_ghost.h"
 #include "overload.h"
-#include "positioning_camera.h"
 #include <SFML/Graphics/Transform.hpp>
 #include <cmath>
 
@@ -62,16 +61,10 @@ sf::Transform compute_instance_transform(const sf::FloatRect &bounds,
 } // anonymous namespace
 
 /////////////////////////////////////////////////
-void UpdatePosition(MrGhost &mr_ghost, sf::Vector2f &world_mouse_position,
-                    const sf::Vector2i &mouse_position,
-                    const CameraState &camera_state,
-                    const sf::RenderTexture &scene_texture) {
-  world_mouse_position =
-      steamrot::logic::positioning::camera::map_to_world_coords(
-          camera_state, mouse_position, scene_texture);
+void UpdatePosition(MrGhost &mr_ghost,
+                    const sf::Vector2f &world_mouse_position) {
   mr_ghost.m_position = world_mouse_position;
 
-  // [TODO:] needs redoing here
   // std::visit(overload{[&](FragmentInstance &instance) {
   //                       const sf::FloatRect bounds =
   //                           instance.GetPart()
