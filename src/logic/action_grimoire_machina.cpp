@@ -11,6 +11,7 @@
 #include "EventPayload.h"
 #include "EventType.h"
 #include "MachinaFormScaffold.h"
+#include "action_ghost.h"
 #include "descriptors_runner.h"
 #include "machina_form_scaffolds/machina_form_scaffold_library.h"
 #include <string>
@@ -211,7 +212,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
 
 /////////////////////////////////////////////////
 void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
-                             const MrGhost &mr_ghost) {
+                             MrGhost &mr_ghost) {
 
   MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
@@ -223,6 +224,9 @@ void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
   }
 
   place_next_piece(*scaffold, mr_ghost);
+
+  // clear the ghost selection after placing it on the scaffold
+  ghost::clear_ghost_selection(mr_ghost);
 }
 
 /////////////////////////////////////////////////

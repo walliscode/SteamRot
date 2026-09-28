@@ -45,7 +45,7 @@ void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
 ///
 /// @param mr_ghost MrGhost instance whose selection will be cleared.
 /////////////////////////////////////////////////
-void ClearGhostSelection(MrGhost &mr_ghost);
+void clear_ghost_selection(MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Dispatch a single active GHOST subscriber to the correct action

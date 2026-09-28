@@ -34,7 +34,7 @@ void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
 }
 
 /////////////////////////////////////////////////
-void ClearGhostSelection(MrGhost &mr_ghost) {
+void clear_ghost_selection(MrGhost &mr_ghost) {
   mr_ghost.m_instance = std::monostate{};
 }
 
@@ -57,7 +57,7 @@ void ProcessSubscriber(Subscriber &subscriber, MrGhost &mr_ghost,
     break;
 
   case GhostPayload::GhostAction::CLEAR:
-    ClearGhostSelection(mr_ghost);
+    clear_ghost_selection(mr_ghost);
     break;
 
   default:
