@@ -229,10 +229,6 @@ ConfigureGhostPayload(GhostPayload &ghost_payload,
   case GhostActionFbs_CLEAR:
     ghost_payload.action = GhostPayload::GhostAction::CLEAR;
     break;
-  default:
-    return std::unexpected(
-        FailInfo{FailMode::NonExistentEnumValue,
-                 "Unknown GhostActionFbs value in flatbuffers data"});
   }
 
   return std::monostate{};

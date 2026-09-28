@@ -20,19 +20,14 @@
 namespace steamrot::logic::positioning::ghost {
 
 /////////////////////////////////////////////////
-/// @brief Update the world-space position and instance transform of MrGhost.
+/// @brief Updates all positioning information for the ghost. translation,
+/// rotation e.t.c.
 ///
-/// Consumes the already-computed scene-wide @p world_mouse_position, writes it
-/// into mr_ghost.m_position, and rebuilds the selected ghost instance
-/// transform using the stored mr_ghost.m_rotation_degrees. Screen-to-world
-/// conversion is intentionally handled elsewhere by camera positioning code.
-///
-/// @param mr_ghost             MrGhost instance whose position will be updated.
-/// @param world_mouse_position Shared world-space cursor position for the
-///                             current tick.
+/// @param mr_ghost [TODO:parameter]
+/// @param world_mouse_position [TODO:parameter]
 /////////////////////////////////////////////////
-void UpdatePosition(MrGhost &mr_ghost,
-                    const sf::Vector2f &world_mouse_position);
+void update_position(MrGhost &mr_ghost,
+                     const sf::Vector2f &world_mouse_position);
 
 /////////////////////////////////////////////////
 /// @brief Rotate the ghost selection by 90 degrees.
@@ -42,21 +37,15 @@ void UpdatePosition(MrGhost &mr_ghost,
 ///
 /// @param mr_ghost MrGhost instance whose rotation will be incremented.
 /////////////////////////////////////////////////
-void RotateGhost(MrGhost &mr_ghost);
+void rotate_ghost(MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
-/// @brief Process all active ROTATE_GHOST subscribers and rotate the ghost.
-///
-/// Iterates @p subscribers; for each active subscriber whose
-/// captured_payload holds an InputPayload with action ROTATE_GHOST,
-/// calls RotateGhost once. This function is the authoritative place for
-/// subscriber-driven rotation logic and is intended to be called from
-/// GhostPositioningLogic::ProcessLogic().
+/// @brief Process all active subscribers and update MrGhost
 ///
 /// @param subscribers Subscribers owned by the calling Logic instance.
 /// @param mr_ghost    MrGhost instance whose rotation will be updated.
 /////////////////////////////////////////////////
-void ProcessRotateSubscribers(
+void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     MrGhost &mr_ghost);
 

@@ -7,95 +7,136 @@
 /// Headers
 /////////////////////////////////////////////////
 #include "positioning_ghost.h"
-#include "Fragment.h"
+#include "FragmentInstance.h"
 #include "MrGhost.h"
+#include "Vector2fEqualsMatcher.h"
+#include "catch2/catch_approx.hpp"
+#include "fragment_library.h"
+#include "joint_library.h"
 #include <SFML/Graphics/VertexArray.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-namespace {
+namespace steamrot::tests {
 
-/////////////////////////////////////////////////
-steamrot::Fragment MakePopulatedFragment() {
-  steamrot::Fragment fragment;
-  sf::VertexArray view(sf::PrimitiveType::Triangles, 6);
-  view[0].position = {0.f, 0.f};
-  view[1].position = {20.f, 0.f};
-  view[2].position = {20.f, 20.f};
-  view[3].position = {0.f, 0.f};
-  view[4].position = {20.f, 20.f};
-  view[5].position = {0.f, 20.f};
-  fragment.positioning_views.insert_or_assign(steamrot::ViewDirection::Front,
-                                              view);
-  return fragment;
-}
+using namespace steamrot::logic::positioning::ghost;
 
-} // anonymous namespace
+TEST_CASE("rotate_ghost tests") {
+  MrGhost mr_ghost;
 
-/////////////////////////////////////////////////
-// RotateGhost
-/////////////////////////////////////////////////
-
-TEST_CASE("RotateGhost increments rotation by 90 degrees",
+  SECTION("rotate_ghost increments rotation by 90 degrees",
           "[unit][positioning_ghost]") {
-  steamrot::MrGhost mr_ghost;
-  REQUIRE(mr_ghost.m_rotation_degrees == 0.f);
+    REQUIRE(mr_ghost.m_rotation_degrees == 0.f);
 
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  REQUIRE(mr_ghost.m_rotation_degrees == 90.f);
-}
+    rotate_ghost(mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees == 90.f);
+  }
 
-TEST_CASE("RotateGhost accumulates rotation across multiple calls",
+  SECTION("rotate_ghost accumulates rotation across multiple calls",
           "[unit][positioning_ghost]") {
-  steamrot::MrGhost mr_ghost;
 
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  REQUIRE(mr_ghost.m_rotation_degrees == 90.f);
+    rotate_ghost(mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees == 90.f);
 
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  REQUIRE(mr_ghost.m_rotation_degrees == 180.f);
+    rotate_ghost(mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees == 180.f);
 
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  REQUIRE(mr_ghost.m_rotation_degrees == 270.f);
+    rotate_ghost(mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees == 270.f);
+  }
 }
 
-TEST_CASE("RotateGhost wraps rotation back to 0 after four calls",
+TEST_CASE("update_position tests", "[unit][positioning_ghost]") {
+
+  MrGhost mr_ghost;
+
+  sf::Vector2f new_position(100.f, 200.f);
+  SECTION("update_position sets the ghost's position to the new value",
           "[unit][positioning_ghost]") {
-  steamrot::MrGhost mr_ghost;
+    mr_ghost.m_position = sf::Vector2f(0.f, 0.f);
+    update_position(mr_ghost, new_position);
+    REQUIRE_THAT(mr_ghost.m_position, EqualsVector2f(new_position));
+  }
 
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-  steamrot::logic::positioning::ghost::RotateGhost(mr_ghost);
-
-  REQUIRE(mr_ghost.m_rotation_degrees == 0.f);
-}
-
-TEST_CASE("UpdatePosition copies the authoritative world mouse position",
+  SECTION("update_position updates the GhostInstance position  and rotation if "
+          "it is a "
+          "FragmentInstance",
           "[unit][positioning_ghost]") {
-  steamrot::MrGhost mr_ghost;
+    // Arrange
+    FragmentInstance fragment_instance{0,
+                                       parts::FragmentRectangleWithOneSocket};
+    fragment_instance.setPosition(sf::Vector2f(0.f, 0.f));
+    mr_ghost.m_instance.emplace<FragmentInstance>(fragment_instance);
+    mr_ghost.m_rotation_degrees = 0.f;
+    const FragmentInstance &instance_ref =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
 
-  steamrot::logic::positioning::ghost::UpdatePosition(mr_ghost, {50.f, 75.f});
+    REQUIRE_THAT(instance_ref.getPosition(),
+                 EqualsVector2f(sf::Vector2f(0.f, 0.f)));
+    REQUIRE(instance_ref.getRotation().asDegrees() == 0.f);
 
-  REQUIRE(mr_ghost.m_position.x == 50.f);
-  REQUIRE(mr_ghost.m_position.y == 75.f);
-}
+    // Act
+    mr_ghost.m_rotation_degrees = 134.f;
+    update_position(mr_ghost, new_position);
 
-TEST_CASE("UpdatePosition rebuilds the active ghost transform from world mouse "
-          "position",
+    // Assert
+    REQUIRE_THAT(instance_ref.getPosition(), EqualsVector2f(new_position));
+    REQUIRE(instance_ref.getRotation().asDegrees() ==
+            Catch::Approx(134.f).margin(0.1f));
+  }
+
+  SECTION("update_position updates the GhostInstance position and rotation if "
+          "it is a JointInstance",
           "[unit][positioning_ghost]") {
-  steamrot::MrGhost mr_ghost;
-  mr_ghost.m_rotation_degrees = 90.f;
-  mr_ghost.m_instance.emplace<steamrot::FragmentInstance>(0, MakePopulatedFragment());
-
-  steamrot::logic::positioning::ghost::UpdatePosition(mr_ghost, {80.f, 90.f});
-
-  const auto &instance =
-      std::get<steamrot::FragmentInstance>(mr_ghost.m_instance);
-  const sf::Vector2f transformed_center =
-      instance.getTransform().transformPoint({10.f, 10.f});
-
-  REQUIRE(mr_ghost.m_position.x == 80.f);
-  REQUIRE(mr_ghost.m_position.y == 90.f);
-  REQUIRE(transformed_center.x == 75.f);
-  REQUIRE(transformed_center.y == 85.f);
+    // Arrange
+    JointInstance joint_instance{0, parts::JointSquareWithOneSocket};
+    joint_instance.setPosition(sf::Vector2f(0.f, 0.f));
+    mr_ghost.m_instance.emplace<JointInstance>(joint_instance);
+    mr_ghost.m_rotation_degrees = 0.f;
+    const JointInstance &instance_ref =
+        std::get<JointInstance>(mr_ghost.m_instance);
+    REQUIRE_THAT(instance_ref.getPosition(),
+                 EqualsVector2f(sf::Vector2f(0.f, 0.f)));
+    REQUIRE(instance_ref.getRotation().asDegrees() == 0.f);
+    // Act
+    mr_ghost.m_rotation_degrees = 90.f;
+    update_position(mr_ghost, new_position);
+    // Assert
+    REQUIRE_THAT(instance_ref.getPosition(), EqualsVector2f(new_position));
+    REQUIRE(instance_ref.getRotation().asDegrees() ==
+            Catch::Approx(90.f).margin(0.1f));
+  }
 }
+
+TEST_CASE("process_subscribers tests", "[unit][positioning_ghost]") {
+  MrGhost mr_ghost;
+  std::vector<std::shared_ptr<Subscriber>> subscribers;
+
+  SECTION(
+      "process_subscribers does not rotate the ghost when no active subscriber "
+      "has a ROTATE_GHOST action",
+      "[unit][positioning_ghost]") {
+    auto subscriber = std::make_shared<Subscriber>();
+    subscriber->m_active = true;
+    subscriber->captured_payload =
+        InputPayload{InputPayload::InputAction::NONE};
+    subscribers.push_back(subscriber);
+    float initial_rotation = mr_ghost.m_rotation_degrees;
+    process_subscribers(subscribers, mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees == initial_rotation);
+  }
+  SECTION(
+      "process_subscribers rotates the ghost when an active subscriber has a "
+      "ROTATE_GHOST action",
+      "[unit][positioning_ghost]") {
+    auto subscriber = std::make_shared<Subscriber>();
+    subscriber->m_active = true;
+    subscriber->captured_payload =
+        InputPayload{InputPayload::InputAction::ROTATE_GHOST};
+    subscribers.push_back(subscriber);
+    float initial_rotation = mr_ghost.m_rotation_degrees;
+    process_subscribers(subscribers, mr_ghost);
+    REQUIRE(mr_ghost.m_rotation_degrees ==
+            Catch::Approx(initial_rotation + 90.f).margin(0.1f));
+  }
+}
+} // namespace steamrot::tests

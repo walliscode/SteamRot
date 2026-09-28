@@ -144,7 +144,7 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost);
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
 void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
-                             const MrGhost &mr_ghost);
+                             MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers by iterating the list, checking
