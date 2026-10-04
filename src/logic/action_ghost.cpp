@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////
 #include "action_ghost.h"
 #include "EventPayload.h"
+#include "overload.h"
 
 namespace steamrot::logic::action::ghost {
 
@@ -28,7 +29,13 @@ void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
   } else if (const auto *tag = std::get_if<JointTag>(&selection)) {
     auto it = grimoire->m_all_joints.find(tag->key);
     if (it != grimoire->m_all_joints.end()) {
-      mr_ghost.m_instance.emplace<JointInstance>(0, it->second);
+      // create a new JointInstance
+      JointInstance joint_instance(0, it->second);
+      // position the sockets on the Joint instance
+      joint_instance.PositionSockets(
+          JointSocketPositioningStrategy::MaximizeDistance);
+      // add the JointInstance to the MrGhost instance variant
+      mr_ghost.m_instance.emplace<JointInstance>(joint_instance);
     }
   }
 }
@@ -36,6 +43,26 @@ void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
 /////////////////////////////////////////////////
 void clear_ghost_selection(MrGhost &mr_ghost) {
   mr_ghost.m_instance = std::monostate{};
+}
+
+/////////////////////////////////////////////////
+std::optional<uint32_t>
+check_if_instance_is_connection_ready(const MrGhost &mr_ghost) {
+
+  return std::visit(
+      overload{
+          [&](const FragmentInstance &frag_instance)
+              -> std::optional<uint32_t> {
+            return frag_instance.CheckIfAnySocketIsWithinConnectionDistance();
+          },
+          [&](const JointInstance &joint_instance) -> std::optional<uint32_t> {
+            return joint_instance.CheckIfAnySocketIsWithinConnectionDistance();
+          },
+          [&](const std::monostate &) -> std::optional<uint32_t> {
+            return std::nullopt;
+          },
+      },
+      mr_ghost.m_instance);
 }
 
 /////////////////////////////////////////////////

@@ -64,32 +64,6 @@ std::vector<std::string> get_all_joint_names(GrimoireMachina &grimoire_machina);
 void toggle_socket_visibility(MachinaFormScaffold &scaffold);
 
 /////////////////////////////////////////////////
-/// @brief Handle a single LOGIC subscriber for scaffold init/clear events.
-///
-/// Checks that the subscriber carries a LogicPayload, then switches on
-/// LogicPayload::LogicToggle to call InitialiseActiveMachinaFormScaffold or
-/// ClearActiveMachinaFormScaffold.
-///
-/// @param subscriber Subscriber whose captured_payload holds the action.
-/// @param grimoire_machina GrimoireMachina instance to mutate.
-/////////////////////////////////////////////////
-void process_logic_events(Subscriber &subscriber,
-                          GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
-/// @brief Handle a single USER_INPUT SELECT subscriber and, when all placement
-/// guards pass, place the ghost item on the active scaffold.
-///
-/// @param subscriber    Subscriber to process.
-/// @param scene_context SceneContext providing archetypes, entities, ghost
-/// state, camera, and mouse position.
-/// @param grimoire_machina GrimoireMachina instance to mutate.
-/////////////////////////////////////////////////
-void process_user_input_events(Subscriber &subscriber,
-                               const SceneContext &scene_context,
-                               GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item as the very first piece on
 /// the active scaffold.
 ///
@@ -101,8 +75,7 @@ void process_user_input_events(Subscriber &subscriber,
 /// @param grimoire_machina GrimoireMachina that owns the active scaffold.
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
-void place_first_piece(GrimoireMachina &grimoire_machina,
-                       const MrGhost &mr_ghost);
+void place_first_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Place the current ghost item onto the scaffold as the next piece,
@@ -129,7 +102,7 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
 /// @param mr_ghost  Current ghost state carrying the instance and its
 ///                  transform.
 /////////////////////////////////////////////////
-void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost);
+void place_next_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item onto the active scaffold.
@@ -146,6 +119,31 @@ void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost);
 void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
                              MrGhost &mr_ghost);
 
+/////////////////////////////////////////////////
+/// @brief Handle a single LOGIC subscriber for scaffold init/clear events.
+///
+/// Checks that the subscriber carries a LogicPayload, then switches on
+/// LogicPayload::LogicToggle to call InitialiseActiveMachinaFormScaffold or
+/// ClearActiveMachinaFormScaffold.
+///
+/// @param subscriber Subscriber whose captured_payload holds the action.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void process_logic_events(Subscriber &subscriber,
+                          GrimoireMachina &grimoire_machina);
+
+/////////////////////////////////////////////////
+/// @brief Handle a single USER_INPUT SELECT subscriber and, when all placement
+/// guards pass, place the ghost item on the active scaffold.
+///
+/// @param subscriber    Subscriber to process.
+/// @param scene_context SceneContext providing archetypes, entities, ghost
+/// state, camera, and mouse position.
+/// @param grimoire_machina GrimoireMachina instance to mutate.
+/////////////////////////////////////////////////
+void process_user_input_events(Subscriber &subscriber,
+                               const SceneContext &scene_context,
+                               GrimoireMachina &grimoire_machina);
 /////////////////////////////////////////////////
 /// @brief Process all active subscribers by iterating the list, checking
 /// active state and event type, then dispatching each subscriber to the
@@ -165,15 +163,6 @@ void process_subscribers(
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
 
 /////////////////////////////////////////////////
-/// @brief Checks whether any of the selections on MrGhost are ready to be
-/// connected to the active MachinaFormScaffold
-///
-/// @param mr_ghost MrGhost instance living on the Scene
-/////////////////////////////////////////////////
-std::optional<uint32_t>
-check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
-
-/////////////////////////////////////////////////
 /// @brief Checks whether any of the sockets on the active MachinaFormScaffold
 /// are ready to be connected to. Returns the part ID and socket index of the
 /// first ready socket, or std::nullopt if no sockets are ready.
@@ -182,6 +171,6 @@ check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost);
 /// @param part_graph PartGraph to check
 /////////////////////////////////////////////////
 std::optional<std::pair<uint32_t, uint32_t>>
-check_PartGraph_for_connection_readiness(const PartGraph &part_graph);
+check_part_graph_for_connection_readiness(const PartGraph &part_graph);
 
 } // namespace steamrot::logic::action::grimoire_machina

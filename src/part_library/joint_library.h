@@ -16,6 +16,14 @@
 #include "Joint.h"
 #include "JointBuilder.h"
 namespace steamrot::parts {
+/////////////////////////////////////////////////
+inline const Joint JointWithNoSockets = [] -> Joint {
+  return JointBuilder()
+      .AddViews(PremadeViews::WhiteSquare)
+      .SetOrigin({10, 10})
+      .SetSocketConfig(0, 0, 0, 0, false, 0, 90)
+      .Build("JointWithNoSockets");
+}();
 
 /////////////////////////////////////////////////
 inline const Joint JointSquareWithOneSocket = [] -> Joint {

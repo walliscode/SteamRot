@@ -10,8 +10,12 @@
 #include "EventPayload.h"
 #include "GrimoireMachina.h"
 #include "MrGhost.h"
+#include "PartGraphBuilder.h"
+#include "SocketState.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "fragment_library.h"
+#include "joint_library.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace steamrot::tests {
@@ -129,7 +133,90 @@ TEST_CASE("clear_ghost_selection tests") {
     REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
   }
 }
+TEST_CASE("check_if_instance_is_connection_ready tests",
+          "[unit][actions][grimoire_machina]"
+          "[check_if_instance_is_connection_ready]") {
+  // Common setup shared across all sections: a PartGraphBuilder and a ghost
+  // with default monostate selection.
+  PartGraphBuilder builder;
+  MrGhost mr_ghost;
+  REQUIRE(std::holds_alternative<std::monostate>(mr_ghost.m_instance));
 
+  SECTION("check_if_instance_is_connection_ready returns false for "
+          "monostate selection") {
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_if_instance_is_connection_ready returns false for "
+          "fragment with no sockets") {
+    FragmentInstance frag_instance{0, parts::FragmentRectangleWithNoSockets};
+
+    mr_ghost.m_instance.emplace<FragmentInstance>(frag_instance);
+
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_if_instance_is_connection_ready returns false for joint "
+          "with no sockets") {
+
+    mr_ghost.m_instance.emplace<JointInstance>(
+        JointInstance{0, parts::JointWithNoSockets});
+
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION("check_if_instance_is_connection_ready returns false if socket is "
+          "outside of "
+          "proximity threshold") {
+    FragmentInstance frag_instance{0, parts::FragmentRectangleWithOneSocket};
+    frag_instance.SetSocketConnectionDistance(
+        0, k_proximity_distance_threshold +
+               5.0f); // outside of proximity threshold
+    mr_ghost.m_instance.emplace<FragmentInstance>(frag_instance);
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+
+  SECTION(
+      "check_if_instance_is_connection_ready returns false if socket is within "
+      "proximity but outside of connection threshold") {
+    FragmentInstance frag_instance{0, parts::FragmentRectangleWithOneSocket};
+    frag_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold +
+               1.0f); // within proximity but outside of connection threshold
+    mr_ghost.m_instance.emplace<FragmentInstance>(frag_instance);
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE_FALSE(result);
+  }
+  SECTION("check_if_instance_is_connection_ready returns part id if socket is "
+          "within "
+          "connection threshold for FragmentInstance") {
+    FragmentInstance frag_instance{10, parts::FragmentRectangleWithOneSocket};
+    frag_instance.SetSocketConnectionDistance(
+        0,
+        k_connection_distance_threshold - 1.0f); // within connection threshold
+    mr_ghost.m_instance.emplace<FragmentInstance>(frag_instance);
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE(result);
+    REQUIRE(result.value() == 0); // socket id is 0
+  }
+
+  SECTION("check_if_instance_is_connection_ready returns part id if socket is "
+          "within "
+          "connection threshold for JointInstance") {
+    JointInstance joint_instance{20, parts::JointSquareWithThreeSockets};
+    joint_instance.SetSocketConnectionDistance(
+        2,
+        k_connection_distance_threshold - 1.0f); // within connection threshold
+    mr_ghost.m_instance.emplace<JointInstance>(joint_instance);
+    auto result = check_if_instance_is_connection_ready(mr_ghost);
+    REQUIRE(result);
+    REQUIRE(result.value() == 2); // socket id is 0
+  }
+}
 TEST_CASE("action::ghost::ProcessSubscriber tests ") {
 
   // Arrange

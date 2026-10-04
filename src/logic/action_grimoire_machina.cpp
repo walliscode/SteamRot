@@ -10,10 +10,15 @@
 #include "action_grimoire_machina.h"
 #include "EventPayload.h"
 #include "EventType.h"
+#include "FragmentInstance.h"
+#include "GrimoireMachina.h"
+#include "JointInstance.h"
 #include "MachinaFormScaffold.h"
 #include "action_ghost.h"
 #include "descriptors_runner.h"
 #include "machina_form_scaffolds/machina_form_scaffold_library.h"
+#include "overload.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -25,15 +30,15 @@ void initialise_active_machina_form_scaffold(
   // clear the active form if it exists
   if (grimoire_machina.m_scaffold_form)
     grimoire_machina.m_scaffold_form.reset();
+
   // add a new MachinaForm to the active form
   grimoire_machina.m_scaffold_form = std::make_unique<MachinaFormScaffold>();
 }
 
 /////////////////////////////////////////////////
 void clear_active_machina_form_scaffold(GrimoireMachina &grimoire_machina) {
-  // clear the active form if it exists
-  if (grimoire_machina.m_scaffold_form)
-    grimoire_machina.m_scaffold_form = nullptr;
+
+  grimoire_machina.m_scaffold_form = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -119,10 +124,8 @@ void process_logic_events(Subscriber &subscriber,
   }
 }
 /////////////////////////////////////////////////
-void place_first_piece(GrimoireMachina &grimoire_machina,
-                       const MrGhost &mr_ghost) {
+void place_first_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost) {
   // if no active scaffold, return
-  MachinaFormScaffold *scaffold = grimoire_machina.m_scaffold_form.get();
   if (!scaffold)
     return;
 
@@ -130,84 +133,95 @@ void place_first_piece(GrimoireMachina &grimoire_machina,
   if (!scaffold->parts.empty())
     return;
 
-  // deal with FragmentInstance selection
-  if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
-    const FragmentInstance &ghost_fi =
-        std::get<FragmentInstance>(mr_ghost.m_instance);
+  // we create a static variable for the position of the first piece. This
+  // ostensibly the middle of the CraftingScene
+  static const sf::Vector2f first_piece_position{0.0f, 0.0f};
 
-    // create a new FragmentInstance from the ghost selection, assign it the
-    // next available stable ID, and add it to the scaffold's PartGraph
-    FragmentInstance instance{scaffold->next_id++, ghost_fi.GetPart()};
-    scaffold->parts.emplace(instance.GetId(), std::move(instance));
+  // capture how to handle every variant of the MrGhost instance with std::visit
+  // and overload pattern
+  std::visit(
+      overload{[&](const FragmentInstance &instance) {
+                 // create a new FragmentInstance from the ghost
+                 // selection, assign it the next available stable ID,
+                 // and add it to the scaffold's PartGraph
+                 const uint32_t next_id = scaffold->next_id++;
+                 scaffold->parts.emplace(
+                     next_id, FragmentInstance{next_id, instance.GetPart()});
 
-    // deal with JointInstance selection
-  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
-    const JointInstance &ghost_ji =
-        std::get<JointInstance>(mr_ghost.m_instance);
+                 // pull out reference to make any further modifications easier
+                 FragmentInstance &new_fragment_instance =
+                     std::get<FragmentInstance>(scaffold->parts.at(next_id));
+                 // set position to first_piece_position
+                 new_fragment_instance.setPosition(first_piece_position);
+               },
+               [&](const JointInstance &instance) {
+                 // create a new JointInstance from the ghost selection, assign
+                 // it the next available stable ID, and add it to the
+                 // scaffold's PartGraph
+                 const uint32_t next_id = scaffold->next_id++;
+                 scaffold->parts.emplace(
+                     next_id, JointInstance{next_id, instance.GetPart()});
+                 // we need to make sure the new JointInstance has its sockets
+                 // positioned correctly
+                 JointInstance &new_joint_instance =
+                     std::get<JointInstance>(scaffold->parts.at(next_id));
+                 new_joint_instance.PositionSockets(
+                     JointSocketPositioningStrategy::MaximizeDistance);
 
-    // create a new JointInstance from the ghost selection, assign it the next
-    // available stable ID, and add it to the scaffold's PartGraph
-    JointInstance instance{scaffold->next_id++, ghost_ji.GetPart()};
-    scaffold->parts.emplace(instance.GetId(), std::move(instance));
-  }
+                 // set position to first_piece_position
+                 new_joint_instance.setPosition(first_piece_position);
+               },
+               [](const std::monostate &) {
+                 // std::monostate: nothing to update
+               }},
+      mr_ghost.m_instance);
 }
 
 /////////////////////////////////////////////////
-void place_next_piece(MachinaFormScaffold &scaffold, const MrGhost &mr_ghost) {
+void place_next_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost) {
 
-  if (scaffold.parts.empty())
+  // if no active scaffold, return
+  if (!scaffold)
     return;
 
-  auto ghost_socket_index = check_MrGhost_for_connection_readiness(mr_ghost);
-  if (!ghost_socket_index.has_value())
+  // this should not be handled with an empty scaffold
+  if (scaffold->parts.empty())
     return;
 
+  // The checks below for socket readiness grab the first available, this is
+  // probably a bit clunky and may cause problems in the future with multiple
+  // sockets being available, but for now it is a simple way to get the first
+  // available socket on both the ghost and the scaffold.
+  if (!ghost::check_if_instance_is_connection_ready(mr_ghost))
+    return;
+
+  // get first ready socket from the PartGraph
   auto partgraph_result =
-      check_PartGraph_for_connection_readiness(scaffold.parts);
+      check_part_graph_for_connection_readiness(scaffold->parts);
   if (!partgraph_result.has_value())
     return;
 
+  // pull out the part_id and socket_id from the result
   const uint32_t partgraph_part_id = partgraph_result.value().first;
   const uint32_t partgraph_socket_id = partgraph_result.value().second;
 
-  if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
-    const FragmentInstance &ghost_fi =
-        std::get<FragmentInstance>(mr_ghost.m_instance);
+  // capture dual variant interactions with std::visit and overload pattern
+  // steps:
+  // // create a new instance that is a copy of the ghost selection
+  // // assign it the next available stable ID
+  // // add it to the scaffold's PartGraph
+  // // create a connection between the new instance and the existing instance
+  // // align the new instance's socket with the existing instance's socket
+  std::visit(overload{[&](const FragmentInstance &ghost_instance,
+                          const JointInstance &part_instance) {},
+                      [&](const JointInstance &ghost_instance,
+                          const FragmentInstance &part_instance) {},
 
-    if (!std::holds_alternative<JointInstance>(
-            scaffold.parts.at(partgraph_part_id)))
-      return;
-
-    FragmentInstance instance{scaffold.next_id++, ghost_fi.GetPart()};
-    scaffold.parts.emplace(instance.GetId(), std::move(instance));
-
-    FragmentInstance &placed_fi =
-        std::get<FragmentInstance>(scaffold.parts.at(instance.GetId()));
-    JointInstance &existing_ji =
-        std::get<JointInstance>(scaffold.parts.at(partgraph_part_id));
-
-    auto conn_result = placed_fi.CreateConnectionWithOtherInstance(
-        ghost_socket_index.value(), existing_ji, partgraph_socket_id);
-
-  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
-    const JointInstance &ghost_ji =
-        std::get<JointInstance>(mr_ghost.m_instance);
-
-    if (!std::holds_alternative<FragmentInstance>(
-            scaffold.parts.at(partgraph_part_id)))
-      return;
-
-    JointInstance instance{scaffold.next_id++, ghost_ji.GetPart()};
-    scaffold.parts.emplace(instance.GetId(), std::move(instance));
-
-    JointInstance &placed_ji =
-        std::get<JointInstance>(scaffold.parts.at(instance.GetId()));
-    FragmentInstance &existing_fi =
-        std::get<FragmentInstance>(scaffold.parts.at(partgraph_part_id));
-
-    auto conn_result = placed_ji.CreateConnectionWithOtherInstance(
-        ghost_socket_index.value(), existing_fi, partgraph_socket_id);
-  }
+                      [](const auto &, const auto &) {
+                        // fall back case: if both are the same type, do nothing
+                        // (or other types in the variant)
+                      }},
+             mr_ghost.m_instance, scaffold->parts.at(partgraph_part_id));
 }
 
 /////////////////////////////////////////////////
@@ -219,11 +233,11 @@ void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
     return;
 
   if (scaffold->parts.empty()) {
-    place_first_piece(grimoire_machina, mr_ghost);
+    place_first_piece(scaffold, mr_ghost);
     return;
   }
 
-  place_next_piece(*scaffold, mr_ghost);
+  place_next_piece(scaffold, mr_ghost);
 
   // clear the ghost selection after placing it on the scaffold
   ghost::clear_ghost_selection(mr_ghost);
@@ -285,53 +299,45 @@ void process_subscribers(
 }
 
 /////////////////////////////////////////////////
-std::optional<uint32_t>
-check_MrGhost_for_connection_readiness(const MrGhost &mr_ghost) {
-
-  // if the ghost selection is empty, return nullopt
-  if (std::holds_alternative<std::monostate>(mr_ghost.m_instance)) {
-    return std::nullopt;
-
-  } else if (std::holds_alternative<FragmentInstance>(mr_ghost.m_instance)) {
-
-    FragmentInstance ghost_fi = std::get<FragmentInstance>(mr_ghost.m_instance);
-    return ghost_fi.CheckIfAnySocketIsAvailable();
-  } else if (std::holds_alternative<JointInstance>(mr_ghost.m_instance)) {
-
-    JointInstance ghost_ji = std::get<JointInstance>(mr_ghost.m_instance);
-    return ghost_ji.CheckIfAnySocketIsAvailable();
-  }
-  return std::nullopt;
-}
-
-/////////////////////////////////////////////////
 std::optional<std::pair<uint32_t, uint32_t>>
-check_PartGraph_for_connection_readiness(const PartGraph &part_graph) {
+check_part_graph_for_connection_readiness(const PartGraph &part_graph) {
 
-  // return false if empty
-  if (part_graph.empty())
-    return std::nullopt;
+  // cyycle through the PartGraph and check each PartInstance for a ready socket
+  for (const auto &[part_id, part_instance] : part_graph) {
+    std::cout << "Checking part instance " << part_id
+              << " for connection readiness." << std::endl;
+    auto result = std::visit(
+        overload{
+            [&](const FragmentInstance &fragment_instance)
+                -> std::optional<std::pair<uint32_t, uint32_t>> {
+              if (auto check_result =
+                      fragment_instance
+                          .CheckIfAnySocketIsWithinConnectionDistance();
+                  check_result.has_value()) {
+                return std::make_optional(
+                    std::make_pair(part_id, check_result.value()));
+              }
+              return std::nullopt;
+            },
+            [&](const JointInstance &joint_instance)
+                -> std::optional<std::pair<uint32_t, uint32_t>> {
+              if (auto check_result =
+                      joint_instance
+                          .CheckIfAnySocketIsWithinConnectionDistance();
+                  check_result.has_value()) {
+                return std::make_optional(
+                    std::make_pair(part_id, check_result.value()));
+              }
+              return std::nullopt;
+            },
+        },
+        part_instance);
 
-  // cycle through all parts in the PartGraph and check their sockets
-  for (const auto &[id, part] : part_graph) {
-
-    // deal with FragmentInstance
-    if (std::holds_alternative<FragmentInstance>(part)) {
-
-      const FragmentInstance &fi = std::get<FragmentInstance>(part);
-      auto readiness_result = fi.CheckIfAnySocketIsAvailable();
-      if (readiness_result.has_value())
-        return std::make_pair(id, readiness_result.value());
-    }
-
-    else if (std::holds_alternative<JointInstance>(part)) {
-      const JointInstance &ji = std::get<JointInstance>(part);
-
-      auto readiness_result = ji.CheckIfAnySocketIsAvailable();
-      if (readiness_result.has_value())
-        return std::make_pair(id, readiness_result.value());
+    if (result.has_value()) {
+      return result;
     }
   }
+
   return std::nullopt;
 }
 

@@ -142,6 +142,37 @@ TEST_CASE("FragmentInstance::GetNumberOfConnectedSockets tests",
   }
 }
 
+TEST_CASE("FragmentInstance::SetSocketConnectionDistance tests",
+          "[FragmentInstance]") {
+
+  // Arrange
+  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
+
+  // PreAssert
+
+  SECTION("Returns false when socket does not exist") {
+    bool result = fragment_instance.SetSocketConnectionDistance(999, 5.f);
+    REQUIRE(result == false);
+  }
+
+  SECTION("Returns true when socket exists and sets distance") {
+    if (fragment_instance.GetSocketCount() == 0) {
+      SUCCEED("No sockets defined by fixture; existence case not applicable.");
+      return;
+    }
+
+    bool result = fragment_instance.SetSocketConnectionDistance(0, 10.f);
+    REQUIRE(result == true);
+
+    const auto *socket = fragment_instance.TryGetSocket(0);
+    if (socket) {
+      REQUIRE(socket->GetDistanceToNearestSocket() == 10.f);
+    } else {
+      FAIL("Socket 0 should exist but was not found.");
+    }
+  }
+}
+
 TEST_CASE("FragmentInstance::GetSocketLocalPosition tests",
           "[FragmentInstance]") {
   FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
@@ -383,6 +414,29 @@ TEST_CASE("FragmentInstance::CheckIfAnySocketIsAvailable tests",
     REQUIRE(result.has_value());
 
     REQUIRE_FALSE(fragment_instance.CheckIfAnySocketIsAvailable().has_value());
+  }
+}
+
+TEST_CASE("FragmentInstance::CheckIfSocketIsWithinConnectionDistance tests",
+          "[FragmentInstance]") {
+  // Arrange
+  FragmentInstance fragment_instance(1, parts::FragmentRectangleWithOneSocket);
+
+  SECTION("False when socket does not exist") {
+    REQUIRE_FALSE(fragment_instance.CheckIfSocketIsWithinConnectionDistance(
+        999)); // non-existent socket
+  }
+
+  SECTION("False when socket exists and not within connection distance") {
+    fragment_instance.SetSocketConnectionDistance(0, 100.f); // set distance
+    REQUIRE_FALSE(fragment_instance.CheckIfSocketIsWithinConnectionDistance(0));
+  }
+
+  SECTION("True when socket exists and within connection distance") {
+    fragment_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold); // set distance
+
+    REQUIRE(fragment_instance.CheckIfSocketIsWithinConnectionDistance(0));
   }
 }
 
