@@ -64,6 +64,16 @@ std::vector<std::string> get_all_joint_names(GrimoireMachina &grimoire_machina);
 void toggle_socket_visibility(MachinaFormScaffold &scaffold);
 
 /////////////////////////////////////////////////
+/// @brief Get the next stable ID for a new piece to be added to the
+/// MachinaFormScaffold. This should be unique
+///
+/// @param scaffold MachinaFormScaffold to get the next stable ID from.
+/// @return A copy of the next stable ID to be used for a new piece in the
+/// scaffold.
+/////////////////////////////////////////////////
+uint32_t generate_stable_id(MachinaFormScaffold &scaffold);
+
+/////////////////////////////////////////////////
 /// @brief Place the currently selected ghost item as the very first piece on
 /// the active scaffold.
 ///
@@ -76,6 +86,17 @@ void toggle_socket_visibility(MachinaFormScaffold &scaffold);
 /// @param mr_ghost         Current ghost state providing the selection tag.
 /////////////////////////////////////////////////
 void place_first_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost);
+
+/////////////////////////////////////////////////
+/// @brief Checks whether any of the sockets on the active MachinaFormScaffold
+/// are ready to be connected to. Returns the part ID and socket index of the
+/// first ready socket, or std::nullopt if no sockets are ready.
+///
+///
+/// @param part_graph PartGraph to check
+/////////////////////////////////////////////////
+std::optional<std::pair<uint32_t, uint32_t>>
+check_part_graph_for_connection_readiness(const PartGraph &part_graph);
 
 /////////////////////////////////////////////////
 /// @brief Place the current ghost item onto the scaffold as the next piece,
@@ -161,16 +182,5 @@ void process_user_input_events(Subscriber &subscriber,
 void process_subscribers(
     const std::vector<std::shared_ptr<Subscriber>> &subscribers,
     const SceneContext &scene_context, GrimoireMachina &grimoire_machina);
-
-/////////////////////////////////////////////////
-/// @brief Checks whether any of the sockets on the active MachinaFormScaffold
-/// are ready to be connected to. Returns the part ID and socket index of the
-/// first ready socket, or std::nullopt if no sockets are ready.
-///
-///
-/// @param part_graph PartGraph to check
-/////////////////////////////////////////////////
-std::optional<std::pair<uint32_t, uint32_t>>
-check_part_graph_for_connection_readiness(const PartGraph &part_graph);
 
 } // namespace steamrot::logic::action::grimoire_machina

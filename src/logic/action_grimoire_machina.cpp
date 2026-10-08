@@ -46,6 +46,12 @@ void toggle_socket_visibility(MachinaFormScaffold &scaffold) {
 
   scaffold.are_sockets_visible = !scaffold.are_sockets_visible;
 }
+
+/////////////////////////////////////////////////
+uint32_t generate_stable_id(MachinaFormScaffold &scaffold) {
+
+  return ++scaffold.next_id;
+}
 /////////////////////////////////////////////////
 std::vector<std::string>
 get_all_fragment_names(GrimoireMachina &grimoire_machina) {
@@ -133,7 +139,7 @@ void place_first_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost) {
   if (!scaffold->parts.empty())
     return;
 
-  // we create a static variable for the position of the first piece. This
+  // we create a static variable for the position of the first piece. This is
   // ostensibly the middle of the CraftingScene
   static const sf::Vector2f first_piece_position{0.0f, 0.0f};
 
@@ -188,12 +194,14 @@ void place_next_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost) {
   if (scaffold->parts.empty())
     return;
 
-  // The checks below for socket readiness grab the first available, this is
-  // probably a bit clunky and may cause problems in the future with multiple
-  // sockets being available, but for now it is a simple way to get the first
-  // available socket on both the ghost and the scaffold.
-  if (!ghost::check_if_instance_is_connection_ready(mr_ghost))
+  auto ghost_instnace_result =
+      ghost::check_if_instance_is_connection_ready(mr_ghost);
+  // return early if the ghost instance is not ready to connect
+  if (!ghost_instnace_result.has_value())
     return;
+
+  // pull out socket_id from the result
+  const uint32_t ghost_socket_id = ghost_instnace_result.value();
 
   // get first ready socket from the PartGraph
   auto partgraph_result =
@@ -212,16 +220,72 @@ void place_next_piece(MachinaFormScaffold *scaffold, const MrGhost &mr_ghost) {
   // // add it to the scaffold's PartGraph
   // // create a connection between the new instance and the existing instance
   // // align the new instance's socket with the existing instance's socket
-  std::visit(overload{[&](const FragmentInstance &ghost_instance,
-                          const JointInstance &part_instance) {},
-                      [&](const JointInstance &ghost_instance,
-                          const FragmentInstance &part_instance) {},
+  std::visit(
+      overload{[&](const FragmentInstance &ghost_instance,
+                   JointInstance &part_instance) {
+                 // create a new FragmentInstance from the ghost
+                 // selection, assign it
+                 const FragmentInstance new_fragment_instance{
+                     generate_stable_id(*scaffold), ghost_instance.GetPart()};
+                 scaffold->parts.emplace(new_fragment_instance.GetId(),
+                                         new_fragment_instance);
+                 // pull out FragmentInstance reference to make any further
+                 // modifications easier
+                 FragmentInstance &new_fragment_instance_ref =
+                     std::get<FragmentInstance>(
+                         scaffold->parts.at(new_fragment_instance.GetId()));
 
-                      [](const auto &, const auto &) {
-                        // fall back case: if both are the same type, do nothing
-                        // (or other types in the variant)
-                      }},
-             mr_ghost.m_instance, scaffold->parts.at(partgraph_part_id));
+                 // create a connection between the new FragmentInstance and the
+                 // existing JointInstance
+                 auto connection_result =
+                     part_instance.CreateConnectionWithOtherInstance(
+                         partgraph_socket_id, new_fragment_instance_ref,
+                         ghost_socket_id);
+                 // [TODO:] use the return value properly to check for errors
+                 // and handle them. This may require a proper overhaul
+
+                 // algin the new FragmentInstance's socket with the existing
+                 // JointInstance's socket
+                 auto align_result =
+                     new_fragment_instance_ref.AlignOntoOtherPartInstance(
+                         ghost_socket_id, part_instance, partgraph_socket_id);
+               },
+               [&](const JointInstance &ghost_instance,
+                   FragmentInstance &part_instance) {
+                 const JointInstance new_joint_instance{
+                     generate_stable_id(*scaffold), ghost_instance.GetPart()};
+                 scaffold->parts.emplace(new_joint_instance.GetId(),
+                                         new_joint_instance);
+                 // pull out JointInstance reference to make any further
+                 // modifications easier
+                 JointInstance &new_joint_instance_ref =
+                     std::get<JointInstance>(
+                         scaffold->parts.at(new_joint_instance.GetId()));
+                 // position the new JointInstance's sockets
+                 new_joint_instance_ref.PositionSockets(
+                     JointSocketPositioningStrategy::MaximizeDistance);
+
+                 // create a connection between the new JointInstance and the
+                 // existing FragmentInstance
+                 auto connection_result =
+                     part_instance.CreateConnectionWithOtherInstance(
+                         partgraph_socket_id, new_joint_instance_ref,
+                         ghost_socket_id);
+                 // [TODO:] use the return value properly to check for errors
+                 // and handle and handle them. This may require a proper
+                 // overhaul
+                 // align the new JointInstance's socket with the existing
+                 // FragmentInstance's socket
+                 auto align_result =
+                     new_joint_instance_ref.AlignOntoOtherPartInstance(
+                         ghost_socket_id, part_instance, partgraph_socket_id);
+               },
+
+               [](const auto &, const auto &) {
+                 // fall back case: if both are the same type, do nothing
+                 // (or other types in the variant)
+               }},
+      mr_ghost.m_instance, scaffold->parts.at(partgraph_part_id));
 }
 
 /////////////////////////////////////////////////
@@ -240,7 +304,7 @@ void place_ghost_on_scaffold(GrimoireMachina &grimoire_machina,
   place_next_piece(scaffold, mr_ghost);
 
   // clear the ghost selection after placing it on the scaffold
-  ghost::clear_ghost_selection(mr_ghost);
+  // ghost::clear_ghost_selection(mr_ghost);
 }
 
 /////////////////////////////////////////////////
@@ -268,6 +332,7 @@ void process_user_input_events(Subscriber &subscriber,
     // if mouse is hovering over UI, do not place piece on scaffold
     if (scene_context.scene_state.is_mouse_over_ui_layer)
       break;
+
     place_ghost_on_scaffold(grimoire_machina, scene_context.mr_ghost);
     break;
 
@@ -304,8 +369,6 @@ check_part_graph_for_connection_readiness(const PartGraph &part_graph) {
 
   // cyycle through the PartGraph and check each PartInstance for a ready socket
   for (const auto &[part_id, part_instance] : part_graph) {
-    std::cout << "Checking part instance " << part_id
-              << " for connection readiness." << std::endl;
     auto result = std::visit(
         overload{
             [&](const FragmentInstance &fragment_instance)

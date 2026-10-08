@@ -14,7 +14,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <algorithm>
 #include <cstdint>
-#include <iostream>
 #include <optional>
 
 namespace steamrot {
@@ -134,8 +133,6 @@ public:
   bool IsWithinConnectionDistance() const {
     if (!m_distance_to_nearest_socket.has_value())
       return false;
-    std::cout << "Distance to nearest socket: "
-              << m_distance_to_nearest_socket.value() << std::endl;
 
     return m_distance_to_nearest_socket.value() <=
            k_connection_distance_threshold;

@@ -19,7 +19,6 @@
 #include <cstdint>
 #include <expected>
 #include <format>
-#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -289,10 +288,11 @@ public:
   }
 
   /////////////////////////////////////////////////
-  /// @brief
+  /// @brief Attempt to check if a specific socket is within connection
+  /// distance.
   ///
-  /// @param socket_id [TODO:parameter]
-  /// @return [TODO:return]
+  /// @param socket_id Socket identifier to check.
+  /// @return True if the socket exists and is within connection distance; false
   /////////////////////////////////////////////////
   bool CheckIfSocketIsWithinConnectionDistance(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
@@ -309,11 +309,7 @@ public:
   /////////////////////////////////////////////////
   std::optional<uint32_t> CheckIfAnySocketIsWithinConnectionDistance() const {
     for (const auto &[socket_id, socket] : sockets) {
-      std::cout << "Checking socket " << socket_id
-                << " for connection distance." << std::endl;
       if (socket.IsWithinConnectionDistance()) {
-        std::cout << "Socket " << socket_id << " is within connection distance."
-                  << std::endl;
         return socket_id;
       }
     }

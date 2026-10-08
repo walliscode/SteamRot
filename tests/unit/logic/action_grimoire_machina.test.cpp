@@ -15,11 +15,13 @@
 #include "SocketState.h"
 #include "Subscriber.h"
 #include "TestFixture.h"
+#include "Vector2fEqualsMatcher.h"
 #include "fragment_library.h"
 #include "joint_library.h"
 #include <SFML/System/Vector2.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
+#include <optional>
 
 namespace steamrot::tests {
 
@@ -70,6 +72,20 @@ TEST_CASE("clear_active_machina_form_scaffold tests",
     clear_active_machina_form_scaffold(grimoire_machina);
     REQUIRE(grimoire_machina.m_scaffold_form == nullptr);
   }
+}
+
+TEST_CASE("generate_stable_id tests", "[unit][actions][grimoire_machina]") {
+  MachinaFormScaffold scaffold;
+
+  REQUIRE(scaffold.next_id == 0u);
+
+  const uint32_t generated_id = generate_stable_id(scaffold);
+  REQUIRE(generated_id == 1u);
+  REQUIRE(scaffold.next_id == 1u);
+
+  const uint32_t second_generated_id = generate_stable_id(scaffold);
+  REQUIRE(second_generated_id == 2u);
+  REQUIRE(scaffold.next_id == 2u);
 }
 
 TEST_CASE("get_all_fragment_names tests", "[unit][actions][grimoire_machina]") {
@@ -229,7 +245,7 @@ TEST_CASE("place_first_piece tests",
   }
 }
 
-TEST_CASE("check__part_graph_for_connection_readiness tests",
+TEST_CASE("check_part_graph_for_connection_readiness tests",
           "[unit][actions][grimoire_machina]"
           "[check_part_graph_for_connection_readiness]") {
 
@@ -373,6 +389,174 @@ TEST_CASE("place_next_piece tests",
     place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
     // Assert
     REQUIRE(grimoire_machina.m_scaffold_form->parts.empty());
+  }
+
+  SECTION("place_next_piece does nothing when ghost selection is monostate and "
+          "scaffold has a FragmentInstance") {
+    // Arrange
+    mr_ghost.m_instance = std::monostate{};
+    grimoire_machina.m_scaffold_form->parts.emplace(
+        0, FragmentInstance{0, grimoire_machina.m_all_fragments["frag"]});
+    FragmentInstance &frag_instance = std::get<FragmentInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(0));
+    frag_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    // Act
+    place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
+    // Assert
+    REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  }
+
+  SECTION("place_next_piece does nothing when ghost selection is a "
+          "FragmentInstance and scaffold has a FragmentInstance") {
+    // Arrange
+    mr_ghost.m_instance.emplace<FragmentInstance>(
+        0, grimoire_machina.m_all_fragments["frag"]);
+    FragmentInstance &ghost_instance =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
+    ghost_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    grimoire_machina.m_scaffold_form->parts.emplace(
+        0, FragmentInstance{0, grimoire_machina.m_all_fragments["frag"]});
+    FragmentInstance &scaffold_instance = std::get<FragmentInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(0));
+    ghost_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+
+    // Act
+    place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
+
+    // Assert
+    REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  }
+
+  SECTION("place_next_piece does nothing when ghost selection is a "
+          "JointInstance and scaffold has a JointInstance") {
+    // Arrange
+    grimoire_machina.m_all_joints["joint"] = Joint{};
+    mr_ghost.m_instance.emplace<JointInstance>(
+        0, grimoire_machina.m_all_joints["joint"]);
+    JointInstance &ghost_instance =
+        std::get<JointInstance>(mr_ghost.m_instance);
+    ghost_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    grimoire_machina.m_scaffold_form->parts.emplace(
+        0, JointInstance{0, grimoire_machina.m_all_joints["joint"]});
+    JointInstance &scaffold_instance =
+        std::get<JointInstance>(grimoire_machina.m_scaffold_form->parts.at(0));
+    scaffold_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    // Act
+    place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
+    // Assert
+    REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 1);
+  }
+
+  SECTION("place_next_piece adds a FragmentInstance to the scaffold when ghost "
+          "selection is a FragmentInstance and "
+          "scaffold has a JointInstance") {
+    // Arrange
+    mr_ghost.m_instance.emplace<FragmentInstance>(
+        0, parts::FragmentRectangleWithOneSocket);
+    FragmentInstance &ghost_instance =
+        std::get<FragmentInstance>(mr_ghost.m_instance);
+    ghost_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+
+    grimoire_machina.m_scaffold_form->parts.emplace(
+        0, JointInstance{0, parts::JointSquareWithOneSocket});
+    JointInstance &scaffold_instance =
+        std::get<JointInstance>(grimoire_machina.m_scaffold_form->parts.at(0));
+    scaffold_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    // Act
+    place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
+    // Assert
+    // PartGraph should now have two parts: the original JointInstance and the
+    // newly placed FragmentInstance.
+    REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 2);
+    // The second part should be a FragmentInstance with the next stable ID.
+    REQUIRE(std::holds_alternative<FragmentInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(1)));
+    FragmentInstance &placed_instance = std::get<FragmentInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(1));
+    REQUIRE(placed_instance.GetId() == 1u);
+
+    // we check to see if the two parts are connected to each other via their
+    // sockets
+    const std::optional<PartToPartConnection> connection_check =
+        scaffold_instance.CheckForFirstConnectionWithOtherInstance(
+            placed_instance);
+    REQUIRE(connection_check.has_value());
+    REQUIRE(connection_check->this_id == scaffold_instance.GetId());
+    REQUIRE(connection_check->this_socket_id == 0u);
+    REQUIRE(connection_check->other_id == placed_instance.GetId());
+    REQUIRE(connection_check->other_socket_id == 0u);
+
+    // now we want to align the two parts so that the sockets occupy the same
+    // position in world space and lines up along its alignment vector
+    REQUIRE_THAT(placed_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(scaffold_instance.GetSocketWorldPosition(0)));
+    const auto placed_socket_alignment_result =
+        placed_instance.GetSocketWorldAlignmentVector(0);
+    REQUIRE(placed_socket_alignment_result.has_value());
+    const auto scaffold_socket_alignment_result =
+        scaffold_instance.GetSocketWorldAlignmentVector(0);
+    REQUIRE(scaffold_socket_alignment_result.has_value());
+    REQUIRE_THAT(placed_socket_alignment_result.value(),
+                 EqualsVector2f(scaffold_socket_alignment_result.value()));
+  }
+
+  SECTION("place_next_piece adds a JointInstance to the scaffold when ghost "
+          "selection is a JointInstance and "
+          "scaffold has a FragmentInstance") {
+    // Arrange
+
+    mr_ghost.m_instance.emplace<JointInstance>(0,
+                                               parts::JointSquareWithOneSocket);
+    JointInstance &ghost_instance =
+        std::get<JointInstance>(mr_ghost.m_instance);
+    ghost_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    grimoire_machina.m_scaffold_form->parts.emplace(
+        0, FragmentInstance{0, parts::FragmentRectangleWithOneSocket});
+    FragmentInstance &scaffold_instance = std::get<FragmentInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(0));
+    scaffold_instance.SetSocketConnectionDistance(
+        0, k_connection_distance_threshold - 1.f);
+    // Act
+    place_next_piece(grimoire_machina.m_scaffold_form.get(), mr_ghost);
+    // Assert
+    // PartGraph should now have two parts: the original FragmentInstance and
+    // the newly placed JointInstance.
+    REQUIRE(grimoire_machina.m_scaffold_form->parts.size() == 2);
+    // The second part should be a JointInstance with the next stable ID.
+    REQUIRE(std::holds_alternative<JointInstance>(
+        grimoire_machina.m_scaffold_form->parts.at(1)));
+    JointInstance &placed_instance =
+        std::get<JointInstance>(grimoire_machina.m_scaffold_form->parts.at(1));
+    REQUIRE(placed_instance.GetId() == 1u);
+
+    const std::optional<PartToPartConnection> connection_check =
+        scaffold_instance.CheckForFirstConnectionWithOtherInstance(
+            placed_instance);
+    REQUIRE(connection_check.has_value());
+    REQUIRE(connection_check->this_id == scaffold_instance.GetId());
+    REQUIRE(connection_check->this_socket_id == 0u);
+    REQUIRE(connection_check->other_id == placed_instance.GetId());
+    REQUIRE(connection_check->other_socket_id == 0u);
+    // now we want to align the two parts so that the sockets occupy the same
+    // position in world space and lines up along its alignment vector
+    REQUIRE_THAT(placed_instance.GetSocketWorldPosition(0),
+                 EqualsVector2f(scaffold_instance.GetSocketWorldPosition(0)));
+    const auto placed_socket_alignment_result =
+        placed_instance.GetSocketWorldAlignmentVector(0);
+    REQUIRE(placed_socket_alignment_result.has_value());
+    const auto scaffold_socket_alignment_result =
+        scaffold_instance.GetSocketWorldAlignmentVector(0);
+    REQUIRE(scaffold_socket_alignment_result.has_value());
+    REQUIRE_THAT(placed_socket_alignment_result.value(),
+                 EqualsVector2f(scaffold_socket_alignment_result.value()));
   }
 }
 
