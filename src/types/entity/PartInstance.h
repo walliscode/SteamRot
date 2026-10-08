@@ -167,6 +167,22 @@ public:
   }
 
   /////////////////////////////////////////////////
+  /// @brief A helper for setting the distance to nearest socket for a given
+  /// socket id. This is really just for testing purposes, not sure whether to
+  /// keep it or not, but it does make life easier
+  ///
+  /// @param socket_id SocketId for which to set the distance to nearest socket
+  /// @param distance distance to change to
+  /////////////////////////////////////////////////
+  bool SetSocketConnectionDistance(uint32_t socket_id, float distance) {
+    SocketType *socket = TryGetSocketMutable(socket_id);
+    if (socket) {
+      socket->SetDistanceToNearestSocket(distance);
+      return true;
+    }
+    return false;
+  }
+  /////////////////////////////////////////////////
   /// @brief Return the local position of a socket by its id, or (0, 0) if the
   /// socket does not exist.
   ///
@@ -197,6 +213,13 @@ public:
     return getTransform().transformPoint(socket->GetLocalPosition());
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Returns the local alignment vector of a socket
+  ///
+  /// @param socket_id uint32_t Socket identifier by which to search
+  /// @return The local alignment vector of the socket, or (0, 0) if the socket
+  /// does not exist.
+  /////////////////////////////////////////////////
   const sf::Vector2f GetSocketLocalAlignmentVector(uint32_t socket_id) const {
     const SocketType *socket = TryGetSocket(socket_id);
     if (!socket) {
@@ -264,6 +287,34 @@ public:
     return std::nullopt;
   }
 
+  /////////////////////////////////////////////////
+  /// @brief Attempt to check if a specific socket is within connection
+  /// distance.
+  ///
+  /// @param socket_id Socket identifier to check.
+  /// @return True if the socket exists and is within connection distance; false
+  /////////////////////////////////////////////////
+  bool CheckIfSocketIsWithinConnectionDistance(uint32_t socket_id) const {
+    const SocketType *socket = TryGetSocket(socket_id);
+    if (!socket) {
+      return false;
+    }
+    return socket->IsWithinConnectionDistance();
+  }
+
+  /////////////////////////////////////////////////
+  /// @brief [TODO:description]
+  ///
+  /// @return [TODO:return]
+  /////////////////////////////////////////////////
+  std::optional<uint32_t> CheckIfAnySocketIsWithinConnectionDistance() const {
+    for (const auto &[socket_id, socket] : sockets) {
+      if (socket.IsWithinConnectionDistance()) {
+        return socket_id;
+      }
+    }
+    return std::nullopt;
+  }
   /////////////////////////////////////////////////
   /// @brief resets all interaction state for all sockets
   /////////////////////////////////////////////////

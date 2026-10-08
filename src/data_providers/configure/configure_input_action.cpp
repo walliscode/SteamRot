@@ -26,6 +26,9 @@ ConfigureInputAction(InputPayload::InputAction &action,
   case InputActionFbs_ROTATE_GHOST:
     action = InputPayload::InputAction::ROTATE_GHOST;
     break;
+  default:
+    return std::unexpected(FailInfo{FailMode::NonExistentEnumValue,
+                                    "InputActionFbs value does not exist"});
   }
 
   return std::monostate{};

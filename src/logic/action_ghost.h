@@ -15,6 +15,8 @@
 #include "AssetManager.h"
 #include "MrGhost.h"
 #include "Subscriber.h"
+#include <optional>
+#include <sys/types.h>
 
 namespace steamrot::logic::action::ghost {
 
@@ -46,6 +48,15 @@ void select_ghost_item(MrGhost &mr_ghost, const GhostSelection &selection,
 /// @param mr_ghost MrGhost instance whose selection will be cleared.
 /////////////////////////////////////////////////
 void clear_ghost_selection(MrGhost &mr_ghost);
+
+/////////////////////////////////////////////////
+/// @brief Checks whether any of the selections on MrGhost are ready to be
+/// connected to, and returns the ID of the first available part.
+///
+/// @param mr_ghost MrGhost instance
+/////////////////////////////////////////////////
+std::optional<uint32_t>
+check_if_instance_is_connection_ready(const MrGhost &mr_ghost);
 
 /////////////////////////////////////////////////
 /// @brief Dispatch a single active GHOST subscriber to the correct action

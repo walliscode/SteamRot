@@ -24,9 +24,15 @@
 
 namespace steamrot {
 
-/// using helpers ///
+/////////////////////////////////////////////////
+/// @brief A variant type that can hold any kind of PartInstance (which is
+/// currently limited to JointInstance and FragmentInstance).
+/////////////////////////////////////////////////
 using PartInstanceVariant = std::variant<JointInstance, FragmentInstance>;
 
+/////////////////////////////////////////////////
+/// @brief A map of part instances keyed by their stable IDs.
+/////////////////////////////////////////////////
 using PartGraph = std::map<uint32_t, PartInstanceVariant>;
 
 /////////////////////////////////////////////////

@@ -18,6 +18,13 @@
 namespace steamrot::parts {
 
 /////////////////////////////////////////////////
+inline const Fragment FragmentRectangleWithNoSockets = [] {
+  return FragmentBuilder()
+      .AddViews(PremadeViews::WhiteOblong)
+      .Build("FragmentRectangleNoSockets");
+}();
+
+/////////////////////////////////////////////////
 inline const Fragment FragmentRectangleWithOneSocket = [] {
   return FragmentBuilder()
       .AddViews(PremadeViews::WhiteOblong)
